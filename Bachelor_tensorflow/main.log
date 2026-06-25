@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.3)  24 JUN 2026 18:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.3)  25 JUN 2026 18:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -32,7 +32,214 @@ Package: inputenc 2021/02/14 v1.3d Input encoding file
 )
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
 Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
-)
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/cyrillic\t2aenc.
+def
+File: t2aenc.def 2023/11/07 v1.0k Cyrillic encoding definition file
+Now handling font encoding T2A ...
+... processing UTF-8 mapping file for font encoding T2A
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/base\t2aenc.dfu
+File: t2aenc.dfu 2022/06/07 v1.3c UTF-8 support
+   defining Unicode char U+00A4 (decimal 164)
+   defining Unicode char U+00A7 (decimal 167)
+   defining Unicode char U+00AB (decimal 171)
+   defining Unicode char U+00BB (decimal 187)
+   defining Unicode char U+0131 (decimal 305)
+   defining Unicode char U+0237 (decimal 567)
+   defining Unicode char U+0400 (decimal 1024)
+   defining Unicode char U+0401 (decimal 1025)
+   defining Unicode char U+0402 (decimal 1026)
+   defining Unicode char U+0403 (decimal 1027)
+   defining Unicode char U+0404 (decimal 1028)
+   defining Unicode char U+0405 (decimal 1029)
+   defining Unicode char U+0406 (decimal 1030)
+   defining Unicode char U+0407 (decimal 1031)
+   defining Unicode char U+0408 (decimal 1032)
+   defining Unicode char U+0409 (decimal 1033)
+   defining Unicode char U+040A (decimal 1034)
+   defining Unicode char U+040B (decimal 1035)
+   defining Unicode char U+040C (decimal 1036)
+   defining Unicode char U+040D (decimal 1037)
+   defining Unicode char U+040E (decimal 1038)
+   defining Unicode char U+040F (decimal 1039)
+   defining Unicode char U+0410 (decimal 1040)
+   defining Unicode char U+0411 (decimal 1041)
+   defining Unicode char U+0412 (decimal 1042)
+   defining Unicode char U+0413 (decimal 1043)
+   defining Unicode char U+0414 (decimal 1044)
+   defining Unicode char U+0415 (decimal 1045)
+   defining Unicode char U+0416 (decimal 1046)
+   defining Unicode char U+0417 (decimal 1047)
+   defining Unicode char U+0418 (decimal 1048)
+   defining Unicode char U+0419 (decimal 1049)
+   defining Unicode char U+041A (decimal 1050)
+   defining Unicode char U+041B (decimal 1051)
+   defining Unicode char U+041C (decimal 1052)
+   defining Unicode char U+041D (decimal 1053)
+   defining Unicode char U+041E (decimal 1054)
+   defining Unicode char U+041F (decimal 1055)
+   defining Unicode char U+0420 (decimal 1056)
+   defining Unicode char U+0421 (decimal 1057)
+   defining Unicode char U+0422 (decimal 1058)
+   defining Unicode char U+0423 (decimal 1059)
+   defining Unicode char U+0424 (decimal 1060)
+   defining Unicode char U+0425 (decimal 1061)
+   defining Unicode char U+0426 (decimal 1062)
+   defining Unicode char U+0427 (decimal 1063)
+   defining Unicode char U+0428 (decimal 1064)
+   defining Unicode char U+0429 (decimal 1065)
+   defining Unicode char U+042A (decimal 1066)
+   defining Unicode char U+042B (decimal 1067)
+   defining Unicode char U+042C (decimal 1068)
+   defining Unicode char U+042D (decimal 1069)
+   defining Unicode char U+042E (decimal 1070)
+   defining Unicode char U+042F (decimal 1071)
+   defining Unicode char U+0430 (decimal 1072)
+   defining Unicode char U+0431 (decimal 1073)
+   defining Unicode char U+0432 (decimal 1074)
+   defining Unicode char U+0433 (decimal 1075)
+   defining Unicode char U+0434 (decimal 1076)
+   defining Unicode char U+0435 (decimal 1077)
+   defining Unicode char U+0436 (decimal 1078)
+   defining Unicode char U+0437 (decimal 1079)
+   defining Unicode char U+0438 (decimal 1080)
+   defining Unicode char U+0439 (decimal 1081)
+   defining Unicode char U+043A (decimal 1082)
+   defining Unicode char U+043B (decimal 1083)
+   defining Unicode char U+043C (decimal 1084)
+   defining Unicode char U+043D (decimal 1085)
+   defining Unicode char U+043E (decimal 1086)
+   defining Unicode char U+043F (decimal 1087)
+   defining Unicode char U+0440 (decimal 1088)
+   defining Unicode char U+0441 (decimal 1089)
+   defining Unicode char U+0442 (decimal 1090)
+   defining Unicode char U+0443 (decimal 1091)
+   defining Unicode char U+0444 (decimal 1092)
+   defining Unicode char U+0445 (decimal 1093)
+   defining Unicode char U+0446 (decimal 1094)
+   defining Unicode char U+0447 (decimal 1095)
+   defining Unicode char U+0448 (decimal 1096)
+   defining Unicode char U+0449 (decimal 1097)
+   defining Unicode char U+044A (decimal 1098)
+   defining Unicode char U+044B (decimal 1099)
+   defining Unicode char U+044C (decimal 1100)
+   defining Unicode char U+044D (decimal 1101)
+   defining Unicode char U+044E (decimal 1102)
+   defining Unicode char U+044F (decimal 1103)
+   defining Unicode char U+0450 (decimal 1104)
+   defining Unicode char U+0451 (decimal 1105)
+   defining Unicode char U+0452 (decimal 1106)
+   defining Unicode char U+0453 (decimal 1107)
+   defining Unicode char U+0454 (decimal 1108)
+   defining Unicode char U+0455 (decimal 1109)
+   defining Unicode char U+0456 (decimal 1110)
+   defining Unicode char U+0457 (decimal 1111)
+   defining Unicode char U+0458 (decimal 1112)
+   defining Unicode char U+0459 (decimal 1113)
+   defining Unicode char U+045A (decimal 1114)
+   defining Unicode char U+045B (decimal 1115)
+   defining Unicode char U+045C (decimal 1116)
+   defining Unicode char U+045D (decimal 1117)
+   defining Unicode char U+045E (decimal 1118)
+   defining Unicode char U+045F (decimal 1119)
+   defining Unicode char U+0490 (decimal 1168)
+   defining Unicode char U+0491 (decimal 1169)
+   defining Unicode char U+0492 (decimal 1170)
+   defining Unicode char U+0493 (decimal 1171)
+   defining Unicode char U+0496 (decimal 1174)
+   defining Unicode char U+0497 (decimal 1175)
+   defining Unicode char U+0498 (decimal 1176)
+   defining Unicode char U+0499 (decimal 1177)
+   defining Unicode char U+049A (decimal 1178)
+   defining Unicode char U+049B (decimal 1179)
+   defining Unicode char U+049C (decimal 1180)
+   defining Unicode char U+049D (decimal 1181)
+   defining Unicode char U+04A0 (decimal 1184)
+   defining Unicode char U+04A1 (decimal 1185)
+   defining Unicode char U+04A2 (decimal 1186)
+   defining Unicode char U+04A3 (decimal 1187)
+   defining Unicode char U+04A4 (decimal 1188)
+   defining Unicode char U+04A5 (decimal 1189)
+   defining Unicode char U+04AA (decimal 1194)
+   defining Unicode char U+04AB (decimal 1195)
+   defining Unicode char U+04AE (decimal 1198)
+   defining Unicode char U+04AF (decimal 1199)
+   defining Unicode char U+04B0 (decimal 1200)
+   defining Unicode char U+04B1 (decimal 1201)
+   defining Unicode char U+04B2 (decimal 1202)
+   defining Unicode char U+04B3 (decimal 1203)
+   defining Unicode char U+04B6 (decimal 1206)
+   defining Unicode char U+04B7 (decimal 1207)
+   defining Unicode char U+04B8 (decimal 1208)
+   defining Unicode char U+04B9 (decimal 1209)
+   defining Unicode char U+04BA (decimal 1210)
+   defining Unicode char U+04BB (decimal 1211)
+   defining Unicode char U+04C0 (decimal 1216)
+   defining Unicode char U+04C1 (decimal 1217)
+   defining Unicode char U+04C2 (decimal 1218)
+   defining Unicode char U+04D0 (decimal 1232)
+   defining Unicode char U+04D1 (decimal 1233)
+   defining Unicode char U+04D2 (decimal 1234)
+   defining Unicode char U+04D3 (decimal 1235)
+   defining Unicode char U+04D4 (decimal 1236)
+   defining Unicode char U+04D5 (decimal 1237)
+   defining Unicode char U+04D6 (decimal 1238)
+   defining Unicode char U+04D7 (decimal 1239)
+   defining Unicode char U+04D8 (decimal 1240)
+   defining Unicode char U+04D9 (decimal 1241)
+   defining Unicode char U+04DA (decimal 1242)
+   defining Unicode char U+04DB (decimal 1243)
+   defining Unicode char U+04DC (decimal 1244)
+   defining Unicode char U+04DD (decimal 1245)
+   defining Unicode char U+04DE (decimal 1246)
+   defining Unicode char U+04DF (decimal 1247)
+   defining Unicode char U+04E2 (decimal 1250)
+   defining Unicode char U+04E3 (decimal 1251)
+   defining Unicode char U+04E4 (decimal 1252)
+   defining Unicode char U+04E5 (decimal 1253)
+   defining Unicode char U+04E6 (decimal 1254)
+   defining Unicode char U+04E7 (decimal 1255)
+   defining Unicode char U+04E8 (decimal 1256)
+   defining Unicode char U+04E9 (decimal 1257)
+   defining Unicode char U+04EC (decimal 1260)
+   defining Unicode char U+04ED (decimal 1261)
+   defining Unicode char U+04EE (decimal 1262)
+   defining Unicode char U+04EF (decimal 1263)
+   defining Unicode char U+04F0 (decimal 1264)
+   defining Unicode char U+04F1 (decimal 1265)
+   defining Unicode char U+04F2 (decimal 1266)
+   defining Unicode char U+04F3 (decimal 1267)
+   defining Unicode char U+04F4 (decimal 1268)
+   defining Unicode char U+04F5 (decimal 1269)
+   defining Unicode char U+04F8 (decimal 1272)
+   defining Unicode char U+04F9 (decimal 1273)
+   defining Unicode char U+200C (decimal 8204)
+   defining Unicode char U+2013 (decimal 8211)
+   defining Unicode char U+2014 (decimal 8212)
+   defining Unicode char U+2018 (decimal 8216)
+   defining Unicode char U+2019 (decimal 8217)
+   defining Unicode char U+201C (decimal 8220)
+   defining Unicode char U+201D (decimal 8221)
+   defining Unicode char U+201E (decimal 8222)
+   defining Unicode char U+2030 (decimal 8240)
+   defining Unicode char U+2031 (decimal 8241)
+   defining Unicode char U+2116 (decimal 8470)
+   defining Unicode char U+2329 (decimal 9001)
+   defining Unicode char U+3008 (decimal 12296)
+   defining Unicode char U+232A (decimal 9002)
+   defining Unicode char U+3009 (decimal 12297)
+   defining Unicode char U+2423 (decimal 9251)
+   defining Unicode char U+27E8 (decimal 10216)
+   defining Unicode char U+27E9 (decimal 10217)
+   defining Unicode char U+FB00 (decimal 64256)
+   defining Unicode char U+FB01 (decimal 64257)
+   defining Unicode char U+FB02 (decimal 64258)
+   defining Unicode char U+FB03 (decimal 64259)
+   defining Unicode char U+FB04 (decimal 64260)
+   defining Unicode char U+FB05 (decimal 64261)
+   defining Unicode char U+FB06 (decimal 64262)
+)))
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.st
 y
 Package: babel 2024/01/07 v24.1 The Babel package
@@ -54,6 +261,13 @@ g
 File: bblopts.cfg 2005/09/08 v0.1 add Arabic and Farsi to "declared" options of
  babel
 )
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/babel-russian\ru
+ssianb.ldf
+File: russianb.ldf 2021/01/10 1.3m Russian support for the Babel system
+Language: russian 2020/09/09 1.3k Russian support for the Babel system
+Package babel Info: Making " an active character on input line 124.
+Package babel Info: Default for \cyrdash is provided on input line 163.
+)
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/babel-german\nge
 rman.ldf
 Language: ngerman 2024/12/10 v2.15 German support for babel (post-1996 orthogra
@@ -63,12 +277,16 @@ phy)
 rmanb.ldf
 Language: ngermanb 2024/12/10 v2.15 German support for babel (post-1996 orthogr
 aphy)
-Package babel Info: Making " an active character on input line 122.
 )))
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/babel/locale/d
 e\babel-ngerman.tex
 Package babel Info: Importing font and identification data for ngerman
 (babel)             from babel-de.ini. Reported on input line 11.
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/babel/locale/r
+u\babel-russian.tex
+Package babel Info: Importing font and identification data for russian
+(babel)             from babel-ru.ini. Reported on input line 11.
 )
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometr
 y.sty
@@ -542,6 +760,336 @@ Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 \f@nch@widthR=\skip81
 \@temptokenb=\toks35
 )
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/todonotes\todono
+tes.sty
+Package: todonotes 2024/01/05 v1.1.7 Todonotes source and documentation.
+Package: todonotes 2024/01/05
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/xkeyval\xkeyval.
+sty
+Package: xkeyval 2022/06/16 v2.9 package option processing (HA)
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/xkeyval\xkeyva
+l.tex
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/xkeyval\xkvuti
+ls.tex
+\XKV@toks=\toks36
+\XKV@tempa@toks=\toks37
+)
+\XKV@depth=\count315
+File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
+))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlaye
+r\tikz.sty
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\p
+gf.sty
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pg
+frcs.sty
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
+pgfutil-common.tex
+\pgfutil@everybye=\toks38
+\pgfutil@tempdima=\dimen262
+\pgfutil@tempdimb=\dimen263
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
+pgfutil-latex.def
+\pgfutil@abb=\box66
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
+pgfrcs.code.tex
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revisi
+on.tex)
+Package: pgfrcs 2023-01-15 v3.1.10 (3.1.10)
+))
+Package: pgf 2023-01-15 v3.1.10 (3.1.10)
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\p
+gfcore.sty
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\
+pgfsys.sty
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
+r\pgfsys.code.tex
+Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
+pgfkeys.code.tex
+\pgfkeys@pathtoks=\toks39
+\pgfkeys@temptoks=\toks40
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
+pgfkeyslibraryfiltered.code.tex
+\pgfkeys@tmptoks=\toks41
+))
+\pgf@x=\dimen264
+\pgf@y=\dimen265
+\pgf@xa=\dimen266
+\pgf@ya=\dimen267
+\pgf@xb=\dimen268
+\pgf@yb=\dimen269
+\pgf@xc=\dimen270
+\pgf@yc=\dimen271
+\pgf@xd=\dimen272
+\pgf@yd=\dimen273
+\w@pgf@writea=\write3
+\r@pgf@reada=\read3
+\c@pgf@counta=\count316
+\c@pgf@countb=\count317
+\c@pgf@countc=\count318
+\c@pgf@countd=\count319
+\t@pgf@toka=\toks42
+\t@pgf@tokb=\toks43
+\t@pgf@tokc=\toks44
+\pgf@sys@id@count=\count320
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
+r\pgf.cfg
+File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
+)
+Driver file for pgf: pgfsys-pdftex.def
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
+r\pgfsys-pdftex.def
+File: pgfsys-pdftex.def 2023-01-15 v3.1.10 (3.1.10)
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
+r\pgfsys-common-pdf.def
+File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
+)))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
+r\pgfsyssoftpath.code.tex
+File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfsyssoftpath@smallbuffer@items=\count321
+\pgfsyssoftpath@bigbuffer@items=\count322
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
+r\pgfsysprotocol.code.tex
+File: pgfsysprotocol.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcore.code.tex
+Package: pgfcore 2023-01-15 v3.1.10 (3.1.10)
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+th.code.tex
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thutil.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thparser.code.tex
+\pgfmath@dimen=\dimen274
+\pgfmath@count=\count323
+\pgfmath@box=\box67
+\pgfmath@toks=\toks45
+\pgfmath@stack@operand=\toks46
+\pgfmath@stack@operation=\toks47
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thfunctions.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thfunctions.basic.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thfunctions.trigonometric.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thfunctions.random.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thfunctions.comparison.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thfunctions.base.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thfunctions.round.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thfunctions.misc.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thfunctions.integerarithmetics.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thcalc.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+thfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count324
+))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfin
+t.code.tex)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcorepoints.code.tex
+File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@picminx=\dimen275
+\pgf@picmaxx=\dimen276
+\pgf@picminy=\dimen277
+\pgf@picmaxy=\dimen278
+\pgf@pathminx=\dimen279
+\pgf@pathmaxx=\dimen280
+\pgf@pathminy=\dimen281
+\pgf@pathmaxy=\dimen282
+\pgf@xx=\dimen283
+\pgf@xy=\dimen284
+\pgf@yx=\dimen285
+\pgf@yy=\dimen286
+\pgf@zx=\dimen287
+\pgf@zy=\dimen288
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcorepathconstruct.code.tex
+File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@path@lastx=\dimen289
+\pgf@path@lasty=\dimen290
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcorepathusage.code.tex
+File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@shorten@end@additional=\dimen291
+\pgf@shorten@start@additional=\dimen292
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcorescopes.code.tex
+File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfpic=\box68
+\pgf@hbox=\box69
+\pgf@layerbox@main=\box70
+\pgf@picture@serial@count=\count325
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcoregraphicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgflinewidth=\dimen293
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcoretransformations.code.tex
+File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@pt@x=\dimen294
+\pgf@pt@y=\dimen295
+\pgf@pt@temp=\dimen296
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcorequick.code.tex
+File: pgfcorequick.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcoreobjects.code.tex
+File: pgfcoreobjects.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcorepathprocessing.code.tex
+File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcorearrows.code.tex
+File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowsep=\dimen297
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcoreshade.code.tex
+File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@max=\dimen298
+\pgf@sys@shading@range@num=\count326
+\pgf@shadingcount=\count327
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcoreimage.code.tex
+File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcoreexternal.code.tex
+File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfexternal@startupbox=\box71
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcorelayers.code.tex
+File: pgfcorelayers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcoretransparency.code.tex
+File: pgfcoretransparency.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcorepatterns.code.tex
+File: pgfcorepatterns.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
+\pgfcorerdf.code.tex
+File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pg
+fmoduleshapes.code.tex
+File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodeparttextbox=\box72
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pg
+fmoduleplot.code.tex
+File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibilit
+y\pgfcomp-version-0-65.sty
+Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
+\pgf@nodesepstart=\dimen299
+\pgf@nodesepend=\dimen300
+)
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibilit
+y\pgfcomp-version-1-18.sty
+Package: pgfcomp-version-1-18 2023-01-15 v3.1.10 (3.1.10)
+))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pg
+ffor.sty
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pg
+fkeys.sty
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
+pgfkeys.code.tex))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pgfmath
+.sty
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
+th.code.tex))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
+pgffor.code.tex
+Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
+\pgffor@iter=\dimen301
+\pgffor@skip=\dimen302
+\pgffor@stack=\toks48
+\pgffor@toks=\toks49
+))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendla
+yer/tikz\tikz.code.tex
+Package: tikz 2023-01-15 v3.1.10 (3.1.10)
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\
+pgflibraryplothandlers.code.tex
+File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@plot@mark@count=\count328
+\pgfplotmarksize=\dimen303
+)
+\tikz@lastx=\dimen304
+\tikz@lasty=\dimen305
+\tikz@lastxsaved=\dimen306
+\tikz@lastysaved=\dimen307
+\tikz@lastmovetox=\dimen308
+\tikz@lastmovetoy=\dimen309
+\tikzleveldistance=\dimen310
+\tikzsiblingdistance=\dimen311
+\tikz@figbox=\box73
+\tikz@figbox@bg=\box74
+\tikz@tempbox=\box75
+\tikz@tempbox@bg=\box76
+\tikztreelevel=\count329
+\tikznumberofchildren=\count330
+\tikznumberofcurrentchild=\count331
+\tikz@fig@count=\count332
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pg
+fmodulematrix.code.tex
+File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfmatrixcurrentrow=\count333
+\pgfmatrixcurrentcolumn=\count334
+\pgf@matrix@numberofcolumns=\count335
+)
+\tikz@expandcount=\count336
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendla
+yer/tikz/libraries\tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendla
+yer/tikz/libraries\tikzlibrarypositioning.code.tex
+File: tikzlibrarypositioning.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+\c@@todonotes@numberoftodonotes=\count337
+)
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblate
 x.sty
 Package: biblatex 2023/03/05 v3.19 programmable bibliographies (PK/MW)
@@ -574,7 +1122,7 @@ Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/logreq\logreq.st
 y
 Package: logreq 2010/08/04 v1.0 xml request logger
-\lrq@indent=\count315
+\lrq@indent=\count338
 
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/logreq\logreq.de
 f
@@ -583,49 +1131,49 @@ File: logreq.def 2010/08/04 v1.0 logreq spec v1.0
 \Urlmuskip=\muskip17
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
-\c@tabx@nest=\count316
-\c@listtotal=\count317
-\c@listcount=\count318
-\c@liststart=\count319
-\c@liststop=\count320
-\c@citecount=\count321
-\c@citetotal=\count322
-\c@multicitecount=\count323
-\c@multicitetotal=\count324
-\c@instcount=\count325
-\c@maxnames=\count326
-\c@minnames=\count327
-\c@maxitems=\count328
-\c@minitems=\count329
-\c@citecounter=\count330
-\c@maxcitecounter=\count331
-\c@savedcitecounter=\count332
-\c@uniquelist=\count333
-\c@uniquename=\count334
-\c@refsection=\count335
-\c@refsegment=\count336
-\c@maxextratitle=\count337
-\c@maxextratitleyear=\count338
-\c@maxextraname=\count339
-\c@maxextradate=\count340
-\c@maxextraalpha=\count341
-\c@abbrvpenalty=\count342
-\c@highnamepenalty=\count343
-\c@lownamepenalty=\count344
-\c@maxparens=\count345
-\c@parenlevel=\count346
-\blx@tempcnta=\count347
-\blx@tempcntb=\count348
-\blx@tempcntc=\count349
-\c@blx@maxsection=\count350
-\blx@maxsegment@0=\count351
-\blx@notetype=\count352
-\blx@parenlevel@text=\count353
-\blx@parenlevel@foot=\count354
-\blx@sectionciteorder@0=\count355
-\blx@sectionciteorderinternal@0=\count356
-\blx@entrysetcounter=\count357
-\blx@biblioinstance=\count358
+\c@tabx@nest=\count339
+\c@listtotal=\count340
+\c@listcount=\count341
+\c@liststart=\count342
+\c@liststop=\count343
+\c@citecount=\count344
+\c@citetotal=\count345
+\c@multicitecount=\count346
+\c@multicitetotal=\count347
+\c@instcount=\count348
+\c@maxnames=\count349
+\c@minnames=\count350
+\c@maxitems=\count351
+\c@minitems=\count352
+\c@citecounter=\count353
+\c@maxcitecounter=\count354
+\c@savedcitecounter=\count355
+\c@uniquelist=\count356
+\c@uniquename=\count357
+\c@refsection=\count358
+\c@refsegment=\count359
+\c@maxextratitle=\count360
+\c@maxextratitleyear=\count361
+\c@maxextraname=\count362
+\c@maxextradate=\count363
+\c@maxextraalpha=\count364
+\c@abbrvpenalty=\count365
+\c@highnamepenalty=\count366
+\c@lownamepenalty=\count367
+\c@maxparens=\count368
+\c@parenlevel=\count369
+\blx@tempcnta=\count370
+\blx@tempcntb=\count371
+\blx@tempcntc=\count372
+\c@blx@maxsection=\count373
+\blx@maxsegment@0=\count374
+\blx@notetype=\count375
+\blx@parenlevel@text=\count376
+\blx@parenlevel@foot=\count377
+\blx@sectionciteorder@0=\count378
+\blx@sectionciteorderinternal@0=\count379
+\blx@entrysetcounter=\count380
+\blx@biblioinstance=\count381
 \labelnumberwidth=\skip82
 \labelalphawidth=\skip83
 \biblabelsep=\skip84
@@ -634,12 +1182,12 @@ Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 \bibinitsep=\skip87
 \bibparsep=\skip88
 \bibhang=\skip89
-\blx@bcfin=\read3
-\blx@bcfout=\write3
+\blx@bcfin=\read4
+\blx@bcfout=\write4
 \blx@langwohyphens=\language80
-\c@mincomprange=\count359
-\c@maxcomprange=\count360
-\c@mincompwidth=\count361
+\c@mincomprange=\count382
+\c@maxcomprange=\count383
+\c@mincompwidth=\count384
 Package biblatex Info: Trying to load biblatex default data model...
 Package biblatex Info: ... file 'blx-dm.def' found.
 
@@ -651,74 +1199,74 @@ Package biblatex Info: Trying to load biblatex style data model...
 Package biblatex Info: ... file 'ieee.dbx' not found.
 Package biblatex Info: Trying to load biblatex custom data model...
 Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
-\c@afterword=\count362
-\c@savedafterword=\count363
-\c@annotator=\count364
-\c@savedannotator=\count365
-\c@author=\count366
-\c@savedauthor=\count367
-\c@bookauthor=\count368
-\c@savedbookauthor=\count369
-\c@commentator=\count370
-\c@savedcommentator=\count371
-\c@editor=\count372
-\c@savededitor=\count373
-\c@editora=\count374
-\c@savededitora=\count375
-\c@editorb=\count376
-\c@savededitorb=\count377
-\c@editorc=\count378
-\c@savededitorc=\count379
-\c@foreword=\count380
-\c@savedforeword=\count381
-\c@holder=\count382
-\c@savedholder=\count383
-\c@introduction=\count384
-\c@savedintroduction=\count385
-\c@namea=\count386
-\c@savednamea=\count387
-\c@nameb=\count388
-\c@savednameb=\count389
-\c@namec=\count390
-\c@savednamec=\count391
-\c@translator=\count392
-\c@savedtranslator=\count393
-\c@shortauthor=\count394
-\c@savedshortauthor=\count395
-\c@shorteditor=\count396
-\c@savedshorteditor=\count397
-\c@labelname=\count398
-\c@savedlabelname=\count399
-\c@institution=\count400
-\c@savedinstitution=\count401
-\c@lista=\count402
-\c@savedlista=\count403
-\c@listb=\count404
-\c@savedlistb=\count405
-\c@listc=\count406
-\c@savedlistc=\count407
-\c@listd=\count408
-\c@savedlistd=\count409
-\c@liste=\count410
-\c@savedliste=\count411
-\c@listf=\count412
-\c@savedlistf=\count413
-\c@location=\count414
-\c@savedlocation=\count415
-\c@organization=\count416
-\c@savedorganization=\count417
-\c@origlocation=\count418
-\c@savedoriglocation=\count419
-\c@origpublisher=\count420
-\c@savedorigpublisher=\count421
-\c@publisher=\count422
-\c@savedpublisher=\count423
-\c@language=\count424
-\c@savedlanguage=\count425
-\c@origlanguage=\count426
-\c@savedoriglanguage=\count427
-\c@pageref=\count428
-\c@savedpageref=\count429
+\c@afterword=\count385
+\c@savedafterword=\count386
+\c@annotator=\count387
+\c@savedannotator=\count388
+\c@author=\count389
+\c@savedauthor=\count390
+\c@bookauthor=\count391
+\c@savedbookauthor=\count392
+\c@commentator=\count393
+\c@savedcommentator=\count394
+\c@editor=\count395
+\c@savededitor=\count396
+\c@editora=\count397
+\c@savededitora=\count398
+\c@editorb=\count399
+\c@savededitorb=\count400
+\c@editorc=\count401
+\c@savededitorc=\count402
+\c@foreword=\count403
+\c@savedforeword=\count404
+\c@holder=\count405
+\c@savedholder=\count406
+\c@introduction=\count407
+\c@savedintroduction=\count408
+\c@namea=\count409
+\c@savednamea=\count410
+\c@nameb=\count411
+\c@savednameb=\count412
+\c@namec=\count413
+\c@savednamec=\count414
+\c@translator=\count415
+\c@savedtranslator=\count416
+\c@shortauthor=\count417
+\c@savedshortauthor=\count418
+\c@shorteditor=\count419
+\c@savedshorteditor=\count420
+\c@labelname=\count421
+\c@savedlabelname=\count422
+\c@institution=\count423
+\c@savedinstitution=\count424
+\c@lista=\count425
+\c@savedlista=\count426
+\c@listb=\count427
+\c@savedlistb=\count428
+\c@listc=\count429
+\c@savedlistc=\count430
+\c@listd=\count431
+\c@savedlistd=\count432
+\c@liste=\count433
+\c@savedliste=\count434
+\c@listf=\count435
+\c@savedlistf=\count436
+\c@location=\count437
+\c@savedlocation=\count438
+\c@organization=\count439
+\c@savedorganization=\count440
+\c@origlocation=\count441
+\c@savedoriglocation=\count442
+\c@origpublisher=\count443
+\c@savedorigpublisher=\count444
+\c@publisher=\count445
+\c@savedpublisher=\count446
+\c@language=\count447
+\c@savedlanguage=\count448
+\c@origlanguage=\count449
+\c@savedoriglanguage=\count450
+\c@pageref=\count451
+\c@savedpageref=\count452
 \shorthandwidth=\skip90
 \shortjournalwidth=\skip91
 \shortserieswidth=\skip92
@@ -746,19 +1294,19 @@ Package biblatex Info: ... file 'biblatex.def' found.
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblate
 x.def
 File: biblatex.def 2023/03/05 v3.19 biblatex compatibility (PK/MW)
-\c@textcitecount=\count430
-\c@textcitetotal=\count431
-\c@textcitemaxnames=\count432
-\c@biburlbigbreakpenalty=\count433
-\c@biburlbreakpenalty=\count434
-\c@biburlnumpenalty=\count435
-\c@biburlucpenalty=\count436
-\c@biburllcpenalty=\count437
+\c@textcitecount=\count453
+\c@textcitetotal=\count454
+\c@textcitemaxnames=\count455
+\c@biburlbigbreakpenalty=\count456
+\c@biburlbreakpenalty=\count457
+\c@biburlnumpenalty=\count458
+\c@biburlucpenalty=\count459
+\c@biburllcpenalty=\count460
 \biburlbigskip=\muskip18
 \biburlnumskip=\muskip19
 \biburlucskip=\muskip20
 \biburllcskip=\muskip21
-\c@smartand=\count438
+\c@smartand=\count461
 )
 Package biblatex Info: Trying to load bibliography style 'ieee'...
 Package biblatex Info: ... file 'ieee.bbx' found.
@@ -784,8 +1332,8 @@ Package biblatex Info: ... file 'standard.bbx' found.
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/bbx\sta
 ndard.bbx
 File: standard.bbx 2023/03/05 v3.19 biblatex bibliography style (PK/MW)
-\c@bbx:relatedcount=\count439
-\c@bbx:relatedtotal=\count440
+\c@bbx:relatedcount=\count462
+\c@bbx:relatedtotal=\count463
 ))))
 Package biblatex Info: Trying to load citation style 'numeric-comp'...
 Package biblatex Info: ... file 'numeric-comp.cbx' found.
@@ -793,10 +1341,10 @@ Package biblatex Info: ... file 'numeric-comp.cbx' found.
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/cbx\num
 eric-comp.cbx
 File: numeric-comp.cbx 2023/03/05 v3.19 biblatex citation style (PK/MW)
-\c@cbx@tempcnta=\count441
-\c@cbx@tempcntb=\count442
-\c@cbx@tempcntc=\count443
-\c@cbx@tempcntd=\count444
+\c@cbx@tempcnta=\count464
+\c@cbx@tempcntb=\count465
+\c@cbx@tempcntc=\count466
+\c@cbx@tempcntd=\count467
 Package biblatex Info: Redefining '\cite'.
 Package biblatex Info: Redefining '\parencite'.
 Package biblatex Info: Redefining '\footcite'.
@@ -826,8 +1374,8 @@ Package: expl3 2024-01-04 L3 programming layer (loader)
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3back
 end-pdftex.def
 File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count445
-\l__pdf_internal_box=\box66
+\l__color_backend_stack_int=\count468
+\l__pdf_internal_box=\box77
 ))
 Package biblatex Info: ... and expl3
 (biblatex)             2024-01-04 L3 programming layer (loader) 
@@ -878,11 +1426,11 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 \gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count446
+\c@section@level=\count469
 )
-\@linkdim=\dimen262
-\Hy@linkcounter=\count447
-\Hy@pagecounter=\count448
+\@linkdim=\dimen312
+\Hy@linkcounter=\count470
+\Hy@pagecounter=\count471
 
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.
 def
@@ -894,7 +1442,7 @@ Now handling font encoding PD1 ...
 c.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count449
+\Hy@SavedSpaceFactor=\count472
 
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.d
 ef
@@ -902,6 +1450,7 @@ File: puenc.def 2023-11-26 v7.01g Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
 ... no UTF-8 mapping file for font encoding PU
 )
+Package hyperref Info: Option `unicode' set `true' on input line 3167.
 Package hyperref Info: Option `colorlinks' set `true' on input line 4064.
 Package hyperref Info: Option `bookmarks' set `true' on input line 4064.
 Package hyperref Info: Option `bookmarksnumbered' set `true' on input line 4064
@@ -913,9 +1462,9 @@ Package hyperref Info: Plain pages OFF on input line 4196.
 Package hyperref Info: Backreferencing OFF on input line 4201.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4448.
-\c@Hy@tempcnt=\count450
+\c@Hy@tempcnt=\count473
 LaTeX Info: Redefining \url on input line 4786.
-\XeTeXLinkMargin=\dimen263
+\XeTeXLinkMargin=\dimen313
 
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.
 sty
@@ -926,9 +1475,9 @@ intcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
-\Fld@menulength=\count451
-\Field@Width=\dimen264
-\Fld@charsize=\dimen265
+\Fld@menulength=\count474
+\Field@Width=\dimen314
+\Fld@charsize=\dimen315
 Package hyperref Info: Hyper figures OFF on input line 6065.
 Package hyperref Info: Link nesting OFF on input line 6070.
 Package hyperref Info: Hyper index ON on input line 6073.
@@ -942,9 +1491,9 @@ x.sty
 Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
 package with kernel methods
 )
-\Hy@abspage=\count452
-\c@Item=\count453
-\c@Hfootnote=\count454
+\Hy@abspage=\count475
+\c@Item=\count476
+\c@Hfootnote=\count477
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
 
@@ -958,8 +1507,8 @@ Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend pac
 kage
 with kernel methods
 )
-\Fld@listcount=\count455
-\c@bookmark@seq@number=\count456
+\Fld@listcount=\count478
+\c@bookmark@seq@number=\count479
 
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\r
 erunfilecheck.sty
@@ -994,311 +1543,6 @@ e 7836.
 Package cleveref Info: include cross-reference names in hyperlinks on input lin
 e 7852.
 )
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlaye
-r\tikz.sty
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\p
-gf.sty
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pg
-frcs.sty
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
-pgfutil-common.tex
-\pgfutil@everybye=\toks36
-\pgfutil@tempdima=\dimen266
-\pgfutil@tempdimb=\dimen267
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
-pgfutil-latex.def
-\pgfutil@abb=\box67
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
-pgfrcs.code.tex
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revisi
-on.tex)
-Package: pgfrcs 2023-01-15 v3.1.10 (3.1.10)
-))
-Package: pgf 2023-01-15 v3.1.10 (3.1.10)
-
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\p
-gfcore.sty
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\
-pgfsys.sty
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
-r\pgfsys.code.tex
-Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
-
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
-pgfkeys.code.tex
-\pgfkeys@pathtoks=\toks37
-\pgfkeys@temptoks=\toks38
-
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
-pgfkeyslibraryfiltered.code.tex
-\pgfkeys@tmptoks=\toks39
-))
-\pgf@x=\dimen268
-\pgf@y=\dimen269
-\pgf@xa=\dimen270
-\pgf@ya=\dimen271
-\pgf@xb=\dimen272
-\pgf@yb=\dimen273
-\pgf@xc=\dimen274
-\pgf@yc=\dimen275
-\pgf@xd=\dimen276
-\pgf@yd=\dimen277
-\w@pgf@writea=\write4
-\r@pgf@reada=\read4
-\c@pgf@counta=\count457
-\c@pgf@countb=\count458
-\c@pgf@countc=\count459
-\c@pgf@countd=\count460
-\t@pgf@toka=\toks40
-\t@pgf@tokb=\toks41
-\t@pgf@tokc=\toks42
-\pgf@sys@id@count=\count461
-
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
-r\pgf.cfg
-File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
-)
-Driver file for pgf: pgfsys-pdftex.def
-
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
-r\pgfsys-pdftex.def
-File: pgfsys-pdftex.def 2023-01-15 v3.1.10 (3.1.10)
-
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
-r\pgfsys-common-pdf.def
-File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
-)))
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
-r\pgfsyssoftpath.code.tex
-File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfsyssoftpath@smallbuffer@items=\count462
-\pgfsyssoftpath@bigbuffer@items=\count463
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlaye
-r\pgfsysprotocol.code.tex
-File: pgfsysprotocol.code.tex 2023-01-15 v3.1.10 (3.1.10)
-))
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcore.code.tex
-Package: pgfcore 2023-01-15 v3.1.10 (3.1.10)
-
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-th.code.tex
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thutil.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thparser.code.tex
-\pgfmath@dimen=\dimen278
-\pgfmath@count=\count464
-\pgfmath@box=\box68
-\pgfmath@toks=\toks43
-\pgfmath@stack@operand=\toks44
-\pgfmath@stack@operation=\toks45
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thfunctions.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thfunctions.basic.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thfunctions.trigonometric.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thfunctions.random.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thfunctions.comparison.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thfunctions.base.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thfunctions.round.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thfunctions.misc.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thfunctions.integerarithmetics.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thcalc.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-thfloat.code.tex
-\c@pgfmathroundto@lastzeros=\count465
-))
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfin
-t.code.tex)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcorepoints.code.tex
-File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@picminx=\dimen279
-\pgf@picmaxx=\dimen280
-\pgf@picminy=\dimen281
-\pgf@picmaxy=\dimen282
-\pgf@pathminx=\dimen283
-\pgf@pathmaxx=\dimen284
-\pgf@pathminy=\dimen285
-\pgf@pathmaxy=\dimen286
-\pgf@xx=\dimen287
-\pgf@xy=\dimen288
-\pgf@yx=\dimen289
-\pgf@yy=\dimen290
-\pgf@zx=\dimen291
-\pgf@zy=\dimen292
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcorepathconstruct.code.tex
-File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@path@lastx=\dimen293
-\pgf@path@lasty=\dimen294
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcorepathusage.code.tex
-File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@shorten@end@additional=\dimen295
-\pgf@shorten@start@additional=\dimen296
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcorescopes.code.tex
-File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfpic=\box69
-\pgf@hbox=\box70
-\pgf@layerbox@main=\box71
-\pgf@picture@serial@count=\count466
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcoregraphicstate.code.tex
-File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgflinewidth=\dimen297
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcoretransformations.code.tex
-File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@pt@x=\dimen298
-\pgf@pt@y=\dimen299
-\pgf@pt@temp=\dimen300
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcorequick.code.tex
-File: pgfcorequick.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcoreobjects.code.tex
-File: pgfcoreobjects.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcorepathprocessing.code.tex
-File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcorearrows.code.tex
-File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfarrowsep=\dimen301
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcoreshade.code.tex
-File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@max=\dimen302
-\pgf@sys@shading@range@num=\count467
-\pgf@shadingcount=\count468
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcoreimage.code.tex
-File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcoreexternal.code.tex
-File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfexternal@startupbox=\box72
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcorelayers.code.tex
-File: pgfcorelayers.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcoretransparency.code.tex
-File: pgfcoretransparency.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcorepatterns.code.tex
-File: pgfcorepatterns.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer
-\pgfcorerdf.code.tex
-File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)))
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pg
-fmoduleshapes.code.tex
-File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfnodeparttextbox=\box73
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pg
-fmoduleplot.code.tex
-File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibilit
-y\pgfcomp-version-0-65.sty
-Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
-\pgf@nodesepstart=\dimen303
-\pgf@nodesepend=\dimen304
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibilit
-y\pgfcomp-version-1-18.sty
-Package: pgfcomp-version-1-18 2023-01-15 v3.1.10 (3.1.10)
-))
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pg
-ffor.sty
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pg
-fkeys.sty
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
-pgfkeys.code.tex))
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pgfmath
-.sty
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfma
-th.code.tex))
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\
-pgffor.code.tex
-Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
-\pgffor@iter=\dimen305
-\pgffor@skip=\dimen306
-\pgffor@stack=\toks46
-\pgffor@toks=\toks47
-))
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendla
-yer/tikz\tikz.code.tex
-Package: tikz 2023-01-15 v3.1.10 (3.1.10)
-
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\
-pgflibraryplothandlers.code.tex
-File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@plot@mark@count=\count469
-\pgfplotmarksize=\dimen307
-)
-\tikz@lastx=\dimen308
-\tikz@lasty=\dimen309
-\tikz@lastxsaved=\dimen310
-\tikz@lastysaved=\dimen311
-\tikz@lastmovetox=\dimen312
-\tikz@lastmovetoy=\dimen313
-\tikzleveldistance=\dimen314
-\tikzsiblingdistance=\dimen315
-\tikz@figbox=\box74
-\tikz@figbox@bg=\box75
-\tikz@tempbox=\box76
-\tikz@tempbox@bg=\box77
-\tikztreelevel=\count470
-\tikznumberofchildren=\count471
-\tikznumberofcurrentchild=\count472
-\tikz@fig@count=\count473
-
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pg
-fmodulematrix.code.tex
-File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfmatrixcurrentrow=\count474
-\pgfmatrixcurrentcolumn=\count475
-\pgf@matrix@numberofcolumns=\count476
-)
-\tikz@expandcount=\count477
-
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendla
-yer/tikz/libraries\tikzlibrarytopaths.code.tex
-File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)))
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\
 pgflibraryarrows.meta.code.tex
 File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
@@ -1306,10 +1550,6 @@ File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfarrowlength=\dimen317
 \pgfarrowwidth=\dimen318
 \pgfarrowlinewidth=\dimen319
-)
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendla
-yer/tikz/libraries\tikzlibrarypositioning.code.tex
-File: tikzlibrarypositioning.code.tex 2023-01-15 v3.1.10 (3.1.10)
 )
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendla
 yer/tikz/libraries\tikzlibrarycalc.code.tex
@@ -1396,30 +1636,37 @@ Package: setspace 2022/12/04 v6.7b set line spacing
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/amscls\amsthm.st
 y
 Package: amsthm 2020/05/29 v2.20.6
-\thm@style=\toks48
-\thm@bodyfont=\toks49
-\thm@headfont=\toks50
-\thm@notefont=\toks51
-\thm@headpunct=\toks52
+\thm@style=\toks50
+\thm@bodyfont=\toks51
+\thm@headfont=\toks52
+\thm@notefont=\toks53
+\thm@headpunct=\toks54
 \thm@preskip=\skip105
 \thm@postskip=\skip106
 \thm@headsep=\skip107
-\dth@everypar=\toks53
+\dth@everypar=\toks55
 )
-\c@theorem=\count478
+\c@theorem=\count480
 )
 
 Package biblatex Warning: 'babel/polyglossia' detected but 'csquotes' missing.
 (biblatex)                Loading 'csquotes' recommended.
 
-\@quotelevel=\count479
-\@quotereset=\count480
+\@quotelevel=\count481
+\@quotereset=\count482
 LaTeX Font Info:    Trying to load font information for T1+lmr on input line 14
 .
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-(main.aux)
+(main.aux
+
+LaTeX Warning: Label `eq:q_limits' multiply defined.
+
+
+LaTeX Warning: Label `eq:q_limits@cref' multiply defined.
+
+)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 14.
@@ -1436,10 +1683,20 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 14.
 LaTeX Font Info:    ... okay on input line 14.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 14.
 LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 14.
+LaTeX Font Info:    Trying to load font information for T2A+cmr on input line 1
+4.
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/cyrillic\t2acmr.
+fd
+File: t2acmr.fd 2001/08/11 v1.0a Computer Modern Cyrillic font definitions
+)
+LaTeX Font Info:    ... okay on input line 14.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 14.
 LaTeX Font Info:    ... okay on input line 14.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 14.
 LaTeX Font Info:    ... okay on input line 14.
+LaTeX Info: Redefining \th on input line 14.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -1504,17 +1761,17 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp
 -pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count481
+\scratchcounter=\count483
 \scratchdimen=\dimen320
 \scratchbox=\box100
-\nofMPsegments=\count482
-\nofMParguments=\count483
-\everyMPshowfont=\toks54
-\MPscratchCnt=\count484
+\nofMPsegments=\count484
+\nofMParguments=\count485
+\everyMPshowfont=\toks56
+\MPscratchCnt=\count486
 \MPscratchDim=\dimen321
-\MPnumerator=\count485
-\makeMPintoPDFobject=\count486
-\everyMPtoPDFconversion=\toks55
+\MPnumerator=\count487
+\makeMPintoPDFobject=\count488
+\everyMPtoPDFconversion=\toks57
 )
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\eps
 topdf-base.sty
@@ -1530,7 +1787,7 @@ Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
-\c@lstlisting=\count487
+\c@lstlisting=\count489
 Package biblatex Info: Trying to load language 'ngerman'...
 Package biblatex Info: ... file 'ngerman.lbx' found.
 
@@ -1551,10 +1808,17 @@ Package biblatex Info: ... file 'german.lbx' found.
 man.lbx
 File: german.lbx 2023/03/05 v3.19 biblatex localization (PK/MW)
 ))
+Package biblatex Info: Trying to load language 'russian'...
+Package biblatex Info: ... file 'russian.lbx' found.
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\rus
+sian.lbx
+File: russian.lbx 2023/03/05 v3.19 biblatex localization (PK/MW)
+)
 Package biblatex Info: Input encoding 'utf8' detected.
 Package biblatex Info: Automatic encoding selection.
 (biblatex)             Assuming data encoding 'utf8'.
-\openout3 = `main.bcf'.
+\openout4 = `main.bcf'.
 
 Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'main.bbl' found.
@@ -1701,9 +1965,7 @@ Package cleveref Info: loaded `ngerman' language definitions on input line 1.
  [9
 
 
-{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.e
-nc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-m
-athit.enc}]
+]
 Package cleveref Info: loaded `ngerman' language definitions on input line 60.
 
 
@@ -1784,9 +2046,11 @@ l.44
       [1
 
 {C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-math
-sy.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/
-lm-mathex.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dv
-ips/lm/lm-ts1.enc}]
+it.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/
+lm-rm.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/
+lm/lm-mathsy.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc
+/dvips/lm/lm-mathex.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fo
+nts/enc/dvips/lm/lm-ts1.enc}]
 Underfull \hbox (badness 10000) in paragraph at lines 87--88
 []|\T1/lmr/m/n/12 (+20) Verbraucher, PV-
  []
@@ -1891,14 +2155,17 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 LaTeX Warning: Reference `ch:tpf' on page 1 undefined on input line 410.
 
 
-Overfull \hbox (4.43558pt too wide) in paragraph at lines 543--543
+Overfull \hbox (4.43558pt too wide) in paragraph at lines 541--541
 []\T1/lmr/bx/n/17.28 (-20) Current In-jec-ti-on Me-thod und PV-Behandlung 
  []
 
 
-LaTeX Warning: Citation 'DaCosta1999' on page 9 undefined on input line 547.
+Overfull \hbox (17.85085pt too wide) in paragraph at lines 543--555
+\T1/lmr/m/n/12 (-20) Die kon-ven-tio-nel-le Newton-Raphson-Lastflussberechnung 
+ba-siert auf Leistungs-Mismatch-
+ []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 568.
+Package cleveref Info: loaded `ngerman' language definitions on input line 571.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1908,20 +2175,15 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [9]
-Overfull \hbox (1.12585pt too wide) in paragraph at lines 594--595
-\T1/lmr/m/n/12 (-20) und der Mismatch-Vektor als $\OT1/lmr/m/n/12 (-20) ^^A\OML
-/lmm/b/it/12 I[] \OT1/lmr/m/n/12 (-20) = [^^A\OML/lmm/m/it/12 I[];  \OT1/lmr/m/
-n/12 (-20) ^^A\OML/lmm/m/it/12 I[];  \OT1/lmr/m/n/12 (-20) ^^A\OML/lmm/m/it/12 
-I[];  \OT1/lmr/m/n/12 (-20) ^^A\OML/lmm/m/it/12 I[];  \OT1/lmr/m/n/12 (-20) ^^A
-\OML/lmm/m/it/12 I[];  \OT1/lmr/m/n/12 (-20) ^^A\OML/lmm/m/it/12 I[]\OT1/lmr/m/
-n/12 (-20) ][]$
- []
+LaTeX Font Info:    Trying to load font information for T2A+lmr on input line 5
+97.
+LaTeX Font Info:    No file T2Almr.fd. on input line 597.
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+LaTeX Font Warning: Font shape `T2A/lmr/m/n' undefined
+(Font)              using `T2A/cmr/m/n' instead on input line 597.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 625.
-
+Package cleveref Info: loaded `ngerman' language definitions on input line 620.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1931,10 +2193,18 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [10]
+Overfull \hbox (51.90152pt too wide) in paragraph at lines 665--669
+[]\T1/lmr/m/n/12 (-20) Die Jacobi-Matrix $\OML/lmm/b/it/12 J[]$ \T1/lmr/m/n/12 
+(-20) be-sitzt die glei-che Blockstruk-tur wie die $\OT1/lmr/m/n/12 (-20) (2\OM
+L/lmm/m/it/12 n \OMS/lmsy/m/n/12 ^^B \OT1/lmr/m/n/12 (-20) 2\OML/lmm/m/it/12 n\
+OT1/lmr/m/n/12 (-20) )$\T1/lmr/m/n/12 (-20) -Knotenadmittanzmatrix,
+ []
 
-LaTeX Warning: Citation 'DaCosta1999' on page 11 undefined on input line 638.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 674.
+Underfull \vbox (badness 7326) has occurred while \output is active []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 676.
+
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1944,22 +2214,34 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [11]
-Overfull \hbox (13.51712pt too wide) in paragraph at lines 684--685
-[]\T1/lmr/m/n/12 (-20) Die Au-ÿer-dia-go-nal-blö-cke ($\OML/lmm/m/it/12 l \OMS/
-lmsy/m/n/12 6\OT1/lmr/m/n/12 (-20) = \OML/lmm/m/it/12 k$\T1/lmr/m/n/12 (-20) ) 
-für PQ-Knoten sind iden-tisch mit den Admittanzmatrix-
- []
+! Missing delimiter (. inserted).
+<to be read again> 
+                   e
+l.711 \end{align}
+                 
+I was expecting to see something like `(' or `\{' or
+`\}' here. If you typed, e.g., `{' instead of `\{', you
+should probably delete the `{' by typing `1' now, so that
+braces don't get unbalanced. Otherwise just proceed.
+Acceptable delimiters are characters whose \delcode is
+nonnegative, or you can use `\delimiter <delimiter code>'.
+
+! Missing delimiter (. inserted).
+<to be read again> 
+                   e
+l.711 \end{align}
+                 
+I was expecting to see something like `(' or `\{' or
+`\}' here. If you typed, e.g., `{' instead of `\{', you
+should probably delete the `{' by typing `1' now, so that
+braces don't get unbalanced. Otherwise just proceed.
+Acceptable delimiters are characters whose \delcode is
+nonnegative, or you can use `\delimiter <delimiter code>'.
 
 
-LaTeX Warning: Citation 'DaCosta1999' on page 12 undefined on input line 695.
+Underfull \vbox (badness 1152) has occurred while \output is active []
 
-
-LaTeX Warning: Citation 'DaCosta1999' on page 12 undefined on input line 712.
-
-
-Underfull \vbox (badness 6842) has occurred while \output is active []
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 723.
+Package cleveref Info: loaded `ngerman' language definitions on input line 770.
 
 
 
@@ -1970,10 +2252,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [12]
+Package cleveref Info: loaded `ngerman' language definitions on input line 821.
 
-LaTeX Warning: Citation 'DaCosta1999' on page 13 undefined on input line 753.
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 773.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1983,12 +2263,14 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [13]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 831.
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+LaTeX Warning: Reference `fig:jacobi_structure' on page 14 undefined on input l
+ine 874.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 851.
+
+Underfull \vbox (badness 1609) has occurred while \output is active []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 887.
 
 
 
@@ -1999,14 +2281,9 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [14]
-Overfull \hbox (17.92923pt too wide) in paragraph at lines 855--856
-\T1/lmr/m/n/12 (-20) Generatoren an PV-Knoten ha-ben be-grenz-te Blind-leis-tun
-gs-re-ser-ven $\OML/lmm/m/it/12 Q[] \OMS/lmsy/m/n/12 2 \OT1/lmr/m/n/12 (-20) [\
-OML/lmm/m/it/12 Q[]; Q[]\OT1/lmr/m/n/12 (-20) ]$\T1/lmr/m/n/12 (-20) .
- []
+Package cleveref Info: loaded `ngerman' language definitions on input line 938.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 1068
-.
+
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -2016,9 +2293,9 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [15]
 
-LaTeX Warning: Reference `ch:tpf' on page 1 undefined on input line 1099.
+LaTeX Warning: Reference `ch:tpf' on page 1 undefined on input line 971.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 1105
+Package cleveref Info: loaded `ngerman' language definitions on input line 1057
 .
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2029,8 +2306,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [16]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 1107.
-Package cleveref Info: loaded `ngerman' language definitions on input line 1157
+put line 1059.
+Package cleveref Info: loaded `ngerman' language definitions on input line 1103
 .
 
 
@@ -2041,15 +2318,18 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [17]
-Overfull \hbox (16.58989pt too wide) in paragraph at lines 1185--1185
+Package hyperref Info: bookmark level for unknown todo defaults to 0 on input l
+ine 1119.
+
+Overfull \hbox (16.58989pt too wide) in paragraph at lines 1137--1137
 []\T1/lmr/bx/n/14.4 (-20) Konvergenzverhalten und Ver-gleich mit Newton-Raphson
  
  []
 
 
-Underfull \vbox (badness 4328) has occurred while \output is active []
+Underfull \vbox (badness 7256) has occurred while \output is active []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 1209
+Package cleveref Info: loaded `ngerman' language definitions on input line 1160
 .
 
 
@@ -2061,8 +2341,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [18]
 
-LaTeX Warning: Reference `ch:methoden_pv' on page 1 undefined on input line 122
-6.
+LaTeX Warning: Reference `ch:methoden_pv' on page 1 undefined on input line 117
+8.
 
 )
 Package cleveref Info: loaded `ngerman' language definitions on input line 95.
@@ -2140,10 +2420,16 @@ L3 programming layer <2024-01-04>
  ***********
 
 
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+
 LaTeX Warning: There were undefined references.
 
+
+LaTeX Warning: There were multiply-defined labels.
+
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: C8F7C217A49B9D58FF911FFC44FEE3DA;9271.
+(rerunfilecheck)             Checksum: B22573B47DE13D5CE0B0CD9926E2DBB9;9271.
 
 Package biblatex Warning: Please (re)run Biber on the file:
 (biblatex)                main
@@ -2154,41 +2440,35 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 40949 strings out of 474486
- 800015 string characters out of 5740452
- 1955542 words of memory out of 5000000
- 62100 multiletter control sequences out of 15000+600000
- 674339 words of font info for 245 fonts, out of 8000000 for 9000
+ 42521 strings out of 474486
+ 827822 string characters out of 5740452
+ 1946542 words of memory out of 5000000
+ 63639 multiletter control sequences out of 15000+600000
+ 669295 words of font info for 242 fonts, out of 8000000 for 9000
  1143 hyphenation exceptions out of 8191
- 89i,15n,90p,1151b,3383s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lm
-bx10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/publi
-c/lm/lmbx12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type
-1/public/lm/lmcsc10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fo
-nts/type1/public/lm/lmex10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/Mi
-KTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/sgrigorevski/AppData/Local/Prog
-rams/MiKTeX/fonts/type1/public/lm/lmmi12.pfb><C:/Users/sgrigorevski/AppData/Loc
-al/Programs/MiKTeX/fonts/type1/public/lm/lmmi5.pfb><C:/Users/sgrigorevski/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi6.pfb><C:/Users/sgrigorevski
-/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi7.pfb><C:/Users/sgrigo
-revski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/
-sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib10.pfb><C
-:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib7
-.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm
-/lmr10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/pub
-lic/lm/lmr12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/typ
-e1/public/lm/lmr7.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/font
-s/type1/public/lm/lmr8.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX
-/fonts/type1/public/lm/lmri12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs
-/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/sgrigorevski/AppData/Local/P
-rograms/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:/Users/sgrigorevski/AppData/L
-ocal/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C:/Users/sgrigorevski/Ap
-pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/
-Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/sy
-mbols/msbm10.pfb>
-Output written on main.pdf (43 pages, 505140 bytes).
+ 104i,15n,104p,1151b,2483s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <C:\Users\sgrigorevski\AppData\Local\MiKTeX\fonts/pk/ljfour/lh/lh-t2a/dpi600
+\larm1200.pk><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/p
+ublic/lm/lmbx12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/
+type1/public/lm/lmcsc10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/lm/lmex10.pfb><C:/Users/sgrigorevski/AppData/Local/Program
+s/MiKTeX/fonts/type1/public/lm/lmmi12.pfb><C:/Users/sgrigorevski/AppData/Local/
+Programs/MiKTeX/fonts/type1/public/lm/lmmi6.pfb><C:/Users/sgrigorevski/AppData/
+Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/sgrigorevski/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib10.pfb><C:/Users/sgrigor
+evski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/s
+grigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/U
+sers/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb>
+<C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri
+12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/
+lm/lmsy10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/
+public/lm/lmsy8.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/
+type1/public/lm/lmtt12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX
+/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Users/sgrigorevski/AppData/
+Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on main.pdf (43 pages, 435958 bytes).
 PDF statistics:
- 787 PDF objects out of 1000 (max. 8388607)
- 205 named destinations out of 1000 (max. 500000)
- 64341 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 746 PDF objects out of 1000 (max. 8388607)
+ 204 named destinations out of 1000 (max. 500000)
+ 66389 words of extra memory for PDF output out of 74296 (max. 10000000)
 

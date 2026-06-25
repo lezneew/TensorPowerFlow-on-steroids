@@ -538,516 +538,389 @@ Diese Einschränkungen motivieren die Suche nach alternativen Verfahren, insbeso
 %	\item Die Konvergenz hängt vom Startwert ab; bei ungünstiger Initialisierung kann das Verfahren zur nicht-operationellen Lösung (niedrige Spannung) konvergieren \cite{Salazar2024}.
 %	\item Eine Parallelisierung über mehrere Lastflüsse ist schwierig, da jeder Lastfluss seine eigene, iterationsabhängige Jacobi-Matrix besitzt.
 %\end{enumerate}
+\section{Current Injection Method und PV-Behandlung}\label{sec:cim}
 
-%======================================================================
-\section{Current Injection Method und PV-Behandlung}
-\label{sec:cim}
-%======================================================================
+Die konventionelle Newton-Raphson-Lastflussberechnung basiert auf Leistungs-Mismatch-Gleichungen, 
+die in Polarkoordinaten formuliert werden. Dabei müssen in jedem Iterationsschritt 
+trigonometrische Funktionen (Sinus, Kosinus) ausgewertet und die Jacobi-Matrix vollständig 
+neu berechnet werden, was insbesondere bei großen Netzen einen erheblichen Rechenaufwand 
+darstellt. Die \textit{Current Injection Method} (CIM), vorgestellt von da~Costa et~al.\ 
+\cite{DaCosta1999}, reformuliert das Lastflussproblem auf Basis von Strommismatch-Gleichungen 
+in kartesischen Koordinaten. Dieser Ansatz führt zu einer Jacobi-Matrix, deren Struktur 
+identisch mit der $(2n \times 2n)$-Knotenadmittanzmatrix ist und deren außerdiagonale Blöcke 
+-- mit Ausnahme der PV-Knoten -- während des gesamten Iterationsprozesses konstant bleiben. 
+Dadurch entfällt die Notwendigkeit, transzendente Funktionen auszuwerten, und es ergibt 
+sich eine signifikante Reduktion der Rechenzeit von über 20\,\% gegenüber der konventionellen 
+Formulierung \cite{DaCosta1999}.
 
-Die Current Injection Method (CIM), eingeführt von da Costa et al.\ \cite{DaCosta1999} für einphasige Netze und von Garcia et al.\ \cite{Garcia2000} auf dreiphasige Systeme erweitert, formuliert das Lastflussproblem auf Basis der Strommismatches anstelle der Leistungsmismatches. Dies führt zu einer Jacobi-Matrix, deren Struktur weitgehend der Admittanzmatrix entspricht und daher vorteilhafte Sparsity-Eigenschaften besitzt.
+Im Folgenden wird zunächst die Strommismatch-Formulierung für PQ-Knoten hergeleitet 
+(Abschnitt~\ref{subsec:cim_grundgleichung}), anschließend die Struktur der resultierenden 
+Jacobi-Matrix erläutert (Abschnitt~\ref{subsec:cim_jacobi}), die Erweiterung auf PV-Knoten 
+beschrieben (Abschnitt~\ref{subsec:cim_pv}) und schließlich die Behandlung von 
+Blindleistungsgrenzen mit der PV-zu-PQ-Umwandlung dargestellt 
+(Abschnitt~\ref{subsec:q_limits}).
 
-\subsection{Strommismatch-Formulierung}
-\label{subsec:cim_grundgleichung}
+%-----------------------------------------------------------------------------------
+\subsection{Strommismatch-Formulierung}\label{subsec:cim_grundgleichung}
 
-Der dreiphasige Strommismatch am Knoten $k$ in Phase $\phi$ ist definiert als die Differenz zwischen dem spezifizierten Strom (aus der Leistung berechnet) und dem aus der Admittanzmatrix berechneten Strom \cite{Garcia2000}:
+Ausgangspunkt der CIM ist die komplexe Strominjektion an einem Knoten~$k$. Die 
+Netzgleichung in Matrixform lautet:
 \begin{equation}
-	\Delta I_k^\phi = I_k^{\phi,\spec} - I_k^{\phi,\text{calc}} = \frac{(P_k^\phi + \jj Q_k^\phi)}{(e_k^\phi + \jj f_k^\phi)} - \sum_{m \in \mathcal{N}_k} Y_{km}^\phi V_m^\phi
-	\label{eq:cim_mismatch}
+	\vect{I} = \vect{Y} \, \vect{V}
+	\label{eq:netzgleichung}
+\end{equation}
+wobei $\vect{Y} \in \mathbb{C}^{n \times n}$ die Knotenadmittanzmatrix, 
+$\vect{V} \in \mathbb{C}^{n}$ der Vektor der komplexen Knotenspannungen und 
+$\vect{I} \in \mathbb{C}^{n}$ der Vektor der komplexen Strominjektionen ist.
+
+Für einen PQ-Knoten~$k$ ist die geplante komplexe Leistungsinjektion 
+$S_k^{\mathrm{sp}} = P_k^{\mathrm{sp}} + j\,Q_k^{\mathrm{sp}}$ bekannt. Die geplante 
+(scheduled) Strominjektion ergibt sich aus der Beziehung zwischen Leistung und Strom:
+\begin{equation}
+	I_k^{\mathrm{sp}} = \left(\frac{S_k^{\mathrm{sp}}}{V_k}\right)^* 
+	= \frac{P_k^{\mathrm{sp}} - j\,Q_k^{\mathrm{sp}}}{V_k^*}
+	\label{eq:strom_scheduled}
+\end{equation}
+wobei $V_k^* = e_k - j\,f_k$ die konjugiert komplexe Spannung am Knoten~$k$ 
+bezeichnet, mit dem Realteil $e_k$ und dem Imaginärteil $f_k$.
+
+Die berechnete Strominjektion am Knoten~$k$ ergibt sich aus der Knotenadmittanzmatrix:
+\begin{equation}
+	I_k^{\mathrm{calc}} = \sum_{m=1}^{n} Y_{km} \, V_m 
+	= \sum_{m=1}^{n} (G_{km} + j\,B_{km})(e_m + j\,f_m)
+	\label{eq:strom_calc}
 \end{equation}
 
-Unter Verwendung der konjugierten Spannung ergibt sich der spezifizierte Strom zu:
+Der komplexe Strommismatch am Knoten~$k$ ist definiert als die Differenz zwischen 
+geplanter und berechneter Strominjektion \cite{DaCosta1999}:
 \begin{equation}
-	I_k^{\phi,\spec} = \frac{S_k^{\phi,*}}{V_k^{\phi,*}} = \frac{(P_k^\phi - \jj Q_k^\phi)(e_k^\phi + \jj f_k^\phi)}{(e_k^\phi)^2 + (f_k^\phi)^2}
-	\label{eq:strom_aus_leistung_cim}
+	\Delta I_k = I_k^{\mathrm{sp}} - I_k^{\mathrm{calc}} = \Delta \text{\foreignlanguage{russian}{д}}_k + j\,\Delta \text{\foreignlanguage{russian}{м}}_k
+	\label{eq:strom_mismatch_komplex}
 \end{equation}
 
-Die Zerlegung von \eqref{eq:cim_mismatch} in Real- und Imaginärteil ergibt die Strommismatches in reellen Größen \cite{Garcia2000}:
+Durch Separation in Real- und Imaginärteil ergeben sich zwei reelle Gleichungen pro 
+Knoten. Dabei lassen sich die Stromkomponenten über die Leistungs-Mismatches 
+$\Delta P_k$ und $\Delta Q_k$ ausdrücken. Die Wirk- und Blindleistungs-Mismatches sind 
+definiert als:
 \begin{align}
-	\Delta I_k^{\phi,\re} &= \frac{P_k^\phi e_k^\phi + Q_k^\phi f_k^\phi}{(e_k^\phi)^2 + (f_k^\phi)^2} - \sum_{m} (G_{km}^\phi e_m^\phi - B_{km}^\phi f_m^\phi) \label{eq:cim_re}\\
-	\Delta I_k^{\phi,\im} &= \frac{P_k^\phi f_k^\phi - Q_k^\phi e_k^\phi}{(e_k^\phi)^2 + (f_k^\phi)^2} - \sum_{m} (G_{km}^\phi f_m^\phi + B_{km}^\phi e_m^\phi) \label{eq:cim_im}
+	\Delta P_k &= P_k^{\mathrm{sp}} - P_k^{\mathrm{calc}} \label{eq:dp}\\
+	\Delta Q_k &= Q_k^{\mathrm{sp}} - Q_k^{\mathrm{calc}} \label{eq:dq}
+\end{align}
+wobei die berechneten Leistungen durch die Spannungen und den Stromvektor gegeben sind:
+\begin{align}
+	P_k^{\mathrm{calc}} &= e_k\,\text{\foreignlanguage{russian}{д}}_k^{\mathrm{calc}} + f_k\,\text{\foreignlanguage{russian}{м}}_k^{\mathrm{calc}} 
+	\label{eq:pcalc}\\
+	Q_k^{\mathrm{calc}} &= f_k\,\text{\foreignlanguage{russian}{д}}_k^{\mathrm{calc}} - e_k\,\text{\foreignlanguage{russian}{м}}_k^{\mathrm{calc}} 
+	\label{eq:qcalc}
 \end{align}
 
-\subsection{Jacobi-Matrix der CIM}
-\label{subsec:cim_jacobi}
+Durch algebraische Umformung lassen sich die Strommismatch-Komponenten direkt über die 
+bekannten Leistungs-Mismatches und die aktuellen Spannungswerte berechnen 
+\cite{DaCosta1999}:
+\begin{align}
+	\Delta \text{\foreignlanguage{russian}{д}}_k &= \frac{e_k\,\Delta P_k + f_k\,\Delta Q_k}{V_k^2} 
+	\label{eq:dir}\\
+	\Delta \text{\foreignlanguage{russian}{м}}_k &= \frac{f_k\,\Delta P_k - e_k\,\Delta Q_k}{V_k^2} 
+	\label{eq:dim}
+\end{align}
+mit $V_k^2 = e_k^2 + f_k^2$. Diese Formulierung ist für PQ-Knoten direkt 
+auswertbar, da sowohl $\Delta P_k$ als auch $\Delta Q_k$ bekannte Größen sind. Die 
+Gleichungen~\eqref{eq:dir} und~\eqref{eq:dim} bilden das Gleichungssystem, welches im 
+Newton-Raphson-Verfahren iterativ gelöst wird.
 
-Die Anwendung des Newton-Verfahrens auf die Strommismatches \eqref{eq:cim_re}--\eqref{eq:cim_im} führt auf ein lineares Gleichungssystem der Form \cite{Garcia2000}:
+Die Lastmodellierung erfolgt gemäß dem in Abschnitt~\ref{subsec:zip} eingeführten 
+ZIP-Modell in polynomialer Form:
+\begin{align}
+	P_{L(k)} &= P_{0k}\left(\alpha_Z\,V_k^2 + \alpha_I\,V_k + \alpha_P\right) \label{eq:last_p}\\
+	Q_{L(k)} &= Q_{0k}\left(\alpha_Z\,V_k^2 + \alpha_I\,V_k + \alpha_P\right) \label{eq:last_q}
+\end{align}
+wobei die Koeffizienten die Bedingung $\alpha_Z + \alpha_I + \alpha_P = 1$ 
+erfüllen müssen. Die Terme $\alpha_Z$, $\alpha_I$ und $\alpha_P$ 
+repräsentieren die Anteile der konstanten Impedanz-, konstanten Strom- und konstanten 
+Leistungslast (vgl.\ Gleichung~\eqref{eq:zip}).
+
+%-----------------------------------------------------------------------------------
+\subsection{Jacobi-Matrix der CIM}\label{subsec:cim_jacobi}
+
+Das Newton-Raphson-Verfahren, angewandt auf die Strommismatch-Gleichungen, führt zu 
+folgendem linearen Gleichungssystem pro Iterationsschritt:
 \begin{equation}
 	\begin{bmatrix}
-		\vect{J}_{11} & \cdots & \vect{J}_{1n_b} \\
-		\vdots & \ddots & \vdots \\
-		\vect{J}_{n_b 1} & \cdots & \vect{J}_{n_b n_b}
-	\end{bmatrix}
-	\begin{bmatrix}
-		\Delta \vect{V}_1 \\
-		\vdots \\
-		\Delta \vect{V}_{n_b}
+		\Delta \text{\foreignlanguage{russian}{м}}_1 \\ \Delta \text{\foreignlanguage{russian}{д}}_1 \\ \vdots \\ \Delta \text{\foreignlanguage{russian}{м}}_n \\ \Delta \text{\foreignlanguage{russian}{д}}_n
 	\end{bmatrix}
 	=
+	\vect{J}
 	\begin{bmatrix}
-		\Delta \vect{I}_1 \\
-		\vdots \\
-		\Delta \vect{I}_{n_b}
+		\Delta e_1 \\ \Delta f_1 \\ \vdots \\ \Delta e_n \\ \Delta f_n
 	\end{bmatrix}
-	\label{eq:cim_system}
+	\label{eq:newton_system}
 \end{equation}
 
-wobei der Lösungsvektor pro Knoten $k$ als $\Delta \vect{V}_k = [\Delta e_k^a,\, \Delta f_k^a,\, \Delta e_k^b,\, \Delta f_k^b,\, \Delta e_k^c,\, \Delta f_k^c]^\top$ und der Mismatch-Vektor als $\Delta \vect{I}_k = [\Delta I_k^{a,\re},\, \Delta I_k^{a,\im},\, \Delta I_k^{b,\re},\, \Delta I_k^{b,\im},\, \Delta I_k^{c,\re},\, \Delta I_k^{c,\im}]^\top$ angeordnet ist.
+Die Anordnung der Gleichungen erfolgt dabei so, dass die Imaginärteil-Gleichungen 
+($\Delta \text{\foreignlanguage{russian}{м}}_k$) vor den Realteil-Gleichungen ($\Delta \text{\foreignlanguage{russian}{д}}_k$) stehen. Diese 
+Sortierung bewirkt, dass die Jacobi-Matrix $\vect{J}^*$ diagonaldominant wird, da 
+die Suszeptanzen $B_{km}$ betragsmäßig typischerweise deutlich größer als die 
+Konduktanzen $G_{km}$ sind \cite{DaCosta1999}.
 
-Die Jacobi-Matrix besteht aus $6 \times 6$-Blöcken (bei dreiphasiger Darstellung). Eine zentrale Eigenschaft der CIM ist, dass die \textbf{Außerdiagonalblöcke} ($k \neq m$) identisch mit den entsprechenden Elementen der Admittanzmatrix sind und daher \textit{konstant} über alle Iterationen bleiben \cite{Garcia2000}:
+Die Jacobi-Matrix $\vect{J}^*$ besitzt die gleiche Blockstruktur wie die 
+$(2n \times 2n)$-Knotenadmittanzmatrix, wobei jeder Netzwerkzweig durch einen 
+$(2 \times 2)$-Block repräsentiert wird. Für die Außerdiagonalelemente gilt bei 
+Verbindung zwischen PQ-Knoten $k$ und $m$:
 \begin{equation}
 	\vect{J}_{km} = 
 	\begin{bmatrix}
-		G_{km}^{aa} & -B_{km}^{aa} & G_{km}^{ab} & -B_{km}^{ab} & G_{km}^{ac} & -B_{km}^{ac} \\
-		B_{km}^{aa} &  G_{km}^{aa} & B_{km}^{ab} &  G_{km}^{ab} & B_{km}^{ac} &  G_{km}^{ac} \\
-		G_{km}^{ba} & -B_{km}^{ba} & G_{km}^{bb} & -B_{km}^{bb} & G_{km}^{bc} & -B_{km}^{bc} \\
-		B_{km}^{ba} &  G_{km}^{ba} & B_{km}^{bb} &  G_{km}^{bb} & B_{km}^{bc} &  G_{km}^{bc} \\
-		G_{km}^{ca} & -B_{km}^{ca} & G_{km}^{cb} & -B_{km}^{cb} & G_{km}^{cc} & -B_{km}^{cc} \\
-		B_{km}^{ca} &  G_{km}^{ca} & B_{km}^{cb} &  G_{km}^{cb} & B_{km}^{cc} &  G_{km}^{cc}
+		-B_{km} & G_{km} \\
+		G_{km} & B_{km}
 	\end{bmatrix}
-	\quad (k \neq m)
-	\label{eq:cim_offdiag}
+	\label{eq:offdiag_pq}
 \end{equation}
 
-Die Struktur jedes $2 \times 2$-Phasen-Subblocks entspricht der reell-imaginären Zerlegung des Admittanzelements $Y_{km}^{st} = G_{km}^{st} + \jj B_{km}^{st}$ in der Anordnung $[\Delta I^{\re},\, \Delta I^{\im}]^\top$ gegenüber $[\Delta e,\, \Delta f]^\top$.
+Diese Blöcke sind identisch mit den entsprechenden Elementen der Knotenadmittanzmatrix 
+in kartesischer Darstellung und bleiben daher während des gesamten Iterationsprozesses 
+\textbf{konstant}. Dies ist der zentrale Vorteil der CIM gegenüber der konventionellen 
+Formulierung: Die aufwendige Neuberechnung der Außerdiagonalelemente entfällt vollständig.
 
-Nur die \textbf{Diagonalblöcke} ($k = k$) müssen in jeder Iteration aktualisiert werden. Für einen PQ-Knoten hat der Diagonalblock die Struktur \cite{Garcia2000}:
+Die $(2 \times 2)$-Diagonalblöcke für einen PQ-Knoten~$k$ haben die Form:
 \begin{equation}
-	\vect{J}_{kk} = \vect{J}_{km}\big|_{m=k} + 
+	\vect{J}_{kk} = 
 	\begin{bmatrix}
-		a_k^a & b_k^a & 0 & 0 & 0 & 0 \\
-		c_k^a & d_k^a & 0 & 0 & 0 & 0 \\
-		0 & 0 & a_k^b & b_k^b & 0 & 0 \\
-		0 & 0 & c_k^b & d_k^b & 0 & 0 \\
-		0 & 0 & 0 & 0 & a_k^c & b_k^c \\
-		0 & 0 & 0 & 0 & c_k^c & d_k^c
+		-B_{kk}' & G_{kk}' \\
+		G_{kk}'' & B_{kk}''
 	\end{bmatrix}
-	\label{eq:cim_diagblock}
+	\label{eq:diag_pq}
 \end{equation}
-
-wobei $\vect{J}_{km}\big|_{m=k}$ den Admittanzanteil (Selbstadmittanz) gemäß \eqref{eq:cim_offdiag} mit $m = k$ bezeichnet. Die lastmodellabhängigen Elemente für konstante Leistung sind gegeben durch \cite{Garcia2000}:
+mit den modifizierten Elementen \cite{DaCosta1999}:
 \begin{align}
-	a_k^\phi &= \frac{P_k^\phi \left[(f_k^\phi)^2 - (e_k^\phi)^2\right] - 2 Q_k^\phi e_k^\phi f_k^\phi}{\left[(e_k^\phi)^2 + (f_k^\phi)^2\right]^2} \label{eq:cim_a}\\
-	b_k^\phi &= \frac{Q_k^\phi \left[(f_k^\phi)^2 - (e_k^\phi)^2\right] + 2 P_k^\phi e_k^\phi f_k^\phi}{\left[(e_k^\phi)^2 + (f_k^\phi)^2\right]^2} \label{eq:cim_b}\\
-	c_k^\phi &= -b_k^\phi \label{eq:cim_c}\\
-	d_k^\phi &= a_k^\phi \label{eq:cim_d}
+	B_{kk}'  &= B_{kk} - a_k  \label{eq:bprime}\\
+	G_{kk}'  &= G_{kk} - b_k  \label{eq:gprime}\\
+	G_{kk}'' &= G_{kk} - c_k  \label{eq:gdprime}\\
+	B_{kk}'' &= -B_{kk} - d_k \label{eq:bdprime}
 \end{align}
 
-\subsection{Behandlung von PV-Knoten in der CIM}
-\label{subsec:cim_pv}
+Die Terme $a_k$, $b_k$, $c_k$ und $d_k$ hängen von der spezifizierten Last und 
+Erzeugung am Knoten~$k$ sowie vom gewählten Lastmodell ab. Für den Fall einer reinen 
+Konstantleistungslast ($\alpha_P = 1$, $\alpha_Z = \alpha_I = 0$) vereinfachen sich 
+diese zu \cite{DaCosta1999}:
+\begin{align}
+	a_k = -d_k &= \frac{Q_k'\!\left(e_k^2 - f_k^2\right) 
+		- 2\,e_k\,f_k\,P_k'}{V_k^4}
+	\label{eq:ak_constP}\\[6pt]
+	b_k = -c_k &= \frac{P_k'\!\left e_k^2 - f_k^2\right) 
+		+ 2\, e_k\,f_k\,Q_k'}{V_k^4}
+	\label{eq:bk_constP}
+\end{align}
+mit
+\begin{align}
+	P_k' &= P_{G(k)} - P_{0k}\,\alpha_P \label{eq:Pprime}\\
+	Q_k' &= Q_{G(k)} - Q_{0k}\,\alpha_P \label{eq:Qprime}
+\end{align}
+wobei $P_{G(k)}$ und $Q_{G(k)}$ die erzeugte Wirk- bzw.\ Blindleistung am Knoten~$k$ 
+bezeichnen und $P_{0k}$, $Q_{0k}$ die Nennlastwerte sind.
 
-Die PV-Knoten-Behandlung in der CIM erfordert eine Erweiterung des Gleichungssystems \cite{Garcia2000,DaCosta1999}. Für jeden PV-Knoten $k$ werden drei zusätzliche Unbekannte $\Delta Q_k^a$, $\Delta Q_k^b$, $\Delta Q_k^c$ (eine pro Phase) eingeführt und drei zusätzliche Gleichungen (die Spannungsbedingung pro Phase) hinzugefügt.
+%Die Terme $a_k$, $b_k$, $c_k$ und $d_k$ in den Gleichungen~\eqref{eq:bprime}--\eqref{eq:bdprime}
+%werden im Appendix von \cite{DaCosta1999} hergeleitet. Zunächst werden die Hilfsgrößen
+%$P_k'$ und $Q_k'$ definiert als:
+%\begin{align}
+%	P_k' &= P_{G(k)} - P_{0k}\,a_p \label{eq:Pprime}\\
+%	Q_k' &= Q_{G(k)} - Q_{0k}\,a_q \label{eq:Qprime}
+%\end{align}
+%wobei $P_{G(k)}$ und $Q_{G(k)}$ die erzeugte Wirk- bzw.\ Blindleistung am Knoten~$k$ 
+%bezeichnen und $P_{0k}$, $Q_{0k}$ die Nennlastwerte sind. Die Koeffizienten $a_p$ und 
+%$a_q$ entsprechen dem Konstantimpedanz-Anteil des polynomialen Lastmodells 
+%(Gleichungen~\eqref{eq:last_p} und~\eqref{eq:last_q}).
+%
+%Die vollständigen Ausdrücke für die vier Terme lauten \cite{DaCosta1999}:
+%\begin{align}
+%	a_k &= \frac{Q_k'\!\left(V_{rk}^2 - V_{mk}^2\right) 
+%		- 2\,V_{rk}\,V_{mk}\,P_k'}{V_k^4}
+%	+ \frac{Q_{0k}\,b_q\!\left(V_{rk}^2 - V_{mk}^2\right) 
+%		- 2\,V_{rk}\,V_{mk}\,P_{0k}\,b_p}{2\,V_k^3}
+%	+ Q_{0k}\,a_q
+%	\label{eq:ak_general}\\[10pt]
+%	%
+%	b_k &= -\frac{P_k'\!\left(V_{rk}^2 - V_{mk}^2\right) 
+%		+ 2\,V_{rk}\,V_{mk}\,Q_k'}{V_k^4}
+%	- \frac{P_{0k}\,b_p\!\left(V_{rk}^2 - V_{mk}^2\right) 
+%		+ 2\,V_{rk}\,V_{mk}\,Q_{0k}\,b_q}{2\,V_k^3}
+%	- P_{0k}\,a_p
+%	\label{eq:bk_general}\\[10pt]
+%	%
+%	c_k &= \frac{P_k'\!\left(V_{rk}^2 - V_{mk}^2\right) 
+%		+ 2\,V_{rk}\,V_{mk}\,Q_k'}{V_k^4}
+%	+ \frac{P_{0k}\,b_p\!\left(V_{rk}^2 - V_{mk}^2\right) 
+%		+ 2\,V_{rk}\,V_{mk}\,Q_{0k}\,b_q}{2\,V_k^3}
+%	- P_{0k}\,a_p
+%	\label{eq:ck_general}\\[10pt]
+%	%
+%	d_k &= \frac{Q_k'\!\left(V_{rk}^2 - V_{mk}^2\right) 
+%		- 2\,V_{rk}\,V_{mk}\,P_k'}{V_k^4}
+%	- \frac{Q_{0k}\,b_q\!\left(V_{rk}^2 - V_{mk}^2\right) 
+%		- 2\,V_{rk}\,V_{mk}\,P_{0k}\,b_p}{2\,V_k^3}
+%	- Q_{0k}\,a_q
+%	\label{eq:dk_general}
+%\end{align}
+%mit $V_k^2 = V_{rk}^2 + V_{mk}^2$.
 
-Angenommen, PV-Bus $k$ ist mit den Bussen $l$ und $m$ verbunden, dann hat das erweiterte System gemäß \cite{Garcia2000} die Form:
+Da diese Terme von der aktuellen Spannung $V_k$ abhängen, müssen die Diagonalblöcke 
+in jedem Iterationsschritt aktualisiert werden. Für Knoten ohne spezifizierte Last 
+oder mit reiner Impedanzlast ($a_p = 1$, $b_p = c_p = 0$) reduzieren sich die Terme 
+$a_k$, $b_k$, $c_k$ und $d_k$ auf konstante Admittanzanteile, sodass der 
+Diagonalblock während des gesamten Iterationsprozesses unverändert bleibt 
+\cite{DaCosta1999}.
+
+Die Spannungskorrekturen werden nach der Lösung des linearen Gleichungssystems in 
+kartesischen Koordinaten berechnet und können anschließend in polare Koordinaten 
+umgerechnet werden:
+\begin{align}
+	\Delta \theta_k &= \arctan\left(\frac{e_k\,\Delta f_k - f_k\,\Delta e_k}
+	{e_k^2 + f_k^2}\right) \label{eq:dtheta}\\
+	\Delta V_k &= \frac{e_k\,\Delta e_k + f_k\,\Delta f_k}{V_k} 
+	\label{eq:dv_polar}
+\end{align}
+
+Die Aktualisierung der Zustandsgrößen erfolgt gemäß:
+\begin{align}
+	\theta_k^{(h+1)} &= \theta_k^{(h)} + \Delta \theta_k^{(h+1)} \label{eq:update_theta}\\
+	V_k^{(h+1)} &= V_k^{(h)} + \Delta V_k^{(h+1)} \label{eq:update_v}
+\end{align}
+wobei $h$ den Iterationszähler bezeichnet. Es ist hervorzuheben, dass die 
+Konvergenztrajektorie der CIM identisch mit der des konventionellen Newton-Raphson-
+Verfahrens in Polarkoordinaten ist \cite{DaCosta1999}.
+
+%-----------------------------------------------------------------------------------
+\subsection{Behandlung von PV-Knoten in der CIM}\label{subsec:cim_pv}
+
+An PV-Knoten (Generatorknoten) sind die Wirkleistungseinspeisung $P_k^{\mathrm{sp}}$ 
+und der Spannungsbetrag $V_k^{\mathrm{sp}}$ vorgegeben, während die Blindleistung 
+$Q_k$ eine unbekannte (abhängige) Variable darstellt. Dies erfordert eine besondere 
+Behandlung innerhalb der CIM, da der Blindleistungs-Mismatch $\Delta Q_k$ in den 
+Gleichungen~\eqref{eq:dir} und~\eqref{eq:dim} nicht direkt bekannt ist.
+
+Der in \cite{DaCosta1999} vorgeschlagene Ansatz löst dieses Problem elegant durch die 
+Einführung einer zusätzlichen abhängigen Variablen $\Delta Q_k$ für jeden PV-Knoten 
+sowie einer zusätzlichen linearisierten Gleichung, die die Bedingung eines konstanten 
+Spannungsbetrags $|\Delta V_k| = 0$ erzwingt. Die linearisierte Form dieser Bedingung 
+lautet:
+\begin{equation}
+	e_k\,\Delta e_k + f_k\,\Delta f_k = 0
+	\label{eq:dv_constraint}
+\end{equation}
+
+Diese Gleichung kann umgestellt werden zu:
+\begin{equation}
+	\Delta f_k = -\frac{e_k}{f_k}\,\Delta e_k
+	\label{eq:dvm_constraint}
+\end{equation}
+
+Durch Einsetzen von Gleichung~\eqref{eq:dvm_constraint} in die 
+Strommismatch-Gleichungen des Knotens~$k$ wird die abhängige Variable $\Delta Q_k$ 
+(in Form von $\Delta Q_k / V_k^2$) anstelle von $\Delta f_k$ als Unbekannte im 
+Gleichungssystem verwendet. Dies bedeutet, dass im Lösungsvektor die Komponente 
+$\Delta f_k$ für jeden PV-Knoten durch $\Delta Q_k / V_k^2$ ersetzt wird.
+
+Das resultierende erweiterte Gleichungssystem für einen PV-Knoten~$k$ lässt sich in 
+Blockform schreiben als:
 \begin{equation}
 	\begin{bmatrix}
-		\vect{A}_{kk} & \vect{B}_{kk} & \vect{A}_{kl} & \vect{B}_{kl} & \vect{A}_{km} & \vect{B}_{km} & \vect{D}_k \\
-		\vect{C}_{kk} & \hat{\vect{B}}_{kk} & \vect{C}_{kl} & \hat{\vect{B}}_{kl} & \vect{C}_{km} & \hat{\vect{B}}_{km} & \vect{M}_k \\
-		\vect{A}_{lk} & \vect{B}_{lk} & \vect{A}_{ll} & \vect{B}_{ll} & 0 & 0 & 0 \\
-		\vect{C}_{lk} & \hat{\vect{B}}_{lk} & \vect{C}_{ll} & \hat{\vect{B}}_{ll} & 0 & 0 & 0 \\
-		\vect{A}_{mk} & \vect{B}_{mk} & 0 & 0 & \vect{A}_{mm} & \vect{B}_{mm} & 0 \\
-		\vect{C}_{mk} & \hat{\vect{B}}_{mk} & 0 & 0 & \vect{C}_{mm} & \hat{\vect{B}}_{mm} & 0 \\
-		\vect{L}_k & \vect{N}_k & 0 & 0 & 0 & 0 & 0
-	\end{bmatrix}
-	\begin{bmatrix}
-		\Delta \vect{e}_k \\
-		\Delta \vect{f}_k \\
-		\Delta \vect{e}_l \\
-		\Delta \vect{f}_l \\
-		\Delta \vect{e}_m \\
-		\Delta \vect{f}_m \\
-		\Delta \vect{Q}_k
+		\Delta \text{\foreignlanguage{russian}{м}}_k \\ \Delta \text{\foreignlanguage{russian}{д}}_k \\ 0
 	\end{bmatrix}
 	=
 	\begin{bmatrix}
-		\Delta \vect{I}_r^k \\
-		\Delta \vect{I}_m^k \\
-		\Delta \vect{I}_r^l \\
-		\Delta \vect{I}_m^l \\
-		\Delta \vect{I}_r^m \\
-		\Delta \vect{I}_m^m \\
-		\Delta \vect{V}_k
+		-B_{kk} & G_{kk} & f_k/V_k^2 \\
+		G_{kk} & B_{kk} & -e_k/V_k^2 \\
+		e_k & f_k & 0
 	\end{bmatrix}
-	\label{eq:cim_pv_system}
-\end{equation}
-
-Hierbei bezeichnen $\Delta \vect{e}_k = [\Delta e_k^a,\, \Delta e_k^b,\, \Delta e_k^c]^\top$ und $\Delta \vect{f}_k = [\Delta f_k^a,\, \Delta f_k^b,\, \Delta f_k^c]^\top$ die Spannungskorrekturen in kartesischen Koordinaten, $\Delta \vect{Q}_k = [\Delta Q_k^a,\, \Delta Q_k^b,\, \Delta Q_k^c]^\top$ die Blindleistungskorrekturen, und $\Delta \vect{I}_r^k$, $\Delta \vect{I}_m^k$ die Real- bzw.\ Imaginärteile der Strommismatches. Die Untermatrizen haben jeweils die Ordnung $3 \times 3$.
-
-Die Diagonalblöcke des PV-Knotens $k$ enthalten die Admittanzelemente plus lastmodellabhängige Terme \cite{Garcia2000}:
-\begin{align}
-	(A_{kk})^{st} &= G_{kk}^{st} + a_k^s \delta_{st} \label{eq:Akk}\\
-	(B_{kk})^{st} &= -B_{kk}^{st} + b_k^s \delta_{st} \label{eq:Bkk}\\
-	(C_{kk})^{st} &= B_{kk}^{st} + c_k^s \delta_{st} \label{eq:Ckk}\\
-	(\hat{B}_{kk})^{st} &= G_{kk}^{st} + d_k^s \delta_{st} \label{eq:Bkk_hat}
-\end{align}
-wobei $\delta_{st}$ das Kronecker-Delta ist, die Indizes $s,t \in \{a,b,c\}$ die Phasen bezeichnen, und die Koeffizienten $a_k^\phi$, $b_k^\phi$, $c_k^\phi$, $d_k^\phi$ durch \eqref{eq:cim_a}--\eqref{eq:cim_d} gegeben sind. Da am PV-Knoten $Q_k^\phi$ unbekannt ist und in jeder Iteration aktualisiert wird, ändern sich diese Koeffizienten entsprechend.
-
-Die Außerdiagonalblöcke ($l \neq k$) für PQ-Knoten sind identisch mit den Admittanzmatrix-Elementen \cite{Garcia2000}:
-\begin{equation}
-	(A_{lk})^{st} = G_{lk}^{st}, \quad
-	(B_{lk})^{st} = -B_{lk}^{st}, \quad
-	(C_{lk})^{st} = B_{lk}^{st}, \quad
-	(\hat{B}_{lk})^{st} = G_{lk}^{st}
-	\label{eq:offdiag_standard}
-\end{equation}
-
-\subsubsection{Matrizen $\vect{D}_k$ und $\vect{M}_k$}
-
-Die Matrizen $\vect{D}_k, \vect{M}_k \in \R^{3 \times 3}$ beschreiben den Einfluss der Blindleistungsänderung $\Delta Q_k^\phi$ auf den Strommismatch am PV-Knoten $k$ selbst. Sie ergeben sich durch Ableitung des spezifizierten Stroms nach $Q_k^\phi$ und sind Diagonalmatrizen \cite{Garcia2000,DaCosta1999}:
-\begin{equation}
-	\vect{D}_k = 
 	\begin{bmatrix}
-		\dfrac{f_k^a}{|V_k^a|^2} & 0 & 0 \\[6pt]
-		0 & \dfrac{f_k^b}{|V_k^b|^2} & 0 \\[6pt]
-		0 & 0 & \dfrac{f_k^c}{|V_k^c|^2}
-	\end{bmatrix}, \qquad
-	\vect{M}_k = 
-	\begin{bmatrix}
-		\dfrac{-e_k^a}{|V_k^a|^2} & 0 & 0 \\[6pt]
-		0 & \dfrac{-e_k^b}{|V_k^b|^2} & 0 \\[6pt]
-		0 & 0 & \dfrac{-e_k^c}{|V_k^c|^2}
+		\Delta e_k \\ \Delta f_k \\ \Delta Q_k
 	\end{bmatrix}
-	\label{eq:Dk_Mk}
+	\label{eq:pv_augmented}
 \end{equation}
 
-Die Herleitung folgt aus der Zerlegung des Strommismatches gemäß \eqref{eq:cim_re}--\eqref{eq:cim_im}. Da der Strommismatch über die Beziehungen \cite{DaCosta1999}
+Durch Elimination der dritten Zeile und Substitution von $\Delta f_k$ ergibt sich 
+ein $(2 \times 2)$-Diagonalblock für den PV-Knoten~$k$:
 \begin{equation}
-	\Delta I_k^{\phi,\re} = \frac{e_k^\phi \Delta P_k^\phi + f_k^\phi \Delta Q_k^\phi}{|V_k^\phi|^2}, \qquad
-	\Delta I_k^{\phi,\im} = \frac{f_k^\phi \Delta P_k^\phi - e_k^\phi \Delta Q_k^\phi}{|V_k^\phi|^2}
-	\label{eq:mismatch_PQ_relation}
-\end{equation}
-mit den Leistungsmismatches verknüpft ist, ergeben sich die Koeffizienten von $\Delta Q_k^\phi$ direkt als Einträge von $\vect{D}_k$ und $\vect{M}_k$:
-\begin{equation}
-	(D_k)^{\phi\phi} = \frac{f_k^\phi}{|V_k^\phi|^2}, \qquad
-	(M_k)^{\phi\phi} = \frac{-e_k^\phi}{|V_k^\phi|^2}
-	\label{eq:dI_dQ}
-\end{equation}
-
-\subsubsection{Matrizen $\vect{L}_k$ und $\vect{N}_k$}
-
-Die Matrizen $\vect{L}_k, \vect{N}_k \in \R^{3 \times 3}$ stehen in der letzten Zeile von \eqref{eq:cim_pv_system} und beschreiben die linearisierte Spannungsbedingung $|V_k^\phi|^2 = |V_k^{\phi,\spec}|^2$. Die Ableitungen der Spannungsbetragsgleichung nach den Spannungskomponenten sind \cite{Garcia2000}:
-\begin{equation}
-	\frac{\partial |V_k^\phi|^2}{\partial e_k^\phi} = 2e_k^\phi, \qquad
-	\frac{\partial |V_k^\phi|^2}{\partial f_k^\phi} = 2f_k^\phi
-	\label{eq:dV_de}
-\end{equation}
-
-In Matrixform:
-\begin{equation}
-	\vect{L}_k = 
+	\vect{J}_{kk,\mathrm{PV}} = 
 	\begin{bmatrix}
-		2e_k^a & 0 & 0 \\
-		0 & 2e_k^b & 0 \\
-		0 & 0 & 2e_k^c
-	\end{bmatrix}, \qquad
-	\vect{N}_k = 
-	\begin{bmatrix}
-		2f_k^a & 0 & 0 \\
-		0 & 2f_k^b & 0 \\
-		0 & 0 & 2f_k^c
+		-B_{kk} - G_{kk}\,\dfrac{e_k}{f_k} & \dfrac{f_k}{V_k^2} \\[8pt]
+		G_{kk} + B_{kk}\,\dfrac{e_k}{f_k} & -\dfrac{e_k}{V_k^2}
 	\end{bmatrix}
-	\label{eq:Lk_Nk}
+	\label{eq:diag_pv}
 \end{equation}
 
-\subsubsection{Modifizierte Außerdiagonalelemente in Spalte $k$}
-
-Durch die Anwesenheit des PV-Knotens werden die Außerdiagonalelemente in der Spalte von Knoten $k$ spannungsabhängig. Die Elimination von $\Delta \vect{f}_k$ mithilfe der Spannungsbedingung (letzte Zeile von \eqref{eq:cim_pv_system}) führt auf die Beziehung \cite{DaCosta1999}:
+Die außerdiagonalen $(2 \times 2)$-Blöcke, die einen PV-Knoten~$k$ mit einem 
+benachbarten Knoten~$l$ verbinden, verändern sich ebenfalls. Die erste Spalte bleibt 
+identisch mit der Admittanzmatrix, während die zweite Spalte zu Null wird, da 
+$\Delta f_k$ durch die Spannungsbedingung eliminiert wurde:
 \begin{equation}
-	\Delta f_k^\phi = -\frac{e_k^\phi}{f_k^\phi} \Delta e_k^\phi
-	\label{eq:df_elimination}
+	\vect{J}_{lk,\mathrm{PV}} = 
+	\begin{bmatrix}
+		-B_{lk} - G_{lk}\,\dfrac{e_k}{f_k} & 0 \\[8pt]
+		G_{lk} + B_{lk}\,\dfrac{e_k}{f_k} & 0
+	\end{bmatrix}
+	\label{eq:offdiag_pv}
 \end{equation}
 
-Setzt man \eqref{eq:df_elimination} in die Außerdiagonalblöcke ein, so ergeben sich die modifizierten Elemente für einen benachbarten Bus $l$ gemäß \cite{Garcia2000}:
-\begin{align}
-	q_{lk}^{st} &= G_{lk}^{st} + B_{lk}^{st} \frac{f_k^t}{e_k^t} \label{eq:qlk}\\
-	r_{lk}^{st} &= B_{lk}^{st} - G_{lk}^{st} \frac{f_k^t}{e_k^t} \label{eq:rlk}
-\end{align}
-
-Hierbei ersetzt $q_{lk}^{st}$ die ursprünglichen $(A_{lk})^{st}$- und $(\hat{B}_{lk})^{st}$-Einträge, und $r_{lk}^{st}$ ersetzt die $(C_{lk})^{st}$- und $(B_{lk})^{st}$-Einträge in der Spalte des PV-Knotens. Diese Elemente müssen in jeder Iteration aktualisiert werden, da sie vom Verhältnis $f_k^t / e_k^t$ abhängen.
-
-\subsubsection{Mismatches am PV-Knoten}
-
-Der dreiphasige Strommismatch $\Delta \vect{I}_k$ am PV-Knoten wird analog zu \eqref{eq:cim_re}--\eqref{eq:cim_im} berechnet, wobei $Q_k^{\phi,(h)}$ der aktuelle Schätzwert der Blindleistung in Iteration $h$ ist \cite{Garcia2000}:
-\begin{align}
-	\Delta I_k^{\phi,\re} &= \frac{P_k^\phi e_k^\phi + Q_k^{\phi,(h)} f_k^\phi}{(e_k^\phi)^2 + (f_k^\phi)^2} - \sum_{m} (G_{km}^\phi e_m^\phi - B_{km}^\phi f_m^\phi) \label{eq:cim_pv_re}\\
-	\Delta I_k^{\phi,\im} &= \frac{P_k^\phi f_k^\phi - Q_k^{\phi,(h)} e_k^\phi}{(e_k^\phi)^2 + (f_k^\phi)^2} - \sum_{m} (G_{km}^\phi f_m^\phi + B_{km}^\phi e_m^\phi) \label{eq:cim_pv_im}
-\end{align}
-
-Die Blindleistung wird in jeder Iteration aktualisiert:
+Diese Implementierung bewahrt die $(2n \times 2n)$-Struktur der Jacobi-Matrix 
+unabhängig von der Anzahl der PV-Knoten im System. Die Unbekannte $\Delta f_k$ 
+wird durch $\Delta Q_k$ ersetzt, sodass nach der Lösung des Gleichungssystems der 
+aktualisierte Blindleistungs-Mismatch direkt verfügbar ist. Die Spannung am 
+PV-Knoten wird ausschließlich über die Winkelkorrektur aktualisiert:
 \begin{equation}
-	Q_k^{\phi,(h+1)} = Q_k^{\phi,(h)} + \Delta Q_k^\phi
-	\label{eq:Q_update}
+	\theta_k^{(h+1)} = \theta_k^{(h)} + \Delta \theta_k^{(h+1)}
+	\label{eq:pv_update}
 \end{equation}
+während der Spannungsbetrag $V_k = V_k^{\mathrm{sp}}$ konstant bleibt.
 
-Der Spannungsmismatch in der letzten Zeile von \eqref{eq:cim_pv_system} ist:
+Abbildung~\ref{fig:jacobi_structure} illustriert schematisch die Struktur der 
+Jacobi-Matrix $\vect{J}^*$ für ein System mit PQ- und PV-Knoten. Die mit einem 
+Stern (\textasteriskcentered) markierten Elemente werden in jeder Iteration 
+aktualisiert, während alle übrigen Elemente konstant bleiben.
+
+Ein wesentlicher Vorteil dieser Formulierung ist, dass die Konvergenzcharakteristik 
+vollständig mit der des konventionellen Newton-Raphson-Verfahrens in Polarkoordinaten 
+übereinstimmt. Dies wurde von da~Costa et~al.\ \cite{DaCosta1999} anhand 
+praxisrelevanter Testnetze mit bis zu 2111~Knoten nachgewiesen, wobei identische 
+Konvergenzverläufe bei einer gleichzeitigen Reduktion der Rechenzeit um über 20\,\% 
+erzielt wurden. Die Rechenzeiteinsparung resultiert primär aus der Konstanz der 
+außerdiagonalen Jacobi-Elemente sowie dem Entfall trigonometrischer 
+Funktionsauswertungen.
+
+%-----------------------------------------------------------------------------------
+\subsection{Q-Limits und PV-zu-PQ-Umwandlung}\label{subsec:q_limits}
+
+In realen Energieversorgungssystemen unterliegen Generatoren physikalischen 
+Blindleistungsgrenzen:
 \begin{equation}
-	\Delta |V_k^\phi|^2 = |V_k^{\phi,\spec}|^2 - \left[(e_k^\phi)^2 + (f_k^\phi)^2\right]
-	\label{eq:spannungsmismatch}
+	Q_k^{\min} \leq Q_k \leq Q_k^{\max}
+	\label{eq:q_limits}
 \end{equation}
 
-\subsubsection{Auswirkung auf die Jacobi-Matrix-Struktur}
+Solange die am PV-Knoten berechnete Blindleistung $Q_k$ innerhalb dieser Grenzen 
+liegt, kann der Generator die spezifizierte Spannung aufrechterhalten. Wird eine 
+der Grenzen verletzt, muss der PV-Knoten in einen PQ-Knoten umgewandelt werden, 
+wobei $Q_k^{\mathrm{sp}}$ auf den verletzten Grenzwert fixiert wird.
 
-Im Gegensatz zu reinen PQ-Systemen, bei denen nur die Diagonalblöcke in jeder Iteration aktualisiert werden müssen, erfordert die Anwesenheit eines PV-Knotens die Aktualisierung der \textit{gesamten zugehörigen Spalte} der Jacobi-Matrix \cite{Garcia2000}. Dies umfasst:
+Bei der Umwandlung ändert sich die Struktur der Jacobi-Matrix lokal:
 \begin{itemize}
-	\item den Diagonalblock $\vect{J}_{kk}$, da die Koeffizienten $a_k^\phi$, $b_k^\phi$, $c_k^\phi$, $d_k^\phi$ vom aktuellen Schätzwert $Q_k^{\phi,(h)}$ abhängen,
-	\item die Matrizen $\vect{D}_k$ und $\vect{M}_k$, die von den Spannungskomponenten abhängen,
-	\item die modifizierten Außerdiagonalelemente $q_{lk}^{st}$ und $r_{lk}^{st}$ in der Spalte von Knoten $k$, sowie
-	\item die Matrizen $\vect{L}_k$ und $\vect{N}_k$ in der Spannungsbedingungszeile.
+	\item Der $(2 \times 2)$-Diagonalblock wechselt von der PV-Form 
+	(Gleichung~\eqref{eq:diag_pv}) zur PQ-Form (Gleichung~\eqref{eq:diag_pq}), 
+	wobei $Q_k^{\mathrm{sp}}$ den fixierten Grenzwert annimmt.
+	\item Die außerdiagonalen Blöcke in der Spalte des betroffenen Knotens kehren 
+	zur Standardform gemäß Gleichung~\eqref{eq:offdiag_pq} zurück.
+	\item Die Unbekannte $\Delta Q_k$ wird durch $\Delta V_{mk}$ ersetzt, sodass 
+	der Spannungsbetrag frei variieren kann.
 \end{itemize}
-\Cref{fig:jacobi_pv} illustriert diese Struktur schematisch.
 
-\begin{figure}[H]
-	\centering
-	\begin{tikzpicture}[scale=0.55]
-		% Hauptmatrix
-		\draw[thick] (0,0) rectangle (10,10);
-		
-		% Diagonalblöcke (PQ-Busse)
-		\fill[blue!15] (0,8) rectangle (2,10);
-		\fill[blue!15] (2,6) rectangle (4,8);
-		\fill[blue!15] (4,4) rectangle (6,6);
-		\fill[blue!15] (6,2) rectangle (8,4);
-		
-		% PV-Bus Diagonalblock
-		\fill[orange!30] (8,0) rectangle (10,2);
-		
-		% Spalte des PV-Bus (off-diagonal, aktualisiert)
-		\fill[red!20] (8,2) rectangle (10,10);
-		
-		% Zusätzliche Spalte (ΔQ)
-		\fill[yellow!30] (10,0) rectangle (11,10);
-		
-		% Zusätzliche Zeile (Spannungsbedingung)
-		\fill[green!20] (0,-1.5) rectangle (10,0);
-		
-		% Null-Block
-		\fill[gray!10] (10,-1.5) rectangle (11,0);
-		
-		% Rahmen
-		\draw[thick] (10,0) rectangle (11,10);
-		\draw[thick] (0,-1.5) rectangle (10,0);
-		\draw[thick] (10,-1.5) rectangle (11,0);
-		
-		% Beschriftungen
-		\node[font=\footnotesize] at (1,9) {$\vect{J}_{11}$};
-		\node[font=\footnotesize] at (3,7) {$\vect{J}_{22}$};
-		\node[font=\footnotesize] at (5,5) {$\vect{J}_{33}$};
-		\node[font=\footnotesize] at (7,3) {$\vect{J}_{44}$};
-		\node[font=\footnotesize] at (9,1) {$\vect{J}_{kk}$};
-		\node[font=\footnotesize] at (10.5,5) {$\frac{\vect{D}_k}{\vect{M}_k}$};
-		\node[font=\footnotesize] at (9,6) {$q,r$};
-		\node[font=\footnotesize] at (5,-0.75) {$\vect{L}_k \quad \vect{N}_k$};
-		\node[font=\footnotesize] at (10.5,-0.75) {$\vect{0}$};
-		
-		% Legende
-		\node[font=\footnotesize, anchor=west] at (12,9) {\tikz\fill[blue!15] (0,0) rectangle (0.3,0.3); PQ-Diagonalblöcke (jede Iter.)};
-		\node[font=\footnotesize, anchor=west] at (12,8) {\tikz\fill[red!20] (0,0) rectangle (0.3,0.3); Spalte $k$: $q_{lk}^{st}$, $r_{lk}^{st}$ (jede Iter.)};
-		\node[font=\footnotesize, anchor=west] at (12,7) {\tikz\fill[orange!30] (0,0) rectangle (0.3,0.3); PV-Diagonalblock (jede Iter.)};
-		\node[font=\footnotesize, anchor=west] at (12,6) {\tikz\fill[yellow!30] (0,0) rectangle (0.3,0.3); $\vect{D}_k$/$\vect{M}_k$-Spalte (jede Iter.)};
-		\node[font=\footnotesize, anchor=west] at (12,5) {\tikz\fill[green!20] (0,0) rectangle (0.3,0.3); Spannungsbedingung (jede Iter.)};
-	\end{tikzpicture}
-	\caption{Schematische Struktur der erweiterten Jacobi-Matrix mit PV-Knoten gemäß \cite{Garcia2000}. Die Außerdiagonalblöcke der PQ-Knoten (weiß) sind konstant. Die gesamte Spalte des PV-Knotens sowie die zusätzliche $\Delta Q$-Spalte und Spannungsbedingungszeile müssen in jeder Iteration aktualisiert werden.}
-	\label{fig:jacobi_pv}
-\end{figure}
+Die Rückumwandlung in einen PV-Knoten erfolgt, wenn die berechnete Spannung den 
+Sollwert $V_k^{\mathrm{sp}}$ überschreitet (bei Fixierung auf $Q_k^{\min}$) bzw.\ 
+unterschreitet (bei Fixierung auf $Q_k^{\max}$). Um Oszillationen zwischen den 
+Knotentypen zu vermeiden, empfiehlt es sich, die Umwandlungslogik erst nach 
+einigen Anfangsiterationen zu aktivieren.
 
-\subsection{Q-Limits und PV-zu-PQ-Umwandlung}
-\label{subsec:q_limits}
-
-Generatoren an PV-Knoten haben begrenzte Blindleistungsreserven $Q_k^\phi \in [Q_k^{\phi,\min}, Q_k^{\phi,\max}]$. Wenn die nach Konvergenz berechnete Blindleistung ein Limit verletzt, wird der Knoten als PQ-Knoten mit $Q_k^\phi = Q_k^{\phi,\min}$ bzw.\ $Q_k^\phi = Q_k^{\phi,\max}$ weiterbehandelt. Die zusätzlichen Zeilen und Spalten für $\vect{D}_k$/$\vect{M}_k$ und $\vect{L}_k$/$\vect{N}_k$ entfallen dann aus dem Gleichungssystem, und die Jacobi-Spalte von Knoten $k$ wird wieder konstant.
-
-Umgekehrt muss nach jedem Konvergenzschritt geprüft werden, ob ein zuvor als PQ umgewandelter Knoten wieder als PV-Knoten behandelt werden sollte. Dies ist der Fall, wenn die resultierende Spannung den spezifizierten Wert über- bzw.\ unterschreitet und die Blindleistung sich in Richtung des zulässigen Bereichs bewegen würde.
-
-%%======================================================================
-%\section{Current Injection Method und PV-Behandlung}
-%\label{sec:cim}
-%%======================================================================
-%
-%Die Current Injection Method (CIM), eingeführt von Garcia et al.\ \cite{Garcia2000}, formuliert das Lastflussproblem auf Basis der Strommismatches anstelle der Leistungsmismatches. Dies führt zu einer Jacobi-Matrix, deren Struktur weitgehend der Admittanzmatrix entspricht und daher vorteilhafte Sparsity-Eigenschaften besitzt.
-%
-%\subsection{Strommismatch-Formulierung}
-%\label{subsec:cim_grundgleichung}
-%
-%Der dreiphasige Strommismatch am Knoten $k$ in Phase $\phi$ ist definiert als die Differenz zwischen dem spezifizierten Strom (aus der Leistung berechnet) und dem aus der Admittanzmatrix berechneten Strom \cite{Garcia2000}:
-%\begin{equation}
-%	\Delta I_k^\phi = I_k^{\phi,\spec} - I_k^{\phi,\text{calc}} = \frac{(P_k^\phi - \jj Q_k^\phi)(e_k^\phi + \jj f_k^\phi)}{(e_k^\phi)^2 + (f_k^\phi)^2} - \sum_{m \in \mathcal{N}_k} Y_{km}^\phi V_m^\phi
-%	\label{eq:cim_mismatch}
-%\end{equation}
-%
-%Dabei wurde \eqref{eq:strom_aus_leistung} verwendet und der Strom in Real- und Imaginärteil zerlegt. Die Zerlegung von \eqref{eq:cim_mismatch} ergibt:
-%\begin{align}
-%	\Delta I_k^{\phi,\text{re}} &= \frac{P_k^\phi e_k^\phi + Q_k^\phi f_k^\phi}{(e_k^\phi)^2 + (f_k^\phi)^2} - \sum_{m} (G_{km}^\phi e_m^\phi - B_{km}^\phi f_m^\phi) \label{eq:cim_re}\\
-%	\Delta I_k^{\phi,\text{im}} &= \frac{P_k^\phi f_k^\phi - Q_k^\phi e_k^\phi}{(e_k^\phi)^2 + (f_k^\phi)^2} - \sum_{m} (B_{km}^\phi e_m^\phi + G_{km}^\phi f_m^\phi) \label{eq:cim_im}
-%\end{align}
-%
-%\subsection{Jacobi-Matrix der CIM}
-%\label{subsec:cim_jacobi}
-%
-%Die Anwendung des Newton-Verfahrens auf die Strommismatches \eqref{eq:cim_re}--\eqref{eq:cim_im} führt auf ein lineares Gleichungssystem der Form \cite{Garcia2000}:
-%\begin{equation}
-%	\begin{bmatrix}
-%		\vect{J}_{11} & \cdots & \vect{J}_{1n_b} \\
-%		\vdots & \ddots & \vdots \\
-%		\vect{J}_{n_b 1} & \cdots & \vect{J}_{n_b n_b}
-%	\end{bmatrix}
-%	\begin{bmatrix}
-%		\Delta \vect{V}_1 \\
-%		\vdots \\
-%		\Delta \vect{V}_{n_b}
-%	\end{bmatrix}
-%	=
-%	\begin{bmatrix}
-%		\Delta \vect{I}_1 \\
-%		\vdots \\
-%		\Delta \vect{I}_{n_b}
-%	\end{bmatrix}
-%	\label{eq:cim_system}
-%\end{equation}
-%
-%Die Jacobi-Matrix besteht aus $6 \times 6$-Blöcken (bei dreiphasiger Darstellung). Eine zentrale Eigenschaft der CIM ist, dass die \textbf{Außerdiagonalblöcke} ($k \neq m$) identisch mit den entsprechenden Elementen der Admittanzmatrix sind und daher \textit{konstant} über alle Iterationen bleiben \cite{Garcia2000}:
-%\begin{equation}
-%	\vect{J}_{km} = 
-%	\begin{bmatrix}
-%		G_{km}^{aa} & -B_{km}^{aa} & G_{km}^{ab} & -B_{km}^{ab} & G_{km}^{ac} & -B_{km}^{ac} \\
-%		B_{km}^{aa} & G_{km}^{aa} & B_{km}^{ab} & G_{km}^{ab} & B_{km}^{ac} & G_{km}^{ac} \\
-%		G_{km}^{ba} & -B_{km}^{ba} & G_{km}^{bb} & -B_{km}^{bb} & G_{km}^{bc} & -B_{km}^{bc} \\
-%		B_{km}^{ba} & G_{km}^{ba} & B_{km}^{bb} & G_{km}^{bb} & B_{km}^{bc} & G_{km}^{bc} \\
-%		G_{km}^{ca} & -B_{km}^{ca} & G_{km}^{cb} & -B_{km}^{cb} & G_{km}^{cc} & -B_{km}^{cc} \\
-%		B_{km}^{ca} & G_{km}^{ca} & B_{km}^{cb} & G_{km}^{cb} & B_{km}^{cc} & G_{km}^{cc}
-%	\end{bmatrix}
-%	\quad (k \neq m)
-%	\label{eq:cim_offdiag}
-%\end{equation}
-%
-%Nur die \textbf{Diagonalblöcke} ($k = k$) müssen in jeder Iteration aktualisiert werden. Für einen PQ-Knoten mit konstanter Leistung ($\alpha_P = 1$) hat der Diagonalblock die Struktur \cite{Garcia2000}:
-%\begin{equation}
-%	\vect{J}_{kk} = \vect{J}_{km}\big|_{m=k} + 
-%	\begin{bmatrix}
-%		a_k^a & b_k^a & 0 & 0 & 0 & 0 \\
-%		c_k^a & d_k^a & 0 & 0 & 0 & 0 \\
-%		0 & 0 & a_k^b & b_k^b & 0 & 0 \\
-%		0 & 0 & c_k^b & d_k^b & 0 & 0 \\
-%		0 & 0 & 0 & 0 & a_k^c & b_k^c \\
-%		0 & 0 & 0 & 0 & c_k^c & d_k^c
-%	\end{bmatrix}
-%	\label{eq:cim_diagblock}
-%\end{equation}
-%
-%wobei die lastmodellabhängigen Elemente für konstante Leistung gegeben sind durch \cite{Garcia2000}:
-%\begin{align}
-%	a_k^\phi = \frac{P_k^\phi \left[(f_k^\phi)^2 - (e_k^\phi)^2\right] - 2 Q_k^\phi e_k^\phi f_k^\phi}{\left[(e_k^\phi)^2 + (f_k^\phi)^2\right]^2}&, \quad b_k^\phi = \frac{Q_k^\phi \left[(f_k^\phi)^2 - (e_k^\phi)^2\right] + 2 P_k^\phi e_k^\phi f_k^\phi}{\left[(e_k^\phi)^2 + (f_k^\phi)^2\right]^2} \label{eq:cim_b}\\
-%	c_k^\phi = -b_k^\phi&, \quad d_k^\phi = a_k^\phi \label{eq:cim_d}
-%\end{align}
-%
-%%Für konstante Impedanzlasten ($\alpha_Z = 1$) sind $a_k^\phi = b_k^\phi = c_k^\phi = d_k^\phi = 0$, sodass die gesamte Jacobi-Matrix konstant wird und nur eine einzige Faktorisierung erforderlich ist.
-%
-%\subsection{Behandlung von PV-Knoten in der CIM}
-%\label{subsec:cim_pv}
-%
-%Die PV-Knoten-Behandlung in der CIM erfordert eine Erweiterung des Gleichungssystems \cite{Garcia2000}. Für jeden PV-Knoten $k$ werden drei zusätzliche Unbekannte $\Delta Q_k^a$, $\Delta Q_k^b$, $\Delta Q_k^c$ (eine pro Phase) eingeführt und drei zusätzliche Gleichungen (die Spannungsbedingung pro Phase) hinzugefügt.
-%
-%Angenommen, PV-Bus $k$ ist mit den Busen $m$ und $p$ verbunden, dann hat das erweiterte System die Form:
-%\begin{equation}
-%	\begin{bmatrix}
-%		\vect{J}_{kk} & \vect{J}_{km} & \vect{J}_{kp} & \vect{L}_k \\
-%		\vect{J}_{mk} & \vect{J}_{mm} & 0 & 0 \\
-%		\vect{J}_{pk} & 0 & \vect{J}_{pp} & 0 \\
-%		\vect{N}_k & 0 & 0 & 0
-%	\end{bmatrix}
-%	\begin{bmatrix}
-%		\Delta \vect{V}_k \\
-%		\Delta \vect{V}_m \\
-%		\Delta \vect{V}_p \\
-%		\Delta \vect{Q}_k
-%	\end{bmatrix}
-%	=
-%	\begin{bmatrix}
-%		\Delta \vect{I}_k \\
-%		\Delta \vect{I}_m \\
-%		\Delta \vect{I}_p \\
-%		\Delta |\vect{V}_k|^2
-%	\end{bmatrix}
-%	\label{eq:cim_pv_system}
-%\end{equation}
-%Die Matrix $\vect{L}_k \in \R^{6 \times 3}$ beschreibt, wie sich der Strommismatch ändert, wenn die Blindleistung $Q_k^\phi$ variiert wird. Sie ergibt sich durch Ableitung von \eqref{eq:cim_re}--\eqref{eq:cim_im} nach $Q_k^\phi$:
-%\begin{equation}
-%	\frac{\partial \Delta I_k^{\phi,\text{re}}}{\partial Q_k^\phi} = \frac{f_k^\phi}{|V_k^\phi|^2}, \qquad
-%	\frac{\partial \Delta I_k^{\phi,\text{im}}}{\partial Q_k^\phi} = \frac{-e_k^\phi}{|V_k^\phi|^2}
-%	\label{eq:dI_dQ}
-%\end{equation}
-%
-%Die Matrix $\vect{N}_k \in \R^{3 \times 6}$ beschreibt die Ableitung der Spannungsbedingung \eqref{eq:pv_bedingung} nach den Spannungskomponenten:
-%\begin{equation}
-%	\frac{\partial}{\partial e_k^\phi}\left[(e_k^\phi)^2 + (f_k^\phi)^2\right] = 2e_k^\phi, \qquad
-%	\frac{\partial}{\partial f_k^\phi}\left[(e_k^\phi)^2 + (f_k^\phi)^2\right] = 2f_k^\phi
-%	\label{eq:Nk_herleitung}
-%\end{equation}
-%In Matrixform sehen die Matrizen wie folgt aus:
-%\begin{equation}
-%	\vect{N}_k = 
-%	\begin{bmatrix}
-%		2e_k^a & 2f_k^a & 0 & 0 & 0 & 0 \\
-%		0 & 0 & 2e_k^b & 2f_k^b & 0 & 0 \\
-%		0 & 0 & 0 & 0 & 2e_k^c & 2f_k^c
-%	\end{bmatrix}, \qquad
-%	\vect{L}_k = 
-%	\begin{bmatrix}
-%		\dfrac{-f_k^a}{|V_k^a|^2} & 0 & 0 \\[8pt]
-%		\dfrac{e_k^a}{|V_k^a|^2} & 0 & 0 \\[8pt]
-%		0 & \dfrac{-f_k^b}{|V_k^b|^2} & 0 \\[8pt]
-%		0 & \dfrac{e_k^b}{|V_k^b|^2} & 0 \\[8pt]
-%		0 & 0 & \dfrac{-f_k^c}{|V_k^c|^2} \\[8pt]
-%		0 & 0 & \dfrac{e_k^c}{|V_k^c|^2}
-%	\end{bmatrix}
-%	\label{eq:Lk}
-%\end{equation}
-%
-%Der Strommismatch $\Delta \vect{I}_k$ für den PV-Knoten wird analog zu \eqref{eq:cim_re}--\eqref{eq:cim_im} berechnet, wobei $Q_k^\phi$ der aktuelle Schätzwert der Blindleistung ist. Der Spannungsmismatch ist:
-%\begin{equation}
-%	\Delta |V_k^\phi|^2 = |V_k^{\phi,\spec}|^2 - \left[(e_k^\phi)^2 + (f_k^\phi)^2\right]
-%	\label{eq:spannungsmismatch}
-%\end{equation}
-%
-%Im Gegensatz zu den PQ-Knoten, bei denen nur die Diagonalblöcke aktualisiert werden müssen, erfordert die Anwesenheit eines PV-Knotens die Aktualisierung der gesamten zugehörigen Spalte, da die Elemente von $\vect{L}_k$ spannungsabhängig sind. \Cref{fig:jacobi_pv} illustriert diese Struktur schematisch.
-%
-%\begin{figure}[H]
-%	\centering
-%	\begin{tikzpicture}[scale=0.6]
-%		% Matrix
-%		\draw[thick] (0,0) rectangle (8,8);
-%		
-%		% Diagonal blocks
-%		\foreach \i in {0,2,4,6}{
-%			\fill[blue!20] (\i,8-\i-2) rectangle (\i+2,8-\i);
-%		}
-%		
-%		% PV column (letzte Spalte)
-%		\fill[red!20] (8,0) rectangle (9,8);
-%		
-%		% PV row (letzte Zeile)
-%		\fill[green!20] (0,-1) rectangle (8,0);
-%		
-%		% Null-Block
-%		\fill[white] (8,-1) rectangle (9,0);
-%		
-%		% Labels
-%		\node at (4, 8.5) {$\vect{J}_{km}$ (konstant, off-diag)};
-%		\node[blue!70!black] at (4, -2) {Blau: Diagonalblöcke (aktualisiert pro Iteration)};
-%		\node[red!70!black] at (11.5, 4) {$\vect{L}_k$};
-%		\node[green!70!black] at (4, -2.7) {Grün: $\vect{N}_k$ (Spannungsbedingung)};
-%		
-%		\draw[thick] (8,0) rectangle (9,8);
-%		\draw[thick] (0,-1) rectangle (8,0);
-%		\draw[thick] (8,-1) rectangle (9,0);
-%		\node at (8.5,-0.5) {$\vect{0}$};
-%	\end{tikzpicture}
-%	\caption{Schematische Struktur der erweiterten Jacobi-Matrix mit PV-Knoten in der CIM. Die Außerdiagonalblöcke (weiß) sind identisch mit der Admittanzmatrix und konstant.}
-%	\label{fig:jacobi_pv}
-%\end{figure}
-%
-%\subsection{Q-Limits und PV-zu-PQ-Umwandlung}
-%\label{subsec:q_limits}
-%
-%Generatoren an PV-Knoten haben begrenzte Blindleistungsreserven $Q_k \in [Q_k^{\min}, Q_k^{\max}]$. Wenn die nach Konvergenz berechnete Blindleistung ein Limit verletzt, wird der Knoten als PQ-Knoten mit $Q_k = Q_k^{\min}$ bzw.\ $Q_k = Q_k^{\max}$ weiterbehandelt \cite{Santos2019}. Die Zeilen und Spalten für $\vect{L}_k$ und $\vect{N}_k$ entfallen dann aus dem Gleichungssystem.
-
+Dieser Wechsel ist innerhalb der CIM besonders effizient, da lediglich lokale 
+Modifikationen an einzelnen $(2 \times 2)$-Blöcken erforderlich sind und die 
+$(2n \times 2n)$-Gesamtstruktur sowie die Sparse-Faktorisierungsreihenfolge 
+unverändert bleiben.
 %======================================================================
 \section{Fixed-Point-Iteration und Konvergenz}
 \label{sec:fpi}
@@ -1087,16 +960,95 @@ wobei die konstanten Hilfsmatrizen definiert sind als:
 
 Hierbei bezeichnen $\had$ das Hadamard-Produkt (element-weise Multiplikation) und $\vect{v}_{(n)}^{*\circ(-1)}$ die element-weise Anwendung der Operation „konjugieren und Kehrwert bilden" auf den Spannungsvektor der $n$-ten Iteration.
 
-\paragraph{Interpretation der Terme.}
 Der Ausdruck $\vect{s}^* \had \vect{v}_{(n)}^{*\circ(-1)} = \vect{s}^* / \vect{v}_{(n)}^*$ in \eqref{eq:fpi_grundgleichung} (nach Einsetzen von \eqref{eq:F_def}) entspricht physikalisch dem konjugierten Strom. Die Multiplikation mit $\vect{B}^{-1}$ (die im Fall rein konstanter Leistung der Bus-Impedanzmatrix $\ZB = \Ydd^{-1}$ entspricht) liefert den resultierenden Spannungsabfall. Der Term $\vect{w}$ berücksichtigt den Einfluss der Slack-Spannung.
 
 \paragraph{Spezialfall konstante Leistung ($\alpha_P = 1$, $\alpha_I = \alpha_Z = 0$).}
 Für diesen in Verteilnetzen häufigen Fall vereinfacht sich \eqref{eq:fpi_grundgleichung} zu:
 \begin{equation}
-	\vect{v}_{(n+1)} = \ZB \cdot \left(\vect{s}^* \had \vect{v}_{(n)}^{*\circ(-1)}\right) + \vect{w}
+	\vect{v}_{(n+1)} = -\ZB \cdot \left(\vect{s}^* \had \vect{v}_{(n)}^{*\circ(-1)}\right) + \vect{w}
 	\label{eq:fpi_konstP}
 \end{equation}
 mit $\ZB = \Ydd^{-1}$ und $\vect{w} = -\ZB \Yds \vect{v}_s$. Diese Formulierung bildet die Grundlage des Tensor Power Flow (\cref{ch:tpf}).
+
+%\begin{proof}
+%	Zu zeigen ist, dass sich die allgemeine FPI-Formulierung~\eqref{eq:fpi_grundgleichung} für den Spezialfall rein konstanter Leistung ($\alpha_P = 1$, $\alpha_I = 0$, $\alpha_Z = 0$) auf die Form~\eqref{eq:fpi_konstP} vereinfacht.
+%	
+%	\paragraph{Schritt 1: Einsetzen der ZIP-Koeffizienten in die Hilfsmatrizen.}
+%	
+%	Aus den Definitionen~\eqref{eq:A_def}--\eqref{eq:c_def} folgt mit $\alpha_P = 1$, $\alpha_I = 0$, $\alpha_Z = 0$:
+%	\begin{align}
+%		\vect{A} &= \diag(\underbrace{\alpha_P}_{=1} \had \vect{s}^*) = \diag(\vect{s}^*) \label{eq:proof_A}\\[6pt]
+%		\vect{B} &= \diag(\underbrace{\alpha_Z}_{=0} \had \vect{s}^*) + \Ydd = \vect{0} + \Ydd = \Ydd \label{eq:proof_B}\\[6pt]
+%		\vect{c} &= \Yds \vect{v}_s + \underbrace{\alpha_I}_{=0} \had \vect{s}^* = \Yds \vect{v}_s \label{eq:proof_c}
+%	\end{align}
+%	
+%	\paragraph{Schritt 2: Berechnung von $\vect{F}$ und $\vect{w}$.}
+%	
+%	Einsetzen von~\eqref{eq:proof_A}--\eqref{eq:proof_B} in die Definitionen~\eqref{eq:F_def}--\eqref{eq:w_def}:
+%	\begin{align}
+%		\vect{F} &= -\vect{B}^{-1} \vect{A} = -\Ydd^{-1} \diag(\vect{s}^*) = -\ZB \diag(\vect{s}^*) \label{eq:proof_F}\\[6pt]
+%		\vect{w} &= -\vect{B}^{-1} \vect{c} = -\Ydd^{-1} \Yds \vect{v}_s = -\ZB \Yds \vect{v}_s \label{eq:proof_w}
+%	\end{align}
+%	
+%	wobei $\ZB := \Ydd^{-1}$ die Bus-Impedanzmatrix ist.
+%	
+%	\paragraph{Schritt 3: Einsetzen in die Iterationsvorschrift.}
+%	
+%	Substitution von~\eqref{eq:proof_F}--\eqref{eq:proof_w} in die allgemeine FPI-Gleichung~\eqref{eq:fpi_grundgleichung}:
+%	\begin{align}
+%		\vect{v}_{(n+1)} &= \vect{F} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w} \nonumber\\[4pt]
+%		&= -\ZB \diag(\vect{s}^*) \cdot \vect{v}_{(n)}^{*\eleminv} + \left(-\ZB \Yds \vect{v}_s\right) \label{eq:proof_einsetzen}
+%	\end{align}
+%	
+%	\paragraph{Schritt 4: Vereinfachung des Matrixprodukts.}
+%	
+%	Für die Multiplikation einer Diagonalmatrix mit einem Vektor gilt die allgemeine Identität:
+%	\begin{equation}
+%		\diag(\vect{a}) \cdot \vect{b} = \vect{a} \had \vect{b}
+%		\label{eq:diag_identity}
+%	\end{equation}
+%	
+%	Anwendung auf den ersten Term in~\eqref{eq:proof_einsetzen}:
+%	\begin{equation}
+%		\diag(\vect{s}^*) \cdot \vect{v}_{(n)}^{*\eleminv} = \vect{s}^* \had \vect{v}_{(n)}^{*\eleminv}
+%		\label{eq:proof_hadamard}
+%	\end{equation}
+%	
+%	Physikalisch entspricht dieser Ausdruck dem konjugierten Knotenstrom bei konstanter Leistung, da:
+%	\begin{equation}
+%		\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv} = \frac{\vect{s}^*}{\vect{v}_{(n)}^*} = \left(\frac{\vect{s}}{\vect{v}_{(n)}}\right)^* = \vect{i}_{(n)}^*
+%		\label{eq:proof_strom}
+%	\end{equation}
+%	
+%	wobei die Division element-weise zu verstehen ist und $\vect{i} = \vect{s}/\vect{v} = (P + \jj Q)/v$ der Verbraucherstrom ist.
+%	
+%	\paragraph{Schritt 5: Endergebnis.}
+%	
+%	Einsetzen von~\eqref{eq:proof_hadamard} in~\eqref{eq:proof_einsetzen} ergibt die behauptete Vereinfachung:
+%	\begin{equation}
+%		\boxed{
+%			\vect{v}_{(n+1)} = -\ZB \cdot \left(\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv}\right) + \vect{w}, \qquad \vect{w} = -\ZB \Yds \vect{v}_s
+%		}
+%		\label{eq:proof_ergebnis}
+%	\end{equation}
+%	
+%	\paragraph{Anmerkung zur Vorzeichenkonvention.}
+%	
+%	In~\eqref{eq:proof_ergebnis} ist $\vect{s} = P + \jj Q$ in \textit{Verbraucherkonvention} definiert (positive Werte bedeuten Leistungsaufnahme). Das negative Vorzeichen vor $\ZB$ ergibt sich aus der Struktur der Admittanzgleichung~\eqref{eq:admittanz_system}, bei der $-\vect{i}_d$ auf der linken Seite steht.
+%	
+%	Im Algorithm~1 des Salazar-Papers~\cite{Salazar2024} wird stattdessen die \textit{Injektionskonvention} verwendet. Definiert man die injizierte Leistung als $\vect{S}_{\mathrm{inj}} = -\vect{s}$ (negativ für Lasten), so wird~\eqref{eq:proof_ergebnis} zu:
+%	\begin{equation}
+%		\vect{v}_{(n+1)} = \ZB \cdot \left(\vect{S}_{\mathrm{inj}}^* \had \vect{v}_{(n)}^{*\eleminv}\right) + \vect{w}
+%		\label{eq:proof_injection}
+%	\end{equation}
+%	
+%	Beide Darstellungen sind mathematisch äquivalent; die Wahl der Konvention betrifft lediglich die Interpretation des Vorzeichens von $\vect{s}$ bzw.\ $\vect{S}_{\mathrm{inj}}$.
+%	
+%	\paragraph{Physikalische Konsistenz.}
+%	
+%	Die Formel~\eqref{eq:proof_ergebnis} ist physikalisch konsistent: Der Term $-\ZB(\vect{s}^*/\vect{v}^*) = -\ZB \cdot \vect{i}^*$ beschreibt den Spannungsabfall über der Netzimpedanz aufgrund des Laststroms (negatives Vorzeichen, da die Spannung am Lastknoten \textit{unterhalb} der Leerlaufspannung liegt). Der Term $\vect{w} = -\ZB\Yds\vect{v}_s$ stellt die Leerlaufspannung dar, die sich ohne Last allein aus der Slack-Spannung ergeben würde.
+%	
+%\end{proof}
 
 \subsection{Algorithmus}
 \label{subsec:fpi_algorithmus}
@@ -1164,7 +1116,7 @@ Für den Spezialfall $\alpha_P = 1$ und unter Verwendung der Bus-Impedanzmatrix 
 
 \subsection{Physikalische Interpretation der Konvergenzbedingung}
 \label{subsec:konvergenz_physik}
-
+\todo[inline]{Literatur finden}
 Die Bedingung $\eta < 1$ aus \eqref{eq:eta_physikalisch} hat eine anschauliche physikalische Bedeutung:
 \begin{equation}
 	\|Z_{ii}\| < \|Z_{L,i}\| \quad \forall i \in \Omega_d
@@ -1173,7 +1125,7 @@ Die Bedingung $\eta < 1$ aus \eqref{eq:eta_physikalisch} hat eine anschauliche p
 
 Dies bedeutet: Die Thévenin-Impedanz an jedem Knoten muss kleiner sein als die äquivalente Lastimpedanz. Diese Bedingung ist äquivalent zur Aussage, dass das Netz im normalen Betriebspunkt arbeitet (hohe Spannung, niedriger Strom) und nicht am Punkt maximaler Leistungsübertragung \cite{Salazar2024}. 
 
-Salazar Duque et al.\ \cite{Salazar2024} zeigen, dass der FPI-Algorithmus bei Erfüllung von \eqref{eq:konvergenz_physik} stets zur \textit{operationellen} Lösung konvergiert -- unabhängig vom Startwert. Dies steht im Gegensatz zum NR-Verfahren, das bei ungünstiger Initialisierung auch zur nicht-operationellen Lösung (niedrige Spannung, hoher Strom) konvergieren kann.
+Salazar Duque et al.\ \cite{Salazar2024} zeigen, dass der FPI-Algorithmus bei Erfüllung von \eqref{eq:konvergenz_physik} stets zur \textit{operationellen} Lösung konvergiert unabhängig vom Startwert. Dies steht im Gegensatz zum NR-Verfahren, das bei ungünstiger Initialisierung auch zur nicht-operationellen Lösung (niedrige Spannung, hoher Strom) konvergieren kann.
 
 Die Machbarkeitsbedingung für die Existenz einer Lastflusslösung wurde in \cite{Salazar2024} geometrisch hergeleitet als:
 \begin{equation}

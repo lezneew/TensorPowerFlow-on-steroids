@@ -53,8 +53,8 @@
       \strng{authorbibnamehash}{240f08141cb334eb4bbecb72e3eb5536}
       \strng{authornamehash}{b8eacb012dd1e63931223887d9e8fdfd}
       \strng{authorfullhash}{240f08141cb334eb4bbecb72e3eb5536}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{arXiv preprint arXiv:2403.04578v1}
@@ -91,8 +91,8 @@
       \strng{authorbibnamehash}{9f1e91778f495c8691fbf670c59b8c6d}
       \strng{authornamehash}{0f121ff9aea812c1de6fcc327a404ab5}
       \strng{authorfullhash}{9f1e91778f495c8691fbf670c59b8c6d}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Electric Power Systems Research}
@@ -130,12 +130,57 @@
       \strng{authorbibnamehash}{178fa45e0c3da8648325bd7ff9e88de1}
       \strng{authornamehash}{178fa45e0c3da8648325bd7ff9e88de1}
       \strng{authorfullhash}{178fa45e0c3da8648325bd7ff9e88de1}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Power Systems Analysis}
       \field{year}{1994}
+    \endentry
+    \entry{DaCosta1999}{article}{}
+      \name{author}{3}{}{%
+        {{hash=f2036344c5c0bf7b8b5a346402230880}{%
+           family={Costa},
+           familyi={C\bibinitperiod},
+           given={Vander\bibnamedelima Menengoy},
+           giveni={V\bibinitperiod\bibinitdelim M\bibinitperiod},
+           prefix={da},
+           prefixi={d\bibinitperiod}}}%
+        {{hash=6502e67f7ec96e4a3b74ac212794c1bb}{%
+           family={Martins},
+           familyi={M\bibinitperiod},
+           given={Nelson},
+           giveni={N\bibinitperiod}}}%
+        {{hash=c485df95f18fbbc26e7aece33f77bef7}{%
+           family={Pereira},
+           familyi={P\bibinitperiod},
+           given={José\bibnamedelimb Luiz\bibnamedelima R.},
+           giveni={J\bibinitperiod\bibinitdelim L\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{c7a950a8521d89bf44acfea9ae6801d4}
+      \strng{fullhash}{c22ce9031f3bbd40a7844423566167bd}
+      \strng{bibnamehash}{c22ce9031f3bbd40a7844423566167bd}
+      \strng{authorbibnamehash}{c22ce9031f3bbd40a7844423566167bd}
+      \strng{authornamehash}{c7a950a8521d89bf44acfea9ae6801d4}
+      \strng{authorfullhash}{c22ce9031f3bbd40a7844423566167bd}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Power Systems}
+      \field{month}{11}
+      \field{number}{4}
+      \field{title}{Developments in the {Newton Raphson} Power Flow Formulation Based on Current Injections}
+      \field{volume}{14}
+      \field{year}{1999}
+      \field{pages}{1320\bibrangedash 1326}
+      \range{pages}{7}
+      \verb{doi}
+      \verb 10.1109/59.801890
+      \endverb
     \endentry
     \entry{Garcia2000}{article}{}
       \name{author}{5}{}{%
@@ -173,8 +218,8 @@
       \strng{authorbibnamehash}{ea28ed5d23d3defaca1a9bf8ba93af35}
       \strng{authornamehash}{5ff752d929dd2fbfdd80cb32662cc673}
       \strng{authorfullhash}{ea28ed5d23d3defaca1a9bf8ba93af35}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{IEEE Transactions on Power Systems}
@@ -186,57 +231,6 @@
       \range{pages}{7}
       \verb{doi}
       \verb 10.1109/59.867133
-      \endverb
-    \endentry
-    \entry{Santos2019}{article}{}
-      \name{author}{5}{}{%
-        {{hash=211fae1c0d75ce97d8f15907331acac3}{%
-           family={Santos},
-           familyi={S\bibinitperiod},
-           given={Erika\bibnamedelimb Pequeno\bibnamedelima dos},
-           giveni={E\bibinitperiod\bibinitdelim P\bibinitperiod\bibinitdelim d\bibinitperiod}}}%
-        {{hash=44c85e65e01b213036cd85dbeb7e032f}{%
-           family={Kobay},
-           familyi={K\bibinitperiod},
-           given={Bruna},
-           giveni={B\bibinitperiod}}}%
-        {{hash=fcbca78c39765fe149e2ea5d4884f5f8}{%
-           family={Rosa},
-           familyi={R\bibinitperiod},
-           given={Mauro\bibnamedelima Augusto},
-           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod},
-           prefix={da},
-           prefixi={d\bibinitperiod}}}%
-        {{hash=93a4146b1a34cf9bb7516c42a1b07e8a}{%
-           family={Salgado},
-           familyi={S\bibinitperiod},
-           given={Roberto\bibnamedelimb de\bibnamedelima Souza},
-           giveni={R\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
-        {{hash=2ba30a8d1bad21a1736bd24f40007729}{%
-           family={Issicaba},
-           familyi={I\bibinitperiod},
-           given={Diego},
-           giveni={D\bibinitperiod}}}%
-      }
-      \strng{namehash}{28ef6a758df6c4ce78f6ab0051d0caa4}
-      \strng{fullhash}{50e15bf2f6c2ebe450386c2862eb43e8}
-      \strng{bibnamehash}{50e15bf2f6c2ebe450386c2862eb43e8}
-      \strng{authorbibnamehash}{50e15bf2f6c2ebe450386c2862eb43e8}
-      \strng{authornamehash}{28ef6a758df6c4ce78f6ab0051d0caa4}
-      \strng{authorfullhash}{50e15bf2f6c2ebe450386c2862eb43e8}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{IET Generation, Transmission \& Distribution}
-      \field{number}{17}
-      \field{title}{Modified tensor method to power flow analysis}
-      \field{volume}{13}
-      \field{year}{2019}
-      \field{pages}{3960\bibrangedash 3967}
-      \range{pages}{8}
-      \verb{doi}
-      \verb 10.1049/iet-gtd.2018.6187
       \endverb
     \endentry
   \enddatalist
