@@ -1,0 +1,104 @@
+%======================================================================
+% main.tex - Hauptdatei der Bachelorarbeit
+%======================================================================
+\documentclass[12pt, a4paper, twoside, openright]{report}
+
+% Konfiguration laden
+\input{config/packages}
+\input{config/commands}
+\setlength{\parindent}{0pt}
+
+%======================================================================
+% Dokumentbeginn
+%======================================================================
+\begin{document}
+	
+	%----------------------------------------------------------------------
+	% Titelseite
+	%----------------------------------------------------------------------
+	\input{config/titlepage}
+	
+	%----------------------------------------------------------------------
+	% Frontmatter (römische Seitenzahlen)
+	%----------------------------------------------------------------------
+	\pagenumbering{roman}
+	
+	% Eidesstattliche Erklärung
+	\chapter*{Eidesstattliche Erklärung}
+	\addcontentsline{toc}{chapter}{Eidesstattliche Erklärung}
+	Ich erkläre hiermit an Eides statt, dass ich die vorliegende Bachelorarbeit selbstständig und ohne unzulässige Hilfe Dritter verfasst habe. Alle verwendeten Quellen und Hilfsmittel sind angegeben.
+	
+	\vspace{3cm}
+	\noindent
+	\begin{tabular}{@{}p{5cm}p{2cm}p{5cm}@{}}
+		\hrulefill & & \hrulefill \\
+		Ort, Datum & & Unterschrift
+	\end{tabular}
+	
+	\cleardoublepage
+	
+	% Kurzfassung / Abstract
+	\chapter*{Kurzfassung}
+	\addcontentsline{toc}{chapter}{Kurzfassung}
+	% TODO: Kurzfassung einfügen
+	
+	\cleardoublepage
+	
+	\chapter*{Abstract}
+	\addcontentsline{toc}{chapter}{Abstract}
+	% TODO: Abstract einfügen
+	
+	\cleardoublepage
+	
+	% Inhaltsverzeichnis
+	\tableofcontents
+	\cleardoublepage
+	
+	% Abbildungsverzeichnis
+	\listoffigures
+	\addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
+	\cleardoublepage
+	
+	% Tabellenverzeichnis
+	\listoftables
+	\addcontentsline{toc}{chapter}{Tabellenverzeichnis}
+	\cleardoublepage
+	
+	% Symbolverzeichnis
+	\chapter*{Symbolverzeichnis}
+	\addcontentsline{toc}{chapter}{Symbolverzeichnis}
+	% TODO: Symbolverzeichnis einfügen
+	\cleardoublepage
+	
+	% Abkürzungsverzeichnis
+	\chapter*{Abkürzungsverzeichnis}
+	\addcontentsline{toc}{chapter}{Abkürzungsverzeichnis}
+	% TODO: Abkürzungsverzeichnis einfügen
+	\cleardoublepage
+	
+	%----------------------------------------------------------------------
+	% Mainmatter (arabische Seitenzahlen)
+	%----------------------------------------------------------------------
+	\pagenumbering{arabic}
+	
+	%\input{chapters/01_einleitung}
+	\input{chapters/02_grundlagen}
+	%\input{chapters/03_tensor_powerflow}
+	%\input{chapters/04_methoden}
+%	\input{chapters/05_implementierung}
+%	\input{chapters/06_ergebnisse}
+%	\input{chapters/07_zusammenfassung}
+	
+	%----------------------------------------------------------------------
+	% Literaturverzeichnis
+	%----------------------------------------------------------------------
+	\cleardoublepage
+	\printbibliography[heading=bibintoc, title={Literaturverzeichnis}]
+	
+	%----------------------------------------------------------------------
+	% Anhang
+	%----------------------------------------------------------------------
+	\appendix
+	\input{appendix/appendix}
+	
+\end{document}

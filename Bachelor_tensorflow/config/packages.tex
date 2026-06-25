@@ -1,0 +1,105 @@
+% !TeX root = ../main.tex
+%======================================================================
+% packages.tex - Alle verwendeten Pakete
+%======================================================================
+
+% Sprache und Kodierung
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+
+% Seitengeometrie
+\usepackage[
+left=3cm,
+right=2.5cm,
+top=2.5cm,
+bottom=2.5cm,
+bindingoffset=0.5cm
+]{geometry}
+
+% Schrift
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% Mathematik
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{bm}
+
+% Tabellen
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{tabularx}
+
+% Grafiken
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
+
+% Algorithmen
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% Code-Listings
+\usepackage{listings}
+\lstset{
+	language=Python,
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{blue},
+	commentstyle=\color{gray},
+	stringstyle=\color{red},
+	numbers=left,
+	numberstyle=\tiny\color{gray},
+	frame=single,
+	breaklines=true,
+	captionpos=b
+}
+
+% Kopf-/Fußzeilen
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\leftmark}
+\fancyhead[RO]{\rightmark}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Literaturverzeichnis - IEEE Stil
+\usepackage[
+backend=biber,
+style=ieee,
+citestyle=numeric-comp,
+sorting=none,
+maxbibnames=6,
+minbibnames=1,
+doi=true,
+url=false,
+isbn=false
+]{biblatex}
+\addbibresource{references.bib}
+
+
+\usepackage[
+colorlinks=true,
+linkcolor=black,
+citecolor=black,
+urlcolor=blue,
+bookmarks=true,
+bookmarksnumbered=true
+]{hyperref}
+
+% Referenzen mit cleveref (nach hyperref laden!)
+\usepackage[ngerman, nameinlink]{cleveref}
+
+% TikZ für Zeichnungen
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, calc, shapes, backgrounds}
+
+% Zeilenabstand
+\usepackage{setspace}
+\onehalfspacing

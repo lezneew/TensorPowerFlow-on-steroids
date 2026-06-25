@@ -1,0 +1,57 @@
+% !TeX root = ../main.tex
+%======================================================================
+% commands.tex - Eigene Befehle und Abkuerzungen (KORRIGIERT)
+%======================================================================
+
+% --- Mathematische Operatoren ---
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\re}{Re}
+\DeclareMathOperator{\im}{Im}
+
+% --- Haeufig verwendete Symbole ---
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\jj}{\mathrm{j}}
+\newcommand{\ee}{\mathrm{e}}
+
+% --- Vektoren und Matrizen ---
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+\newcommand{\matr}[1]{\mathbf{#1}}
+\newcommand{\tens}[1]{\mathcal{#1}}
+
+% --- Spezielle Matrizen ---
+\newcommand{\ZB}{Z_B}
+\newcommand{\Ydd}{Y_{dd}}
+\newcommand{\Yds}{Y_{ds}}
+
+% --- Hadamard-Operationen ---
+\newcommand{\had}{\odot}
+\newcommand{\haddiv}{\oslash}
+\newcommand{\eleminv}{{\circ(-1)}}
+
+% --- Abkuerzungen ---
+\newcommand{\pu}{\,\text{p.u.}}
+\newcommand{\spec}{\mathrm{spec}}
+\newcommand{\conv}{\mathrm{konv}}
+
+% --- Per-Unit-Groessen ---
+\newcommand{\Vspec}{|V^{\spec}|}
+
+% --- Dot-Notation ---
+\newcommand{\dotV}{\dot{V}}
+\newcommand{\dotS}{\dot{S}}
+\newcommand{\dotM}{\dot{M}}
+\newcommand{\dotW}{\dot{W}}
+
+% --- Boxed Equation ---
+\newcommand{\boxedeq}[1]{\begin{equation}\boxed{#1}\end{equation}}
+
+% --- Theorem-Umgebungen (mit amsthm) ---
+\usepackage{amsthm}
+\newtheorem{theorem}{Satz}[chapter]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Bemerkung}

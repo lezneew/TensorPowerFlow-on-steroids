@@ -1,0 +1,60 @@
+\babel@toc {ngerman}{}\relax 
+\contentsline {chapter}{Eidesstattliche Erklärung}{i}{chapter*.1}%
+\contentsline {chapter}{Kurzfassung}{iii}{chapter*.2}%
+\contentsline {chapter}{Abstract}{v}{chapter*.3}%
+\contentsline {chapter}{Abbildungsverzeichnis}{ix}{chapter*.5}%
+\contentsline {chapter}{Tabellenverzeichnis}{xi}{chapter*.6}%
+\contentsline {chapter}{Symbolverzeichnis}{xiii}{chapter*.7}%
+\contentsline {chapter}{Abkürzungsverzeichnis}{xv}{chapter*.8}%
+\contentsline {chapter}{\numberline {1}Grundlagen der Lastflussberechnung}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Netzmodell und Knotentypen}{1}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Die Admittanzmatrix}{1}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Komplexe Leistung und Spannungsdarstellung}{2}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}Knotentypen}{2}{subsection.1.1.3}%
+\contentsline {paragraph}{Slack-Knoten ($V\delta $-Knoten).}{3}{section*.10}%
+\contentsline {paragraph}{PQ-Knoten.}{3}{section*.11}%
+\contentsline {paragraph}{PV-Knoten.}{3}{section*.12}%
+\contentsline {subsection}{\numberline {1.1.4}Das ZIP-Lastmodell}{3}{subsection.1.1.4}%
+\contentsline {section}{\numberline {1.2}Newton-Raphson-Verfahren}{4}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Die polare Standard-Formulierung}{4}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Unbekannte und Gleichungen}{4}{subsection.1.2.2}%
+\contentsline {paragraph}{Unbekannte:}{4}{section*.13}%
+\contentsline {paragraph}{Mismatch-Gleichungen:}{5}{section*.14}%
+\contentsline {subsection}{\numberline {1.2.3}Iterationsvorschrift}{5}{subsection.1.2.3}%
+\contentsline {subsection}{\numberline {1.2.4}Die Jacobi-Matrix in Blockform}{5}{subsection.1.2.4}%
+\contentsline {subsection}{\numberline {1.2.5}Elemente der Jacobi-Matrix}{6}{subsection.1.2.5}%
+\contentsline {paragraph}{Außerdiagonalelemente ($k \neq m$):}{6}{section*.16}%
+\contentsline {paragraph}{Diagonalelemente ($k = m$):}{6}{section*.17}%
+\contentsline {paragraph}{Herleitung der Diagonalelemente.}{6}{section*.18}%
+\contentsline {paragraph}{Zusammenhang zwischen den Blöcken.}{7}{section*.19}%
+\contentsline {subsection}{\numberline {1.2.6}Das vollständige Newton-Raphson-System}{7}{subsection.1.2.6}%
+\contentsline {subsection}{\numberline {1.2.7}Behandlung von PV-Knoten}{7}{subsection.1.2.7}%
+\contentsline {subsection}{\numberline {1.2.8}Q-Limits und PV-zu-PQ-Umwandlung}{8}{subsection.1.2.8}%
+\contentsline {subsection}{\numberline {1.2.9}Konvergenzeigenschaften}{8}{subsection.1.2.9}%
+\contentsline {subsection}{\numberline {1.2.10}Grenzen des Newton-Raphson-Verfahrens}{9}{subsection.1.2.10}%
+\contentsline {section}{\numberline {1.3}Current Injection Method und PV-Behandlung}{9}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Strommismatch-Formulierung}{9}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Jacobi-Matrix der CIM}{10}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}Behandlung von PV-Knoten in der CIM}{11}{subsection.1.3.3}%
+\contentsline {subsubsection}{Matrizen $\bm {D}_k$ und $\bm {M}_k$}{12}{section*.20}%
+\contentsline {subsubsection}{Matrizen $\bm {L}_k$ und $\bm {N}_k$}{13}{section*.21}%
+\contentsline {subsubsection}{Modifizierte Außerdiagonalelemente in Spalte $k$}{13}{section*.22}%
+\contentsline {subsubsection}{Mismatches am PV-Knoten}{13}{section*.23}%
+\contentsline {subsubsection}{Auswirkung auf die Jacobi-Matrix-Struktur}{14}{section*.24}%
+\contentsline {subsection}{\numberline {1.3.4}Q-Limits und PV-zu-PQ-Umwandlung}{15}{subsection.1.3.4}%
+\contentsline {section}{\numberline {1.4}Fixed-Point-Iteration und Konvergenz}{15}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Herleitung des FPI-Algorithmus}{15}{subsection.1.4.1}%
+\contentsline {paragraph}{Interpretation der Terme.}{16}{section*.26}%
+\contentsline {paragraph}{Spezialfall konstante Leistung ($\alpha _P = 1$, $\alpha _I = \alpha _Z = 0$).}{16}{section*.27}%
+\contentsline {subsection}{\numberline {1.4.2}Algorithmus}{16}{subsection.1.4.2}%
+\contentsline {subsection}{\numberline {1.4.3}Konvergenzbeweis mittels Banach-Fixpunktsatz}{17}{subsection.1.4.3}%
+\contentsline {paragraph}{Anwendung auf den FPI-Algorithmus.}{17}{section*.28}%
+\contentsline {subsection}{\numberline {1.4.4}Physikalische Interpretation der Konvergenzbedingung}{18}{subsection.1.4.4}%
+\contentsline {subsection}{\numberline {1.4.5}Konvergenzverhalten und Vergleich mit Newton-Raphson}{18}{subsection.1.4.5}%
+\contentsline {paragraph}{Sensitivität gegenüber dem $R/X$-Verhältnis.}{19}{section*.30}%
+\contentsline {subsection}{\numberline {1.4.6}Limitierung: Keine PV-Knoten}{19}{subsection.1.4.6}%
+\contentsline {chapter}{Literaturverzeichnis}{21}{chapter*.31}%
+\contentsline {chapter}{\numberline {A}Ergänzende Herleitungen}{23}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Vollständige Herleitung der Sensitivitätskette}{23}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Koeffizienten der quadratischen Gleichung}{23}{section.A.2}%
+\contentsline {chapter}{\numberline {B}Zusätzliche Simulationsergebnisse}{25}{appendix.B}%
