@@ -35,7 +35,6 @@ def create_2bus_network():
 
     # Last am Bus 1: S_load = 0.5 + j0.2 p.u. (Verbraucherkonvention)
     s_nom = np.array([0.5 + 0.2j], dtype=np.complex128)
-    s_nom = 3*s_nom
 
     return NetworkData(
         Y_dd=Y_dd,
