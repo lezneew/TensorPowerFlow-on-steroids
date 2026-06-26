@@ -38,17 +38,21 @@
 \contentsline {subsection}{\numberline {1.3.3}Behandlung von PV-Knoten in der CIM}{13}{subsection.1.3.3}%
 \contentsline {subsection}{\numberline {1.3.4}Q-Limits und PV-zu-PQ-Umwandlung}{15}{subsection.1.3.4}%
 \contentsline {section}{\numberline {1.4}Fixed-Point-Iteration und Konvergenz}{15}{section.1.4}%
-\contentsline {subsection}{\numberline {1.4.1}Herleitung des FPI-Algorithmus}{16}{subsection.1.4.1}%
-\contentsline {paragraph}{Spezialfall konstante Leistung ($\alpha _P = 1$, $\alpha _I = \alpha _Z = 0$).}{16}{section*.20}%
-\contentsline {subsection}{\numberline {1.4.2}Algorithmus}{17}{subsection.1.4.2}%
-\contentsline {subsection}{\numberline {1.4.3}Konvergenzbeweis mittels Banach-Fixpunktsatz}{17}{subsection.1.4.3}%
-\contentsline {paragraph}{Anwendung auf den FPI-Algorithmus.}{17}{section*.21}%
-\contentsline {subsection}{\numberline {1.4.4}Physikalische Interpretation der Konvergenzbedingung}{18}{subsection.1.4.4}%
-\contentsline {subsection}{\numberline {1.4.5}Konvergenzverhalten und Vergleich mit Newton-Raphson}{19}{subsection.1.4.5}%
-\contentsline {paragraph}{Sensitivität gegenüber dem $R/X$-Verhältnis.}{19}{section*.24}%
-\contentsline {subsection}{\numberline {1.4.6}Limitierung: Keine PV-Knoten}{19}{subsection.1.4.6}%
-\contentsline {chapter}{Literaturverzeichnis}{21}{chapter*.25}%
-\contentsline {chapter}{\numberline {A}Ergänzende Herleitungen}{23}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Vollständige Herleitung der Sensitivitätskette}{23}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Koeffizienten der quadratischen Gleichung}{23}{section.A.2}%
-\contentsline {chapter}{\numberline {B}Zusätzliche Simulationsergebnisse}{25}{appendix.B}%
+\contentsline {subsection}{\numberline {1.4.1}Laurent-Reihen-Approximation}{16}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Herleitung des FPI-Algorithmus}{16}{subsection.1.4.2}%
+\contentsline {subsection}{\numberline {1.4.3}Die Successive Approximation Method (SAM)}{17}{subsection.1.4.3}%
+\contentsline {subsection}{\numberline {1.4.4}Konvergenzbeweis mittels Banach-Fixpunktsatz}{18}{subsection.1.4.4}%
+\contentsline {subsection}{\numberline {1.4.5}Physikalische Interpretation der Konvergenzbedingung}{19}{subsection.1.4.5}%
+\contentsline {chapter}{\numberline {2}Der Tensor Power Flow}{21}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Grundalgorithmus}{21}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Dense- und Sparse-Formulierung}{22}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Motivation: Der Tensor der Lastdaten}{23}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Dense-Formulierung}{23}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Sparse-Formulierung}{24}{subsection.2.2.3}%
+\contentsline {section}{\numberline {2.3}Limitation: Keine PV-Knoten}{25}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Warum PV-Knoten diese Annahme verletzen}{26}{subsection.2.3.1}%
+\contentsline {chapter}{Literaturverzeichnis}{29}{chapter*.21}%
+\contentsline {chapter}{\numberline {A}Ergänzende Herleitungen}{31}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Vollständige Herleitung der Sensitivitätskette}{31}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Koeffizienten der quadratischen Gleichung}{31}{section.A.2}%
+\contentsline {chapter}{\numberline {B}Zusätzliche Simulationsergebnisse}{33}{appendix.B}%

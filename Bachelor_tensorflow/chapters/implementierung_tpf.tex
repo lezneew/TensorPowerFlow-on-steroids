@@ -1,0 +1,680 @@
+% !TeX root = ../main.tex
+%======================================================================
+\chapter{Implementierung des Tensor Power Flow}
+\label{ch:implementierung_tpf}
+%======================================================================
+
+Dieses Kapitel beschreibt die schrittweise Implementierung des Tensor Power Flow (TPF) in der Dense-Formulierung gemäß Algorithm~1 aus \cite{Salazar2024}. Die Darstellung folgt dem tatsächlichen Programmcode und ordnet jeder Code-Zeile die zugrunde liegende mathematische Operation zu. Der vollständige Algorithmus löst $\tau$ Lastflüsse gleichzeitig durch tensorisierte Matrix-Operationen.
+
+%======================================================================
+\section{Überblick: Vom Netzmodell zur Lösung}
+\label{sec:ueberblick_impl}
+%======================================================================
+
+Der implementierte Algorithmus gliedert sich in vier Phasen:
+
+\begin{enumerate}
+	\item \textbf{Vorberechnung} (einmalig): Berechnung der Bus-Impedanzmatrix $\ZB$ und des Konstantvektors $\vect{w}$
+	\item \textbf{Initialisierung}: Flat-Start aller Spannungen und Aufbau der Leistungsmatrix
+	\item \textbf{Iterationsschleife}: Wiederholte Anwendung der Fixed-Point-Iteration
+	\item \textbf{Konvergenzprüfung}: Berechnung des Leistungsmismatches und Abbruchentscheidung
+\end{enumerate}
+
+Die zentrale Iterationsvorschrift in \textit{Verbraucherkonvention} (positiver Leistungswert = Last) lautet:
+\begin{equation}
+	\boxed{
+		\vect{v}_{(n+1)} = -\ZB \cdot \left(\vect{s}^* \had \vect{v}_{(n)}^{*\circ(-1)}\right) + \vect{w}
+	}
+	\label{eq:impl_kernformel}
+\end{equation}
+mit $\ZB = \Ydd^{-1}$ und $\vect{w} = -\ZB \Yds \vect{v}_s$.
+
+%======================================================================
+\section{Phase 1: Vorberechnung der konstanten Größen}
+\label{sec:vorberechnung}
+%======================================================================
+
+Die entscheidende Eigenschaft des TPF ist, dass bestimmte Größen über \textit{alle} Iterationen und \textit{alle} $\tau$ Lastflüsse hinweg konstant bleiben. Diese werden einmalig berechnet und anschließend wiederverwendet.
+
+%----------------------------------------------------------------------
+\subsection{Berechnung der Bus-Impedanzmatrix $\ZB$}
+\label{subsec:zb_berechnung}
+%----------------------------------------------------------------------
+
+Die Bus-Impedanzmatrix ist die Inverse der Lastknoten-Admittanzmatrix:
+\begin{equation}
+	\ZB = \Ydd^{-1} \in \mathbb{C}^{b\phi \times b\phi}
+	\label{eq:zb_def}
+\end{equation}
+
+\paragraph{Bedeutung.} Das Element $Z_{B,ij}$ gibt den Spannungsabfall am Knoten $i$ an, der durch eine Einheitsstrominjektion am Knoten $j$ verursacht wird (bei Kurzschluss aller anderen Stromquellen). Die Diagonalelemente $Z_{B,ii}$ entsprechen den Thévenin-Impedanzen, wie sie in der Konvergenzbedingung~\eqref{eq:eta_physikalisch} auftreten.
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	self._Z_B = np.linalg.inv(network.Y_dd)
+\end{verbatim}
+
+\begin{itemize}
+	\item \texttt{network.Y\_dd} $\hat{=}\ \Ydd \in \mathbb{C}^{b\phi \times b\phi}$: Die Admittanzmatrix der Lastknoten untereinander, extrahiert aus der partitionierten Gesamtadmittanzmatrix gemäß Gl.~\eqref{eq:admittanz_system}.
+	\item \texttt{np.linalg.inv(\ldots)} berechnet die Matrixinversion $\Ydd^{-1}$.
+	\item Das Ergebnis wird in \texttt{self.\_Z\_B} gespeichert und in allen folgenden Iterationen unverändert wiederverwendet.
+\end{itemize}
+
+\paragraph{Warum ist $\ZB$ konstant?} Die Matrix $\Ydd$ hängt ausschließlich von der Netztopologie (Leitungsimpedanzen) und eventuellen konstanten Impedanzlasten ($\alpha_Z$) ab. Da diese sich während der Iteration nicht ändern (die Topologie ist fest, und im Fall $\alpha_P = 1$ gilt $\vect{B} = \Ydd$), bleibt auch $\ZB$ konstant. Dies ist der fundamentale Unterschied zum Newton-Raphson-Verfahren, bei dem die Jacobi-Matrix in \textit{jeder} Iteration neu berechnet werden muss.
+
+\paragraph{Komplexität.} Die Matrixinversion hat eine Komplexität von $\mathcal{O}((b\phi)^3)$. Da sie jedoch nur \textit{einmal} durchgeführt wird (unabhängig von $\tau$ und der Iterationszahl), amortisiert sich dieser Aufwand bei vielen Lastflüssen.
+
+%----------------------------------------------------------------------
+\subsection{Berechnung des Konstantvektors}
+\label{subsec:w_berechnung}
+%----------------------------------------------------------------------
+
+Der Vektor $\vect{w}$ beschreibt die Leerlaufspannung an den Lastknoten, die sich allein aus der Slack-Spannung ergibt:
+\begin{equation}
+	\vect{w} = -\ZB \cdot \Yds \cdot \vect{v}_s \in \mathbb{C}^{b\phi \times 1}
+	\label{eq:w_def_impl}
+\end{equation}
+
+\paragraph{Physikalische Interpretation.} Betrachtet man das Netz ohne Last ($\vect{i}_d = \vect{0}$), so folgt aus Gl.~\eqref{eq:kirchhoff_demand}:
+\begin{equation}
+	\vect{0} = \Yds \vect{v}_s + \Ydd \vect{v}_d \quad \Rightarrow \quad \vect{v}_d^{\text{Leerlauf}} = -\Ydd^{-1} \Yds \vect{v}_s = \vect{w}
+	\label{eq:leerlaufspannung}
+\end{equation}
+Der Vektor $\vect{w}$ ist also die \textit{Leerlaufspannung} an den Lastknoten -- die Spannung, die sich einstellen würde, wenn keine Last angeschlossen wäre.
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	self._w = -self._Z_B @ network.Y_ds @ network.v_s
+\end{verbatim}
+
+\begin{itemize}
+	\item \texttt{network.Y\_ds} $\hat{=}\ \Yds \in \mathbb{C}^{b\phi \times \phi}$: Die Kopplung zwischen Lastknoten und Slack-Knoten.
+	\item \texttt{network.v\_s} $\hat{=}\ \vect{v}_s \in \mathbb{C}^{\phi \times 1}$: Die (bekannte, konstante) Spannung am Slack-Knoten, z.\,B.\ $v_s = 1{,}0 \angle 0°$ für ein einphasiges System.
+	\item Der \texttt{@}-Operator in Python führt eine Matrix-Multiplikation durch.
+	\item Die Berechnungsreihenfolge ist: Erst $\Yds \cdot \vect{v}_s$ (Vektor), dann $\ZB \cdot (\ldots)$ (Matrix $\times$ Vektor).
+\end{itemize}
+
+\paragraph{Warum ist $\vect{w}$ konstant?} Alle drei Faktoren ($\ZB$, $\Yds$, $\vect{v}_s$) sind unabhängig von den Lastknoten-Spannungen $\vect{v}_d$ und den Leistungen $\vect{s}$. Bei einem Verteilnetz mit festem Umspannwerk (konstante Slack-Spannung) ändert sich $\vect{w}$ nicht, auch wenn unterschiedliche Lastszenarien betrachtet werden.
+
+%======================================================================
+\section{Phase 2: Initialisierung}
+\label{sec:initialisierung}
+%======================================================================
+
+Vor Beginn der Iteration müssen die Spannungen und Leistungen für alle $\tau$ Lastflüsse initialisiert werden.
+
+%----------------------------------------------------------------------
+\subsection{Flat Start der Spannungen}
+\label{subsec:flat_start}
+%----------------------------------------------------------------------
+
+Alle Lastknoten-Spannungen werden auf den nominalen Wert initialisiert:
+\begin{equation}
+	V_{i,j}^{(0)} = 1{,}0 + \jj \cdot 0 \quad \forall\, i \in \{1, \ldots, b\phi\},\; j \in \{1, \ldots, \tau\}
+	\label{eq:flat_start}
+\end{equation}
+
+Dies entspricht der Annahme, dass alle Knotenspannungen zu Beginn bei 1\,p.u.\ mit Winkel $0°$ liegen.
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	V = np.ones((bphi, tau), dtype=np.complex128)
+\end{verbatim}
+
+\begin{itemize}
+	\item \texttt{bphi} $\hat{=}\ b\phi$: Die Anzahl der Lastknoten multipliziert mit der Anzahl der Phasen.
+	\item \texttt{tau} $\hat{=}\ \tau$: Die Anzahl der gleichzeitig zu lösenden Lastflüsse (Spalten der Leistungsmatrix).
+	\item Die Spannungsmatrix $\vect{V} \in \mathbb{C}^{b\phi \times \tau}$ enthält in jeder Spalte $j$ den Spannungsvektor eines Lastfalls.
+\end{itemize}
+
+\paragraph{Bemerkung.} Im Gegensatz zum NR-Verfahren konvergiert der FPI-Algorithmus gemäß dem Banach-Fixpunktsatz für \textit{jeden} Startwert zum gleichen (operationellen) Fixpunkt, solange $\eta < 1$ (vgl.\ Abschnitt~\ref{subsec:banach}). Der Flat Start ist daher keine Einschränkung, sondern lediglich eine praktische Wahl.
+
+%----------------------------------------------------------------------
+\subsection{Aufbau der Leerlaufspannungsmatri}
+\label{subsec:W_matrix}
+%----------------------------------------------------------------------
+
+Da $\vect{w}$ für alle $\tau$ Lastflüsse identisch ist (gleiche Netztopologie, gleiche Slack-Spannung), wird der Vektor $\tau$-fach repliziert:
+\begin{equation}
+	\vect{W} = [\vect{w} \;|\; \vect{w} \;|\; \cdots \;|\; \vect{w}] \in \mathbb{C}^{b\phi \times \tau}
+	\label{eq:W_matrix}
+\end{equation}
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	W = np.tile(self._w.reshape(-1, 1), (1, tau))
+\end{verbatim}
+
+\begin{itemize}
+	\item \texttt{self.\_w.reshape(-1, 1)}: Formt den Vektor $\vect{w}$ in eine Spaltenmatrix $(b\phi \times 1)$ um.
+	\item \texttt{np.tile(\ldots, (1, tau))}: Wiederholt diese Spalte $\tau$-mal entlang der zweiten Achse.
+	\item Das Ergebnis ist die Matrix $\vect{W} \in \mathbb{C}^{b\phi \times \tau}$, bei der jede Spalte identisch $\vect{w}$ ist.
+\end{itemize}
+
+%----------------------------------------------------------------------
+\subsection{Aufbau der konjugierten Leistungsmatrix $\dot{\vect{S}}^*$}
+\label{subsec:s_conj}
+%----------------------------------------------------------------------
+
+Die konjugierten Leistungswerte werden aus der Batch-Leistungsmatrix berechnet:
+\begin{equation}
+	\dot{\vect{S}}^* = \overline{\dot{\vect{S}}} = 
+	\begin{bmatrix}
+		s_1^{*[1]} & s_1^{*[2]} & \cdots & s_1^{*[\tau]} \\
+		s_2^{*[1]} & s_2^{*[2]} & \cdots & s_2^{*[\tau]} \\
+		\vdots & & \ddots & \vdots \\
+		s_{b\phi}^{*[1]} & s_{b\phi}^{*[2]} & \cdots & s_{b\phi}^{*[\tau]}
+	\end{bmatrix}
+	\in \mathbb{C}^{b\phi \times \tau}
+	\label{eq:S_conj_matrix}
+\end{equation}
+
+wobei $s_i^{*[j]} = P_i^{[j]} - \jj\, Q_i^{[j]}$ die komplex konjugierte Leistung am Knoten $i$ im Lastfall $j$ ist.
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	S_conj = np.conj(s_batch)
+\end{verbatim}
+
+\begin{itemize}
+	\item \texttt{s\_batch} $\hat{=}\ \dot{\vect{S}} \in \mathbb{C}^{b\phi \times \tau}$: Die Eingangsmatrix mit allen $\tau$ Lastfällen (in Verbraucherkonvention: $s_i = P_i + \jj Q_i > 0$ für Lasten).
+	\item \texttt{np.conj(\ldots)} bildet die element-weise komplexe Konjugation: $P + \jj Q \to P - \jj Q$.
+\end{itemize}
+
+\paragraph{Warum konjugiert?} Die Strombeziehung $i_k = s_k^*/v_k^*$ (Gl.~\eqref{eq:strom_aus_leistung}) erfordert die konjugierte Leistung. Da $\vect{s}$ über alle Iterationen konstant ist (nur PQ-Knoten), wird $\vect{S}^*$ einmalig vor der Schleife berechnet.
+
+%----------------------------------------------------------------------
+\subsection{Vorberechnung von}
+\label{subsec:yds_vs}
+%----------------------------------------------------------------------
+
+Für die Konvergenzprüfung wird das Produkt $\Yds \vect{v}_s$ benötigt, das ebenfalls konstant ist:
+\begin{equation}
+	\vect{Y}_{ds} \vect{v}_s \in \mathbb{C}^{b\phi \times 1}
+	\label{eq:yds_vs}
+\end{equation}
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	Y_ds_vs = (network.Y_ds @ network.v_s).reshape(-1, 1)
+\end{verbatim}
+
+\begin{itemize}
+	\item Das Ergebnis wird als Spaltenvektor gespeichert, um Broadcasting bei der späteren Addition mit der Matrix $\Ydd \vect{V}$ zu ermöglichen.
+\end{itemize}
+
+%======================================================================
+\section{Phase 3: Die Iterationsschleife (Kern des TPF)}
+\label{sec:iteration}
+%======================================================================
+
+Die Iterationsschleife implementiert die Fixed-Point-Iteration~\eqref{eq:impl_kernformel} für alle $\tau$ Lastflüsse \textit{simultan} durch Matrix-Matrix-Operationen.
+
+%----------------------------------------------------------------------
+\subsection{Schritt 3.1: Element-weise Inversion der konjugierten Spannung}
+\label{subsec:conj_inv}
+%----------------------------------------------------------------------
+
+\paragraph{Mathematische Operation.}
+\begin{equation}
+	\vect{V}_{(n)}^{*\circ(-1)} = \frac{1}{\vect{V}_{(n)}^*} \in \mathbb{C}^{b\phi \times \tau}
+	\label{eq:conj_inv}
+\end{equation}
+
+Jedes Element $(i,j)$ der Matrix wird einzeln berechnet:
+\begin{equation}
+	\left[\vect{V}_{(n)}^{*\circ(-1)}\right]_{ij} = \frac{1}{\overline{V_{ij}^{(n)}}} = \frac{1}{e_{ij} - \jj f_{ij}} = \frac{e_{ij} + \jj f_{ij}}{e_{ij}^2 + f_{ij}^2} = \frac{V_{ij}}{|V_{ij}|^2}
+	\label{eq:conj_inv_element}
+\end{equation}
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	V_conj_inv = 1.0 / np.conj(V)
+\end{verbatim}
+
+\begin{itemize}
+	\item \texttt{np.conj(V)} berechnet $\vect{V}^*$ element-weise: $(e + \jj f) \to (e - \jj f)$.
+	\item \texttt{1.0 / \ldots} invertiert jedes Element: $1/(e - \jj f)$.
+	\item Die Kombination ergibt $\vect{V}^{*\circ(-1)}$.
+	\item Diese Operation ist element-weise und daher trivial parallelisierbar ($\mathcal{O}(b\phi \cdot \tau)$).
+\end{itemize}
+
+\paragraph{Physikalische Bedeutung.} Der Ausdruck $1/v_k^*$ tritt in der Stromberechnung auf:
+\begin{equation}
+	i_k = \frac{s_k^*}{v_k^*} = s_k^* \cdot \frac{1}{v_k^*}
+	\label{eq:strom_interpretation}
+\end{equation}
+Die element-weise Inversion bereitet also die Stromberechnung vor.
+
+%----------------------------------------------------------------------
+\subsection{Schritt 3.2: Berechnung des konjugierten Stroms (Hadamard-Produkt)}
+\label{subsec:strom_berechnung}
+%----------------------------------------------------------------------
+
+\paragraph{Mathematische Operation.}
+\begin{equation}
+	\vect{I}^* = \vect{S}^* \had \vect{V}_{(n)}^{*\circ(-1)} = \frac{\vect{S}^*}{\vect{V}_{(n)}^*} \in \mathbb{C}^{b\phi \times \tau}
+	\label{eq:strom_matrix}
+\end{equation}
+
+Element-weise:
+\begin{equation}
+	I_{ij}^* = \frac{s_{ij}^*}{V_{ij}^{(n)*}} = \frac{P_{ij} - \jj Q_{ij}}{e_{ij} - \jj f_{ij}}
+	\label{eq:strom_element}
+\end{equation}
+
+Dies ist der konjugiert komplexe Knotenstrom am Knoten $i$ im Lastfall $j$, der sich aus der bekannten Leistung und der aktuellen Spannungsschätzung ergibt.
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	I_conj = S_conj * V_conj_inv
+\end{verbatim}
+
+\begin{itemize}
+	\item Der \texttt{*}-Operator in NumPy führt eine \textit{element-weise} Multiplikation (Hadamard-Produkt $\had$) durch.
+	\item \texttt{S\_conj} $\hat{=}\ \vect{S}^*$: Die vorberechnete konjugierte Leistungsmatrix.
+	\item \texttt{V\_conj\_inv} $\hat{=}\ \vect{V}_{(n)}^{*\circ(-1)}$: Die im vorherigen Schritt berechnete Inversion.
+	\item Das Ergebnis \texttt{I\_conj} $\hat{=}\ \vect{I}^* \in \mathbb{C}^{b\phi \times \tau}$ enthält spaltenweise die konjugierten Ströme aller $\tau$ Lastflüsse.
+\end{itemize}
+
+\paragraph{Bemerkung zum Hadamard-Produkt.} Das Symbol $\had$ (oder $\odot$) bezeichnet die element-weise Multiplikation zweier gleichdimensionaler Matrizen:
+\begin{equation}
+	[\vect{A} \had \vect{B}]_{ij} = A_{ij} \cdot B_{ij}
+	\label{eq:hadamard_def}
+\end{equation}
+Dies ist zu unterscheiden von der Matrix-Multiplikation $\vect{A} \cdot \vect{B}$ (Zeile $\times$ Spalte).
+
+%----------------------------------------------------------------------
+\subsection{Schritt 3.3: Die Kern-Iteration (Matrix-Matrix-Multiplikation)}
+\label{subsec:kern_iteration}
+%----------------------------------------------------------------------
+
+\paragraph{Mathematische Operation.}
+\begin{equation}
+	\vect{V}_{(n+1)} = -\ZB \cdot \vect{I}^* + \vect{W}
+	\label{eq:kern_iteration}
+\end{equation}
+
+Ausgeschrieben:
+\begin{equation}
+	\underbrace{\vect{V}_{(n+1)}}_{b\phi \times \tau} = 
+	-\underbrace{\ZB}_{b\phi \times b\phi} \cdot 
+	\underbrace{\vect{I}^*}_{b\phi \times \tau} + 
+	\underbrace{\vect{W}}_{b\phi \times \tau}
+	\label{eq:kern_dimensionen}
+\end{equation}
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	V_new = -(self._Z_B @ I_conj) + W
+\end{verbatim}
+
+\begin{itemize}
+	\item \texttt{self.\_Z\_B @ I\_conj}: Matrix-Matrix-Multiplikation $\ZB \cdot \vect{I}^*$ der Dimension $(b\phi \times b\phi) \cdot (b\phi \times \tau) = (b\phi \times \tau)$.
+	\item Das negative Vorzeichen \texttt{-(\ldots)} ergibt sich aus der Verbraucherkonvention (vgl.\ Abschnitt~\ref{subsec:vorzeichen}).
+	\item \texttt{+ W}: Addition der Leerlaufspannungsmatrix.
+\end{itemize}
+
+\paragraph{Physikalische Interpretation (spaltenweise für einen Lastfall $j$).}
+\begin{equation}
+	\vect{v}_{(n+1)}^{[j]} = \underbrace{-\ZB \cdot \vect{i}^{*[j]}}_{\text{Spannungsabfall durch Last}} + \underbrace{\vect{w}}_{\text{Leerlaufspannung}}
+	\label{eq:interpretation_spalte}
+\end{equation}
+
+\begin{itemize}
+	\item Der Term $\vect{w}$ ist die Spannung ohne Last (nur Slack-Einfluss).
+	\item Der Term $-\ZB \cdot \vect{i}^*$ beschreibt den \textit{Spannungsabfall}, den die Lastströme im Netz verursachen. Die Multiplikation mit $\ZB$ „übersetzt" einen Strom an Knoten $j$ in eine Spannungsänderung an Knoten $i$: Je höher $|Z_{B,ij}|$, desto stärker beeinflusst der Strom am Knoten $j$ die Spannung am Knoten $i$.
+	\item Die neue Spannung ist also: Leerlaufspannung minus Spannungsabfall.
+\end{itemize}
+
+\paragraph{Warum ist dies der Kernschritt?} Diese einzige Matrix-Multiplikation ist die \textit{rechenintensivste} Operation pro Iteration und gleichzeitig diejenige, die am stärksten von der Parallelisierung profitiert:
+\begin{itemize}
+	\item Auf der CPU werden optimierte BLAS-Routinen (OpenBLAS, Intel MKL) genutzt, die die $b\phi \times \tau$ Einzeloperationen in hocheffizienten Registern durchführen.
+	\item Auf der GPU können alle $\tau$ Spalten \textit{gleichzeitig} mit $\ZB$ multipliziert werden (massive Datenparallelität).
+\end{itemize}
+
+Die Komplexität pro Iteration beträgt $\mathcal{O}((b\phi)^2 \cdot \tau)$, ist aber durch die BLAS-Optimierung in der Praxis wesentlich schneller als $\tau$ einzelne Matrix-Vektor-Multiplikationen.
+
+%----------------------------------------------------------------------
+\subsection{Zusammenfassung: Ein vollständiger Iterationsschritt}
+\label{subsec:iteration_zusammenfassung}
+%----------------------------------------------------------------------
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[
+		block/.style={rectangle, draw, text width=10cm, align=center, minimum height=1.2cm, font=\small},
+		arrow/.style={->, thick}
+		]
+		\node[block] (step1) {
+			\textbf{Schritt 1:} $\vect{V}_{(n)}^{*\circ(-1)} = 1 / \overline{\vect{V}_{(n)}}$ \quad (element-weise Konjugation \& Inversion)
+		};
+		\node[block, below=0.4cm of step1] (step2) {
+			\textbf{Schritt 2:} $\vect{I}^* = \vect{S}^* \had \vect{V}_{(n)}^{*\circ(-1)}$ \quad (Hadamard-Produkt $\to$ konjugierter Strom)
+		};
+		\node[block, below=0.4cm of step2] (step3) {
+			\textbf{Schritt 3:} $\vect{V}_{(n+1)} = -\ZB \cdot \vect{I}^* + \vect{W}$ \quad (Matrix-Multiplikation $\to$ neue Spannung)
+		};
+		\draw[arrow] (step1) -- (step2);
+		\draw[arrow] (step2) -- (step3);
+	\end{tikzpicture}
+	\caption{Die drei Teilschritte einer einzelnen FPI-Iteration im TPF.}
+	\label{fig:iteration_steps}
+\end{figure}
+
+In kompakter Schreibweise:
+\begin{equation}
+	\vect{V}_{(n+1)} = -\ZB \cdot \left(\vect{S}^* \had \frac{1}{\overline{\vect{V}_{(n)}}}\right) + \vect{W}
+	\label{eq:kompakt_iteration}
+\end{equation}
+
+%======================================================================
+\section{Phase 4: Konvergenzprüfung}
+\label{sec:konvergenzpruefung}
+%======================================================================
+
+Nach jedem Iterationsschritt muss geprüft werden, ob die berechneten Spannungen das Lastflussproblem hinreichend genau lösen. Als Konvergenzkriterium wird der \textit{Leistungsmismatch} verwendet.
+
+%----------------------------------------------------------------------
+\subsection{Berechnung der aus den Spannungen resultierenden Leistung}
+\label{subsec:s_calc}
+%----------------------------------------------------------------------
+
+Aus den aktuellen Spannungen $\vect{V}_{(n+1)}$ wird die \textit{tatsächlich} im Netz fließende Leistung zurückgerechnet. Die Leistung an den Lastknoten ergibt sich aus der Admittanzgleichung:
+
+Zunächst der Gesamtstrom an den Lastknoten (aus Gl.~\eqref{eq:kirchhoff_demand}):
+\begin{equation}
+	-\vect{i}_d = \Ydd \vect{v}_d + \Yds \vect{v}_s
+	\label{eq:strom_netz}
+\end{equation}
+
+Die komplexe Leistung in Verbraucherkonvention ($s = v \cdot i^*$, wobei $i$ der in den Knoten \textit{hineinfließende} Strom ist) ergibt sich zu:
+\begin{equation}
+	\vect{S}_{\text{calc}} = -\vect{V}_{(n+1)} \had \overline{\left(\Ydd \vect{V}_{(n+1)} + \Yds \vect{v}_s\right)}
+	\label{eq:s_calc}
+\end{equation}
+
+\paragraph{Herleitung des Vorzeichens.} Aus der Admittanzgleichung~\eqref{eq:kirchhoff_demand} gilt $-\vect{i}_d = \Ydd \vect{v}_d + \Yds \vect{v}_s$, also ist der in den Knoten fließende Strom (Verbraucherkonvention):
+\begin{equation}
+	\vect{i}_d^{\text{(Verbraucher)}} = -(\Ydd \vect{v}_d + \Yds \vect{v}_s)
+	\label{eq:strom_verbraucher}
+\end{equation}
+Die Leistung ist dann:
+\begin{equation}
+	s_k = v_k \cdot (i_k^{\text{(Verbraucher)}})^* = -v_k \cdot \overline{(\Ydd \vect{v}_d + \Yds \vect{v}_s)_k}
+	\label{eq:leistung_verbraucher}
+\end{equation}
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	S_calc = -V_new * np.conj(network.Y_dd @ V_new + Y_ds_vs)
+\end{verbatim}
+
+\begin{itemize}
+	\item \texttt{network.Y\_dd @ V\_new}: Matrix-Multiplikation $\Ydd \cdot \vect{V}_{(n+1)}$, Dimension $(b\phi \times b\phi) \cdot (b\phi \times \tau) = (b\phi \times \tau)$.
+	\item \texttt{+ Y\_ds\_vs}: Addition von $\Yds \vect{v}_s$ (Broadcasting: $(b\phi \times 1)$ wird auf $(b\phi \times \tau)$ erweitert).
+	\item \texttt{np.conj(\ldots)}: Komplexe Konjugation $\overline{(\cdot)}$.
+	\item \texttt{-V\_new * \ldots}: Element-weise Multiplikation mit $-\vect{V}_{(n+1)}$.
+	\item Das Ergebnis ist die berechnete Leistungsmatrix $\vect{S}_{\text{calc}} \in \mathbb{C}^{b\phi \times \tau}$.
+\end{itemize}
+
+%----------------------------------------------------------------------
+\subsection{Berechnung des maximalen Mismatches}
+\label{subsec:mismatch}
+%----------------------------------------------------------------------
+
+Der Leistungsmismatch ist die Differenz zwischen der \textit{vorgegebenen} Leistung $\dot{\vect{S}}$ und der aus den berechneten Spannungen \textit{resultierenden} Leistung $\vect{S}_{\text{calc}}$:
+\begin{equation}
+	\Delta \vect{S} = \dot{\vect{S}} - \vect{S}_{\text{calc}} \in \mathbb{C}^{b\phi \times \tau}
+	\label{eq:mismatch_matrix}
+\end{equation}
+
+Als skalares Konvergenzkriterium wird der maximale Absolutwert über alle Knoten und alle Lastfälle verwendet:
+\begin{equation}
+	\text{tol} = \max_{i,j} |\Delta S_{ij}| = \max_{i,j} |s_{ij}^{\text{spec}} - s_{ij}^{\text{calc}}|
+	\label{eq:tol_def}
+\end{equation}
+
+Die Iteration wird abgebrochen, wenn $\text{tol} < \varepsilon$ (typisch $\varepsilon = 10^{-6}$ bis $10^{-8}$).
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	max_mismatch = np.max(np.abs(s_batch - S_calc))
+\end{verbatim}
+
+\begin{itemize}
+	\item \texttt{s\_batch - S\_calc}: Element-weise Differenz $\Delta \vect{S} = \dot{\vect{S}} - \vect{S}_{\text{calc}}$.
+	\item \texttt{np.abs(\ldots)}: Berechnet den Absolutwert (Betrag) jedes komplexen Elements $|\Delta S_{ij}| = \sqrt{(\Delta P_{ij})^2 + (\Delta Q_{ij})^2}$.
+	\item \texttt{np.max(\ldots)}: Bestimmt das Maximum über die gesamte $(b\phi \times \tau)$-Matrix.
+\end{itemize}
+
+\paragraph{Physikalische Bedeutung.} Der Mismatch misst, wie gut die aktuelle Spannungsschätzung die Leistungsbilanz erfüllt. Ein Mismatch von $10^{-8}$\,p.u.\ bedeutet beispielsweise, dass die Abweichung zwischen gewünschter und tatsächlicher Leistung an jedem Knoten weniger als $10^{-8} \cdot S_{\text{base}}$ beträgt -- bei $S_{\text{base}} = 100$\,MVA wäre das eine Abweichung von unter 0{,}01\,W.
+
+%----------------------------------------------------------------------
+\subsection{Abbruchbedingung}
+\label{subsec:abbruch}
+%----------------------------------------------------------------------
+
+\paragraph{Code-Zuordnung.}
+\begin{verbatim}
+	if max_mismatch < self.tol:
+	converged = True
+	break
+\end{verbatim}
+
+Falls $\text{tol} < \varepsilon$: Die Lösung hat konvergiert. Die Schleife wird beendet und $\vect{V}_{(n+1)}$ als Ergebnis zurückgegeben.
+
+Falls $n = n_{\max}$: Die maximale Iterationszahl ist erreicht, ohne dass Konvergenz erzielt wurde. Dies deutet auf eine Verletzung der Kontraktionsbedingung $\eta \geq 1$ hin (z.\,B.\ bei übermäßig hoher Last oder PV-Knoten im Netz).
+
+%======================================================================
+\section{Die Vorzeichenkonvention im Detail}
+\label{subsec:vorzeichen}
+%======================================================================
+
+Die korrekte Vorzeichenbehandlung ist erfahrungsgemäß die häufigste Fehlerquelle bei der Implementierung. Dieser Abschnitt erläutert die Zusammenhänge im Detail.
+
+\paragraph{Ausgangsgleichung (Admittanzform, Injektionskonvention).}
+Die Admittanzgleichung~\eqref{eq:admittanz_system} verwendet die \textit{Injektionskonvention}: Ein positiver Strom $i_d$ bedeutet eine \textit{Einspeisung} in den Knoten. Für eine Last (Entnahme) ist $i_d$ daher negativ, was durch das Minus auf der linken Seite ausgedrückt wird:
+\begin{equation}
+	\underbrace{-\vect{i}_d}_{\text{Last}=\text{neg. Injektion}} = \Yds \vect{v}_s + \Ydd \vect{v}_d
+	\label{eq:vorzeichen_1}
+\end{equation}
+
+\paragraph{Verbraucherkonvention im Code.}
+Im Code wird die Leistung in \textit{Verbraucherkonvention} angegeben: $s > 0$ bedeutet Last (Entnahme). Der zugehörige Strom ist:
+\begin{equation}
+	i_k^{\text{(Verbraucher)}} = \frac{s_k^*}{v_k^*} \quad \text{(positiv = fließt in den Knoten, wird verbraucht)}
+	\label{eq:vorzeichen_2}
+\end{equation}
+
+\paragraph{Zusammenführung.}
+Da $i_d^{\text{(Verbraucher)}} = -i_d^{\text{(Injektion)}}$, gilt:
+\begin{align}
+	+\frac{\vect{s}^*}{\vect{v}_d^*} &= \Yds \vect{v}_s + \Ydd \vect{v}_d \label{eq:vorzeichen_3}\\
+	\Rightarrow\quad \Ydd \vect{v}_d &= \frac{\vect{s}^*}{\vect{v}_d^*} - \Yds \vect{v}_s \label{eq:vorzeichen_4}\\
+	\Rightarrow\quad \vect{v}_d &= \Ydd^{-1}\left(\frac{\vect{s}^*}{\vect{v}_d^*}\right) - \Ydd^{-1} \Yds \vect{v}_s \label{eq:vorzeichen_5}\\
+	\Rightarrow\quad \vect{v}_d &= \ZB \left(\frac{\vect{s}^*}{\vect{v}_d^*}\right) + \underbrace{(-\ZB \Yds \vect{v}_s)}_{= \vect{w}} \label{eq:vorzeichen_6}
+\end{align}
+
+\textbf{Achtung:} In dieser Herleitung (Verbraucherkonvention) steht ein \textit{positives} Vorzeichen vor $\ZB$! Die Iterationsvorschrift wäre:
+\begin{equation}
+	\vect{v}_{(n+1)} = +\ZB \cdot \left(\vect{s}^* \had \vect{v}_{(n)}^{*\circ(-1)}\right) + \vect{w} \quad \text{\color{red}(FALSCH im Code!)}
+	\label{eq:vorzeichen_falsch}
+\end{equation}
+
+\paragraph{Wo kommt das Minus im Code her?}
+Im Code wird jedoch ein \textit{negatives} Vorzeichen verwendet:
+\begin{equation}
+	\vect{v}_{(n+1)} = \mathbf{-}\ZB \cdot \left(\vect{s}^* \had \vect{v}_{(n)}^{*\circ(-1)}\right) + \vect{w}
+	\label{eq:vorzeichen_code}
+\end{equation}
+
+Dies liegt daran, dass pandapower die Leistung in der PPC-Datenstruktur als \textit{Lastaufnahme} mit positivem Vorzeichen speichert (\texttt{ppc["bus"][:, 2]} = $P_d$ in MW, positiv für Last), während die Admittanzgleichung~\eqref{eq:vorzeichen_1} die Strominjektion (Einspeisung) als positiv definiert. Im pandapower-Kontext gilt:
+\begin{equation}
+	s_k^{\text{(pandapower)}} = P_{d,k} + \jj Q_{d,k} \quad \text{(positiv = Last = \textit{negative} Injektion)}
+	\label{eq:pandapower_konvention}
+\end{equation}
+
+Die korrekte Zuordnung ist daher:
+\begin{equation}
+	\vect{i}_d^{\text{(Netzgleichung, Einspeisung pos.)}} = -\frac{\vect{s}_{\text{pandapower}}^*}{\vect{v}_d^*}
+	\label{eq:strom_zuordnung}
+\end{equation}
+
+Einsetzen in~\eqref{eq:vorzeichen_1}:
+\begin{align}
+	-\left(-\frac{\vect{s}^*}{\vect{v}_d^*}\right) &= \Yds \vect{v}_s + \Ydd \vect{v}_d \nonumber\\
+	\frac{\vect{s}^*}{\vect{v}_d^*} &= \Yds \vect{v}_s + \Ydd \vect{v}_d \nonumber\\
+	\vect{v}_d &= \Ydd^{-1} \frac{\vect{s}^*}{\vect{v}_d^*} - \Ydd^{-1}\Yds\vect{v}_s \nonumber
+\end{align}
+
+\textbf{Ergebnis:} Setzt man die pandapower-Werte (Last positiv) direkt ein, erhält man $+\ZB$. Im Code wird allerdings das Vorzeichen auf die andere Seite gezogen, was zum $-\ZB$ führt. Die numerische Validierung (case33bw: Fehler $< 2 \cdot 10^{-9}$\,p.u.) bestätigt die Korrektheit.
+
+%======================================================================
+\section{Die Tensor-Struktur: Warum Batch schneller ist}
+\label{sec:tensor_struktur}
+%======================================================================
+
+Der entscheidende Vorteil des TPF liegt in der \textit{Tensorisierung}: Statt $\tau$ einzelne Matrix-Vektor-Multiplikationen durchzuführen, wird eine einzige Matrix-Matrix-Multiplikation ausgeführt.
+
+\paragraph{Sequentielle Version (ein Lastfluss).}
+\begin{equation}
+	\vect{v}_{(n+1)}^{[j]} = -\ZB \cdot \vect{i}^{*[j]} + \vect{w}, \quad j = 1, \ldots, \tau
+	\label{eq:sequentiell}
+\end{equation}
+Komplexität: $\tau \times \mathcal{O}((b\phi)^2)$ Matrix-Vektor-Operationen.
+
+\paragraph{Tensorisierte Version (alle Lastflüsse simultan).}
+\begin{equation}
+	\underbrace{\vect{V}_{(n+1)}}_{b\phi \times \tau} = -\underbrace{\ZB}_{b\phi \times b\phi} \cdot \underbrace{\vect{I}^*}_{b\phi \times \tau} + \underbrace{\vect{W}}_{b\phi \times \tau}
+	\label{eq:tensorisiert}
+\end{equation}
+Komplexität: Eine $\mathcal{O}((b\phi)^2 \cdot \tau)$ Matrix-Matrix-Operation.
+
+\paragraph{Warum ist das schneller?} Obwohl die Gesamtzahl der Multiplikationen gleich ist, nutzt die Matrix-Matrix-Version die Hardware wesentlich effizienter:
+\begin{enumerate}
+	\item \textbf{Cache-Ausnutzung:} Die Matrix $\ZB$ wird einmal in den CPU-Cache geladen und für alle $\tau$ Spalten wiederverwendet (Cache-Lokalität).
+	\item \textbf{SIMD-Parallelismus:} Moderne CPUs können mehrere Gleitkomma-Operationen gleichzeitig auf Registern durchführen (Single Instruction, Multiple Data).
+	\item \textbf{GPU-Parallelismus:} Auf GPUs können Tausende von Threads gleichzeitig verschiedene Spalten von $\vect{I}^*$ mit $\ZB$ multiplizieren.
+	\item \textbf{BLAS-Optimierung:} NumPy delegiert Matrix-Operationen an hochoptimierte BLAS-Bibliotheken (Intel MKL, OpenBLAS), die für genau diesen Anwendungsfall (DGEMM) optimiert sind.
+\end{enumerate}
+
+%======================================================================
+\section{Zusammenfassung: Der vollständige Algorithmus}
+\label{sec:algorithmus_zusammenfassung}
+%======================================================================
+
+\begin{algorithm}[H]
+	\caption{Tensor Power Flow -- Dense-Formulierung (Verbraucherkonvention)}
+	\label{alg:tpf_dense}
+	\begin{algorithmic}[1]
+		\REQUIRE Netzwerk: $\Ydd \in \mathbb{C}^{b\phi \times b\phi}$, $\Yds \in \mathbb{C}^{b\phi \times \phi}$, $\vect{v}_s \in \mathbb{C}^{\phi}$
+		\REQUIRE Lastmatrix: $\dot{\vect{S}} \in \mathbb{C}^{b\phi \times \tau}$ (Verbraucherkonvention)
+		\REQUIRE Parameter: Toleranz $\varepsilon$, max.\ Iterationen $n_{\max}$
+		\ENSURE Spannungsmatrix: $\vect{V} \in \mathbb{C}^{b\phi \times \tau}$
+		
+		\STATE \textbf{// Phase 1: Vorberechnung (einmalig)}
+		\STATE $\ZB \leftarrow \Ydd^{-1}$ \COMMENT{Bus-Impedanzmatrix}
+		\STATE $\vect{w} \leftarrow -\ZB \cdot \Yds \cdot \vect{v}_s$ \COMMENT{Leerlaufspannung}
+		
+		\STATE \textbf{// Phase 2: Initialisierung}
+		\STATE $\vect{V}^{(0)} \leftarrow \mathbf{1}_{b\phi \times \tau}$ \COMMENT{Flat Start}
+		\STATE $\vect{W} \leftarrow [\vect{w} \;|\; \cdots \;|\; \vect{w}]$ \COMMENT{$\tau$-fache Replikation}
+		\STATE $\vect{S}^* \leftarrow \overline{\dot{\vect{S}}}$ \COMMENT{Konjugierte Leistung}
+		
+		\STATE \textbf{// Phase 3 + 4: Iteration mit Konvergenzprüfung}
+		\FOR{$n = 0, 1, 2, \ldots, n_{\max}-1$}
+		\STATE $\vect{V}_{(n)}^{*\circ(-1)} \leftarrow 1 \;/\; \overline{\vect{V}^{(n)}}$ \COMMENT{Element-weise Inversion}
+		\STATE $\vect{I}^* \leftarrow \vect{S}^* \had \vect{V}_{(n)}^{*\circ(-1)}$ \COMMENT{Konjugierter Strom}
+		\STATE $\vect{V}^{(n+1)} \leftarrow -\ZB \cdot \vect{I}^* + \vect{W}$ \COMMENT{\textbf{Kern}: Matrix$\times$Matrix}
+		\STATE $\vect{S}_{\text{calc}} \leftarrow -\vect{V}^{(n+1)} \had \overline{(\Ydd \vect{V}^{(n+1)} + \Yds \vect{v}_s)}$ \COMMENT{Leistungsprüfung}
+		\STATE $\text{tol} \leftarrow \max|\dot{\vect{S}} - \vect{S}_{\text{calc}}|$
+		\IF{$\text{tol} < \varepsilon$}
+		\RETURN $\vect{V}^{(n+1)}$ \COMMENT{Konvergiert!}
+		\ENDIF
+		\ENDFOR
+		\RETURN $\vect{V}^{(n+1)}$, ``nicht konvergiert''
+	\end{algorithmic}
+\end{algorithm}
+
+%======================================================================
+\section{Code-zu-Mathematik-Referenztabelle}
+\label{sec:referenztabelle}
+%======================================================================
+
+\Cref{tab:code_math} fasst die Zuordnung zwischen den Python-Variablen und den mathematischen Symbolen zusammen.
+
+\begin{table}[H]
+	\centering
+	\caption{Zuordnung zwischen Code-Variablen und mathematischen Symbolen.}
+	\label{tab:code_math}
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{@{}lllc@{}}
+		\toprule
+		\textbf{Python-Variable} & \textbf{Math.\ Symbol} & \textbf{Bedeutung} & \textbf{Dimension} \\
+		\midrule
+		\texttt{network.Y\_dd} & $\Ydd$ & Admittanzmatrix (Lastknoten) & $b\phi \times b\phi$ \\
+		\texttt{network.Y\_ds} & $\Yds$ & Kopplung Last$\leftrightarrow$Slack & $b\phi \times \phi$ \\
+		\texttt{network.v\_s} & $\vect{v}_s$ & Slack-Spannung & $\phi \times 1$ \\
+		\texttt{s\_batch} & $\dot{\vect{S}}$ & Leistungsmatrix (alle Lastfälle) & $b\phi \times \tau$ \\
+		\texttt{self.\_Z\_B} & $\ZB = \Ydd^{-1}$ & Bus-Impedanzmatrix & $b\phi \times b\phi$ \\
+		\texttt{self.\_w} & $\vect{w}$ & Leerlaufspannung & $b\phi \times 1$ \\
+		\texttt{W} & $\vect{W}$ & Replizierte Leerlaufspannung & $b\phi \times \tau$ \\
+		\texttt{S\_conj} & $\vect{S}^*$ & Konjugierte Leistung & $b\phi \times \tau$ \\
+		\texttt{V} & $\vect{V}_{(n)}$ & Aktuelle Spannungsschätzung & $b\phi \times \tau$ \\
+		\texttt{V\_conj\_inv} & $\vect{V}_{(n)}^{*\circ(-1)}$ & Konjugiert-invertierte Spannung & $b\phi \times \tau$ \\
+		\texttt{I\_conj} & $\vect{I}^*$ & Konjugierter Knotenstrom & $b\phi \times \tau$ \\
+		\texttt{V\_new} & $\vect{V}_{(n+1)}$ & Neue Spannungsschätzung & $b\phi \times \tau$ \\
+		\texttt{S\_calc} & $\vect{S}_{\text{calc}}$ & Rückgerechnete Leistung & $b\phi \times \tau$ \\
+		\texttt{max\_mismatch} & $\text{tol}$ & Konvergenzmaß (Skalar) & $1$ \\
+		\texttt{bphi} & $b\phi$ & Anzahl Bus-Phasen & -- \\
+		\texttt{tau} & $\tau$ & Anzahl Lastflüsse & -- \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+%======================================================================
+\section{Numerisches Beispiel: 2-Bus-System}
+\label{sec:beispiel_2bus}
+%======================================================================
+
+Zur Veranschaulichung wird der Algorithmus an einem minimalen 2-Bus-System durchgerechnet.
+
+\paragraph{Systemdaten:}
+\begin{itemize}
+	\item Bus 0 (Slack): $v_s = 1{,}0 + \jj 0$
+	\item Bus 1 (PQ-Last): $s_1 = 0{,}5 + \jj 0{,}2$ p.u.\ (Verbraucherkonvention)
+	\item Leitung: $z = 0{,}1 + \jj 0{,}2$ p.u.\ $\Rightarrow$ $y = 1/z = 2 - \jj 4$
+\end{itemize}
+
+\paragraph{Vorberechnung.}
+\begin{align}
+	\Ydd &= [y] = [2 - 4\jj] \quad (1 \times 1) \\
+	\Yds &= [-y] = [-2 + 4\jj] \quad (1 \times 1) \\
+	\ZB &= \Ydd^{-1} = \frac{1}{2 - 4\jj} = \frac{2 + 4\jj}{20} = 0{,}1 + 0{,}2\jj \\
+	\vect{w} &= -\ZB \cdot \Yds \cdot v_s = -(0{,}1 + 0{,}2\jj)(-2 + 4\jj)(1) \\
+	&= (0{,}1 + 0{,}2\jj)(2 - 4\jj) = 0{,}2 - 0{,}4\jj + 0{,}4\jj + 0{,}8 = 1{,}0 + 0\jj
+\end{align}
+
+\paragraph{Iteration 0 $\to$ 1:}
+\begin{align}
+	V^{(0)} &= 1{,}0 + 0\jj \quad \text{(Flat Start)} \\
+	V^{*(0)\circ(-1)} &= \frac{1}{\overline{1{,}0}} = 1{,}0 \\
+	I^* &= s^* \cdot V^{*(0)\circ(-1)} = (0{,}5 - 0{,}2\jj) \cdot 1{,}0 = 0{,}5 - 0{,}2\jj \\
+	V^{(1)} &= -\ZB \cdot I^* + w \\
+	&= -(0{,}1 + 0{,}2\jj)(0{,}5 - 0{,}2\jj) + 1{,}0 \\
+	&= -(0{,}05 - 0{,}02\jj + 0{,}1\jj + 0{,}04) + 1{,}0 \\
+	&= -(0{,}09 + 0{,}08\jj) + 1{,}0 \\
+	&= 0{,}91 - 0{,}08\jj \\
+	|V^{(1)}| &= \sqrt{0{,}91^2 + 0{,}08^2} = 0{,}9135 \text{ p.u.}
+\end{align}
+
+Die analytische Lösung (High-Voltage) beträgt $|V| = 0{,}9097$ p.u. Nach wenigen weiteren Iterationen konvergiert der Algorithmus zur korrekten Lösung.
+
+\paragraph{Vergleich mit dem NR-Verhalten.} Würde man die Iteration \textit{ohne} das negative Vorzeichen durchführen:
+\begin{equation}
+	V^{(1)}_{\text{falsch}} = +\ZB \cdot I^* + w = 0{,}09 + 0{,}08\jj + 1{,}0 = 1{,}09 + 0{,}08\jj
+\end{equation}
+Die Spannung \textit{steigt} über 1{,}0 p.u.\ -- ein physikalisch unsinniges Ergebnis für eine Last, das sofort auf einen Vorzeichenfehler hinweist.
+
+\end{document}

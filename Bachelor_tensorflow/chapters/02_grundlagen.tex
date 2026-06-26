@@ -926,161 +926,112 @@ unverändert bleiben.
 \label{sec:fpi}
 %======================================================================
 
-Die Fixed-Point-Iteration (FPI), auch als \textit{Successive Approximation Method} (SAM) bezeichnet, bietet eine Alternative zum Newton-Raphson-Verfahren, die sich durch ihre einfache Formulierung, geringe Kosten pro Iteration und natürliche Eignung zur Parallelisierung auszeichnet \cite{Giraldo2022, Salazar2024}.
+Die Fixed-Point-Iteration (FPI), auch als \textit{Successive Approximation Method} (SAM) bezeichnet, bietet eine Alternative zum Newton-Raphson-Verfahren, die sich durch ihre einfache Formulierung, geringe Kosten pro Iteration und natürliche Eignung zur Parallelisierung auszeichnet. Die Methode wurde von Giraldo et al.\ \cite{Giraldo2022} im Rahmen der Current Injection Method unter Verwendung der Laurent-Reihenentwicklung vorgeschlagen und bildet die Grundlage des in \cref{ch:tpf} vorgestellten Tensor Power Flow.
+
+\subsection{Laurent-Reihen-Approximation}
+\label{subsec:laurent}
+
+Die Nichtlinearität der Lastflussgleichungen \eqref{eq:cim_mismatch} resultiert aus dem Term $(V_k^\phi)^{-1}$, der im spezifizierten Strom \eqref{eq:strom_aus_leistung} auftritt. Giraldo et al.\ \cite{Giraldo2022} schlagen eine Linearisierung mittels Laurent-Reihenentwicklung vor.
+
+\begin{proposition}[Laurent-Approximation, {\cite[Proposition~1]{Giraldo2022}}]
+	\label{prop:laurent}
+	Die Nichtlinearität $f(V_i) = (V_i)^{-1}$ an einem Knoten $i \in \Omega_d$ wird um einen Arbeitspunkt $\mathrm{V}^0 \in \C$ mittels Laurent-Reihe approximiert als:
+	\begin{equation}
+		f(V_i) \approx \frac{2}{\mathrm{V}^0} - \frac{V_i}{(\mathrm{V}^0)^2}
+		\label{eq:laurent_approx}
+	\end{equation}
+	unter der Annahme $V_i = \mathrm{V}^0 - \Delta V$ mit $\|\Delta V\| / \|\mathrm{V}^0\| < 1$.
+\end{proposition}
+
+%\begin{proof}
+%	Die Funktion $f(\Delta V) = 1/(\mathrm{V}^0 - \Delta V)$ kann für $\|\Delta V\| < \|\mathrm{V}^0\|$ als konvergente Potenzreihe dargestellt werden \cite{Giraldo2022}:
+%	\begin{equation}
+%		f(\Delta V) = \sum_{n=1}^{\infty} \frac{\Delta V^{n-1}}{(\mathrm{V}^0)^n} = \frac{1}{\mathrm{V}^0} + \frac{\Delta V}{(\mathrm{V}^0)^2} + \ldots
+%		\label{eq:laurent_reihe}
+%	\end{equation}
+%	Durch Abbruch nach dem zweiten Glied ($n \leq 2$) und Rücksubstitution $\Delta V = \mathrm{V}^0 - V_i$ ergibt sich die Approximation \eqref{eq:laurent_approx}.
+%\end{proof}
+
+Die Annahme $\|\Delta V\| / \|\mathrm{V}^0\| < 1$ ist physikalisch gerechtfertigt, da Knotenspannungen in Verteilnetzen im Normalbetrieb innerhalb eines engen Bandes um den Nennwert liegen (typisch $0{,}9$ bis $1{,}1$~p.u.) \cite{Giraldo2022}. Im iterativen Algorithmus wird der Arbeitspunkt $\mathrm{V}^0$ nach jeder Iteration auf den aktuellen Spannungswert aktualisiert, sodass die Approximation mit jeder Iteration genauer wird.
 
 \subsection{Herleitung des FPI-Algorithmus}
 \label{subsec:fpi_herleitung}
 
-Ausgangspunkt ist die zweite Zeile von \eqref{eq:admittanz_system}:
+Ausgangspunkt ist die Knotengleichung für die Lastknoten aus \eqref{eq:admittanz_system}:
 \begin{equation}
-	-\vect{i}_d = \vect{Y}_{ds} \vect{v}_s + \vect{Y}_{dd} \vect{v}_d
+	-\vect{I}_d = \Yds \vect{V}_s + \Ydd \vect{V}_d
 	\label{eq:kirchhoff_demand}
 \end{equation}
 
-Mit dem ZIP-Lastmodell nach \eqref{eq:zip} und der Strombeziehung $\vect{I}_d = \vect{S}_d^* / \vect{V}_d^*$ ergibt sich für den Strom \cite{Giraldo2022}:
+Der Strom an den Lastknoten ergibt sich unter Berücksichtigung des ZIP-Lastmodells (vgl.\ \cref{subsec:zip}) nach Giraldo et al.\ \cite{Giraldo2022} zu:
 \begin{equation}
 	\vect{I}_d = \left(\alpha_P \diag(\vect{V}_d^*)^{-1} + \diag(\alpha_I) + \alpha_Z \diag(\vect{V}_d)\right) \vect{S}_n^*
 	\label{eq:strom_zip}
 \end{equation}
 
-Einsetzen in \eqref{eq:kirchhoff_demand} und Umstellen nach $\vect{V}_d$ führt auf die allgemeine FPI-Formulierung nach Salazar Duque et al.\ \cite{Salazar2024}:
+Durch Anwendung der Laurent-Approximation (\cref{prop:laurent}) auf den nichtlinearen Term $\diag(\vect{V}_d^*)^{-1}$ und Einsetzen in \eqref{eq:kirchhoff_demand} ergibt sich das folgende lineare Gleichungssystem \cite{Giraldo2022}:
 \begin{equation}
-	\vect{v}_{(n+1)} = \vect{F} \cdot \vect{v}_{(n)}^{*\circ(-1)} + \vect{w}
-	\label{eq:fpi_grundgleichung}
+	\vect{A}\vect{V}_d^* - \vect{B}\vect{V}_d = \vect{C} + \vect{D}
+	\label{eq:lineares_system}
 \end{equation}
 
-wobei die konstanten Hilfsmatrizen definiert sind als:
+mit den Matrizen und Vektoren:
 \begin{align}
-	\vect{A} &= \diag(\alpha_P \had \vect{s}^*) \label{eq:A_def}\\
-	\vect{B} &= \diag(\alpha_Z \had \vect{s}^*) + \vect{Y}_{dd} \label{eq:B_def}\\
-	\vect{c} &= \vect{Y}_{ds} \vect{v}_s + \alpha_I \had \vect{s}^* \label{eq:c_def}\\
-	\vect{F} &= -\vect{B}^{-1} \vect{A} \label{eq:F_def}\\
-	\vect{w} &= -\vect{B}^{-1} \vect{c} \label{eq:w_def}
+	\vect{A} &= \diag\left(\alpha_P \had \mathrm{V}^{0*-2} \had \vect{S}_n^*\right) \label{eq:giraldo_A}\\
+	\vect{B} &= \diag(\alpha_Z \had \vect{S}_n^*) + \Ydd \label{eq:giraldo_B}\\
+	\vect{C} &= \Yds \vect{V}_s + \alpha_I \had \vect{S}_n^* \label{eq:giraldo_C}\\
+	\vect{D} &= 2\alpha_P \had \mathrm{V}^{0*-1} \had \vect{S}_n^* \label{eq:giraldo_D}
 \end{align}
 
-Hierbei bezeichnen $\had$ das Hadamard-Produkt (element-weise Multiplikation) und $\vect{v}_{(n)}^{*\circ(-1)}$ die element-weise Anwendung der Operation „konjugieren und Kehrwert bilden" auf den Spannungsvektor der $n$-ten Iteration.
+Hierbei bezeichnen $\had$ das Hadamard-Produkt, $\mathrm{V}^{0*-1}$ den element-weisen Kehrwert des konjugierten Arbeitspunktvektors, und $\mathrm{V}^{0*-2}$ das element-weise Quadrat davon. Die Matrix $\vect{B} \in \C^{b\phi \times b\phi}$ und der Vektor $\vect{C} \in \C^{b\phi \times 1}$ sind innerhalb des iterativen Prozesses \textit{konstant}, da sie nur von der Netztopologie ($\Ydd$, $\Yds$), der Slack-Spannung ($\vect{V}_s$) und den spannungsunabhängigen Lastanteilen abhängen. Lediglich $\vect{A}$ und $\vect{D}$ müssen in jeder Iteration aktualisiert werden, da sie vom Arbeitspunkt $\mathrm{V}^0$ abhängen \cite{Giraldo2022}.
 
-Der Ausdruck $\vect{s}^* \had \vect{v}_{(n)}^{*\circ(-1)} = \vect{s}^* / \vect{v}_{(n)}^*$ in \eqref{eq:fpi_grundgleichung} (nach Einsetzen von \eqref{eq:F_def}) entspricht physikalisch dem konjugierten Strom. Die Multiplikation mit $\vect{B}^{-1}$ (die im Fall rein konstanter Leistung der Bus-Impedanzmatrix $\ZB = \Ydd^{-1}$ entspricht) liefert den resultierenden Spannungsabfall. Der Term $\vect{w}$ berücksichtigt den Einfluss der Slack-Spannung.
+\subsection{Die Successive Approximation Method (SAM)}
+\label{subsec:sam}
 
-\paragraph{Spezialfall konstante Leistung ($\alpha_P = 1$, $\alpha_I = \alpha_Z = 0$).}
-Für diesen in Verteilnetzen häufigen Fall vereinfacht sich \eqref{eq:fpi_grundgleichung} zu:
+Giraldo et al.\ \cite{Giraldo2022} schlagen vor, das Gleichungssystem \eqref{eq:lineares_system} nach $\vect{V}_d$ umzustellen:
 \begin{equation}
-	\vect{v}_{(n+1)} = -\ZB \cdot \left(\vect{s}^* \had \vect{v}_{(n)}^{*\circ(-1)}\right) + \vect{w}
-	\label{eq:fpi_konstP}
+	\vect{V}_d^{(k+1)} = \vect{B}^{-1}\left(\vect{A}^{(k)} \vect{V}_d^{*(k)} - \vect{C} - \vect{D}^{(k)}\right)
+	\label{eq:sam_iteration}
 \end{equation}
-mit $\ZB = \Ydd^{-1}$ und $\vect{w} = -\ZB \Yds \vect{v}_s$. Diese Formulierung bildet die Grundlage des Tensor Power Flow (\cref{ch:tpf}).
 
-%\begin{proof}
-%	Zu zeigen ist, dass sich die allgemeine FPI-Formulierung~\eqref{eq:fpi_grundgleichung} für den Spezialfall rein konstanter Leistung ($\alpha_P = 1$, $\alpha_I = 0$, $\alpha_Z = 0$) auf die Form~\eqref{eq:fpi_konstP} vereinfacht.
-%	
-%	\paragraph{Schritt 1: Einsetzen der ZIP-Koeffizienten in die Hilfsmatrizen.}
-%	
-%	Aus den Definitionen~\eqref{eq:A_def}--\eqref{eq:c_def} folgt mit $\alpha_P = 1$, $\alpha_I = 0$, $\alpha_Z = 0$:
-%	\begin{align}
-%		\vect{A} &= \diag(\underbrace{\alpha_P}_{=1} \had \vect{s}^*) = \diag(\vect{s}^*) \label{eq:proof_A}\\[6pt]
-%		\vect{B} &= \diag(\underbrace{\alpha_Z}_{=0} \had \vect{s}^*) + \Ydd = \vect{0} + \Ydd = \Ydd \label{eq:proof_B}\\[6pt]
-%		\vect{c} &= \Yds \vect{v}_s + \underbrace{\alpha_I}_{=0} \had \vect{s}^* = \Yds \vect{v}_s \label{eq:proof_c}
-%	\end{align}
-%	
-%	\paragraph{Schritt 2: Berechnung von $\vect{F}$ und $\vect{w}$.}
-%	
-%	Einsetzen von~\eqref{eq:proof_A}--\eqref{eq:proof_B} in die Definitionen~\eqref{eq:F_def}--\eqref{eq:w_def}:
-%	\begin{align}
-%		\vect{F} &= -\vect{B}^{-1} \vect{A} = -\Ydd^{-1} \diag(\vect{s}^*) = -\ZB \diag(\vect{s}^*) \label{eq:proof_F}\\[6pt]
-%		\vect{w} &= -\vect{B}^{-1} \vect{c} = -\Ydd^{-1} \Yds \vect{v}_s = -\ZB \Yds \vect{v}_s \label{eq:proof_w}
-%	\end{align}
-%	
-%	wobei $\ZB := \Ydd^{-1}$ die Bus-Impedanzmatrix ist.
-%	
-%	\paragraph{Schritt 3: Einsetzen in die Iterationsvorschrift.}
-%	
-%	Substitution von~\eqref{eq:proof_F}--\eqref{eq:proof_w} in die allgemeine FPI-Gleichung~\eqref{eq:fpi_grundgleichung}:
-%	\begin{align}
-%		\vect{v}_{(n+1)} &= \vect{F} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w} \nonumber\\[4pt]
-%		&= -\ZB \diag(\vect{s}^*) \cdot \vect{v}_{(n)}^{*\eleminv} + \left(-\ZB \Yds \vect{v}_s\right) \label{eq:proof_einsetzen}
-%	\end{align}
-%	
-%	\paragraph{Schritt 4: Vereinfachung des Matrixprodukts.}
-%	
-%	Für die Multiplikation einer Diagonalmatrix mit einem Vektor gilt die allgemeine Identität:
-%	\begin{equation}
-%		\diag(\vect{a}) \cdot \vect{b} = \vect{a} \had \vect{b}
-%		\label{eq:diag_identity}
-%	\end{equation}
-%	
-%	Anwendung auf den ersten Term in~\eqref{eq:proof_einsetzen}:
-%	\begin{equation}
-%		\diag(\vect{s}^*) \cdot \vect{v}_{(n)}^{*\eleminv} = \vect{s}^* \had \vect{v}_{(n)}^{*\eleminv}
-%		\label{eq:proof_hadamard}
-%	\end{equation}
-%	
-%	Physikalisch entspricht dieser Ausdruck dem konjugierten Knotenstrom bei konstanter Leistung, da:
-%	\begin{equation}
-%		\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv} = \frac{\vect{s}^*}{\vect{v}_{(n)}^*} = \left(\frac{\vect{s}}{\vect{v}_{(n)}}\right)^* = \vect{i}_{(n)}^*
-%		\label{eq:proof_strom}
-%	\end{equation}
-%	
-%	wobei die Division element-weise zu verstehen ist und $\vect{i} = \vect{s}/\vect{v} = (P + \jj Q)/v$ der Verbraucherstrom ist.
-%	
-%	\paragraph{Schritt 5: Endergebnis.}
-%	
-%	Einsetzen von~\eqref{eq:proof_hadamard} in~\eqref{eq:proof_einsetzen} ergibt die behauptete Vereinfachung:
-%	\begin{equation}
-%		\boxed{
-%			\vect{v}_{(n+1)} = -\ZB \cdot \left(\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv}\right) + \vect{w}, \qquad \vect{w} = -\ZB \Yds \vect{v}_s
-%		}
-%		\label{eq:proof_ergebnis}
-%	\end{equation}
-%	
-%	\paragraph{Anmerkung zur Vorzeichenkonvention.}
-%	
-%	In~\eqref{eq:proof_ergebnis} ist $\vect{s} = P + \jj Q$ in \textit{Verbraucherkonvention} definiert (positive Werte bedeuten Leistungsaufnahme). Das negative Vorzeichen vor $\ZB$ ergibt sich aus der Struktur der Admittanzgleichung~\eqref{eq:admittanz_system}, bei der $-\vect{i}_d$ auf der linken Seite steht.
-%	
-%	Im Algorithm~1 des Salazar-Papers~\cite{Salazar2024} wird stattdessen die \textit{Injektionskonvention} verwendet. Definiert man die injizierte Leistung als $\vect{S}_{\mathrm{inj}} = -\vect{s}$ (negativ für Lasten), so wird~\eqref{eq:proof_ergebnis} zu:
-%	\begin{equation}
-%		\vect{v}_{(n+1)} = \ZB \cdot \left(\vect{S}_{\mathrm{inj}}^* \had \vect{v}_{(n)}^{*\eleminv}\right) + \vect{w}
-%		\label{eq:proof_injection}
-%	\end{equation}
-%	
-%	Beide Darstellungen sind mathematisch äquivalent; die Wahl der Konvention betrifft lediglich die Interpretation des Vorzeichens von $\vect{s}$ bzw.\ $\vect{S}_{\mathrm{inj}}$.
-%	
-%	\paragraph{Physikalische Konsistenz.}
-%	
-%	Die Formel~\eqref{eq:proof_ergebnis} ist physikalisch konsistent: Der Term $-\ZB(\vect{s}^*/\vect{v}^*) = -\ZB \cdot \vect{i}^*$ beschreibt den Spannungsabfall über der Netzimpedanz aufgrund des Laststroms (negatives Vorzeichen, da die Spannung am Lastknoten \textit{unterhalb} der Leerlaufspannung liegt). Der Term $\vect{w} = -\ZB\Yds\vect{v}_s$ stellt die Leerlaufspannung dar, die sich ohne Last allein aus der Slack-Spannung ergeben würde.
-%	
-%\end{proof}
-
-\subsection{Algorithmus}
-\label{subsec:fpi_algorithmus}
-
-Der FPI-Algorithmus ist in \cref{alg:sam} dargestellt. Die Einfachheit der Iteration ist offensichtlich: In jeder Iteration wird lediglich eine Matrix-Vektor-Multiplikation durchgeführt. Die Matrix $\vect{B}^{-1}$ (bzw.\ $\ZB$) wird einmal berechnet und in allen Iterationen wiederverwendet.
+Diese Gleichung hat die Struktur einer Fixpunktiteration $\vect{V}_d^{(k+1)} = f(\vect{V}_d^{(k)})$ und kann sukzessiv gelöst werden. Der Algorithmus ist in \cref{alg:sam} dargestellt.
 
 \begin{algorithm}[H]
 	\caption{Successive Approximation Method (SAM) nach \cite{Giraldo2022}}
 	\label{alg:sam}
 	\begin{algorithmic}[1]
-		\REQUIRE $\vect{S}_n$, $\vect{Y}_{dd}$, $\vect{Y}_{ds}$, $\vect{v}_s$, Toleranz $\varepsilon$, max.\ Iterationen $K$
+		\REQUIRE $\vect{S}_n$, $\Ydd$, $\Yds$, $\vect{V}_s$, Toleranz $\varepsilon$, max.\ Iterationen $K$
 		\ENSURE $\vect{V}_d$
 		
-		\STATE Berechne $\vect{B}^{-1}$ und $\vect{c}$ gemäß \eqref{eq:B_def}--\eqref{eq:c_def}
-		\STATE Initialisiere $\vect{V}_d^{(0)} = [1, a^2, a]$ für alle $i \in \Omega_d$ \COMMENT{Flat Start}
-		\STATE $k \leftarrow 0$; $\text{tol} \leftarrow \infty$
+		\STATE Initialisiere $k = 0$, $\text{tol} = \infty$
+		\STATE Initialisiere $\mathrm{V}^0_{i,\phi} = [1, a^2, a]$ für alle $i \in \Omega_d$ \COMMENT{Flat Start, $a = e^{\jj 2\pi/3}$}
+		\STATE Berechne $\vect{B}^{-1}$ und $\vect{C}$ gemäß \eqref{eq:giraldo_B}--\eqref{eq:giraldo_C} \COMMENT{Einmalig!}
 		
 		\WHILE{$\text{tol} \geq \varepsilon$ \textbf{und} $k < K$}
-		\STATE Berechne $\vect{A}^{(k)}$ und $\vect{D}^{(k)}$ \COMMENT{Nur $\alpha_P$-Anteil aktualisieren}
-		\STATE $\vect{V}_d^{(k+1)} = \vect{B}^{-1}\left(\vect{A}^{(k)} \vect{V}_d^{*(k)} - \vect{c} - \vect{D}^{(k)}\right)$
-		\STATE Berechne Leistungsmismatch: $\text{tol} \leftarrow \max\|\vect{S}_d^{\spec} - \vect{S}_d^{(k+1)}\|$
+		\STATE Berechne $\vect{A}^{(k)}$ und $\vect{D}^{(k)}$ gemäß \eqref{eq:giraldo_A}--\eqref{eq:giraldo_D}
+		\STATE $\vect{V}_d^{(k+1)} = \vect{B}^{-1}\left(\vect{A}^{(k)} \vect{V}_d^{*(k)} - \vect{C} - \vect{D}^{(k)}\right)$
+		\STATE Berechne Leistungsmismatch: $\vect{S}_d^{*(k+1)} = \diag(\vect{V}_d^{*(k+1)})(\Yds\vect{V}_s + \Ydd\vect{V}_d^{(k+1)})$
+		\STATE $\text{tol} \leftarrow \max\|\vect{S}_d^* - \vect{S}_d^{*(k+1)}\|$
+		\STATE $\mathrm{V}^0_d \leftarrow \vect{V}_d^{(k+1)}$ \COMMENT{Arbeitspunkt aktualisieren}
 		\STATE $k \leftarrow k + 1$
 		\ENDWHILE
 		
-		\RETURN $\vect{V}_d^{(k)}$
+		\STATE Berechne $\vect{S}_s^* = \diag(\vect{V}_s^*)(\vect{Y}_{ss}\vect{V}_s + \vect{Y}_{sd}\vect{V}_d^{(k)})$
+		\RETURN $\vect{V}_d^{(k)}$, $\vect{S}_s$
 	\end{algorithmic}
 \end{algorithm}
+
+Die zentrale rechentechnische Eigenschaft des SAM-Algorithmus ist, dass die Matrix $\vect{B}^{-1}$ nur \textit{einmal} berechnet werden muss und in allen Iterationen wiederverwendet wird. In jeder Iteration wird lediglich eine Matrix-Vektor-Multiplikation ($\vect{B}^{-1} \cdot (\ldots)$) durchgeführt \cite{Giraldo2022}. Dies steht im Gegensatz zum Newton-Raphson-Verfahren und zur Direct Solution (DS) aus \cite{Giraldo2022}, bei denen in jeder Iteration ein vollständiges lineares Gleichungssystem gelöst werden muss.
+
+Für große Netze kann die direkte Berechnung von $\vect{B}^{-1}$ speicherintensiv sein, da die Inverse einer dünnbesetzten Matrix im Allgemeinen vollbesetzt ist. Giraldo et al.\ \cite{Giraldo2022} verweisen auf effiziente Algorithmen zum Aufbau der $Z$-Bus-Matrix \cite{Davis2006} sowie auf die Möglichkeit, $\vect{B}$ stattdessen zu faktorisieren (z.\,B.\ LDU-Zerlegung) und die Faktorisierung wiederzuverwenden.
+%
+%\paragraph{Bemerkung zu den Lastmodellen.}
+%Aus \eqref{eq:giraldo_A} ist ersichtlich, dass für rein konstante Impedanzlasten ($\alpha_P = 0$, $\alpha_Z = 1$) die Matrix $\vect{A} = \vect{0}$ wird und die Iteration \eqref{eq:sam_iteration} in einer einzigen Berechnung konvergiert, da keine Nichtlinearität mehr vorhanden ist \cite{Giraldo2022}. Die Nichtlinearität wird ausschließlich durch den leistungskonstanten Lastanteil ($\alpha_P$) eingeführt.
 
 \subsection{Konvergenzbeweis mittels Banach-Fixpunktsatz}
 \label{subsec:banach}
 
-Die Konvergenz des FPI-Algorithmus wird über den Banach'schen Fixpunktsatz nachgewiesen \cite{Giraldo2022, Salazar2024}. Dieser Satz liefert nicht nur die Existenz und Eindeutigkeit des Fixpunktes, sondern auch die Unabhängigkeit vom Startwert.
+Die Konvergenz des SAM-Algorithmus wird von Giraldo et al.\ \cite{Giraldo2022} über den Banach'schen Fixpunktsatz nachgewiesen. Dieser Satz liefert nicht nur die Existenz und Eindeutigkeit des Fixpunktes, sondern auch die Unabhängigkeit vom Startwert.
 
 \begin{theorem}[Banach'scher Fixpunktsatz]
 	\label{thm:banach}
@@ -1092,87 +1043,189 @@ Die Konvergenz des FPI-Algorithmus wird über den Banach'schen Fixpunktsatz nach
 	Dann besitzt $T$ genau einen Fixpunkt $\vect{x}^* = T(\vect{x}^*)$, und die Folge $\vect{x}^{(k+1)} = T(\vect{x}^{(k)})$ konvergiert für jeden Startwert $\vect{x}^{(0)} \in X$ gegen $\vect{x}^*$.
 \end{theorem}
 
-\paragraph{Anwendung auf den FPI-Algorithmus.}
-Die Iteration \eqref{eq:fpi_grundgleichung} kann als Abbildung $T(\vect{v}_{(n)}) = \vect{v}_{(n+1)}$ aufgefasst werden. Um \cref{thm:banach} anwenden zu können, muss gezeigt werden, dass $T$ eine Kontraktion ist.
+\begin{proposition}[Kontraktion der SAM, {\cite[Proposition~2]{Giraldo2022}}]
+	\label{prop:sam_kontraktion}
+	Der SAM-Algorithmus (\cref{alg:sam}) ist eine Kontraktionsabbildung der Form $\vect{V}_d^{(k+1)} = f(\vect{V}_d^{(k)})$ und besitzt eine eindeutige, vom Startwert unabhängige Lösung, falls:
+	\begin{equation}
+		\|f(\vect{V}_d^{(k)}) - f(\vect{U}_d)\| \leq \eta \cdot \|\vect{V}_d^{(k+1)} - \vect{U}_d\|
+		\label{eq:kontraktion_sam}
+	\end{equation}
+	mit dem Kontraktionsfaktor:
+	\begin{equation}
+		\eta = \max_{i \in \Omega_d} \left\{\frac{\|\vect{B}^{-1} \diag(\alpha_P \had \vect{S}_n^*)\|}{v^2}\right\}, \quad 0 \leq \eta < 1
+		\label{eq:eta_giraldo}
+	\end{equation}
+	wobei $\vect{U}_d$ die exakte Lösung ist und $v = \min_{i \in \Omega_d} \|u_i\|$ die minimale Spannungsmagnitude im Netz.
+\end{proposition}
 
-Sei $\vect{U}_d$ die exakte Lösung mit $T(\vect{U}_d) = \vect{U}_d$ und $v = \min_{i \in \Omega_d} \|u_i\|$ die minimale Spannungsmagnitude. Dann gilt nach Giraldo et al.\ \cite{Giraldo2022}:
+\begin{proof}
+	Basierend auf dem Banach-Fixpunktsatz existiert der Fixpunkt $\vect{U}_d$ mit $f(\vect{U}_d) = \vect{U}_d$ und ist eindeutig, wenn $f(\cdot)$ eine Kontraktion auf $\vect{V}_d$ ist. Die Differenz zweier aufeinanderfolgender Iterationen ergibt sich nach \cite{Giraldo2022} zu:
+	\begin{equation}
+		\|\vect{V}_d^{(k+1)} - \vect{U}_d\| = \|f(\vect{V}_d^{(k)}) - f(\vect{U}_d)\| = \|\vect{B}^{-1}\vect{A}^{(k)}(\vect{V}_d^{*(k)} - \vect{U}_d^*)\|
+		\label{eq:kontraktion_beweis}
+	\end{equation}
+	
+	Da $\vect{A}^{(k)}$ eine Diagonalmatrix ist, kann abgeschätzt werden:
+	\begin{equation}
+		\|\vect{V}_d^{(k+1)} - \vect{U}_d\| \leq \frac{\|\vect{B}^{-1} \diag(\alpha_P \had \vect{S}_n^*)\|}{\|\vect{V}_d^{*(k)}\|^2} \cdot \|\vect{V}_d^{*(k)} - \vect{U}_d^*\| \leq \eta \cdot \|\vect{V}_d^{*(k)} - \vect{U}_d^*\|
+		\label{eq:sam_abschaetzung}
+	\end{equation}
+	
+	Damit $\eta < 1$ gilt, müssen zwei Bedingungen erfüllt sein \cite{Giraldo2022}:
+	\begin{enumerate}
+		\item $v > 0$ (Spannungsbeträge sind im Normalbetrieb stets positiv)
+		\item $\|\vect{B}^{-1}\diag(\alpha_P \had \vect{S}_n^*)\| < v^2$
+	\end{enumerate}
+\end{proof}
 
+\subsection{Physikalische Interpretation der Konvergenzbedingung}
+\label{subsec:konvergenz_physik}
+
+Die abstrakte Bedingung $\eta < 1$ kann physikalisch interpretiert werden. Unter der Annahme rein leistungskonstanter Last ($\alpha_P = 1$) wird die Matrix $\vect{B} = \Ydd$ und somit $\vect{B}^{-1} = \vect{Z}_B$ die Bus-Impedanzmatrix (Annahme~2 in \cite{Giraldo2022}). Definiert man die äquivalente Lastimpedanz am Knoten $i$ als:
 \begin{equation}
-	\|\vect{V}_d^{(k+1)} - \vect{U}_d\| = \|\vect{B}^{-1} \vect{A}^{(k)} (\vect{V}_d^{*(k)} - \vect{U}_d^*)\| \leq \frac{\|\vect{B}^{-1} \diag(\alpha_P \had \vect{S}_n^*)\|}{\|\vect{V}_d^{(k)}\|^2} \cdot \|\vect{V}_d^{(k)} - \vect{U}_d\|
-	\label{eq:kontraktion_beweis}
+	Z_{L,i} = \frac{v^2}{\|S_{n,i}^*\|}
+	\label{eq:lastimpedanz}
 \end{equation}
 
-Der Kontraktionsfaktor ergibt sich zu:
-\begin{equation}
-	\eta = \max_{i \in \Omega_d} \left\{\frac{\|\vect{B}^{-1} \diag(\alpha_P \had \vect{S}_n^*)\|}{v^2}\right\}, \quad 0 \leq \eta < 1
-	\label{eq:eta_giraldo}
-\end{equation}
-
-Für den Spezialfall $\alpha_P = 1$ und unter Verwendung der Bus-Impedanzmatrix $\ZB = \vect{B}^{-1}$ kann \eqref{eq:eta_giraldo} physikalisch interpretiert werden. Definiert man die äquivalente Lastimpedanz als $Z_{L,i} = v^2 / \|S_{n,i}^*\|$ und nutzt die Eigenschaft, dass die Diagonalelemente von $\ZB$ die Thévenin-Impedanzen darstellen ($Z_{ii} \geq Z_{ij}$), ergibt sich \cite{Salazar2024}:
+und nutzt die Eigenschaft, dass die Diagonalelemente der Bus-Impedanzmatrix $Z_{ii}$ die Thévenin-Impedanzen darstellen (mit $\|Z_{ii}\| \geq \|Z_{ij}\|$ für $i \neq j$), so ergibt sich der Kontraktionsfaktor näherungsweise zu \cite{Giraldo2022}:
 \begin{equation}
 	\eta \approx \max_{i \in \Omega_d} \left\{\frac{\|Z_{ii}\|}{\|Z_{L,i}\|}\right\}
 	\label{eq:eta_physikalisch}
 \end{equation}
 
-\subsection{Physikalische Interpretation der Konvergenzbedingung}
-\label{subsec:konvergenz_physik}
-\todo[inline]{Literatur finden}
-Die Bedingung $\eta < 1$ aus \eqref{eq:eta_physikalisch} hat eine anschauliche physikalische Bedeutung:
+Die Bedingung $\eta < 1$ ist somit äquivalent zu:
 \begin{equation}
 	\|Z_{ii}\| < \|Z_{L,i}\| \quad \forall i \in \Omega_d
 	\label{eq:konvergenz_physik}
 \end{equation}
 
-Dies bedeutet: Die Thévenin-Impedanz an jedem Knoten muss kleiner sein als die äquivalente Lastimpedanz. Diese Bedingung ist äquivalent zur Aussage, dass das Netz im normalen Betriebspunkt arbeitet (hohe Spannung, niedriger Strom) und nicht am Punkt maximaler Leistungsübertragung \cite{Salazar2024}. 
+Diese Ungleichung besagt: \textit{Die Thévenin-Impedanz an jedem Knoten muss betragsmäßig kleiner sein als die äquivalente Lastimpedanz.} Nach dem Theorem der maximalen Leistungsübertragung \cite{Grainger1994} sind beide Impedanzen genau am Punkt maximaler Leistungsübertragung (\textit{maximum loading point}, MLP) gleich groß \cite{Giraldo2022}. In diesem Grenzfall gilt $\eta = 1$ und die Konvergenz ist nicht mehr gewährleistet.
 
-Salazar Duque et al.\ \cite{Salazar2024} zeigen, dass der FPI-Algorithmus bei Erfüllung von \eqref{eq:konvergenz_physik} stets zur \textit{operationellen} Lösung konvergiert unabhängig vom Startwert. Dies steht im Gegensatz zum NR-Verfahren, das bei ungünstiger Initialisierung auch zur nicht-operationellen Lösung (niedrige Spannung, hoher Strom) konvergieren kann.
+Daraus folgen zwei zentrale Aussagen:
+\begin{enumerate}
+	\item Die Bedingung \eqref{eq:konvergenz_physik} ist für den \textit{normalen Betriebspunkt} eines Netzes stets erfüllt, da dort $\|Z_{L,i}\| \gg \|Z_{ii}\|$ gilt (hohe Spannung, niedriger Strom). Der SAM-Algorithmus konvergiert somit stets zur operationellen Lösung, unabhängig vom Startwert.
+	\item Die Konvergenzrate verschlechtert sich mit zunehmender Last ($\eta \to 1$ für $\lambda \to \lambda_{\text{mlp}}$) und mit steigendem Impedanzbetrag der Leitungen ($\|Z_{ii}\|$ wächst mit dem $R/X$-Verhältnis).
+\end{enumerate}
 
-Die Machbarkeitsbedingung für die Existenz einer Lastflusslösung wurde in \cite{Salazar2024} geometrisch hergeleitet als:
-\begin{equation}
-	\|v_0\|^2 \geq 4 \|s_l\| \cdot \|z_s\|
-	\label{eq:machbarkeit}
-\end{equation}
-wobei $v_0$ die Quellenspannung, $s_l$ die Lastleistung und $z_s$ die Quellenimpedanz ist. Diese konservative Bedingung stellt sicher, dass die Lastflussgleichungen überhaupt eine Lösung besitzen.
+Diese physikalische Interpretation wurde auch in \cite{Salazar2024} aufgegriffen und dort durch eine geometrische Herleitung im Impedanzraum ergänzt (vgl.\ \cref{subsec:tpf_machbarkeit}).
 
-\subsection{Konvergenzverhalten und Vergleich mit Newton-Raphson}
-\label{subsec:konvergenz_vergleich}
+%\subsection{Konvergenzverhalten}
+%\label{subsec:konvergenz_verhalten}
+%
+%Giraldo et al.\ \cite{Giraldo2022} untersuchen das Konvergenzverhalten des SAM-Algorithmus in umfangreichen numerischen Tests. Die wesentlichen Ergebnisse sind:
+%
+%\paragraph{Sensitivität gegenüber dem $R/X$-Verhältnis.}
+%Der Kontraktionsfaktor $\eta$ steigt mit zunehmendem $R/X$-Verhältnis der Leitungen, da die Impedanzmatrix $\vect{Z}_B = \vect{B}^{-1}$ betragsmäßig wächst. Für das 136-Bus-Testnetz ergibt sich beispielsweise $\eta = 0{,}0757$ bei $\rho = 1{,}0$ (nominales $R/X$) und $\eta = 0{,}1488$ bei $\rho = 3{,}0$ (dreifaches $R/X$) \cite{Giraldo2022}. Für typische Verteilnetze mit $R/X \in [0{,}5; 5{,}0]$ bleibt $\eta$ jedoch deutlich unter 1.
+%
+%\paragraph{Sensitivität gegenüber der Lastbedingung.}
+%Die Anzahl der benötigten Iterationen steigt mit dem Lastfaktor $\lambda$ und geht für $\lambda \to \lambda_{\text{mlp}}$ gegen unendlich (da $\eta \to 1$). Dies steht im Einklang mit \cref{prop:sam_kontraktion}: Am Punkt maximaler Leistungsübertragung verliert die Abbildung ihre Kontraktionseigenschaft \cite{Giraldo2022}.
+%
+%\paragraph{Unabhängigkeit vom Startwert.}
+%In Tests mit 10.000 zufälligen Startwerten ($V^0_{i,\phi} = \rho \angle \theta$ mit $\rho \sim \mathcal{U}(10^{-12}, 3{,}0)$ und $\theta \sim \mathcal{U}(-40°, 40°)$) konvergierte der SAM-Algorithmus stets zur selben Lösung -- im Gegensatz zu Newton-artigen Verfahren, die bei ungünstiger Initialisierung divergieren oder zur nicht-operationellen Lösung konvergieren können \cite{Giraldo2022}. Dieses Ergebnis bestätigt experimentell die theoretische Aussage von \cref{prop:sam_kontraktion}.
 
-Die wesentlichen Unterschiede zwischen FPI und NR bezüglich der Konvergenz sind in \cref{tab:fpi_vs_nr} zusammengefasst.
+%\subsection{Rechentechnische Eigenschaften}
+%\label{subsec:sam_rechenzeit}
+%
+%Die rechentechnischen Vorteile des SAM gegenüber den verglichenen Algorithmen sind in \cref{tab:sam_rechenzeit} zusammengefasst.
+%
+%\begin{table}[H]
+%	\centering
+%	\caption{Durchschnittliche Rechenzeiten pro Iteration für verschiedene Netzgrößen. Daten aus \cite[Table~1]{Giraldo2022}. $\kappa = |\Omega_d| \cdot |\Omega_\phi|$ bezeichnet die Anzahl der Gleichungen.}
+%	\label{tab:sam_rechenzeit}
+%	\begin{tabular}{@{}rcccc@{}}
+%		\toprule
+%		$\kappa$ & \textbf{DS [ms]} & \textbf{SAM [ms]} & \textbf{BFS [ms]} & \textbf{3PL [ms]} \\
+%		\midrule
+%		33 & 0,19 & \textbf{0,01} & 0,12 & 0,15 \\
+%		99 & 0,43 & \textbf{0,04} & 0,18 & 0,56 \\
+%		357 & 1,74 & \textbf{0,21} & 1,97 & 7,49 \\
+%		1.947 & 17,92 & \textbf{4,54} & 57,20 & 419,53 \\
+%		3.120 & 38,90 & \textbf{11,36} & 147,38 & -- \\
+%		\bottomrule
+%	\end{tabular}
+%\end{table}
+%
+%Aus \cref{tab:sam_rechenzeit} ist ersichtlich, dass der SAM-Algorithmus pro Iteration den geringsten Rechenaufwand aller getesteten Methoden aufweist -- bis zu 13-mal schneller als der BFS und bis zu 37-mal schneller als der 3PL (Newton-artig) für das größte Testnetz ($\kappa = 3120$) \cite{Giraldo2022}. Der Grund liegt in der Algorithmusstruktur: Der SAM erfordert pro Iteration lediglich eine Matrix-Vektor-Multiplikation der Dimension $\kappa$, während die DS und 3PL ein lineares Gleichungssystem der Dimension $2\kappa$ lösen müssen.
+%
+%\subsection{Vergleich mit Newton-Raphson}
+%\label{subsec:fpi_vs_nr}
+%
+%Die wesentlichen Unterschiede zwischen der SAM/FPI und dem Newton-Raphson-Verfahren bezüglich der Konvergenz sind in \cref{tab:fpi_vs_nr} zusammengefasst.
+%
+%\begin{table}[H]
+%	\centering
+%	\caption{Vergleich der Konvergenzeigenschaften von FPI/SAM und NR.}
+%	\label{tab:fpi_vs_nr}
+%	\begin{tabular}{@{}lll@{}}
+%		\toprule
+%		\textbf{Eigenschaft} & \textbf{Newton-Raphson} & \textbf{SAM (FPI)} \\
+%		\midrule
+%		Konvergenzordnung & Quadratisch & Linear \\
+%		Typische Iterationen & 3--6 & 5--15 \\
+%		Kosten pro Iteration & Hoch (Jacobi + LU) & Niedrig (Matrix$\times$Vektor) \\
+%		Startwertabhängigkeit & Ja & Nein (bei $\eta < 1$) \\
+%		Konvergenz zur Lösung & Kann zur Low-Voltage konv. & Stets High-Voltage \\
+%		Systemmatrix pro Iteration & Neue Jacobi-Matrix & Konstant ($\vect{B}^{-1}$) \\
+%		Parallelisierung & Schwierig & Einfach \\
+%		PV-Knoten & Direkt im System & Nicht direkt möglich \\
+%		\bottomrule
+%	\end{tabular}
+%\end{table}
+%
+%Die lineare Konvergenz des SAM bedeutet, dass der Fehler in jeder Iteration um den konstanten Faktor $\eta$ reduziert wird:
+%\begin{equation}
+%	\|\vect{V}_d^{(k+1)} - \vect{U}_d\| \leq \eta^{k+1} \cdot \|\vect{V}_d^{(0)} - \vect{U}_d\|
+%	\label{eq:lineare_konvergenz}
+%\end{equation}
+%
+%Für typische Verteilnetze liegt $\eta$ im Bereich $0{,}05$ bis $0{,}15$ unter normalen Lastbedingungen, was 5--10 Iterationen bis zur Konvergenz bei einer Toleranz von $10^{-6}$ erfordert \cite{Giraldo2022}. Obwohl dies mehr Iterationen als beim NR-Verfahren (3--5) erfordert, ist die Gesamtrechenzeit aufgrund der niedrigen Kosten pro Iteration vergleichbar oder sogar geringer -- insbesondere bei wiederholter Ausführung vieler Lastflüsse, da die einmal berechnete Inverse $\vect{B}^{-1}$ wiederverwendet werden kann.
 
-\begin{table}[H]
-	\centering
-	\caption{Vergleich der Konvergenzeigenschaften von FPI und NR.}
-	\label{tab:fpi_vs_nr}
-	\begin{tabular}{@{}lll@{}}
-		\toprule
-		\textbf{Eigenschaft} & \textbf{Newton-Raphson} & \textbf{Fixed-Point-Iteration} \\
-		\midrule
-		Konvergenzordnung & Quadratisch & Linear \\
-		Typische Iterationen & 3--6 & 5--15 \\
-		Kosten pro Iteration & Hoch (Jacobi + LU) & Niedrig (Matrix$\times$Vektor) \\
-		Startwertabhängigkeit & Ja & Nein (bei $\eta < 1$) \\
-		Konvergenz zur Lösung & Kann zur Low-Voltage konv. & Stets High-Voltage \\
-		$\ZB$ pro Iteration & Neue Jacobi-Matrix & Konstant \\
-		Parallelisierung & Schwierig & Einfach \\
-		PV-Knoten & Direkt im System & Nicht direkt möglich \\
-		\bottomrule
-	\end{tabular}
-\end{table}
+%\subsection{Kompakte Formulierung nach Salazar Duque et al.}
+%\label{subsec:fpi_kompakt}
+%
+%Salazar Duque et al.\ \cite{Salazar2024} formulieren den SAM-Algorithmus in einer kompakten Notation um, die sich für die Tensorisierung eignet. Für den Spezialfall rein konstanter Leistung ($\alpha_P = 1$, $\alpha_I = \alpha_Z = 0$) vereinfacht sich $\vect{B} = \Ydd$ zu einer reinen Admittanzmatrix und $\vect{B}^{-1} = \ZB$ zur Bus-Impedanzmatrix. Die Iteration \eqref{eq:sam_iteration} nimmt dann die Form an \cite{Salazar2024}:
+%\begin{equation}
+%	\vect{v}_{(n+1)} = \vect{F} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}
+%	\label{eq:fpi_kompakt}
+%\end{equation}
+%
+%mit den konstanten Hilfsmatrizen:
+%\begin{align}
+%	\vect{F} &= -\vect{B}^{-1}\vect{A} = -\ZB \diag(\vect{s}^*) \label{eq:F_def}\\
+%	\vect{w} &= -\vect{B}^{-1}\vect{c} = -\ZB \Yds \vect{v}_s \label{eq:w_def}
+%\end{align}
+%
+%wobei $\vect{v}_{(n)}^{*\eleminv}$ den element-weisen Kehrwert des konjugierten Spannungsvektors bezeichnet und $\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv} = \vect{s}^*/\vect{v}_{(n)}^*$ physikalisch dem konjugierten Stromvektor entspricht \cite{Salazar2024}.
+%
+%Der Kontraktionsfaktor ergibt sich in dieser Notation zu \cite{Salazar2024}:
+%\begin{equation}
+%	k = \|\ZB \diag(\vect{1} \oslash \vect{z}_l)\|_1 = \frac{|\hat{z}_{jj}|}{|\hat{z}_{l,j}|}
+%	\label{eq:k_salazar}
+%\end{equation}
+%
+%wobei $\vect{z}_l$ den Vektor der äquivalenten Lastimpedanzen bezeichnet und die $\hat{\cdot}$-Notation das Wertepaar $(j, z_{l,j})$ kennzeichnet, für das das Impedanzverhältnis maximal wird. Die Bedingung $k < 1$ ist identisch zu \eqref{eq:konvergenz_physik}.
+%
+%Salazar Duque et al.\ \cite{Salazar2024} ergänzen den Konvergenzbeweis um eine geometrische Interpretation im Impedanzraum (Kreisgleichungen) und leiten daraus eine konservative Machbarkeitsbedingung für die Existenz einer Lastflusslösung ab:
+%\begin{equation}
+%	\|v_0\|^2 \geq 4 \|s_l\| \cdot \|z_s\|
+%	\label{eq:machbarkeit}
+%\end{equation}
+%wobei $v_0$ die Quellenspannung, $s_l$ die Lastleistung und $z_s$ die Quellenimpedanz ist. Diese Bedingung ist konsistent mit den in der Literatur bekannten Existenzbedingungen \cite{Bolognani2016, Bazrafshan2018}. Die geometrische Herleitung wird in \cref{subsec:tpf_machbarkeit} im Kontext des Tensor Power Flow detailliert behandelt.
+%
+%Die kompakte Formulierung \eqref{eq:fpi_kompakt} bildet die Grundlage für die in \cref{ch:tpf} vorgestellte Tensorisierung des Algorithmus, da die konstante Matrix $\ZB$ die gleichzeitige Berechnung vieler Lastflüsse durch eine einzige Matrix-Matrix-Multiplikation ermöglicht.
 
-Die lineare Konvergenz des FPI bedeutet, dass der Fehler in jeder Iteration um den konstanten Faktor $\eta$ reduziert wird:
-\begin{equation}
-	\|\vect{V}_d^{(k+1)} - \vect{U}_d\| \leq \eta^{k+1} \cdot \|\vect{V}_d^{(0)} - \vect{U}_d\|
-	\label{eq:lineare_konvergenz}
-\end{equation}
-
-Nach Giraldo et al.\ \cite{Giraldo2022} liegt $\eta$ für typische Verteilnetze im Bereich $0{,}05$--$0{,}15$ unter normalen Lastbedingungen, was 5--10 Iterationen bis zur Konvergenz bei einer Toleranz von $10^{-6}$ erfordert. Der Kontraktionsfaktor steigt mit zunehmender Last und nähert sich $\eta \to 1$ am Punkt maximaler Leistungsübertragung ($\lambda \to \lambda_{\text{mlp}}$), wodurch die Konvergenz dort langsamer wird.
-
-\paragraph{Sensitivität gegenüber dem $R/X$-Verhältnis.}
-Giraldo et al.\ \cite{Giraldo2022} zeigen, dass der Kontraktionsfaktor $\eta$ mit steigendem $R/X$-Verhältnis der Leitungen zunimmt (da die Impedanzmatrix $\ZB$ betragsmäßig wächst), was die Konvergenz verlangsamt. Für typische Verteilnetze mit $R/X \in [0{,}5; 5{,}0]$ bleibt $\eta$ jedoch deutlich unter 1.
-
-\subsection{Limitierung: Keine PV-Knoten}
-\label{subsec:fpi_limitation}
-
-Die zentrale Annahme der FPI-Formulierung ist, dass der Leistungsvektor $\vect{s}$ über alle Iterationen \textit{konstant} ist. Dies ermöglicht die Vorausberechnung von $\vect{F}$ und $\vect{w}$ (bzw.\ $\ZB$) und deren Wiederverwendung in jeder Iteration.
-
-Bei PV-Knoten ist jedoch $Q_k$ unbekannt und somit $s_k = P_k + \jj Q_k$ nicht vollständig definiert. Wird $Q_k$ iterativ angepasst, ändert sich der Leistungsvektor $\vect{s}$ zwischen den Iterationen, und die Matrizen $\vect{A}$, $\vect{F}$ aus \eqref{eq:A_def}--\eqref{eq:F_def} sind nicht mehr konstant. Dies verletzt die Grundvoraussetzung des FPI-Algorithmus und ist der Ausgangspunkt für die in \cref{ch:methoden_pv} entwickelten Erweiterungen.
+%\subsection{Limitierung: Keine PV-Knoten}
+%\label{subsec:fpi_limitation}
+%
+%Die zentrale Annahme sowohl des SAM-Algorithmus \cite{Giraldo2022} als auch seiner kompakten Formulierung \cite{Salazar2024} ist, dass der Leistungsvektor $\vect{S}_n$ (bzw.\ $\vect{s}$) über alle Iterationen \textit{bekannt und konstant} ist. Dies ermöglicht:
+%\begin{itemize}
+%	\item Die einmalige Berechnung von $\vect{B}^{-1}$ (bzw.\ $\ZB$) und deren Wiederverwendung in jeder Iteration.
+%	\item Die Vorausberechnung des konstanten Vektors $\vect{C}$ (bzw.\ $\vect{w}$).
+%	\item Die Anwendung des Banach-Fixpunktsatzes mit konstantem Kontraktionsfaktor $\eta$.
+%\end{itemize}
+%
+%Bei PV-Knoten ist jedoch die Blindleistung $Q_k$ unbekannt und somit $s_k = P_k + \jj Q_k$ nicht vollständig definiert. Wird $Q_k$ iterativ angepasst, ändert sich der Leistungsvektor $\vect{S}_n$ zwischen den Iterationen. Dies hat zur Folge, dass die Matrix $\vect{A}$ aus \eqref{eq:giraldo_A} (die direkt von $\vect{S}_n^*$ abhängt) nicht mehr konstant ist und der Konvergenzbeweis (\cref{prop:sam_kontraktion}) in seiner vorliegenden Form nicht mehr gültig ist.
+%
+%Es ist anzumerken, dass weder Giraldo et al.\ \cite{Giraldo2022} noch Salazar Duque et al.\ \cite{Salazar2024} eine Behandlung von PV-Knoten im Rahmen des SAM/FPI vorschlagen. Die CIM nach Garcia et al.\ \cite{Garcia2000} (vgl.\ \cref{sec:cim}) bietet zwar eine PV-Behandlung über die Erweiterung des Newton-Raphson-Systems um $\vect{L}_k$ und $\vect{N}_k$, diese ist jedoch nicht direkt auf den FPI-Algorithmus übertragbar, da die FPI kein erweiterbares lineares Gleichungssystem besitzt, sondern eine reine Abbildung $\vect{V}^{(k+1)} = f(\vect{V}^{(k)})$ darstellt.
+%
+%Die Entwicklung geeigneter Erweiterungen zur Berücksichtigung von PV-Knoten im Rahmen des FPI/TPF ist Gegenstand von \cref{ch:methoden_pv}.
