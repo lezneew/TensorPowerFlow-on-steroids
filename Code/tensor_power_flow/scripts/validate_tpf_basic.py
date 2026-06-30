@@ -107,35 +107,35 @@ def main():
     print("  TPF VALIDIERUNG – Phase 2: Standard-TPF korrekt?")
     print("=" * 60)
 
-    # # --- Test 1: Kleines Netz (case4gs — 4 Busse, 1 Slack + 3 PQ) ---
-    # print("\n\n>>> Test 1: case4gs (4 Busse)")
-    # try:
-    #     net = pn.case4gs()
-    #     debug_network_types(net, 'case4gs')
-    #     run_validation(net, "case4gs")
-    # except Exception as e:
-    #     print(f"  FEHLER: {e}")
+    # --- Test 1: Kleines Netz (case4gs — 4 Busse, 1 Slack + 3 PQ) ---
+    print("\n\n>>> Test 1: case4gs (4 Busse)")
+    try:
+        net = pn.case4gs()
+        debug_network_types(net, 'case4gs')
+        run_validation(net, "case4gs")
+    except Exception as e:
+        print(f"  FEHLER: {e}")
 
     # --- Test 2: IEEE 33 Bus (radiales Verteilnetz) ---
     print("\n\n>>> Test 2: case33bw (33 Busse, radial)")
     try:
         net = pn.case33bw()
-        # debug_network_types(net, 'case33bw')
+        debug_network_types(net, 'case33bw')
         run_validation(net, "case33bw (IEEE 33)")
     except Exception as e:
         print(f"  FEHLER: {e}")
 
-    # # --- Test 3: case_ieee30 (30 Busse — hat PV-Knoten!) ---
-    # # Hier testen wir, ob der Builder PV-Knoten korrekt ausschließt
-    # print("\n\n>>> Test 3: case_ieee30 (30 Busse, mit PV-Knoten)")
-    # try:
-    #     net = pn.case_ieee30()
-    #     debug_network_types(net, 'case_ieee30')
-    #     # PV-Knoten entfernen für reinen PQ-Test
-    #     # (Generatoren außer Slack in statische Last umwandeln)
-    #     run_validation(net, "case_ieee30 (nur PQ-Teil)")
-    # except Exception as e:
-    #     print(f"  FEHLER: {e}")
+    # --- Test 3: case_ieee30 (30 Busse — hat PV-Knoten!) ---
+    # Hier testen wir, ob der Builder PV-Knoten korrekt ausschließt
+    print("\n\n>>> Test 3: case_ieee30 (30 Busse, mit PV-Knoten)")
+    try:
+        net = pn.case_ieee30()
+        debug_network_types(net, 'case_ieee30')
+        # PV-Knoten entfernen für reinen PQ-Test
+        # (Generatoren außer Slack in statische Last umwandeln)
+        run_validation(net, "case_ieee30 (nur PQ-Teil)")
+    except Exception as e:
+        print(f"  FEHLER: {e}")
 
 if __name__ == "__main__":
     main()

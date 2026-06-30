@@ -27,26 +27,34 @@ class NetworkData:
     n_phases: int
     bus_names: list[str] | None = None
 
-    # === NEU: PV-Knoten ===
-    pv_mask: NDArray[np.bool_] | None = None        # (b·φ,) True an PV-Positionen
+    # === PV-Knoten ===
+    pv_mask: NDArray[np.bool_] | None = None          # (b·φ,) True an PV-Positionen
     pv_v_setpoint: NDArray[np.float64] | None = None  # (n_pv,) Soll-|V|
     pv_p_setpoint: NDArray[np.float64] | None = None  # (n_pv,) Soll-P in p.u.
+    pv_q_min: NDArray[np.float64] | None = None       # (n_pv,) Q_min in p.u.
+    pv_q_max: NDArray[np.float64] | None = None       # (n_pv,) Q_max in p.u.
 
     @property
     def n_bus_phases(self) -> int:
         return self.n_buses * self.n_phases
 
     @property
+    def has_pv(self) -> bool:
+        """True wenn PV-Knoten vorhanden sind."""
+        return self.pv_mask is not None and np.any(self.pv_mask)
+
+    @property
     def n_pv(self) -> int:
+        """Anzahl PV-Knoten."""
         if self.pv_mask is None:
             return 0
         return int(np.sum(self.pv_mask))
 
     @property
-    def pv_indices(self) -> NDArray[np.int64] | None:
+    def pv_indices(self) -> NDArray[np.int64]:
         """Lokale Indizes der PV-Knoten innerhalb des d-Blocks."""
         if self.pv_mask is None:
-            return None
+            return np.array([], dtype=np.int64)
         return np.where(self.pv_mask)[0]
 
     @property
