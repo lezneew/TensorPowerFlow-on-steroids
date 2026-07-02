@@ -4,4 +4,8 @@
 \contentsline {table}{\numberline {1.2}{\ignorespaces Blöcke der Jacobi-Matrix in polarer Formulierung.}}{6}{table.caption.15}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Abhängigkeit der FPI-Bestandteile von der Blindleistung $Q_k$ eines PV-Knotens für den allgemeinen ZIP-Fall.}}{28}{table.caption.20}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Kosten der Hilfsmatrizen-Aktualisierung in Methode~B pro Iteration.}}{39}{table.caption.38}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Rechentechnischer Vergleich der Tensor-Operationen pro Iteration (Spezialfall $\alpha _{Z,k} = \alpha _{I,k} = 0$ am PV-Knoten).}}{43}{table.caption.49}%
+\addvspace {10\p@ }
 \addvspace {10\p@ }

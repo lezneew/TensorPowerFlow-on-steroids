@@ -10,10 +10,10 @@
 \@writefile{toc}{\contentsline {chapter}{Eidesstattliche Erklärung}{i}{chapter*.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {chapter}{Kurzfassung}{iii}{chapter*.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {chapter}{Abstract}{v}{chapter*.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{Abbildungsverzeichnis}{ix}{chapter*.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{Tabellenverzeichnis}{xi}{chapter*.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{Symbolverzeichnis}{xiii}{chapter*.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{Abkürzungsverzeichnis}{xv}{chapter*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{Abbildungsverzeichnis}{xi}{chapter*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{Tabellenverzeichnis}{xiii}{chapter*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{Symbolverzeichnis}{xv}{chapter*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{Abkürzungsverzeichnis}{xvii}{chapter*.8}\protected@file@percent }
 \abx@aux@cite{0}{Salazar2024}
 \abx@aux@segm{0}{0}{Salazar2024}
 \abx@aux@cite{0}{Salazar2024}
@@ -479,23 +479,228 @@
 \newlabel{subsec:tpf_pv_problem@cref}{{[subsection][1][2,3]2.3.1}{[1][25][]26}}
 \newlabel{eq:s_pv_unbekannt}{{2.22}{26}{Warum PV-Knoten diese Annahme verletzen}{equation.2.3.22}{}}
 \newlabel{eq:s_pv_unbekannt@cref}{{[equation][22][2]2.22}{[1][25][]26}}
-\@writefile{toc}{\contentsline {chapter}{Literaturverzeichnis}{29}{chapter*.21}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {A}Ergänzende Herleitungen}{31}{appendix.A}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {3}Methoden zur PV-Knoten-Integration im Tensor Power Flow}{27}{chapter.3}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{app:herleitungen}{{A}{31}{Ergänzende Herleitungen}{appendix.A}{}}
-\newlabel{app:herleitungen@cref}{{[appendix][1][2147483647]A}{[1][31][]31}}
-\@writefile{toc}{\contentsline {section}{\numberline {A.1}Vollständige Herleitung der Sensitivitätskette}{31}{section.A.1}\protected@file@percent }
-\newlabel{app:sensitivitaet}{{A.1}{31}{Vollständige Herleitung der Sensitivitätskette}{section.A.1}{}}
-\newlabel{app:sensitivitaet@cref}{{[subappendix][1][2147483647,1]A.1}{[1][31][]31}}
-\@writefile{toc}{\contentsline {section}{\numberline {A.2}Koeffizienten der quadratischen Gleichung}{31}{section.A.2}\protected@file@percent }
-\newlabel{app:koeffizienten}{{A.2}{31}{Koeffizienten der quadratischen Gleichung}{section.A.2}{}}
-\newlabel{app:koeffizienten@cref}{{[subappendix][2][2147483647,1]A.2}{[1][31][]31}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {B}Zusätzliche Simulationsergebnisse}{33}{appendix.B}\protected@file@percent }
+\newlabel{ch:methoden_pv}{{3}{27}{Methoden zur PV-Knoten-Integration im Tensor Power Flow}{chapter.3}{}}
+\newlabel{ch:methoden_pv@cref}{{[chapter][3][]3}{[1][27][]27}}
+\newlabel{eq:pv_fpi_basis}{{3.1}{27}{Methoden zur PV-Knoten-Integration im Tensor Power Flow}{equation.3.0.1}{}}
+\newlabel{eq:pv_fpi_basis@cref}{{[equation][1][3]3.1}{[1][27][]27}}
+\abx@aux@cite{0}{Garcia2000}
+\abx@aux@segm{0}{0}{Garcia2000}
+\abx@aux@cite{0}{Giraldo2022}
+\abx@aux@segm{0}{0}{Giraldo2022}
+\@writefile{toc}{\contentsline {section}{\numberline {3.1}Analyse der Auswirkung von PV-Knoten auf die FPI-Struktur}{28}{section.3.1}\protected@file@percent }
+\newlabel{sec:pv_auswirkung}{{3.1}{28}{Analyse der Auswirkung von PV-Knoten auf die FPI-Struktur}{section.3.1}{}}
+\newlabel{sec:pv_auswirkung@cref}{{[section][1][3]3.1}{[1][27][]28}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.1}Welche Matrizen werden von Q-Änderungen beeinflusst?}{28}{subsection.3.1.1}\protected@file@percent }
+\newlabel{subsec:pv_einfluss}{{3.1.1}{28}{Welche Matrizen werden von Q-Änderungen beeinflusst?}{subsection.3.1.1}{}}
+\newlabel{subsec:pv_einfluss@cref}{{[subsection][1][3,1]3.1.1}{[1][27][]28}}
+\newlabel{eq:s_pv_change}{{3.2}{28}{Welche Matrizen werden von Q-Änderungen beeinflusst?}{equation.3.1.2}{}}
+\newlabel{eq:s_pv_change@cref}{{[equation][2][3]3.2}{[1][28][]28}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Abhängigkeit der FPI-Bestandteile von der Blindleistung $Q_k$ eines PV-Knotens für den allgemeinen ZIP-Fall.}}{28}{table.caption.20}\protected@file@percent }
+\newlabel{tab:pv_abhaengigkeit_allgemein}{{3.1}{28}{Abhängigkeit der FPI-Bestandteile von der Blindleistung $Q_k$ eines PV-Knotens für den allgemeinen ZIP-Fall}{table.caption.20}{}}
+\newlabel{tab:pv_abhaengigkeit_allgemein@cref}{{[table][1][3]3.1}{[1][28][]28}}
+\@writefile{toc}{\contentsline {paragraph}{Interpretation.}{28}{section*.21}\protected@file@percent }
+\newlabel{eq:pv_spezialfall}{{3.3}{29}{Interpretation}{equation.3.1.3}{}}
+\newlabel{eq:pv_spezialfall@cref}{{[equation][3][3]3.3}{[1][28][]29}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.2}Umschreibung der Iteration}{29}{subsection.3.1.2}\protected@file@percent }
+\newlabel{subsec:pv_umschreibung}{{3.1.2}{29}{Umschreibung der Iteration}{subsection.3.1.2}{}}
+\newlabel{subsec:pv_umschreibung@cref}{{[subsection][2][3,1]3.1.2}{[1][29][]29}}
+\newlabel{eq:pv_fpi_explizit}{{3.4}{29}{Umschreibung der Iteration}{equation.3.1.4}{}}
+\newlabel{eq:pv_fpi_explizit@cref}{{[equation][4][3]3.4}{[1][29][]29}}
+\newlabel{eq:A_hadamard}{{3.5}{29}{Umschreibung der Iteration}{equation.3.1.5}{}}
+\newlabel{eq:A_hadamard@cref}{{[equation][5][3]3.5}{[1][29][]29}}
+\newlabel{eq:pv_fpi_explizit2}{{3.6}{29}{Umschreibung der Iteration}{equation.3.1.6}{}}
+\newlabel{eq:pv_fpi_explizit2@cref}{{[equation][6][3]3.6}{[1][29][]29}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.3}Konsequenzen für den Konvergenzbeweis}{29}{subsection.3.1.3}\protected@file@percent }
+\newlabel{subsec:pv_konvergenz_konsequenz}{{3.1.3}{29}{Konsequenzen für den Konvergenzbeweis}{subsection.3.1.3}{}}
+\newlabel{subsec:pv_konvergenz_konsequenz@cref}{{[subsection][3][3,1]3.1.3}{[1][29][]29}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.2}Methode A: Äußere Q-Schleife}{30}{section.3.2}\protected@file@percent }
+\newlabel{sec:methode_a}{{3.2}{30}{Methode A: Äußere Q-Schleife}{section.3.2}{}}
+\newlabel{sec:methode_a@cref}{{[section][2][3]3.2}{[1][30][]30}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}Grundidee}{30}{subsection.3.2.1}\protected@file@percent }
+\newlabel{subsec:methode_a_idee}{{3.2.1}{30}{Grundidee}{subsection.3.2.1}{}}
+\newlabel{subsec:methode_a_idee@cref}{{[subsection][1][3,2]3.2.1}{[1][30][]30}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}Herleitung der Q-Korrekturformel}{30}{subsection.3.2.2}\protected@file@percent }
+\newlabel{subsec:methode_a_herleitung}{{3.2.2}{30}{Herleitung der Q-Korrekturformel}{subsection.3.2.2}{}}
+\newlabel{subsec:methode_a_herleitung@cref}{{[subsection][2][3,2]3.2.2}{[1][30][]30}}
+\@writefile{toc}{\contentsline {paragraph}{Thévenin-Äquivalent am Knoten $k$.}{31}{section*.22}\protected@file@percent }
+\newlabel{eq:thevenin_equiv}{{3.7}{31}{Thévenin-Äquivalent am Knoten $k$}{equation.3.2.7}{}}
+\newlabel{eq:thevenin_equiv@cref}{{[equation][7][3]3.7}{[1][30][]31}}
+\newlabel{eq:Z_Bkk_def}{{3.8}{31}{Thévenin-Äquivalent am Knoten $k$}{equation.3.2.8}{}}
+\newlabel{eq:Z_Bkk_def@cref}{{[equation][8][3]3.8}{[1][31][]31}}
+\@writefile{toc}{\contentsline {paragraph}{Strominjektion als Funktion von $Q_k$.}{31}{section*.23}\protected@file@percent }
+\newlabel{eq:current_from_power}{{3.9}{31}{Strominjektion als Funktion von $Q_k$}{equation.3.2.9}{}}
+\newlabel{eq:current_from_power@cref}{{[equation][9][3]3.9}{[1][31][]31}}
+\@writefile{toc}{\contentsline {paragraph}{Linearisierung: Stromänderung bei Q-Variation.}{31}{section*.24}\protected@file@percent }
+\newlabel{eq:delta_I}{{3.10}{31}{Linearisierung: Stromänderung bei Q-Variation}{equation.3.2.10}{}}
+\newlabel{eq:delta_I@cref}{{[equation][10][3]3.10}{[1][31][]31}}
+\@writefile{toc}{\contentsline {paragraph}{Spannungsänderung über Thévenin-Impedanz.}{31}{section*.25}\protected@file@percent }
+\newlabel{eq:delta_V}{{3.11}{31}{Spannungsänderung über Thévenin-Impedanz}{equation.3.2.11}{}}
+\newlabel{eq:delta_V@cref}{{[equation][11][3]3.11}{[1][31][]31}}
+\newlabel{eq:delta_V_expanded}{{3.12}{31}{Spannungsänderung über Thévenin-Impedanz}{equation.3.2.12}{}}
+\newlabel{eq:delta_V_expanded@cref}{{[equation][12][3]3.12}{[1][31][]31}}
+\@writefile{toc}{\contentsline {paragraph}{Änderung des Spannungsbetragsquadrats.}{31}{section*.26}\protected@file@percent }
+\newlabel{eq:delta_V2_identity}{{3.13}{31}{Änderung des Spannungsbetragsquadrats}{equation.3.2.13}{}}
+\newlabel{eq:delta_V2_identity@cref}{{[equation][13][3]3.13}{[1][31][]31}}
+\newlabel{eq:VstarDeltaV}{{3.14}{31}{Änderung des Spannungsbetragsquadrats}{equation.3.2.14}{}}
+\newlabel{eq:VstarDeltaV@cref}{{[equation][14][3]3.14}{[1][31][]31}}
+\newlabel{eq:real_part}{{3.15}{32}{Änderung des Spannungsbetragsquadrats}{equation.3.2.15}{}}
+\newlabel{eq:real_part@cref}{{[equation][15][3]3.15}{[1][31][]32}}
+\newlabel{eq:sensitivity_result}{{3.16}{32}{Änderung des Spannungsbetragsquadrats}{equation.3.2.16}{}}
+\newlabel{eq:sensitivity_result@cref}{{[equation][16][3]3.16}{[1][32][]32}}
+\@writefile{toc}{\contentsline {paragraph}{Ergebnis: Q-Korrekturformel.}{32}{section*.27}\protected@file@percent }
+\newlabel{eq:methode_a_dQ}{{3.17}{32}{Ergebnis: Q-Korrekturformel}{equation.3.2.17}{}}
+\newlabel{eq:methode_a_dQ@cref}{{[equation][17][3]3.17}{[1][32][]32}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Eigenschaften der Korrekturformel}{32}{subsection.3.2.3}\protected@file@percent }
+\newlabel{subsec:methode_a_eigenschaften}{{3.2.3}{32}{Eigenschaften der Korrekturformel}{subsection.3.2.3}{}}
+\newlabel{subsec:methode_a_eigenschaften@cref}{{[subsection][3][3,2]3.2.3}{[1][32][]32}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.4}Algorithmus}{33}{subsection.3.2.4}\protected@file@percent }
+\newlabel{subsec:methode_a_algorithmus}{{3.2.4}{33}{Algorithmus}{subsection.3.2.4}{}}
+\newlabel{subsec:methode_a_algorithmus@cref}{{[subsection][4][3,2]3.2.4}{[1][33][]33}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Methode A: Äußere Q-Schleife mit innerem TPF (allgemeiner ZIP-Fall)}}{33}{algorithm.4}\protected@file@percent }
+\newlabel{alg:methode_a}{{4}{33}{Methode A: Äußere Q-Schleife mit innerem TPF (allgemeiner ZIP-Fall)}{algorithm.4}{}}
+\newlabel{alg:methode_a@cref}{{[algorithm][4][]4}{[1][33][]33}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.5}Rechentechnische Betrachtung}{34}{subsection.3.2.5}\protected@file@percent }
+\newlabel{subsec:methode_a_kosten}{{3.2.5}{34}{Rechentechnische Betrachtung}{subsection.3.2.5}{}}
+\newlabel{subsec:methode_a_kosten@cref}{{[subsection][5][3,2]3.2.5}{[1][33][]34}}
+\@writefile{toc}{\contentsline {paragraph}{Fall $\alpha _{Z,k} = 0$ am PV-Knoten (häufiger Spezialfall).}{34}{section*.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Fall $\alpha _{Z,k} \neq  0$ (allgemeiner Fall).}{34}{section*.29}\protected@file@percent }
+\newlabel{eq:sherman_morrison}{{3.18}{34}{Fall $\alpha _{Z,k} \neq 0$ (allgemeiner Fall)}{equation.3.2.18}{}}
+\newlabel{eq:sherman_morrison@cref}{{[equation][18][3]3.18}{[1][34][]34}}
+\@writefile{toc}{\contentsline {paragraph}{Konvergenz der inneren Schleife.}{34}{section*.30}\protected@file@percent }
+\newlabel{eq:eta_methode_a}{{3.19}{34}{Konvergenz der inneren Schleife}{equation.3.2.19}{}}
+\newlabel{eq:eta_methode_a@cref}{{[equation][19][3]3.19}{[1][34][]34}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}Methode B: Eingebettete Q-Korrektur}{34}{section.3.3}\protected@file@percent }
+\newlabel{sec:methode_b}{{3.3}{34}{Methode B: Eingebettete Q-Korrektur}{section.3.3}{}}
+\newlabel{sec:methode_b@cref}{{[section][3][3]3.3}{[1][34][]34}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Grundidee}{34}{subsection.3.3.1}\protected@file@percent }
+\newlabel{subsec:methode_b_idee}{{3.3.1}{34}{Grundidee}{subsection.3.3.1}{}}
+\newlabel{subsec:methode_b_idee@cref}{{[subsection][1][3,3]3.3.1}{[1][34][]34}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.2}Mathematische Formulierung}{35}{subsection.3.3.2}\protected@file@percent }
+\newlabel{subsec:methode_b_formulierung}{{3.3.2}{35}{Mathematische Formulierung}{subsection.3.3.2}{}}
+\newlabel{subsec:methode_b_formulierung@cref}{{[subsection][2][3,3]3.3.2}{[1][35][]35}}
+\@writefile{toc}{\contentsline {paragraph}{Schritt 1: FPI-Schritt mit aktuellen Hilfsmatrizen.}{35}{section*.31}\protected@file@percent }
+\newlabel{eq:methode_b_fpi}{{3.20}{35}{Schritt 1: FPI-Schritt mit aktuellen Hilfsmatrizen}{equation.3.3.20}{}}
+\newlabel{eq:methode_b_fpi@cref}{{[equation][20][3]3.20}{[1][35][]35}}
+\@writefile{toc}{\contentsline {paragraph}{Schritt 2: Spannungsbetrags-Projektion.}{35}{section*.32}\protected@file@percent }
+\newlabel{eq:methode_b_projektion}{{3.21}{35}{Schritt 2: Spannungsbetrags-Projektion}{equation.3.3.21}{}}
+\newlabel{eq:methode_b_projektion@cref}{{[equation][21][3]3.21}{[1][35][]35}}
+\@writefile{toc}{\contentsline {paragraph}{Schritt 3: Q-Rückrechnung aus dem Kirchhoff'schen Knotengesetz.}{35}{section*.33}\protected@file@percent }
+\newlabel{eq:methode_b_strom}{{3.22}{35}{Schritt 3: Q-Rückrechnung aus dem Kirchhoff'schen Knotengesetz}{equation.3.3.22}{}}
+\newlabel{eq:methode_b_strom@cref}{{[equation][22][3]3.22}{[1][35][]35}}
+\newlabel{eq:methode_b_leistung}{{3.23}{35}{Schritt 3: Q-Rückrechnung aus dem Kirchhoff'schen Knotengesetz}{equation.3.3.23}{}}
+\newlabel{eq:methode_b_leistung@cref}{{[equation][23][3]3.23}{[1][35][]35}}
+\newlabel{eq:methode_b_Q}{{3.24}{35}{Schritt 3: Q-Rückrechnung aus dem Kirchhoff'schen Knotengesetz}{equation.3.3.24}{}}
+\newlabel{eq:methode_b_Q@cref}{{[equation][24][3]3.24}{[1][35][]35}}
+\@writefile{toc}{\contentsline {paragraph}{Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren.}{36}{section*.34}\protected@file@percent }
+\newlabel{eq:methode_b_s_update}{{3.25}{36}{Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren}{equation.3.3.25}{}}
+\newlabel{eq:methode_b_s_update@cref}{{[equation][25][3]3.25}{[1][36][]36}}
+\newlabel{eq:methode_b_A_update}{{3.26}{36}{Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren}{equation.3.3.26}{}}
+\newlabel{eq:methode_b_A_update@cref}{{[equation][26][3]3.26}{[1][36][]36}}
+\newlabel{eq:methode_b_B_update}{{3.27}{36}{Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren}{equation.3.3.27}{}}
+\newlabel{eq:methode_b_B_update@cref}{{[equation][27][3]3.27}{[1][36][]36}}
+\newlabel{eq:methode_b_c_update}{{3.28}{36}{Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren}{equation.3.3.28}{}}
+\newlabel{eq:methode_b_c_update@cref}{{[equation][28][3]3.28}{[1][36][]36}}
+\newlabel{eq:methode_b_F_update}{{3.29}{36}{Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren}{equation.3.3.29}{}}
+\newlabel{eq:methode_b_F_update@cref}{{[equation][29][3]3.29}{[1][36][]36}}
+\newlabel{eq:methode_b_w_update}{{3.30}{36}{Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren}{equation.3.3.30}{}}
+\newlabel{eq:methode_b_w_update@cref}{{[equation][30][3]3.30}{[1][36][]36}}
+\@writefile{toc}{\contentsline {paragraph}{Vereinfachung für $\alpha _{Z,k} = \alpha _{I,k} = 0$ am PV-Knoten.}{36}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.3}Algorithmus}{38}{subsection.3.3.3}\protected@file@percent }
+\newlabel{subsec:methode_b_algorithmus}{{3.3.3}{38}{Algorithmus}{subsection.3.3.3}{}}
+\newlabel{subsec:methode_b_algorithmus@cref}{{[subsection][3][3,3]3.3.3}{[1][36][]38}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces Methode B: Eingebettete Q-Korrektur (allgemeiner ZIP-Fall)}}{38}{algorithm.5}\protected@file@percent }
+\newlabel{alg:methode_b}{{5}{38}{Methode B: Eingebettete Q-Korrektur (allgemeiner ZIP-Fall)}{algorithm.5}{}}
+\newlabel{alg:methode_b@cref}{{[algorithm][5][]5}{[1][36][]38}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.4}Eigenschaften und Diskussion}{39}{subsection.3.3.4}\protected@file@percent }
+\newlabel{subsec:methode_b_diskussion}{{3.3.4}{39}{Eigenschaften und Diskussion}{subsection.3.3.4}{}}
+\newlabel{subsec:methode_b_diskussion@cref}{{[subsection][4][3,3]3.3.4}{[1][39][]39}}
+\@writefile{toc}{\contentsline {paragraph}{Vergleich mit Methode A.}{39}{section*.36}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Kosten der Matrix-Updates.}{39}{section*.37}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.2}{\ignorespaces Kosten der Hilfsmatrizen-Aktualisierung in Methode~B pro Iteration.}}{39}{table.caption.38}\protected@file@percent }
+\newlabel{tab:methode_b_update_kosten}{{3.2}{39}{Kosten der Hilfsmatrizen-Aktualisierung in Methode~B pro Iteration}{table.caption.38}{}}
+\newlabel{tab:methode_b_update_kosten@cref}{{[table][2][3]3.2}{[1][39][]39}}
+\newlabel{eq:F_spalte_update}{{3.31}{39}{Kosten der Matrix-Updates}{equation.3.3.31}{}}
+\newlabel{eq:F_spalte_update@cref}{{[equation][31][3]3.31}{[1][39][]39}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}Tensorformulierung der Methoden}{40}{section.3.4}\protected@file@percent }
+\newlabel{sec:tensor_formulierung}{{3.4}{40}{Tensorformulierung der Methoden}{section.3.4}{}}
+\newlabel{sec:tensor_formulierung@cref}{{[section][4][3]3.4}{[1][39][]40}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.1}Recap: Tensor-Reshape und allgemeine FPI}{40}{subsection.3.4.1}\protected@file@percent }
+\newlabel{subsec:tensor_recap}{{3.4.1}{40}{Recap: Tensor-Reshape und allgemeine FPI}{subsection.3.4.1}{}}
+\newlabel{subsec:tensor_recap@cref}{{[subsection][1][3,4]3.4.1}{[1][40][]40}}
+\newlabel{eq:tensor_fpi_allgemein}{{3.32}{40}{Recap: Tensor-Reshape und allgemeine FPI}{equation.3.4.32}{}}
+\newlabel{eq:tensor_fpi_allgemein@cref}{{[equation][32][3]3.32}{[1][40][]40}}
+\@writefile{toc}{\contentsline {paragraph}{Szenarioabhängigkeit.}{40}{section*.39}\protected@file@percent }
+\newlabel{eq:szenarioabh}{{3.33}{40}{Szenarioabhängigkeit}{equation.3.4.33}{}}
+\newlabel{eq:szenarioabh@cref}{{[equation][33][3]3.33}{[1][40][]40}}
+\@writefile{toc}{\contentsline {paragraph}{Die rettende Eigenschaft: Nur $\bm  {A}$ ist szenarioabhängig (für $\alpha _{Z,k} = 0$).}{40}{section*.40}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.2}Umformulierung für den Tensor-Fall}{40}{subsection.3.4.2}\protected@file@percent }
+\newlabel{subsec:tensor_umformulierung}{{3.4.2}{40}{Umformulierung für den Tensor-Fall}{subsection.3.4.2}{}}
+\newlabel{subsec:tensor_umformulierung@cref}{{[subsection][2][3,4]3.4.2}{[1][40][]40}}
+\newlabel{eq:tensor_umform1}{{3.34}{40}{Umformulierung für den Tensor-Fall}{equation.3.4.34}{}}
+\newlabel{eq:tensor_umform1@cref}{{[equation][34][3]3.34}{[1][40][]40}}
+\newlabel{eq:tensor_umform2}{{3.35}{41}{Umformulierung für den Tensor-Fall}{equation.3.4.35}{}}
+\newlabel{eq:tensor_umform2@cref}{{[equation][35][3]3.35}{[1][40][]41}}
+\@writefile{toc}{\contentsline {paragraph}{Allgemeiner ZIP-Fall ($\alpha _{Z,k} \neq  0$).}{41}{section*.41}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.3}Tensorformulierung von Methode A}{41}{subsection.3.4.3}\protected@file@percent }
+\newlabel{subsec:tensor_methode_a}{{3.4.3}{41}{Tensorformulierung von Methode A}{subsection.3.4.3}{}}
+\newlabel{subsec:tensor_methode_a@cref}{{[subsection][3][3,4]3.4.3}{[1][41][]41}}
+\@writefile{toc}{\contentsline {paragraph}{Innere Schleife (Matrix-Matrix-Multiplikation).}{41}{section*.42}\protected@file@percent }
+\newlabel{eq:tensor_a_inner}{{3.36}{41}{Innere Schleife (Matrix-Matrix-Multiplikation)}{equation.3.4.36}{}}
+\newlabel{eq:tensor_a_inner@cref}{{[equation][36][3]3.36}{[1][41][]41}}
+\@writefile{toc}{\contentsline {paragraph}{Bemerkung zur Szenarioabhängigkeit.}{41}{section*.43}\protected@file@percent }
+\newlabel{eq:tensor_a_inner_explizit}{{3.37}{42}{Bemerkung zur Szenarioabhängigkeit}{equation.3.4.37}{}}
+\newlabel{eq:tensor_a_inner_explizit@cref}{{[equation][37][3]3.37}{[1][42][]42}}
+\@writefile{toc}{\contentsline {paragraph}{Äußere Schleife (element-weise, trivial parallel).}{42}{section*.44}\protected@file@percent }
+\newlabel{eq:tensor_a_dQ}{{3.38}{42}{Äußere Schleife (element-weise, trivial parallel)}{equation.3.4.38}{}}
+\newlabel{eq:tensor_a_dQ@cref}{{[equation][38][3]3.38}{[1][42][]42}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.4}Tensorformulierung von Methode B}{42}{subsection.3.4.4}\protected@file@percent }
+\newlabel{subsec:tensor_methode_b}{{3.4.4}{42}{Tensorformulierung von Methode B}{subsection.3.4.4}{}}
+\newlabel{subsec:tensor_methode_b@cref}{{[subsection][4][3,4]3.4.4}{[1][42][]42}}
+\@writefile{toc}{\contentsline {paragraph}{Schritt 1: FPI (Matrix-Matrix-Multiplikation).}{42}{section*.45}\protected@file@percent }
+\newlabel{eq:tensor_b_fpi}{{3.39}{42}{Schritt 1: FPI (Matrix-Matrix-Multiplikation)}{equation.3.4.39}{}}
+\newlabel{eq:tensor_b_fpi@cref}{{[equation][39][3]3.39}{[1][42][]42}}
+\@writefile{toc}{\contentsline {paragraph}{Schritt 2: Projektion (element-weise).}{42}{section*.46}\protected@file@percent }
+\newlabel{eq:tensor_b_proj}{{3.40}{42}{Schritt 2: Projektion (element-weise)}{equation.3.4.40}{}}
+\newlabel{eq:tensor_b_proj@cref}{{[equation][40][3]3.40}{[1][42][]42}}
+\@writefile{toc}{\contentsline {paragraph}{Schritt 3: Stromberechnung und Q-Rückrechnung.}{43}{section*.47}\protected@file@percent }
+\newlabel{eq:tensor_b_strom_matrix}{{3.41}{43}{Schritt 3: Stromberechnung und Q-Rückrechnung}{equation.3.4.41}{}}
+\newlabel{eq:tensor_b_strom_matrix@cref}{{[equation][41][3]3.41}{[1][42][]43}}
+\newlabel{eq:tensor_b_Q_matrix}{{3.42}{43}{Schritt 3: Stromberechnung und Q-Rückrechnung}{equation.3.4.42}{}}
+\newlabel{eq:tensor_b_Q_matrix@cref}{{[equation][42][3]3.42}{[1][43][]43}}
+\@writefile{toc}{\contentsline {paragraph}{Schritt 4: $\dot  {S}$-Update (element-weise).}{43}{section*.48}\protected@file@percent }
+\newlabel{eq:tensor_b_s_update}{{3.43}{43}{Schritt 4: $\dotS $-Update (element-weise)}{equation.3.4.43}{}}
+\newlabel{eq:tensor_b_s_update@cref}{{[equation][43][3]3.43}{[1][43][]43}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.5}Gesamtvergleich der Tensor-Operationen}{43}{subsection.3.4.5}\protected@file@percent }
+\newlabel{subsec:tensor_vergleich}{{3.4.5}{43}{Gesamtvergleich der Tensor-Operationen}{subsection.3.4.5}{}}
+\newlabel{subsec:tensor_vergleich@cref}{{[subsection][5][3,4]3.4.5}{[1][43][]43}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.3}{\ignorespaces Rechentechnischer Vergleich der Tensor-Operationen pro Iteration (Spezialfall $\alpha _{Z,k} = \alpha _{I,k} = 0$ am PV-Knoten).}}{43}{table.caption.49}\protected@file@percent }
+\newlabel{tab:tensor_vergleich}{{3.3}{43}{Rechentechnischer Vergleich der Tensor-Operationen pro Iteration (Spezialfall $\alpha _{Z,k} = \alpha _{I,k} = 0$ am PV-Knoten)}{table.caption.49}{}}
+\newlabel{tab:tensor_vergleich@cref}{{[table][3][3]3.3}{[1][43][]43}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.6}Zusammenfassung: Warum die Parallelisierung erhalten bleibt}{43}{subsection.3.4.6}\protected@file@percent }
+\newlabel{subsec:tensor_zusammenfassung}{{3.4.6}{43}{Zusammenfassung: Warum die Parallelisierung erhalten bleibt}{subsection.3.4.6}{}}
+\newlabel{subsec:tensor_zusammenfassung@cref}{{[subsection][6][3,4]3.4.6}{[1][43][]43}}
+\newlabel{eq:tensor_bedingung}{{3.44}{43}{Zusammenfassung: Warum die Parallelisierung erhalten bleibt}{equation.3.4.44}{}}
+\newlabel{eq:tensor_bedingung@cref}{{[equation][44][3]3.44}{[1][43][]43}}
+\@writefile{toc}{\contentsline {chapter}{Literaturverzeichnis}{47}{chapter*.51}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {A}Ergänzende Herleitungen}{49}{appendix.A}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{app:ergebnisse}{{B}{33}{Zusätzliche Simulationsergebnisse}{appendix.B}{}}
-\newlabel{app:ergebnisse@cref}{{[appendix][2][2147483647]B}{[1][33][]33}}
+\newlabel{app:herleitungen}{{A}{49}{Ergänzende Herleitungen}{appendix.A}{}}
+\newlabel{app:herleitungen@cref}{{[appendix][1][2147483647]A}{[1][49][]49}}
+\@writefile{toc}{\contentsline {section}{\numberline {A.1}Vollständige Herleitung der Sensitivitätskette}{49}{section.A.1}\protected@file@percent }
+\newlabel{app:sensitivitaet}{{A.1}{49}{Vollständige Herleitung der Sensitivitätskette}{section.A.1}{}}
+\newlabel{app:sensitivitaet@cref}{{[subappendix][1][2147483647,1]A.1}{[1][49][]49}}
+\@writefile{toc}{\contentsline {section}{\numberline {A.2}Koeffizienten der quadratischen Gleichung}{49}{section.A.2}\protected@file@percent }
+\newlabel{app:koeffizienten}{{A.2}{49}{Koeffizienten der quadratischen Gleichung}{section.A.2}{}}
+\newlabel{app:koeffizienten@cref}{{[subappendix][2][2147483647,1]A.2}{[1][49][]49}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {B}Zusätzliche Simulationsergebnisse}{51}{appendix.B}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\newlabel{app:ergebnisse}{{B}{51}{Zusätzliche Simulationsergebnisse}{appendix.B}{}}
+\newlabel{app:ergebnisse@cref}{{[appendix][2][2147483647]B}{[1][51][]51}}
 \abx@aux@read@bbl@mdfivesum{4787F7CDEC68DAE0E9058774C6AE68D1}
 \abx@aux@read@bblrerun
 \abx@aux@defaultrefcontext{0}{Salazar2024}{none/global//global/global}
@@ -503,4 +708,4 @@
 \abx@aux@defaultrefcontext{0}{Grainger1994}{none/global//global/global}
 \abx@aux@defaultrefcontext{0}{DaCosta1999}{none/global//global/global}
 \abx@aux@defaultrefcontext{0}{Garcia2000}{none/global//global/global}
-\gdef \@abspage@last{51}
+\gdef \@abspage@last{71}

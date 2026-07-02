@@ -2420,6 +2420,8 @@
     <bcf:citekey order="53" intorder="1">Salazar2024</bcf:citekey>
     <bcf:citekey order="54" intorder="1">Salazar2024</bcf:citekey>
     <bcf:citekey order="55" intorder="1">Salazar2024</bcf:citekey>
+    <bcf:citekey order="56" intorder="1">Garcia2000</bcf:citekey>
+    <bcf:citekey order="56" intorder="2">Giraldo2022</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">

@@ -1,32 +1,655 @@
 %======================================================================
-\chapter{Methoden zur PV-Knoten-Integration im TPF}
+\chapter{Methoden zur PV-Knoten-Integration im Tensor Power Flow}
 \label{ch:methoden_pv}
 %======================================================================
 
-\section{Stand der Technik: PV-Knoten in konventionellen Verfahren}
-\label{sec:pv_stand}
-% TODO
+In den vorherigen Kapiteln wurde gezeigt, dass der Tensor Power Flow durch die Konstantheit der Systemmatrix $\vect{F}$ (bzw.\ $\vect{B}^{-1}$) einen erheblichen Geschwindigkeitsvorteil gegenüber konventionellen Verfahren bietet. Die zentrale Limitation liegt in der Annahme, dass der Leistungsvektor $\vect{s}$ über alle Iterationen vollständig bekannt und konstant ist (\cref{subsec:fpi_limitation,sec:tpf_limitation}). PV-Knoten verletzen diese Annahme, da ihre Blindleistung $Q_k$ unbekannt ist und iterativ bestimmt werden muss.
 
+Dieses Kapitel entwickelt zwei Methoden, die PV-Knoten in die FPI-Struktur des TPF integrieren, ohne die Parallelisierbarkeit wesentlich einzuschränken. Beide Methoden operieren auf der allgemeinen FPI-Formulierung aus \cref{sec:tpf_algorithmus}:
+\begin{equation}
+	\vect{v}_{(n+1)} = \vect{F}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}^{(n)}
+	\label{eq:pv_fpi_basis}
+\end{equation}
+mit den in \eqref{eq:tpf_A}--\eqref{eq:tpf_w} definierten Hilfsgrößen.
+%\begin{align}
+%	\vect{A}^{(n)} &= \diag(\alpha_P \had \vect{s}^{*(n)}) \label{eq:pv_A}\\
+%	\vect{B}^{(n)} &= \diag(\alpha_Z \had \vect{s}^{*(n)}) + \Ydd \label{eq:pv_B}\\
+%	\vect{c}^{(n)} &= \Yds\vect{v}_s + \alpha_I \had \vect{s}^{*(n)} \label{eq:pv_c}\\
+%	\vect{F}^{(n)} &= -(\vect{B}^{(n)})^{-1}\vect{A}^{(n)} \label{eq:pv_F}\\
+%	\vect{w}^{(n)} &= -(\vect{B}^{(n)})^{-1}\vect{c}^{(n)} \label{eq:pv_w}
+%\end{align}
+%
+Der Index $(n)$ kennzeichnet, dass diese Größen im allgemeinen Fall von der aktuellen Schätzung des Leistungsvektors $\vect{s}^{(n)}$ abhängen, welcher sich bei PV-Knoten zwischen den Iterationen ändert, da dort $s_k^{(n)} = P_k^{\spec} + \jj Q_k^{(n)}$ mit iterativ bestimmtem $Q_k^{(n)}$ gilt.
+
+%======================================================================
+\section{Analyse der Auswirkung von PV-Knoten auf die FPI-Struktur}
+\label{sec:pv_auswirkung}
+%======================================================================
+
+\subsection{Welche Matrizen werden von Q-Änderungen beeinflusst?}
+\label{subsec:pv_einfluss}
+
+Um die nachfolgenden Methoden zu motivieren, wird zunächst systematisch analysiert, welche Bestandteile der FPI-Formulierung \eqref{eq:pv_A}--\eqref{eq:pv_w} von einer Änderung der Blindleistung $Q_k$ an einem PV-Knoten $k$ betroffen sind. Der Leistungsvektor ändert sich am PV-Knoten gemäß:
+\begin{equation}
+	s_k^{(n)} = P_k^{\spec} + \jj Q_k^{(n)} \quad \Rightarrow \quad s_k^{*(n)} = P_k^{\spec} - \jj Q_k^{(n)}
+	\label{eq:s_pv_change}
+\end{equation}
+
+Die Auswirkungen auf die einzelnen Matrizen sind in \cref{tab:pv_abhaengigkeit_allgemein} zusammengefasst.
+
+\begin{table}[H]
+	\centering
+	\caption{Abhängigkeit der FPI-Bestandteile von der Blindleistung $Q_k$ eines PV-Knotens für den allgemeinen ZIP-Fall.}
+	\label{tab:pv_abhaengigkeit_allgemein}
+	\begin{tabular}{@{}lccl@{}}
+		\toprule
+		\textbf{Größe} & \textbf{Betroffen?} & \textbf{Bedingung für Konstantheit} & \textbf{Begründung} \\
+		\midrule
+		$\Ydd$ & Nein & Immer konstant & Nur Netztopologie \\
+		$\vect{A} = \diag(\alpha_P \had \vect{s}^*)$ & Ja$^{(1)}$ & $\alpha_{P,k} = 0$ & $k$-tes Element: $\alpha_{P,k} s_k^*$ \\
+		$\vect{B} = \diag(\alpha_Z \had \vect{s}^*) + \Ydd$ & Ja$^{(2)}$ & $\alpha_{Z,k} = 0$ & $k$-tes Diag.: $\alpha_{Z,k} s_k^*$ \\
+		$\vect{c} = \Yds\vect{v}_s + \alpha_I \had \vect{s}^*$ & Ja$^{(3)}$ & $\alpha_{I,k} = 0$ & $k$-tes Element: $\alpha_{I,k} s_k^*$ \\
+		$\vect{B}^{-1}$ & Ja$^{(2)}$ & $\alpha_{Z,k} = 0$ & Folgt aus $\vect{B}$ \\
+		$\vect{F} = -\vect{B}^{-1}\vect{A}$ & Ja$^{(1,2)}$ & $\alpha_{P,k} = \alpha_{Z,k} = 0$ & Folgt aus $\vect{A}$, $\vect{B}$ \\
+		$\vect{w} = -\vect{B}^{-1}\vect{c}$ & Ja$^{(2,3)}$ & $\alpha_{Z,k} = \alpha_{I,k} = 0$ & Folgt aus $\vect{B}$, $\vect{c}$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\paragraph{Interpretation.}
+Die Auswirkungen einer Q-Änderung am PV-Knoten hängen fundamental vom Lastmodell an diesem Knoten ab:
+\begin{itemize}
+	\item \textbf{Fall 1:} $\alpha_{Z,k} = 0$ am PV-Knoten. Dann bleibt $\vect{B}$ (und damit $\vect{B}^{-1}$) über alle Iterationen \textit{konstant}. Lediglich $\vect{A}$ und ggf.\ $\vect{c}$ ändern sich. Dies ist der rechentechnisch günstigste Fall, da die Inversion von $\vect{B}$ (die teuerste Operation) nur einmal durchgeführt werden muss.
+	\item \textbf{Fall 2:} $\alpha_{Z,k} \neq 0$ am PV-Knoten. Dann ändert sich $\vect{B}$ mit jeder Q-Aktualisierung, und $\vect{B}^{-1}$ muss grundsätzlich neu berechnet werden. Jedoch ändert sich nur ein \textit{Diagonalelement} von $\vect{B}$, was effiziente Rang-1-Updates (Sherman-Morrison-Formel) ermöglicht.
+\end{itemize}
+
+In der Praxis werden Generatoren an PV-Knoten fast ausschließlich als leistungskonstante Einspeiser modelliert ($\alpha_{P,k} = 1$, $\alpha_{Z,k} = \alpha_{I,k} = 0$), da ihr Verhalten durch die Leistungselektronik oder Turbinenregelung bestimmt wird, nicht durch die Netzspannung \cite{Garcia2000, Giraldo2022}. Für diesen häufigen Spezialfall gilt:
+\begin{equation}
+	\alpha_{Z,k} = \alpha_{I,k} = 0 \quad \Rightarrow \quad \vect{B}^{-1} \text{ und } \vect{w} \text{ bleiben konstant.}
+	\label{eq:pv_spezialfall}
+\end{equation}
+
+Die nachfolgende Entwicklung wird zunächst für den \textit{allgemeinen ZIP-Fall} formuliert und die Vereinfachungen für den Spezialfall \eqref{eq:pv_spezialfall} jeweils explizit angegeben.
+
+\subsection{Umschreibung der Iteration}
+\label{subsec:pv_umschreibung}
+
+Für die nachfolgende Analyse ist es hilfreich, die Iteration \eqref{eq:pv_fpi_basis} explizit in Abhängigkeit des Leistungsvektors auszuschreiben. Einsetzen von \eqref{eq:pv_F}--\eqref{eq:pv_w} ergibt:
+\begin{equation}
+	\vect{v}_{(n+1)} = -(\vect{B}^{(n)})^{-1} \cdot \left[\vect{A}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{c}^{(n)}\right]
+	\label{eq:pv_fpi_explizit}
+\end{equation}
+
+Da $\vect{A}^{(n)}$ eine Diagonalmatrix ist, kann das Produkt $\vect{A}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv}$ als Hadamard-Operation umgeschrieben werden:
+\begin{equation}
+	\vect{A}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv} = (\alpha_P \had \vect{s}^{*(n)}) \had \vect{v}_{(n)}^{*\eleminv}
+	\label{eq:A_hadamard}
+\end{equation}
+
+Damit wird \eqref{eq:pv_fpi_explizit} zu:
+\begin{equation}
+	\vect{v}_{(n+1)} = -(\vect{B}^{(n)})^{-1} \cdot \left[(\alpha_P \had \vect{s}^{*(n)}) \had \vect{v}_{(n)}^{*\eleminv} + \vect{c}^{(n)}\right]
+	\label{eq:pv_fpi_explizit2}
+\end{equation}
+
+In dieser Form wird deutlich, dass die Änderung von $\vect{s}^{(n)}$ an PV-Knoten:
+\begin{enumerate}
+	\item den Vektor $(\alpha_P \had \vect{s}^{*(n)}) \had \vect{v}_{(n)}^{*\eleminv}$ beeinflusst (über $\alpha_P$-gewichteten Anteil),
+	\item den Vektor $\vect{c}^{(n)}$ beeinflusst (über $\alpha_I$-gewichteten Anteil),
+	\item die Matrix $(\vect{B}^{(n)})^{-1}$ beeinflusst (über $\alpha_Z$-gewichteten Anteil).
+\end{enumerate}
+
+\subsection{Konsequenzen für den Konvergenzbeweis}
+\label{subsec:pv_konvergenz_konsequenz}
+
+Der Konvergenzbeweis nach \cref{prop:sam_kontraktion} basiert auf der Konstantheit von $\vect{s}$ und damit aller Hilfsmatrizen. Wenn $\vect{s}$ sich zwischen den Iterationen ändert, ist der Kontraktionsfaktor $\eta$ aus \eqref{eq:eta_giraldo} nicht mehr über die gesamte Iteration konstant. Es gelten folgende Einschränkungen:
+\begin{enumerate}
+	\item Der formale Konvergenzbeweis (\cref{prop:sam_kontraktion}) ist in seiner vorliegenden Form \textit{nicht direkt anwendbar}, da die Abbildung $T^{(n)}(\cdot)$ iterationsabhängig wird.
+	\item Die physikalische Konvergenzbedingung $\|Z_{ii}\| < \|Z_{L,i}\|$ (\cref{subsec:konvergenz_physik}) bleibt als heuristische Richtlinie anwendbar, sofern die Q-Änderungen die äquivalente Lastimpedanz nicht fundamental verändern.
+	\item In der Praxis konvergieren die nachfolgend vorgestellten Methoden für typische Verteilnetz-Betriebspunkte zuverlässig, wie in \cref{ch:ergebnisse} numerisch validiert wird.
+\end{enumerate}
+
+%======================================================================
 \section{Methode A: Äußere Q-Schleife}
 \label{sec:methode_a}
-% TODO
+%======================================================================
 
+\subsection{Grundidee}
+\label{subsec:methode_a_idee}
+
+Methode~A realisiert die PV-Knoten-Behandlung durch eine verschachtelte Schleifenstruktur. Der Standard-TPF wird als \textit{innere Schleife} mit festem Leistungsvektor $\vect{s}^{(\ell)}$ (und damit festen Matrizen $\vect{F}^{(\ell)}$, $\vect{w}^{(\ell)}$) ausgeführt, bis er konvergiert. Anschließend wird in einer \textit{äußeren Schleife} die Blindleistung $Q_k$ an den PV-Knoten korrigiert, der Leistungsvektor $\vect{s}^{(\ell+1)}$ aktualisiert, und die Hilfsmatrizen neu berechnet.
+
+Der konzeptionelle Ablauf ist:
+\begin{enumerate}
+	\item Setze $Q_k^{(0)} = 0$ als initialen Schätzwert (äußere Iteration $\ell = 0$).
+	\item Berechne $\vect{s}^{(\ell)}$, daraus $\vect{A}^{(\ell)}$, $\vect{B}^{(\ell)}$, $\vect{c}^{(\ell)}$, $\vect{F}^{(\ell)}$, $\vect{w}^{(\ell)}$.
+	\item Führe den vollständigen TPF (innere Schleife) mit festem $\vect{F}^{(\ell)}$, $\vect{w}^{(\ell)}$ bis zur Konvergenz aus $\to$ ergibt $\vect{v}^{(\ell)}$.
+	\item Berechne die Abweichung $\Delta|V_k|^2 = |V_k^{\spec}|^2 - |v_k^{(\ell)}|^2$.
+	\item Korrigiere $Q_k^{(\ell+1)} = Q_k^{(\ell)} + \Delta Q_k^{(\ell)}$.
+	\item Falls $|\Delta|V_k|^2| < \varepsilon_Q$ für alle PV-Knoten: fertig. Sonst: zurück zu Schritt~2.
+\end{enumerate}
+
+Ein wesentlicher Vorteil dieser Struktur ist, dass die innere Schleife ein \textit{unmodifizierter} Standard-TPF ist: Da $\vect{s}^{(\ell)}$ dort konstant gehalten wird, sind alle Hilfsmatrizen $\vect{A}^{(\ell)}$, $\vect{B}^{(\ell)}$, $\vect{F}^{(\ell)}$, $\vect{w}^{(\ell)}$ über die inneren Iterationen fixiert. Der Konvergenzbeweis (\cref{prop:sam_kontraktion}) ist daher für die innere Schleife vollständig gültig.
+
+\subsection{Herleitung der Q-Korrekturformel}
+\label{subsec:methode_a_herleitung}
+
+Für die Q-Korrektur in Schritt~5 wird eine Beziehung zwischen $\Delta Q_k$ und dem Spannungsmismatch $\Delta|V_k|^2$ benötigt. Diese wird über das Thévenin-Ersatzschaltbild am PV-Knoten~$k$ hergeleitet.
+
+\paragraph{Thévenin-Äquivalent am Knoten $k$.}
+Aus Sicht eines PV-Knotens~$k$ lässt sich das restliche Netz durch sein Thévenin-Äquivalent beschreiben. Die Spannung am Knoten~$k$ ergibt sich als:
+\begin{equation}
+	V_k = E_{\text{th},k} - Z_{B,kk}^{(\ell)} \cdot I_k
+	\label{eq:thevenin_equiv}
+\end{equation}
+wobei $E_{\text{th},k}$ die Thévenin-Leerlaufspannung (bestimmt durch das restliche Netz und die Slack-Spannung) und $Z_{B,kk}^{(\ell)}$ das $k$-te Diagonalelement der Bus-Impedanzmatrix ist:
+\begin{equation}
+	Z_{B,kk}^{(\ell)} = \left[(\vect{B}^{(\ell)})^{-1}\right]_{kk} = R_{kk}^{(\ell)} + \jj X_{kk}^{(\ell)}
+	\label{eq:Z_Bkk_def}
+\end{equation}
+
+\paragraph{Strominjektion als Funktion von $Q_k$.}
+Die komplexe Leistungsinjektion am Knoten~$k$ in Erzeugerkonvention lautet $S_k = P_k + \jj Q_k = V_k \cdot I_k^*$. Daraus folgt für den Strom:
+\begin{equation}
+	I_k = \frac{S_k^*}{V_k^*} = \frac{P_k - \jj Q_k}{V_k^*}
+	\label{eq:current_from_power}
+\end{equation}
+
+\paragraph{Linearisierung: Stromänderung bei Q-Variation.}
+Bei festgehaltenem $P_k$ und unter der Annahme, dass sich $V_k$ bei einer kleinen Änderung $\Delta Q_k$ nur geringfügig ändert (Linearisierung um den aktuellen Arbeitspunkt $v_k^{(\ell)}$), ergibt sich die Stromänderung:
+\begin{equation}
+	\Delta I_k \approx \frac{-\jj\,\Delta Q_k}{V_k^*} \bigg|_{V_k = v_k^{(\ell)}}
+	\label{eq:delta_I}
+\end{equation}
+
+\paragraph{Spannungsänderung über Thévenin-Impedanz.}
+Die resultierende Spannungsänderung am Knoten~$k$ folgt aus dem Thévenin-Äquivalent~\eqref{eq:thevenin_equiv}:
+\begin{equation}
+	\Delta V_k = -Z_{B,kk}^{(\ell)} \cdot \Delta I_k = Z_{B,kk}^{(\ell)} \cdot \frac{\jj\,\Delta Q_k}{(v_k^{(\ell)})^*}
+	\label{eq:delta_V}
+\end{equation}
+
+Mit $Z_{B,kk}^{(\ell)} = R_{kk}^{(\ell)} + \jj X_{kk}^{(\ell)}$ und $(v_k^{(\ell)})^* = |v_k^{(\ell)}|\,e^{-\jj\theta_k}$ ergibt die Ausmultiplikation:
+\begin{equation}
+	\Delta V_k = \frac{\Delta Q_k}{|v_k^{(\ell)}|}\left(X_{kk}^{(\ell)} - \jj R_{kk}^{(\ell)}\right) e^{\jj\theta_k}
+	\label{eq:delta_V_expanded}
+\end{equation}
+
+\paragraph{Änderung des Spannungsbetragsquadrats.}
+Die Änderung von $|V_k|^2$ lässt sich über die Identität
+\begin{equation}
+	\Delta(|V_k|^2) = 2\,\re\!\left(V_k^* \cdot \Delta V_k\right)
+	\label{eq:delta_V2_identity}
+\end{equation}
+berechnen. Einsetzen von \eqref{eq:delta_V_expanded} mit $V_k^* = |v_k^{(\ell)}|\,e^{-\jj\theta_k}$ liefert:
+\begin{align}
+	V_k^* \cdot \Delta V_k &= |v_k^{(\ell)}|\,e^{-\jj\theta_k} \cdot \frac{\Delta Q_k}{|v_k^{(\ell)}|}\left(X_{kk}^{(\ell)} - \jj R_{kk}^{(\ell)}\right) e^{\jj\theta_k} \nonumber \\
+	&= \Delta Q_k \cdot \left(X_{kk}^{(\ell)} - \jj R_{kk}^{(\ell)}\right)
+	\label{eq:VstarDeltaV}
+\end{align}
+
+Der Realteil ergibt:
+\begin{equation}
+	\re\!\left(V_k^* \cdot \Delta V_k\right) = X_{kk}^{(\ell)} \cdot \Delta Q_k
+	\label{eq:real_part}
+\end{equation}
+
+Bemerkenswert ist, dass der Widerstandsanteil $R_{kk}^{(\ell)}$ ausschließlich zum Imaginärteil beiträgt und sich somit vollständig herauskürzt. Einsetzen in \eqref{eq:delta_V2_identity} liefert die zentrale Sensitivitätsbeziehung:
+\begin{equation}
+	\Delta(|V_k|^2) = 2\,X_{kk}^{(\ell)} \cdot \Delta Q_k
+	\label{eq:sensitivity_result}
+\end{equation}
+
+\paragraph{Ergebnis: Q-Korrekturformel.}
+Um die Spannung vom berechneten Wert $|v_k^{(\ell)}|$ auf den Sollwert $|V_k^{\spec}|$ zu korrigieren, wird $\Delta(|V_k|^2) = |V_k^{\spec}|^2 - |v_k^{(\ell)}|^2$ gefordert. Auflösen von \eqref{eq:sensitivity_result} nach $\Delta Q_k$ ergibt:
+\begin{equation}
+	\boxed{
+		\Delta Q_k^{(\ell)} = \frac{|V_k^{\spec}|^2 - |v_k^{(\ell)}|^2}{2 \cdot X_{kk}^{(\ell)}}
+	}
+	\label{eq:methode_a_dQ}
+\end{equation}
+
+wobei $X_{kk}^{(\ell)} = \im\left(\left[(\vect{B}^{(\ell)})^{-1}\right]_{kk}\right)$ die Thévenin-Reaktanz am Knoten~$k$ ist.
+
+\subsection{Eigenschaften der Korrekturformel}
+\label{subsec:methode_a_eigenschaften}
+
+Die hergeleitete Formel~\eqref{eq:methode_a_dQ} besitzt mehrere bemerkenswerte Eigenschaften:
+
+\begin{enumerate}
+	\item \textbf{Spannungsunabhängigkeit:} Die Formel hängt nur von $X_{kk}^{(\ell)}$ und den Spannungsbeträgen ab, nicht vom aktuellen Spannungswinkel $\theta_k$. Dies ist eine Konsequenz der vollständigen Eliminierung des Widerstandsanteils~$R_{kk}$ in Gleichung~\eqref{eq:real_part}.
+	
+	\item \textbf{Physikalische Interpretation:} Die Sensitivität $\partial|V_k|^2/\partial Q_k = 2X_{kk}$ besagt, dass die Spannungsänderung proportional zur Thévenin-Reaktanz ist. In Netzen mit hoher Reaktanz (typisch für Übertragungsnetze) reicht bereits eine geringe Q-Änderung für eine signifikante Spannungskorrektur.
+	
+	\item \textbf{Abhängigkeit von $\vect{B}^{(\ell)}$:}
+	\begin{itemize}
+		\item Wenn $\alpha_{Z,k} = 0$ (am PV-Knoten): $\vect{B}^{(\ell)} = \vect{B}$ ist konstant, und damit auch $X_{kk}^{(\ell)} = X_{kk}$ über alle äußeren Iterationen. Die Sensitivität ist eine \textit{vorab berechenbare Konstante}.
+		\item Wenn $\alpha_{Z,k} \neq 0$: $\vect{B}^{(\ell)}$ ändert sich mit $Q_k^{(\ell)}$, und $X_{kk}^{(\ell)}$ muss nach jeder äußeren Iteration aktualisiert werden. In der Praxis ist die Änderung gering und $X_{kk}^{(\ell)} \approx X_{kk}^{(0)}$ eine gute Näherung.
+	\end{itemize}
+	
+	\item \textbf{Lineare Konvergenz:} Da \eqref{eq:methode_a_dQ} eine First-Order-Sensitivität darstellt (Linearisierung um den aktuellen Arbeitspunkt), konvergiert die äußere Schleife linear. Dies ist konsistent mit dem beobachteten Verhalten in den numerischen Tests (\cref{sec:ergebnisse}).
+\end{enumerate}
+
+\subsection{Algorithmus}
+\label{subsec:methode_a_algorithmus}
+
+\begin{algorithm}[H]
+	\caption{Methode A: Äußere Q-Schleife mit innerem TPF (allgemeiner ZIP-Fall)}
+	\label{alg:methode_a}
+	\begin{algorithmic}[1]
+		\REQUIRE $\vect{s}_{\text{PQ}}$, $P_k^{\spec}$ und $|V_k^{\spec}|$ für $k \in \Omega_{\text{PV}}$, $\Ydd$, $\Yds$, $\vect{v}_s$, ZIP-Koeffizienten $\alpha_P, \alpha_I, \alpha_Z$, Toleranzen $\varepsilon_v$, $\varepsilon_Q$, max.\ äußere Iterationen $L$
+		\ENSURE $\vect{v}$, $Q_k$ für $k \in \Omega_{\text{PV}}$
+		
+		\STATE \textbf{Initialisierung:}
+		\STATE $Q_k^{(0)} = 0$ für alle $k \in \Omega_{\text{PV}}$; \quad $\ell = 0$
+		
+		\STATE
+		\STATE \textbf{Äußere Schleife:}
+		\WHILE{$\max_k |\Delta|V_k|^2| \geq \varepsilon_Q$ \textbf{und} $\ell < L$}
+		
+		\STATE \textit{\% Leistungsvektor und Hilfsmatrizen aktualisieren}
+		\STATE $s_k^{(\ell)} = P_k^{\spec} + \jj Q_k^{(\ell)}$ für alle $k \in \Omega_{\text{PV}}$
+		\STATE $\vect{A}^{(\ell)} = \diag(\alpha_P \had \vect{s}^{*(\ell)})$
+		\STATE $\vect{B}^{(\ell)} = \diag(\alpha_Z \had \vect{s}^{*(\ell)}) + \Ydd$
+		\STATE $\vect{c}^{(\ell)} = \Yds\vect{v}_s + \alpha_I \had \vect{s}^{*(\ell)}$
+		\STATE Berechne $(\vect{B}^{(\ell)})^{-1}$ \COMMENT{Nur wenn $\alpha_{Z,k} \neq 0$; sonst einmalig}
+		\STATE $\vect{F}^{(\ell)} = -(\vect{B}^{(\ell)})^{-1}\vect{A}^{(\ell)}$; \quad $\vect{w}^{(\ell)} = -(\vect{B}^{(\ell)})^{-1}\vect{c}^{(\ell)}$
+		\STATE $X_{kk}^{(\ell)} = \im\left([(\vect{B}^{(\ell)})^{-1}]_{kk}\right)$ für alle $k \in \Omega_{\text{PV}}$
+		
+		\STATE
+		\STATE \textit{\% Innere Schleife: Standard-FPI mit konstantem $\vect{F}^{(\ell)}$, $\vect{w}^{(\ell)}$}
+		\STATE $\vect{v}^{(0)} = \mathbf{1} + \jj\mathbf{0}$; \quad $n = 0$; \quad $\text{tol}_v = \infty$
+		\WHILE{$\text{tol}_v \geq \varepsilon_v$ \textbf{und} $n < K$}
+		\STATE $\vect{v}^{(n+1)} = \vect{F}^{(\ell)} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}^{(\ell)}$
+		\STATE $\text{tol}_v = \max\|\vect{s}^{(\ell)} - \vect{s}^{(n+1)}_{\text{calc}}\|$; \quad $n = n + 1$
+		\ENDWHILE
+		\STATE $\vect{v}^{(\ell)} = \vect{v}^{(n)}$ \COMMENT{Konvergierte Lösung der inneren Schleife}
+		
+		\STATE
+		\STATE \textit{\% Q-Korrektur}
+		\FOR{jeden PV-Knoten $k \in \Omega_{\text{PV}}$}
+		\STATE $\Delta|V_k|^2 = |V_k^{\spec}|^2 - |v_k^{(\ell)}|^2$
+		\STATE $\Delta Q_k^{(\ell)} = \Delta|V_k|^2 \,/\, (2 \cdot X_{kk}^{(\ell)})$
+		\STATE $Q_k^{(\ell+1)} = Q_k^{(\ell)} + \Delta Q_k^{(\ell)}$
+		\STATE $Q_k^{(\ell+1)} = \max\big(Q_k^{\min},\, \min(Q_k^{\max},\, Q_k^{(\ell+1)})\big)$ \COMMENT{Q-Limits}
+		\ENDFOR
+		\STATE $\ell = \ell + 1$
+		
+		\ENDWHILE
+		\RETURN $\vect{v}^{(\ell)}$, $\{Q_k^{(\ell)}\}_{k \in \Omega_{\text{PV}}}$
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{Rechentechnische Betrachtung}
+\label{subsec:methode_a_kosten}
+
+\paragraph{Fall $\alpha_{Z,k} = 0$ am PV-Knoten (häufiger Spezialfall).}
+Die Matrix $\vect{B}$ ist konstant und $\vect{B}^{-1}$ muss nur einmal berechnet werden. In der äußeren Schleife müssen lediglich die Diagonalmatrix $\vect{A}^{(\ell)}$, der Vektor $\vect{c}^{(\ell)}$ und die Produkte $\vect{F}^{(\ell)} = -\vect{B}^{-1}\vect{A}^{(\ell)}$, $\vect{w}^{(\ell)} = -\vect{B}^{-1}\vect{c}^{(\ell)}$ neu berechnet werden. Die Berechnung von $\vect{F}^{(\ell)}$ ist eine Matrix-Diagonalmatrix-Multiplikation (Skalierung der Spalten von $\vect{B}^{-1}$) mit Kosten $\mathcal{O}((b\phi)^2)$.
+
+\paragraph{Fall $\alpha_{Z,k} \neq 0$ (allgemeiner Fall).}
+Die Matrix $\vect{B}$ ändert sich, da ihr Diagonalelement am PV-Knoten $k$ den Wert $\alpha_{Z,k} s_k^{*(\ell)} + Y_{dd,kk}$ hat. Eine vollständige Neuberechnung von $\vect{B}^{-1}$ hat Kosten $\mathcal{O}((b\phi)^3)$. Stattdessen kann die Sherman-Morrison-Formel für Rang-1-Updates verwendet werden:
+\begin{equation}
+	(\vect{B}^{(\ell+1)})^{-1} = (\vect{B}^{(\ell)} + \delta_k \vect{e}_k \vect{e}_k^T)^{-1} = (\vect{B}^{(\ell)})^{-1} - \frac{(\vect{B}^{(\ell)})^{-1}\vect{e}_k \vect{e}_k^T (\vect{B}^{(\ell)})^{-1} \cdot \delta_k}{1 + \delta_k \vect{e}_k^T (\vect{B}^{(\ell)})^{-1} \vect{e}_k}
+	\label{eq:sherman_morrison}
+\end{equation}
+mit $\delta_k = \alpha_{Z,k}(s_k^{*(\ell+1)} - s_k^{*(\ell)}) = -\jj\,\alpha_{Z,k}\,\Delta Q_k^{(\ell)}$ und $\vect{e}_k$ dem $k$-ten Einheitsvektor. Die Kosten pro PV-Knoten reduzieren sich damit auf $\mathcal{O}((b\phi)^2)$.
+
+\paragraph{Konvergenz der inneren Schleife.}
+Da innerhalb der inneren Schleife $\vect{s}^{(\ell)}$ und damit $\vect{F}^{(\ell)}$ konstant sind, ist der Banach-Fixpunktsatz (\cref{prop:sam_kontraktion}) anwendbar. Die innere Schleife konvergiert garantiert, solange $\eta^{(\ell)} < 1$ mit:
+\begin{equation}
+	\eta^{(\ell)} = \left\|(\vect{B}^{(\ell)})^{-1} \diag(\alpha_P \had \vect{s}^{*(\ell)})\right\|_1 \cdot \frac{1}{v_{\min}^2}
+	\label{eq:eta_methode_a}
+\end{equation}
+
+%======================================================================
 \section{Methode B: Eingebettete Q-Korrektur}
 \label{sec:methode_b}
-% TODO
+%======================================================================
 
-\section{Methode C: Implizite quadratische Q-Bestimmung}
-\label{sec:methode_c}
-% TODO
+\subsection{Grundidee}
+\label{subsec:methode_b_idee}
 
-\section{Beweis: Konstanz der Sensitivitätskette}
-\label{sec:beweis_konstanz}
-% TODO
+Im Gegensatz zu Methode~A, die eine verschachtelte Schleifenstruktur erfordert, integriert Methode~B die PV-Knoten-Behandlung direkt in \textit{jede} FPI-Iteration. Die Grundidee besteht aus drei Schritten, die nach dem regulären FPI-Update ausgeführt werden:
+\begin{enumerate}
+	\item \textbf{Spannungsbetrags-Projektion:} Der an einem PV-Knoten berechnete Spannungszeiger wird in seiner Richtung (Winkel) beibehalten, aber im Betrag auf den Sollwert $|V_k^{\spec}|$ skaliert.
+	\item \textbf{Q-Rückrechnung:} Die Blindleistung wird aus der Netzgleichung (Kirchhoff'sches Knotengesetz) mit dem projizierten Spannungszeiger exakt zurückberechnet.
+	\item \textbf{Hilfsmatrizen-Update:} Die Matrizen $\vect{A}$, $\vect{B}$ (falls nötig), $\vect{c}$, $\vect{F}$, $\vect{w}$ werden mit dem neuen $Q_k$ aktualisiert.
+\end{enumerate}
 
+Dieser Ansatz erzwingt die Spannungsbedingung $|v_k| = |V_k^{\spec}|$ in jeder Iteration \textit{exakt}. Die Blindleistung ergibt sich direkt aus der Leistungsbilanz, ohne Linearisierung oder Sensitivitätsapproximation.
+
+\subsection{Mathematische Formulierung}
+\label{subsec:methode_b_formulierung}
+
+\paragraph{Schritt 1: FPI-Schritt mit aktuellen Hilfsmatrizen.}
+Die reguläre FPI-Iteration \eqref{eq:pv_fpi_basis} wird mit den aktuellen Matrizen $\vect{F}^{(n)}$, $\vect{w}^{(n)}$ durchgeführt:
+\begin{equation}
+	\vect{v}_{(n+1)}' = \vect{F}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}^{(n)}
+	\label{eq:methode_b_fpi}
+\end{equation}
+
+Der Strich in $\vect{v}_{(n+1)}'$ kennzeichnet, dass dies ein Zwischenergebnis ist, das an den PV-Knoten noch korrigiert wird. An PQ-Knoten gilt $v_{k,(n+1)} = v_{k,(n+1)}'$ ohne Korrektur.
+
+\paragraph{Schritt 2: Spannungsbetrags-Projektion.}
+An jedem PV-Knoten $k \in \Omega_{\text{PV}}$ wird der Spannungszeiger auf den Sollbetrag projiziert:
+\begin{equation}
+	v_{k,(n+1)} = |V_k^{\spec}| \cdot \frac{v_{k,(n+1)}'}{|v_{k,(n+1)}'|}
+	\label{eq:methode_b_projektion}
+\end{equation}
+
+Dies ist eine reine Skalierungsoperation. Der resultierende Spannungszeiger hat den korrekten Betrag $|v_{k,(n+1)}| = |V_k^{\spec}|$ und einen aus der FPI-Iteration stammenden Winkel.
+
+\paragraph{Schritt 3: Q-Rückrechnung aus dem Kirchhoff'schen Knotengesetz.}
+Nach der Projektion ist die Spannung am PV-Knoten bekannt. Der zugehörige Strom ergibt sich aus der Admittanzmatrix:
+\begin{equation}
+	i_{k,(n+1)} = \sum_{m \in \Omega_d} Y_{dd,km} \cdot v_{m,(n+1)} + (\Yds)_k \cdot \vect{v}_s
+	\label{eq:methode_b_strom}
+\end{equation}
+
+Die komplexe Leistung am PV-Knoten ergibt sich zu:
+\begin{equation}
+	s_{k,(n+1)}^{\text{calc}} = v_{k,(n+1)} \cdot i_{k,(n+1)}^*
+	\label{eq:methode_b_leistung}
+\end{equation}
+
+Die Blindleistung ist der Imaginärteil:
+\begin{equation}
+	Q_k^{(n+1)} = \im\left(v_{k,(n+1)} \cdot i_{k,(n+1)}^*\right)
+	\label{eq:methode_b_Q}
+\end{equation}
+
+Es sei angemerkt, dass die so berechnete Blindleistung die Netzgleichung \textit{exakt} erfüllt -- im Gegensatz zur linearisierten Sensitivitätsformel \eqref{eq:methode_a_dQ} aus Methode~A.
+
+\paragraph{Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren.}
+Der Leistungsvektor wird aktualisiert:
+\begin{equation}
+	s_k^{(n+1)} = P_k^{\spec} + \jj Q_k^{(n+1)}, \quad \forall k \in \Omega_{\text{PV}}
+	\label{eq:methode_b_s_update}
+\end{equation}
+
+Anschließend werden die Hilfsmatrizen für die nächste Iteration neu berechnet:
+\begin{align}
+	\vect{A}^{(n+1)} &= \diag(\alpha_P \had \vect{s}^{*(n+1)}) \label{eq:methode_b_A_update}\\
+	\vect{B}^{(n+1)} &= \diag(\alpha_Z \had \vect{s}^{*(n+1)}) + \Ydd \label{eq:methode_b_B_update}\\
+	\vect{c}^{(n+1)} &= \Yds\vect{v}_s + \alpha_I \had \vect{s}^{*(n+1)} \label{eq:methode_b_c_update}\\
+	\vect{F}^{(n+1)} &= -(\vect{B}^{(n+1)})^{-1}\vect{A}^{(n+1)} \label{eq:methode_b_F_update}\\
+	\vect{w}^{(n+1)} &= -(\vect{B}^{(n+1)})^{-1}\vect{c}^{(n+1)} \label{eq:methode_b_w_update}
+\end{align}
+
+\paragraph{Vereinfachung für $\alpha_{Z,k} = \alpha_{I,k} = 0$ am PV-Knoten.}
+In diesem häufigen Spezialfall sind $\vect{B}$, $\vect{B}^{-1}$ und $\vect{c}$ konstant. Es müssen lediglich die Einträge von $\vect{A}$ an den PV-Knoten-Positionen aktualisiert werden, und $\vect{F}$ ergibt sich durch Neuskalierung der entsprechenden Spalten von $\vect{B}^{-1}$. Die Berechnung von $\vect{w}$ entfällt, da $\vect{c}$ und $\vect{B}^{-1}$ unverändert bleiben.
+
+\subsection{Algorithmus}
+\label{subsec:methode_b_algorithmus}
+
+\begin{algorithm}[H]
+	\caption{Methode B: Eingebettete Q-Korrektur (allgemeiner ZIP-Fall)}
+	\label{alg:methode_b}
+	\begin{algorithmic}[1]
+		\REQUIRE $\vect{s}_{\text{PQ}}$, $P_k^{\spec}$ und $|V_k^{\spec}|$ für $k \in \Omega_{\text{PV}}$, $\Ydd$, $\Yds$, $\vect{v}_s$, ZIP-Koeffizienten, Toleranz $\varepsilon$, max.\ Iterationen $K$
+		\ENSURE $\vect{v}$, $Q_k$ für $k \in \Omega_{\text{PV}}$
+		
+		\STATE \textbf{Initialisierung:}
+		\STATE $Q_k^{(0)} = 0$ für alle $k \in \Omega_{\text{PV}}$
+		\STATE $\vect{v}^{(0)} = \mathbf{1} + \jj\mathbf{0}$; \quad $n = 0$; \quad $\text{tol} = \infty$
+		\STATE $\vect{s}^{(0)} = [\vect{s}_{\text{PQ}};\, P_k^{\spec} + \jj Q_k^{(0)}]$
+		\STATE Berechne $\vect{A}^{(0)}$, $\vect{B}^{(0)}$, $\vect{c}^{(0)}$, $(\vect{B}^{(0)})^{-1}$, $\vect{F}^{(0)}$, $\vect{w}^{(0)}$ gemäß \eqref{eq:pv_A}--\eqref{eq:pv_w}
+		
+		\STATE
+		\STATE \textbf{Hauptschleife:}
+		\WHILE{$\text{tol} \geq \varepsilon$ \textbf{und} $n < K$}
+		
+		\STATE \textit{\% Schritt 1: FPI-Schritt}
+		\STATE $\vect{v}_{(n+1)}' = \vect{F}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}^{(n)}$
+		
+		\STATE
+		\STATE \textit{\% Schritt 2: Spannungsbetrags-Projektion an PV-Knoten}
+		\FOR{jeden PV-Knoten $k \in \Omega_{\text{PV}}$}
+		\STATE $v_{k,(n+1)} = |V_k^{\spec}| \cdot v_{k,(n+1)}' \,/\, |v_{k,(n+1)}'|$
+		\ENDFOR
+		\STATE $v_{m,(n+1)} = v_{m,(n+1)}'$ für alle $m \notin \Omega_{\text{PV}}$
+		
+		\STATE
+		\STATE \textit{\% Schritt 3: Q-Rückrechnung aus Netzgleichung}
+		\FOR{jeden PV-Knoten $k \in \Omega_{\text{PV}}$}
+		\STATE $i_{k,(n+1)} = \sum_{m} Y_{dd,km} \cdot v_{m,(n+1)} + (\Yds)_k \cdot \vect{v}_s$
+		\STATE $Q_k^{(n+1)} = \im\left(v_{k,(n+1)} \cdot i_{k,(n+1)}^*\right)$
+		\STATE $Q_k^{(n+1)} = \max\big(Q_k^{\min},\, \min(Q_k^{\max},\, Q_k^{(n+1)})\big)$ \COMMENT{Q-Limits}
+		\ENDFOR
+		
+		\STATE
+		\STATE \textit{\% Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren}
+		\STATE $s_k^{(n+1)} = P_k^{\spec} + \jj Q_k^{(n+1)}$ für alle $k \in \Omega_{\text{PV}}$
+		\STATE Aktualisiere $\vect{A}^{(n+1)}$ gemäß \eqref{eq:methode_b_A_update}
+		\IF{$\alpha_{Z,k} \neq 0$ für ein $k \in \Omega_{\text{PV}}$}
+		\STATE Aktualisiere $\vect{B}^{(n+1)}$ und $(\vect{B}^{(n+1)})^{-1}$ \COMMENT{Rang-1-Update}
+		\ENDIF
+		\IF{$\alpha_{I,k} \neq 0$ für ein $k \in \Omega_{\text{PV}}$}
+		\STATE Aktualisiere $\vect{c}^{(n+1)}$
+		\ENDIF
+		\STATE $\vect{F}^{(n+1)} = -(\vect{B}^{(n+1)})^{-1}\vect{A}^{(n+1)}$
+		\STATE $\vect{w}^{(n+1)} = -(\vect{B}^{(n+1)})^{-1}\vect{c}^{(n+1)}$
+		
+		\STATE
+		\STATE \textit{\% Konvergenz prüfen}
+		\STATE Berechne Leistungsmismatch an PQ-Knoten
+		\STATE $\text{tol} = \max\|\vect{s}^{\spec}_{\text{PQ}} - \vect{s}_{\text{PQ,calc}}^{(n+1)}\|$
+		\STATE $n = n + 1$
+		
+		\ENDWHILE
+		\RETURN $\vect{v}_{(n)}$, $\{Q_k^{(n)}\}_{k \in \Omega_{\text{PV}}}$
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{Eigenschaften und Diskussion}
+\label{subsec:methode_b_diskussion}
+
+\paragraph{Vergleich mit Methode A.}
+\begin{itemize}
+	\item Methode~B hat nur eine \textit{einzige Schleife}. Dies vereinfacht die Implementierung und vermeidet die vollständige Konvergenz einer inneren Schleife bei jedem äußeren Schritt.
+	\item Die Spannungsbedingung $|v_k| = |V_k^{\spec}|$ wird in \textit{jeder} Iteration exakt eingehalten.
+	\item Die Q-Bestimmung \eqref{eq:methode_b_Q} ist \textit{exakt} (keine Linearisierung), während Methode~A die Näherungsformel \eqref{eq:methode_a_dQ} verwendet.
+	\item Die Hilfsmatrizen müssen in jeder Iteration aktualisiert werden (im allgemeinen ZIP-Fall), während sie bei Methode~A innerhalb der inneren Schleife konstant bleiben.
+\end{itemize}
+
+\paragraph{Kosten der Matrix-Updates.}
+Die Aktualisierung der Hilfsmatrizen in Schritt~4 hat unterschiedliche Kosten je nach ZIP-Modell am PV-Knoten:
+
+\begin{table}[H]
+	\centering
+	\caption{Kosten der Hilfsmatrizen-Aktualisierung in Methode~B pro Iteration.}
+	\label{tab:methode_b_update_kosten}
+	\begin{tabular}{@{}lcc@{}}
+		\toprule
+		\textbf{Operation} & \textbf{$\alpha_{Z,k} = 0$} & \textbf{$\alpha_{Z,k} \neq 0$} \\
+		\midrule
+		$\vect{A}^{(n+1)}$: Diagonalelemente setzen & $\mathcal{O}(n_{\text{PV}})$ & $\mathcal{O}(n_{\text{PV}})$ \\
+		$(\vect{B}^{(n+1)})^{-1}$: Rang-1-Update & entfällt & $\mathcal{O}((b\phi)^2 \cdot n_{\text{PV}})$ \\
+		$\vect{c}^{(n+1)}$: Element-Update & entfällt$^*$ & $\mathcal{O}(n_{\text{PV}})$ \\
+		$\vect{F}^{(n+1)} = -\vect{B}^{-1}\vect{A}^{(n+1)}$ & $\mathcal{O}(b\phi \cdot n_{\text{PV}})^{**}$ & $\mathcal{O}((b\phi)^2)$ \\
+		$\vect{w}^{(n+1)} = -\vect{B}^{-1}\vect{c}^{(n+1)}$ & entfällt$^*$ & $\mathcal{O}((b\phi)^2)$ \\
+		\midrule
+		\textbf{Gesamt} & $\mathcal{O}(b\phi \cdot n_{\text{PV}})$ & $\mathcal{O}((b\phi)^2 \cdot n_{\text{PV}})$ \\
+		\bottomrule
+	\end{tabular}\\[3pt]
+	{\footnotesize $^*$ Falls zusätzlich $\alpha_{I,k} = 0$. \quad $^{**}$ Da nur $n_{\text{PV}}$ Spalten von $\vect{F}$ sich ändern (Spalten-Skalierung).}
+\end{table}
+
+Für den häufigen Spezialfall $\alpha_{Z,k} = \alpha_{I,k} = 0$ am PV-Knoten dominiert die Berechnung von $\vect{F}^{(n+1)}$, die sich auf eine Skalierung von $n_{\text{PV}}$ Spalten der konstanten Matrix $\vect{B}^{-1}$ reduziert. Da $\vect{A}$ eine Diagonalmatrix ist, gilt:
+\begin{equation}
+	[\vect{F}^{(n+1)}]_{:,k} = -\vect{B}^{-1}_{:,k} \cdot A_{kk}^{(n+1)} = -\vect{B}^{-1}_{:,k} \cdot \alpha_{P,k} \cdot s_k^{*(n+1)}
+	\label{eq:F_spalte_update}
+\end{equation}
+
+Nur die $n_{\text{PV}}$ Spalten von $\vect{F}$, die PV-Knoten entsprechen, müssen aktualisiert werden. Die übrigen $(b\phi - n_{\text{PV}})$ Spalten bleiben unverändert.
+
+%======================================================================
 \section{Tensorformulierung der Methoden}
 \label{sec:tensor_formulierung}
-% TODO
+%======================================================================
 
-\section{Theoretischer Vergleich}
-\label{sec:vergleich_theorie}
-% TODO
+In diesem Abschnitt wird gezeigt, wie die in \cref{sec:methode_a,sec:methode_b} entwickelten Methoden für die gleichzeitige Berechnung von $\tau$ Lastflüssen im Tensor-Rahmen formuliert werden können.
+
+\subsection{Recap: Tensor-Reshape und allgemeine FPI}
+\label{subsec:tensor_recap}
+
+Gemäß \cref{sec:tpf_formulierungen} werden alle $\tau$ Leistungsvektoren als Spalten der Matrix $\dotS \in \C^{b\phi \times \tau}$ angeordnet. Die tensorisierte FPI in ihrer allgemeinen Form lautet:
+\begin{equation}
+	\dotV_{(n+1)} = \vect{F}^{(n)} \cdot \dotV_{(n)}^{*\eleminv} + \dot{W}^{(n)}
+	\label{eq:tensor_fpi_allgemein}
+\end{equation}
+
+wobei $\dot{W}^{(n)} = [\vect{w}^{(n)}, \ldots, \vect{w}^{(n)}] \in \C^{b\phi \times \tau}$ und $\dotV_{(n)}^{*\eleminv}$ die element-weise Anwendung der Operation ``konjugieren und Kehrwert bilden'' auf alle Elemente der Matrix darstellt.
+
+Im reinen PQ-Fall sind $\vect{F}$ und $\vect{w}$ konstant über alle Iterationen und alle $\tau$ Szenarien. Die Situation ändert sich bei PV-Knoten:
+
+\paragraph{Szenarioabhängigkeit.}
+Im Allgemeinen haben verschiedene Szenarien $i$ und $j$ unterschiedliche Lastbedingungen und damit unterschiedliche Q-Werte am selben PV-Knoten:
+\begin{equation}
+	Q_k^{(n)}[i] \neq Q_k^{(n)}[j] \quad \Rightarrow \quad s_k^{*(n)}[i] \neq s_k^{*(n)}[j]
+	\label{eq:szenarioabh}
+\end{equation}
+
+Dies bedeutet, dass der Leistungsvektor für verschiedene Szenarien unterschiedlich ist. Folglich wären im allgemeinen Fall die Matrizen $\vect{A}$, $\vect{B}$, $\vect{F}$, $\vect{w}$ für \textit{jedes Szenario} unterschiedlich -- was die Tensor-Parallelisierung zunichte machen würde.
+
+\paragraph{Die rettende Eigenschaft: Nur $\vect{A}$ ist szenarioabhängig (für $\alpha_{Z,k} = 0$).}
+Wenn am PV-Knoten $\alpha_{Z,k} = 0$ gilt, dann hängt $\vect{B}$ nicht von $\vect{s}$ ab und ist daher für alle Szenarien und Iterationen \textit{identisch}. Ebenso ist $\vect{c}$ konstant falls $\alpha_{I,k} = 0$. Der Tensor-Trick bleibt erhalten, indem die szenarioabhängige Matrix $\vect{A}^{(n)}$ in die Hadamard-Struktur aufgelöst wird.
+
+\subsection{Umformulierung für den Tensor-Fall}
+\label{subsec:tensor_umformulierung}
+
+Für den Spezialfall $\alpha_{Z,k} = \alpha_{I,k} = 0$ am PV-Knoten schreibt sich die Iteration \eqref{eq:pv_fpi_explizit2} als:
+\begin{equation}
+	\vect{v}_{(n+1)} = -\vect{B}^{-1} \cdot \left[(\alpha_P \had \vect{s}^{*(n)}) \had \vect{v}_{(n)}^{*\eleminv}\right] - \vect{B}^{-1}\vect{c}
+	\label{eq:tensor_umform1}
+\end{equation}
+
+wobei $\vect{B}^{-1}$ und $\vect{c}$ konstant sind. Im Tensor-Format:
+\begin{equation}
+	\dotV_{(n+1)} = -\vect{B}^{-1} \cdot \underbrace{\left[(\alpha_P \had \dotS^{*(n)}) \had \dotV_{(n)}^{*\eleminv}\right]}_{\in \C^{b\phi \times \tau}} + \dot{W}
+	\label{eq:tensor_umform2}
+\end{equation}
+
+Die Matrix $\dotS^{*(n)} \in \C^{b\phi \times \tau}$ enthält die szenario- und iterationsabhängigen Leistungswerte. Entscheidend ist: Die \textit{linke} Matrix $\vect{B}^{-1}$ ist für alle $\tau$ Szenarien und alle Iterationen \textit{identisch}. Die Multiplikation $\vect{B}^{-1} \cdot (\ldots)$ bleibt eine einzige Matrix-Matrix-Multiplikation -- unabhängig davon, ob sich $\dotS^{(n)}$ zwischen den Iterationen ändert.
+
+\paragraph{Allgemeiner ZIP-Fall ($\alpha_{Z,k} \neq 0$).}
+Wenn $\vect{B}$ szenarioabhängig wird, ist die Tensor-Parallelisierung in der dense-Formulierung nicht mehr direkt möglich, da jedes Szenario seine eigene Matrix $(\vect{B}^{(n)}[i])^{-1}$ benötigen würde. In diesem Fall muss auf die sparse-Formulierung zurückgegriffen werden, bei der die Block-Diagonalmatrix $\dotM$ (vgl.\ \eqref{eq:block_diagonal}) ohnehin szenarioabhängige Blöcke enthält. Die einmalige Faktorisierung geht dann zwar verloren, aber die Block-Diagonalstruktur ermöglicht weiterhin eine effiziente parallele Lösung.
+
+In der Praxis ist dieser Fall selten, da Generatoren als leistungskonstant modelliert werden. Für den Rest dieses Abschnitts wird daher $\alpha_{Z,k} = \alpha_{I,k} = 0$ am PV-Knoten vorausgesetzt.
+
+\subsection{Tensorformulierung von Methode A}
+\label{subsec:tensor_methode_a}
+
+Bei Methode~A werden alle $\tau$ Lastflüsse \textit{gleichzeitig} in der inneren Schleife berechnet. Die Q-Korrektur in der äußeren Schleife wird element-weise über alle $\tau$ Szenarien ausgeführt:
+
+\paragraph{Innere Schleife (Matrix-Matrix-Multiplikation).}
+In jeder äußeren Iteration $\ell$ wird $\vect{F}^{(\ell)}$ aktualisiert und die innere Schleife parallelisiert:
+\begin{equation}
+	\dotV_{(n+1)} = \vect{F}^{(\ell)} \cdot \dotV_{(n)}^{*\eleminv} + \dot{W}
+	\label{eq:tensor_a_inner}
+\end{equation}
+
+Dies ist eine einzige Multiplikation $\vect{F}^{(\ell)} \in \C^{b\phi \times b\phi}$ mit $\dotV_{(n)}^{*\eleminv} \in \C^{b\phi \times \tau}$ für alle $\tau$ Lastflüsse gleichzeitig. Da $\vect{F}^{(\ell)}$ innerhalb der inneren Schleife konstant ist, ist dies exakt die TPF-Operation aus \cref{alg:tpf_dense}.
+
+\paragraph{Bemerkung zur Szenarioabhängigkeit.}
+Im Tensor-Fall hat jedes Szenario $i$ einen anderen Leistungsvektor $\dotS[:,i]$ und damit nach der äußeren Q-Korrektur einen anderen Q-Wert $Q_k^{(\ell)}[i]$. Die aktualisierte Matrix $\vect{A}^{(\ell)}$ müsste eigentlich szenarioabhängig sein. Für Methode~A im Tensor-Setting wird daher die innere Schleife umformuliert als:
+\begin{equation}
+	\dotV_{(n+1)} = -\vect{B}^{-1} \cdot \left[(\alpha_P \had \dotS^{*(\ell)}) \had \dotV_{(n)}^{*\eleminv}\right] + \dot{W}
+	\label{eq:tensor_a_inner_explizit}
+\end{equation}
+
+wobei $\dotS^{*(\ell)} \in \C^{b\phi \times \tau}$ für jedes Szenario den aktuellen Leistungsvektor enthält und innerhalb der inneren Schleife \textit{fest} ist. Die Operation $(\alpha_P \had \dotS^{*(\ell)}) \had \dotV_{(n)}^{*\eleminv}$ ist eine rein element-weise Operation auf der $b\phi \times \tau$-Matrix und die anschließende Multiplikation mit $\vect{B}^{-1}$ ist eine Matrix-Matrix-Multiplikation. Der Tensor-Vorteil bleibt vollständig erhalten.
+
+\paragraph{Äußere Schleife (element-weise, trivial parallel).}
+\begin{equation}
+	\Delta Q[k,:] = \frac{|V_k^{\spec}|^2 - |\dotV^{(\ell)}_{\conv}[k,:]|^2}{2 \cdot X_{kk}}, \quad \forall k \in \Omega_{\text{PV}}
+	\label{eq:tensor_a_dQ}
+\end{equation}
+
+Die Division durch den Skalar $2X_{kk}$ wirkt gleichzeitig auf alle $\tau$ Szenarien und ist trivial parallelisierbar.
+
+\subsection{Tensorformulierung von Methode B}
+\label{subsec:tensor_methode_b}
+
+Methode~B erfordert keine verschachtelte Schleifenstruktur und ist besonders gut für die Tensorisierung geeignet. Die vier Schritte (\cref{alg:methode_b}) werden direkt auf den Tensor-Fall übertragen:
+
+\paragraph{Schritt 1: FPI (Matrix-Matrix-Multiplikation).}
+\begin{equation}
+	\dotV_{(n+1)}' = -\vect{B}^{-1} \cdot \left[(\alpha_P \had \dotS^{*(n)}) \had \dotV_{(n)}^{*\eleminv}\right] + \dot{W}
+	\label{eq:tensor_b_fpi}
+\end{equation}
+
+Die Matrix $\vect{B}^{-1}$ bleibt über alle Iterationen und Szenarien konstant (für $\alpha_{Z,k} = 0$). Die szenario- und iterationsabhängige Information steckt vollständig in $\dotS^{*(n)}$, welches sich an den PV-Knoten-Zeilen zwischen den Iterationen ändert.
+
+\paragraph{Schritt 2: Projektion (element-weise).}
+\begin{equation}
+	\dotV_{(n+1)}[k,:] = |V_k^{\spec}| \cdot \frac{\dotV_{(n+1)}'[k,:]}{|\dotV_{(n+1)}'[k,:]|}, \quad \forall k \in \Omega_{\text{PV}}
+	\label{eq:tensor_b_proj}
+\end{equation}
+
+Betragsberechnung und Division wirken element-weise auf die Zeile $[k,:]$ und damit gleichzeitig auf alle $\tau$ Szenarien.
+
+\paragraph{Schritt 3: Stromberechnung und Q-Rückrechnung.}
+\begin{equation}
+	\dot{I}_{\text{PV}} = \Ydd[\Omega_{\text{PV}}, :] \cdot \dotV_{(n+1)} + \Yds[\Omega_{\text{PV}}, :] \cdot \vect{v}_s
+	\label{eq:tensor_b_strom_matrix}
+\end{equation}
+
+Dies ist eine Matrix-Matrix-Multiplikation der Dimension $(n_{\text{PV}} \times b\phi) \cdot (b\phi \times \tau) = (n_{\text{PV}} \times \tau)$. Die Blindleistung ergibt sich element-weise:
+\begin{equation}
+	\dot{Q}_{\text{PV}}^{(n+1)} = \im\left(\dotV_{(n+1)}[\Omega_{\text{PV}}, :] \had \dot{I}_{\text{PV}}^*\right) \in \R^{n_{\text{PV}} \times \tau}
+	\label{eq:tensor_b_Q_matrix}
+\end{equation}
+
+\paragraph{Schritt 4: $\dotS$-Update (element-weise).}
+\begin{equation}
+	\dotS^{(n+1)}[k,:] = P_k^{\spec} + \jj \dot{Q}_{\text{PV}}^{(n+1)}[k,:], \quad \forall k \in \Omega_{\text{PV}}
+	\label{eq:tensor_b_s_update}
+\end{equation}
+
+\subsection{Gesamtvergleich der Tensor-Operationen}
+\label{subsec:tensor_vergleich}
+
+\begin{table}[H]
+	\centering
+	\caption{Rechentechnischer Vergleich der Tensor-Operationen pro Iteration (Spezialfall $\alpha_{Z,k} = \alpha_{I,k} = 0$ am PV-Knoten).}
+	\label{tab:tensor_vergleich}
+	\begin{tabular}{@{}p{4cm}p{4.5cm}cc@{}}
+		\toprule
+		\textbf{Operation} & \textbf{Dimension} & \textbf{Kosten} & \textbf{Gleich wie PQ?} \\
+		\midrule
+		$\vect{B}^{-1} \cdot (\ldots)$ & $(b\phi)^2 \cdot \tau$ & Dominant & Ja \\
+		Projektion & $n_{\text{PV}} \cdot \tau$ (element-weise) & Minimal & -- \\
+		$Y_{dd, \text{PV}} \cdot \dotV$ & $n_{\text{PV}} \cdot b\phi \cdot \tau$ & Gering$^*$ & -- \\
+		Q-Berechnung & $n_{\text{PV}} \cdot \tau$ (element-weise) & Minimal & -- \\
+		$\dotS$-Update & $n_{\text{PV}} \cdot \tau$ (element-weise) & Minimal & -- \\
+		\midrule
+		$\vect{B}^{-1}$ \textbf{konstant?} & & \textbf{Ja} & \\
+		\textbf{Tensor-Parallelisierung?} & & \textbf{Ja} & \\
+		\bottomrule
+	\end{tabular}\\[3pt]
+	{\footnotesize $^*$ $n_{\text{PV}} \ll b\phi$ in typischen Verteilnetzen, daher vernachlässigbar gegenüber der Hauptoperation.}
+\end{table}
+
+\subsection{Zusammenfassung: Warum die Parallelisierung erhalten bleibt}
+\label{subsec:tensor_zusammenfassung}
+
+Die Analyse zeigt, dass auch bei Verwendung der allgemeinen FPI-Formulierung \eqref{eq:pv_fpi_basis} der Tensor-Parallelisierungsvorteil erhalten bleibt, sofern die folgende Bedingung erfüllt ist:
+
+\begin{equation}
+	\alpha_{Z,k} = 0, \quad \forall k \in \Omega_{\text{PV}}
+	\label{eq:tensor_bedingung}
+\end{equation}
+
+Unter dieser Bedingung -- die für leistungskonstante Generatoren stets erfüllt ist -- gilt:
+\begin{enumerate}
+	\item Die Matrix $\vect{B}^{-1}$ ist \textbf{konstant über alle Iterationen und alle $\tau$ Szenarien}. Ihre einmalige Berechnung (oder Faktorisierung im sparse-Fall) wird über die gesamte Rechnung wiederverwendet.
+	\item Die teure Operation (Matrix-Matrix-Multiplikation $\vect{B}^{-1} \cdot (\ldots)$) ist \textbf{strukturell identisch} zum reinen PQ-Fall und profitiert uneingeschränkt von BLAS/GPU-Parallelisierung.
+	\item Die Änderung des Leistungsvektors $\dotS^{(n)}$ an PV-Knoten betrifft nur die \textbf{rechte Seite} des Produkts (den Vektor, der mit $\vect{B}^{-1}$ multipliziert wird) und nicht die Matrix selbst.
+	\item Die zusätzlichen Operationen (Projektion, Stromberechnung, Q-Update) sind entweder element-weise oder von deutlich geringerer Dimension ($n_{\text{PV}} \ll b\phi$) und damit vernachlässigbar.
+	\item Die einzige Einschränkung ist eine erhöhte Iterationszahl: Methode~B benötigt typischerweise 8--15 statt 5--10 Iterationen, Methode~A benötigt 15--50 FPI-Evaluierungen. Der Speedup pro Iteration bleibt jedoch unverändert.
+\end{enumerate}
+
+Wenn $\alpha_{Z,k} \neq 0$ am PV-Knoten gilt, geht der Tensor-Vorteil in der dense-Formulierung teilweise verloren, da $\vect{B}^{-1}$ szenarioabhängig wird. In diesem Fall bietet die sparse-Formulierung (\cref{subsec:tpf_sparse}) mit szenarioabhängigen Diagonalblöcken in $\dotM$ eine Alternative, wobei die Block-Diagonalstruktur eine parallele Lösung ermöglicht.
+
+Die quantitative Bewertung des resultierenden Gesamtspeedups gegenüber konventionellen Verfahren ist Gegenstand von \cref{ch:ergebnisse}.
