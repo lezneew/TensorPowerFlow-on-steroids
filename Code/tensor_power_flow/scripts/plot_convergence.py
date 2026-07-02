@@ -1,11 +1,16 @@
 # tensor_power_flow/scripts/plot_convergence.py
 """
-Konvergenz-Plot: PV |V|-Fehler über Outer-Iterationen für alle Testnetze
-=========================================================================
+Konvergenz-Plot: PV |V|-Fehler und Gesamtnetz-Fehler über Iterationen
+=======================================================================
+
+Plot 1: PV |V|-Fehler vs. Outer-Iteration (nur PV-Knoten Sollwertabweichung)
+Plot 2: Gesamtnetz max(||V_new|-|V_old||) vs. kumulative Inner-Iteration
+         → zeigt Konvergenzverhalten ALLER Busse (PQ + PV)
 """
 import numpy as np
 import matplotlib.pyplot as plt
-import sys, os
+import sys
+import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
@@ -26,9 +31,12 @@ def collect_convergence_data(networks: dict, omega: float = 1.0):
     Returns
     -------
     data : list[dict] mit keys:
-        - name, eta, n_pv, converged
+        - name, eta, n_pv, n_bus, converged
         - pv_v_errors: list[float] (PV |V|-Fehler pro Outer-Iteration)
         - inner_tols: list[float] (Inner-FPI Toleranz pro Outer)
+        - inner_per_outer: list[int]
+        - inner_v_change_all: list[float] (Gesamtnetz-Fehler pro Inner-Iter)
+        - outer_start_indices: list[int] (wo Outer-Iter in der flachen Liste starten)
     """
     data = []
 
@@ -62,20 +70,25 @@ def collect_convergence_data(networks: dict, omega: float = 1.0):
             result = solver.solve(network)
 
             if solver.pv_info and solver.pv_info.pv_v_error_history:
+                pv_info = solver.pv_info
                 record = {
                     "name": name,
                     "eta": eta,
                     "n_pv": network.n_pv,
                     "n_bus": network.n_bus_phases,
                     "converged": result.converged,
-                    "outer_iter": solver.pv_info.outer_iterations,
-                    "pv_v_errors": solver.pv_info.pv_v_error_history,
-                    "inner_tols": solver.pv_info.v_change_history,
-                    "inner_per_outer": solver.pv_info.inner_iterations_per_outer,
+                    "outer_iter": pv_info.outer_iterations,
+                    "pv_v_errors": pv_info.pv_v_error_history,
+                    "inner_tols": pv_info.v_change_history,
+                    "inner_per_outer": pv_info.inner_iterations_per_outer,
+                    # NEU: Gesamtnetz-Fehler (alle Busse)
+                    "inner_v_change_all": pv_info.inner_v_change_all,
+                    "outer_start_indices": pv_info.outer_start_indices,
                 }
                 data.append(record)
                 status = "✓" if result.converged else "✗"
-                print(f"{status} ({record['outer_iter']} outer)")
+                print(f"{status} ({record['outer_iter']} outer, "
+                      f"{pv_info.inner_iterations_total} inner total)")
             else:
                 print("keine Historie verfügbar")
 
@@ -89,8 +102,8 @@ def plot_convergence(data: list[dict], save_path: str = None):
     """
     Erstellt den Konvergenz-Plot.
 
-    Subplot 1: PV |V|-Fehler vs. Outer-Iteration (alle Netze)
-    Subplot 2: Kumulative Inner-Iterationen vs. PV |V|-Fehler
+    Subplot 1: PV |V|-Fehler vs. Outer-Iteration (PV-Knoten Abweichung)
+    Subplot 2: Gesamtnetz max(|ΔV|) vs. kumulative Inner-Iteration (ALLE Busse)
     """
     fig, axes = plt.subplots(1, 2, figsize=(16, 7))
 
@@ -98,7 +111,6 @@ def plot_convergence(data: list[dict], save_path: str = None):
     cmap = plt.cm.tab20
     colors = [cmap(i / max(len(data), 1)) for i in range(len(data))]
 
-    # Marker für konvergiert/divergiert
     marker_conv = "o"
     marker_div = "x"
 
@@ -127,57 +139,77 @@ def plot_convergence(data: list[dict], save_path: str = None):
             alpha=0.85,
         )
 
-    # Toleranzlinie
     ax1.axhline(y=1e-6, color="green", linestyle=":", linewidth=1.5,
                 label="tol_pv = 1e-6")
     ax1.axhline(y=1e-4, color="orange", linestyle=":", linewidth=1.0,
                 label="1e-4 (PASS-Kriterium)")
 
-    ax1.set_xlabel("Outer-Iteration ℓ", fontsize=12)
-    ax1.set_ylabel("max |V_PV| - |V_spec|| [p.u.]", fontsize=12)
-    ax1.set_title("Methode A: PV-Spannungsfehler vs. Outer-Iteration", fontsize=13)
+    ax1.set_xlabel("Äußere Iteration ℓ", fontsize=12)
+    ax1.set_ylabel("max ||V_PV| - V_spec|| [p.u.]", fontsize=12)
+    ax1.set_title("PV-Spannungsfehler vs. Outer-Iteration", fontsize=13)
     ax1.legend(fontsize=8, loc="upper right", ncol=1)
     ax1.grid(True, which="both", alpha=0.3)
     ax1.set_xlim(left=0.5)
     ax1.set_ylim(bottom=1e-8, top=1e1)
 
     # ══════════════════════════════════════════════════════════════
-    #  Plot 2: PV |V|-Fehler vs. kumulative Inner-Iterationen
+    #  Plot 2: Gesamtnetz-Fehler vs. kumulative Inner-Iteration
+    #           max(||V_new| - |V_old||) über ALLE Busse (PQ + PV)
     # ══════════════════════════════════════════════════════════════
     ax2 = axes[1]
 
     for i, rec in enumerate(data):
-        errors = rec["pv_v_errors"]
-        inner_per_outer = rec["inner_per_outer"]
+        v_changes = rec["inner_v_change_all"]
+        outer_starts = rec["outer_start_indices"]
 
-        # Kumulative innere Iterationen
-        cum_inner = np.cumsum(inner_per_outer[:len(errors)])
+        if not v_changes:
+            continue
+
+        # X-Achse: kumulative Inner-Iteration (1-basiert)
+        x = list(range(1, len(v_changes) + 1))
 
         marker = marker_conv if rec["converged"] else marker_div
         linestyle = "-" if rec["converged"] else "--"
 
-        label = f"{rec['name']} ({rec['n_bus']} Busse)"
+        label = f"{rec['name']} ({rec['n_bus']} Busse, PV={rec['n_pv']})"
 
         ax2.semilogy(
-            cum_inner, errors,
+            x, v_changes,
             color=colors[i],
             marker=marker,
-            markersize=4,
+            markersize=2,
             linestyle=linestyle,
-            linewidth=1.5,
+            linewidth=1.2,
             label=label,
-            alpha=0.85,
+            alpha=0.8,
         )
 
-    ax2.axhline(y=1e-6, color="green", linestyle=":", linewidth=1.5,
-                label="tol_pv = 1e-6")
+        # Markiere Outer-Iteration Grenzen mit vertikalen Linien
+        for idx_start in outer_starts[1:]:  # Erste überspringen (ist 0)
+            if idx_start < len(v_changes):
+                ax2.axvline(
+                    x=idx_start + 1,
+                    color=colors[i],
+                    linestyle=":",
+                    linewidth=0.5,
+                    alpha=0.3,
+                )
 
-    ax2.set_xlabel("Kumulative Inner-Iterationen (Gesamt-FPI-Schritte)", fontsize=12)
-    ax2.set_ylabel("max ||V_PV| - |V_spec|| [p.u.]", fontsize=12)
-    ax2.set_title("Methode A: PV-Fehler vs. Rechenaufwand", fontsize=13)
+    ax2.axhline(y=1e-8, color="green", linestyle=":", linewidth=1.5,
+                label="tol_inner = 1e-8")
+    ax2.axhline(y=1e-6, color="blue", linestyle="-.", linewidth=1.0,
+                label="1e-6")
+
+    ax2.set_xlabel("Kumulative Inner-Iteration (Gesamt-FPI-Schritte)", fontsize=12)
+    ax2.set_ylabel("max ||V_new| - |V_old|| [p.u.]\n(alle Busse: PQ + PV)", fontsize=12)
+    ax2.set_title(
+        "Gesamtnetz-Konvergenz: Spannungsänderung aller Busse\n"
+        "(vertikale Linien = Q-Update / Outer-Iteration)",
+        fontsize=12,
+    )
     ax2.legend(fontsize=8, loc="upper right", ncol=1)
     ax2.grid(True, which="both", alpha=0.3)
-    ax2.set_ylim(bottom=1e-8, top=1e1)
+    ax2.set_ylim(bottom=1e-12, top=1e1)
 
     plt.tight_layout()
 
@@ -190,19 +222,17 @@ def plot_convergence(data: list[dict], save_path: str = None):
 
 def plot_convergence_single(data: list[dict], save_path: str = None):
     """
-    Einzelner, übersichtlicher Plot: PV |V|-Fehler vs. Outer-Iteration.
+    Einzelner Plot: PV |V|-Fehler vs. Outer-Iteration.
     Farbcodiert nach Konvergenz-Status.
     """
     fig, ax = plt.subplots(figsize=(12, 7))
 
-    # Separate Listen für konvergiert / divergiert
     conv_data = [d for d in data if d["converged"]]
     div_data = [d for d in data if not d["converged"]]
 
     cmap_conv = plt.cm.Greens
     cmap_div = plt.cm.Reds
 
-    # ── Konvergierte Netze (grün-Töne) ──
     for i, rec in enumerate(conv_data):
         errors = rec["pv_v_errors"]
         iters = list(range(1, len(errors) + 1))
@@ -219,13 +249,12 @@ def plot_convergence_single(data: list[dict], save_path: str = None):
             alpha=0.9,
         )
 
-    # ── Divergierte Netze (rot-Töne) ──
     for i, rec in enumerate(div_data):
         errors = rec["pv_v_errors"]
         iters = list(range(1, len(errors) + 1))
         color = cmap_div(0.4 + 0.5 * i / max(len(div_data), 1))
 
-        ax.semilogy(
+        ax.loglog(
             iters, errors,
             color=color,
             marker="x",
@@ -236,13 +265,11 @@ def plot_convergence_single(data: list[dict], save_path: str = None):
             alpha=0.8,
         )
 
-    # ── Referenzlinien ──
     ax.axhline(y=1e-6, color="blue", linestyle=":", linewidth=2.0,
                label="tol_pv = 1e-6 (Konvergenzkriterium)")
     ax.axhline(y=1e-4, color="darkorange", linestyle="-.", linewidth=1.5,
                label="1e-4 (PASS-Schwelle)")
 
-    # ── Formatierung ──
     ax.set_xlabel("Äußere Iteration ℓ", fontsize=13)
     ax.set_ylabel("max ||V_PV,k| - V_spec,k|| [p.u.]", fontsize=13)
     ax.set_title(
@@ -266,6 +293,98 @@ def plot_convergence_single(data: list[dict], save_path: str = None):
     plt.show()
 
 
+def plot_network_error_only(data: list[dict], save_path: str = None):
+    """
+    Dedizierter Plot NUR für die Gesamtnetz-Konvergenz (alle Busse).
+
+    Zeigt max(||V_new| - |V_old||) pro Inner-Iteration für JEDES Netz.
+    Vertikale Markierungen zeigen Q-Updates (Outer-Iterationsgrenzen).
+    """
+    fig, ax = plt.subplots(figsize=(14, 8))
+
+    cmap = plt.cm.tab20
+    colors = [cmap(i / max(len(data), 1)) for i in range(len(data))]
+
+    for i, rec in enumerate(data):
+        v_changes = rec["inner_v_change_all"]
+        outer_starts = rec["outer_start_indices"]
+
+        if not v_changes:
+            continue
+
+        x = list(range(1, len(v_changes) + 1))
+
+        marker = "o" if rec["converged"] else "x"
+        linestyle = "-" if rec["converged"] else "--"
+        alpha = 0.85 if rec["converged"] else 0.6
+
+        label = (f"{rec['name']} "
+                 f"(n={rec['n_bus']}, PV={rec['n_pv']}, η={rec['eta']:.2f})")
+
+        # ax.semilogy(
+        #     x, v_changes,
+        #     color=colors[i],
+        #     marker=marker,
+        #     markersize=2,
+        #     linestyle=linestyle,
+        #     linewidth=1.3,
+        #     label=label,
+        #     alpha=alpha,
+        # )
+
+        # Markiere Outer-Grenzen
+        for j, idx_start in enumerate(outer_starts[1:], start=1):
+            if idx_start < len(v_changes):
+                ax.axvline(
+                    x=idx_start + 1,
+                    color=colors[i],
+                    linestyle=":",
+                    linewidth=0.6,
+                    alpha=0.4,
+                )
+
+    # Referenzlinien
+    ax.axhline(y=1e-8, color="green", linestyle=":", linewidth=2.0,
+               label="tol_inner = 1e-8")
+    ax.axhline(y=1e-6, color="blue", linestyle="-.", linewidth=1.5,
+               label="1e-6")
+    ax.axhline(y=1e-4, color="darkorange", linestyle="-.", linewidth=1.0,
+               label="1e-4")
+
+    ax.set_xlabel("Kumulative Inner-Iteration (Gesamt-FPI-Schritte über alle Outer)", fontsize=12)
+    ax.set_ylabel("max ||V_new| - |V_old|| über alle Busse (PQ + PV) [p.u.]", fontsize=12)
+    ax.set_title(
+        "Gesamtnetz-Konvergenz: Spannungsänderung pro FPI-Schritt\n"
+        "(Spitzen = Q-Update bricht lokale Konvergenz → erneute FPI)",
+        fontsize=13,
+    )
+
+    ax.legend(fontsize=8, loc="upper right", ncol=1, framealpha=0.9)
+    ax.grid(True)
+    ax.grid(True)
+    ax.set_ylim(bottom=1e-12, top=1e0)
+    ax.set_xlim(left=0.5)
+    ax.loglog()
+    # Annotation: Erklärung der Spitzen
+    ax.annotate(
+        "Q-Update\n(Outer-Iter)",
+        xy=(0.75, 0.85),
+        xycoords="axes fraction",
+        fontsize=9,
+        color="gray",
+        ha="center",
+        style="italic",
+    )
+
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
+        print(f"\n  Plot gespeichert: {save_path}")
+
+    plt.show()
+
+
 # ══════════════════════════════════════════════════════════════════════
 #  Main
 # ══════════════════════════════════════════════════════════════════════
@@ -275,12 +394,14 @@ def main():
 
     parser = argparse.ArgumentParser(description="Konvergenz-Plot Methode A")
     parser.add_argument("--suite", choices=["quick", "radial", "full"],
-                        default="radial")
+                        default="full")
     parser.add_argument("--omega", type=float, default=1.0)
     parser.add_argument("--save", type=str, default=None,
                         help="Pfad zum Speichern des Plots (z.B. convergence.png)")
-    parser.add_argument("--single", action="store_true",
-                        help="Nur einen einzelnen Plot statt Doppelplot")
+    parser.add_argument("--plot", choices=["both", "pv_only", "net_only"],
+                        default="both",
+                        help="both: Doppelplot, pv_only: nur PV-Fehler, "
+                             "net_only: nur Gesamtnetz-Fehler")
     args = parser.parse_args()
 
     print("╔═══════════════════════════════════════════════════════════════╗")
@@ -313,10 +434,12 @@ def main():
     # Plot
     save_path = args.save or f"convergence_method_a_omega{args.omega}.png"
 
-    if args.single:
-        plot_convergence_single(data, save_path=save_path)
-    else:
+    if args.plot == "both":
         plot_convergence(data, save_path=save_path)
+    elif args.plot == "pv_only":
+        plot_convergence_single(data, save_path=save_path)
+    elif args.plot == "net_only":
+        plot_network_error_only(data, save_path=save_path)
 
 
 if __name__ == "__main__":

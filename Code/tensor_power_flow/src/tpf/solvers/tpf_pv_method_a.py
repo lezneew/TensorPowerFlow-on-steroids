@@ -24,17 +24,12 @@ Algorithmus:
 │  Schlüsselvorteil: K und L bleiben über ALLE Iterationen    │
 │  konstant → Parallelisierbarkeit bleibt erhalten!           │
 └─────────────────────────────────────────────────────────────┘
-
-Referenzen:
-- Exposé Methode A (Thévenin-basierte Q-Korrektur)
-- Giraldo et al. (2022): FPI/SAM Konvergenzbeweis
-- Costa et al. (1999): PV-Behandlung über Current Injection
 """
 
 import numpy as np
 from numpy.typing import NDArray
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from tpf.core.network import NetworkData
 from tpf.core.results import PowerFlowResult
@@ -46,7 +41,6 @@ from tpf.solvers.base_solver import BaseSolver
 # ══════════════════════════════════════════════════════════════════════
 
 @dataclass
-@dataclass
 class PVConvergenceInfo:
     """Detaillierte Konvergenz-Informationen für die PV-Schleife."""
     outer_iterations: int
@@ -57,8 +51,16 @@ class PVConvergenceInfo:
     pv_v_final: NDArray
     converged_inner: bool
     converged_outer: bool
-    pv_v_error_history: list[float] = None      # |V|-Fehler pro Outer-Iteration
-    v_change_history: list[float] = None        # Inner-FPI tol pro Outer-Iteration
+    pv_v_error_history: list[float] = None      # PV |V|-Fehler pro Outer-Iteration
+    v_change_history: list[float] = None        # Inner-FPI finale Toleranz pro Outer
+
+    # NEU: Gesamtnetz-Fehler pro JEDER Inner-Iteration (flache Liste)
+    # Länge = inner_iterations_total
+    # Zeigt max(||V_new| - |V_old||) über ALLE Busse (PQ + PV)
+    inner_v_change_all: list[float] = field(default_factory=list)
+
+    # NEU: Markierungen wo Outer-Iterationen beginnen (Index in inner_v_change_all)
+    outer_start_indices: list[int] = field(default_factory=list)
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -86,7 +88,6 @@ class TPFDensePVMethodA(BaseSolver):
         ω < 1.0: Unterdämpft (nötig bei η nahe 1 oder vermaschten Netzen)
     enforce_q_lims : bool
         Wenn True: Q-Grenzen aus NetworkData einhalten (Clamping).
-        PV-Knoten, die an Q-Grenzen laufen, werden zu PQ-Knoten.
     """
 
     def __init__(
@@ -137,7 +138,6 @@ class TPFDensePVMethodA(BaseSolver):
 
         # ── Validierung ──
         if not network.has_pv:
-            # Kein PV-Knoten → Fallback auf Standard-TPF
             return self._solve_pq_only(network, s_batch, t_start)
 
         # ── Solve mit PV-Behandlung ──
@@ -156,8 +156,8 @@ class TPFDensePVMethodA(BaseSolver):
         tau = s_batch.shape[1]
 
         K, L = self._precompute(network)
-        V, n_iter, converged, tol_val = self._inner_fpi(
-            K, L, np.conj(s_batch), bphi, tau
+        V, n_iter, converged, tol_val, _ = self._inner_fpi(
+            K, L, np.conj(s_batch), bphi, tau, collect_history=False
         )
 
         elapsed = time.perf_counter() - t_start
@@ -189,31 +189,26 @@ class TPFDensePVMethodA(BaseSolver):
         Z_B = -K  # Z_B = Y_dd^{-1}
 
         # PV-Knoten-Informationen
-        pv_idx = network.pv_indices           # Lokale Indizes im d-Block
+        pv_idx = network.pv_indices
         n_pv = len(pv_idx)
-        v_spec = network.pv_v_setpoint        # (n_pv,) Soll-|V|
+        v_spec = network.pv_v_setpoint
 
         # Thévenin-Reaktanz an PV-Knoten: X_kk = Im(Z_B[k,k])
-        X_th = np.imag(Z_B[pv_idx, pv_idx])  # (n_pv,)
-
-        # Schutz vor X_th ≈ 0 (rein resistive Verbindung)
+        X_th = np.imag(Z_B[pv_idx, pv_idx])
         X_th_safe = np.where(np.abs(X_th) > 1e-10, X_th, 1e-10)
 
         # ── Arbeitskopie von s_batch ──
-        s_work = s_batch.copy()  # (bφ, τ)
+        s_work = s_batch.copy()
 
         # Fixe P-Werte an PV-Knoten merken
-        p_pv_fixed = s_work[pv_idx, :].real.copy()  # (n_pv, τ)
+        p_pv_fixed = s_work[pv_idx, :].real.copy()
 
         # Q an PV-Knoten initialisieren: Start mit Q = 0
-        # (Bedeutung: Netto-Blindleistung am Bus = 0)
-        q_pv = np.zeros((n_pv, tau))  # (n_pv, τ)
-
-        # s_work an PV-Knoten setzen
+        q_pv = np.zeros((n_pv, tau))
         s_work[pv_idx, :] = p_pv_fixed + 1j * q_pv
 
         # ── Initialisierung ──
-        V = np.ones((bphi, tau), dtype=np.complex128)  # Flat start
+        V = np.ones((bphi, tau), dtype=np.complex128)
         converged_outer = False
         converged_inner = False
         outer_iter = 0
@@ -221,7 +216,7 @@ class TPFDensePVMethodA(BaseSolver):
         inner_iter_log = []
         pv_v_error = np.inf
 
-        # Q-Grenzen (falls vorhanden)
+        # Q-Grenzen
         q_min = None
         q_max = None
         if self.enforce_q_lims and network.pv_q_min is not None:
@@ -229,50 +224,57 @@ class TPFDensePVMethodA(BaseSolver):
         if self.enforce_q_lims and network.pv_q_max is not None:
             q_max = network.pv_q_max.reshape(-1, 1) * np.ones((1, tau))
 
+        # ── Historien ──
+        pv_v_error_history = []
+        v_change_history = []
+        inner_v_change_all = []       # NEU: Gesamtnetz-Fehler pro Inner-Iter
+        outer_start_indices = []      # NEU: Index wo jede Outer-Iter beginnt
+
         # ══════════════════════════════════════════════════════════════
         #  ÄUSSERE SCHLEIFE
         # ══════════════════════════════════════════════════════════════
-        pv_v_error_history = []
-        v_change_history = []
 
         for ell in range(self.max_iter_outer):
             outer_iter = ell + 1
 
-            # ── Schritt 1: Innere FPI mit aktuellem s_work ──
-            S_conj = np.conj(s_work)  # (bφ, τ)
+            # Markiere Start dieser Outer-Iteration in der flachen Historie
+            outer_start_indices.append(len(inner_v_change_all))
 
-            V, n_inner, converged_inner, tol_inner = self._inner_fpi(
-                K, L, S_conj, bphi, tau, V_init=V
+            # ── Schritt 1: Innere FPI mit aktuellem s_work ──
+            S_conj = np.conj(s_work)
+
+            V, n_inner, converged_inner, tol_inner, inner_history = self._inner_fpi(
+                K, L, S_conj, bphi, tau, V_init=V, collect_history=True
             )
 
             inner_iter_total += n_inner
             inner_iter_log.append(n_inner)
 
+            # Flache Historie erweitern
+            inner_v_change_all.extend(inner_history)
+
             if not converged_inner:
-                # Innere Schleife divergiert → Abbruch
                 break
 
             # ── Schritt 2: PV-Spannungsfehler prüfen ──
-            v_mag_pv = np.abs(V[pv_idx, :])  # (n_pv, τ)
-            v_spec_2d = v_spec.reshape(-1, 1)  # (n_pv, 1) → broadcast
+            v_mag_pv = np.abs(V[pv_idx, :])
+            v_spec_2d = v_spec.reshape(-1, 1)
 
-            # Fehler: max über alle PV-Knoten und Szenarien
             pv_v_error = np.max(np.abs(v_mag_pv - v_spec_2d))
+
+            pv_v_error_history.append(float(pv_v_error))
+            v_change_history.append(float(tol_inner))
 
             if pv_v_error < self.tol_pv:
                 converged_outer = True
                 break
 
             # ── Schritt 3: Q-Korrektur (Thévenin) ──
-            # ΔQ = (|V_spec|² - |V_calc|²) / (2·X_kk)
             delta_q = (
                 (v_spec_2d ** 2 - v_mag_pv ** 2)
                 / (2.0 * X_th_safe.reshape(-1, 1))
-            )  # (n_pv, τ)
+            )
 
-            # Q-Update mit Relaxation
-            # Convention: s_nom ist Verbraucherkonvention (positiv = Verbrauch)
-            # ΔQ > 0 → brauchen mehr Einspeisung → weniger Verbrauch → q sinkt
             q_pv = q_pv - self.omega * delta_q
 
             # ── Schritt 4: Q-Grenzen (optional) ──
@@ -281,9 +283,6 @@ class TPFDensePVMethodA(BaseSolver):
                     q_pv = np.maximum(q_pv, q_min)
                 if q_max is not None:
                     q_pv = np.minimum(q_pv, q_max)
-
-            pv_v_error_history.append(float(pv_v_error))
-            v_change_history.append(float(tol_inner))
 
             # ── Schritt 5: s_work aktualisieren ──
             s_work[pv_idx, :] = p_pv_fixed + 1j * q_pv
@@ -294,7 +293,6 @@ class TPFDensePVMethodA(BaseSolver):
 
         elapsed = time.perf_counter() - t_start
 
-        # Diagnostik speichern
         self.pv_info = PVConvergenceInfo(
             outer_iterations=outer_iter,
             inner_iterations_total=inner_iter_total,
@@ -306,6 +304,8 @@ class TPFDensePVMethodA(BaseSolver):
             converged_outer=converged_outer,
             pv_v_error_history=pv_v_error_history,
             v_change_history=v_change_history,
+            inner_v_change_all=inner_v_change_all,
+            outer_start_indices=outer_start_indices,
         )
 
         return PowerFlowResult(
@@ -333,7 +333,7 @@ class TPFDensePVMethodA(BaseSolver):
         """
         Z_B = np.linalg.inv(network.Y_dd)
         K = -Z_B
-        L = K @ network.Y_ds @ network.v_s  # (bφ,)
+        L = K @ network.Y_ds @ network.v_s
         return K, L
 
     # ══════════════════════════════════════════════════════════════════
@@ -348,7 +348,8 @@ class TPFDensePVMethodA(BaseSolver):
         bphi: int,
         tau: int,
         V_init: NDArray | None = None,
-    ) -> tuple[NDArray, int, bool, float]:
+        collect_history: bool = False,
+    ) -> tuple[NDArray, int, bool, float, list[float]]:
         """
         Standard Fixed-Point Iteration (innere Schleife).
 
@@ -361,7 +362,9 @@ class TPFDensePVMethodA(BaseSolver):
         S_conj : (bφ, τ) konjugierte Leistungen
         bphi : Dimension
         tau : Anzahl Szenarien
-        V_init : (bφ, τ) Startwert (Warm-Start aus vorheriger Outer-Iteration)
+        V_init : (bφ, τ) Startwert (Warm-Start)
+        collect_history : bool
+            Wenn True, sammle tol_val pro Iteration
 
         Returns
         -------
@@ -369,34 +372,35 @@ class TPFDensePVMethodA(BaseSolver):
         n_iter : Anzahl Iterationen
         converged : bool
         tol_val : finaler Fehler
+        history : list[float] — tol_val pro Iteration (leer wenn collect_history=False)
         """
-        # Startwert
         if V_init is not None:
             V = V_init.copy()
         else:
             V = np.ones((bphi, tau), dtype=np.complex128)
 
-        L_col = L.reshape(-1, 1)  # (bφ, 1) für Broadcasting
+        L_col = L.reshape(-1, 1)
 
         converged = False
         n_iter = 0
         tol_val = np.inf
+        history = []
 
         for n in range(self.max_iter):
-            # Λ = S* / V* = S* · (1/V*)
-            LAMBDA = S_conj * (1.0 / np.conj(V))  # (bφ, τ)
+            LAMBDA = S_conj * (1.0 / np.conj(V))
+            V_new = K @ LAMBDA + L_col
 
-            # V_{n+1} = K @ Λ + L
-            V_new = K @ LAMBDA + L_col  # (bφ, τ)
-
-            # Konvergenz: max Spannungsänderung
-            tol_val = np.max(np.abs(np.abs(V_new) - np.abs(V)))
+            # max Spannungsänderung über ALLE Busse (PQ + PV)
+            tol_val = float(np.max(np.abs(np.abs(V_new) - np.abs(V))))
 
             n_iter = n + 1
             V = V_new
+
+            if collect_history:
+                history.append(tol_val)
 
             if tol_val < self.tol:
                 converged = True
                 break
 
-        return V, n_iter, converged, tol_val
+        return V, n_iter, converged, tol_val, history

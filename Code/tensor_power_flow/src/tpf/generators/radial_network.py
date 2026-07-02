@@ -151,7 +151,7 @@ class RadialNetworkGenerator:
         elif cfg.topology == "chain":
             G = nx.path_graph(n)
         elif cfg.topology == "random_tree":
-            G = nx.random_tree(n, seed=cfg.seed)
+            G = nx.nx.random_labeled_tree(n, seed=cfg.seed)
         else:
             raise ValueError(f"Unbekannte Topologie: {cfg.topology}")
 
@@ -308,6 +308,7 @@ def create_radial_network(
     load_kw: float = 50.0,
     pv_p_mw: float = 0.2,
     pv_vm_pu: float = 1.02,
+    pv_vm_std_pu: float = 0.01,
     seed: int = 42,
     topology: str = "tree",
     pv_placement: str = "uniform",
@@ -323,6 +324,7 @@ def create_radial_network(
     load_kw : float – Mittlere Last pro Bus [kW]
     pv_p_mw : float – Wirkleistung pro DG [MW]
     pv_vm_pu : float – Sollspannung der DG [p.u.]
+    pv_vm_std_pu : float – Standardabweichung der Sollspannung [p.u.]
     seed : int – Zufallssamen
     topology : str – "tree", "chain", "random_tree"
     pv_placement : str – "uniform", "end", "random"
@@ -342,6 +344,7 @@ def create_radial_network(
         p_load_mean_kw=load_kw,
         pv_p_mw=pv_p_mw,
         pv_vm_pu=pv_vm_pu,
+        pv_vm_std_pu=pv_vm_std_pu,
         seed=seed,
         topology=topology,
         pv_placement=pv_placement,
@@ -481,6 +484,229 @@ def create_radial_high_pv_penetration() -> pp.pandapowerNet:
 
 
 # ══════════════════════════════════════════════════════════════════════
+#  ERWEITERT: Viele Netzgrößen für umfassende Validierung
+# ══════════════════════════════════════════════════════════════════════
+
+# ── Größen-Sweep ──
+
+def create_radial_5bus_1pv() -> pp.pandapowerNet:
+    """5-Bus Kette mit 1 PV."""
+    return create_radial_network(n_buses=5, n_pv=1, topology="chain", seed=300)
+
+
+def create_radial_8bus_2pv() -> pp.pandapowerNet:
+    """8-Bus Baum mit 2 PV."""
+    return create_radial_network(n_buses=8, n_pv=2, seed=301)
+
+
+def create_radial_15bus_2pv() -> pp.pandapowerNet:
+    """15-Bus Baum mit 2 PV."""
+    return create_radial_network(n_buses=15, n_pv=2, seed=302)
+
+
+def create_radial_20bus_3pv() -> pp.pandapowerNet:
+    """20-Bus Baum mit 3 PV."""
+    return create_radial_network(n_buses=20, n_pv=3, seed=303)
+
+
+def create_radial_25bus_4pv() -> pp.pandapowerNet:
+    """25-Bus Baum mit 4 PV."""
+    return create_radial_network(n_buses=25, n_pv=4, seed=304)
+
+
+def create_radial_40bus_4pv() -> pp.pandapowerNet:
+    """40-Bus Baum mit 4 PV."""
+    return create_radial_network(n_buses=40, n_pv=4, seed=305)
+
+
+def create_radial_60bus_6pv() -> pp.pandapowerNet:
+    """60-Bus Baum mit 6 PV."""
+    return create_radial_network(n_buses=60, n_pv=6, seed=306)
+
+
+def create_radial_75bus_8pv() -> pp.pandapowerNet:
+    """75-Bus Baum mit 8 PV."""
+    return create_radial_network(n_buses=75, n_pv=8, seed=307)
+
+
+def create_radial_150bus_15pv() -> pp.pandapowerNet:
+    """150-Bus Baum mit 15 PV."""
+    return create_radial_network(n_buses=150, n_pv=15, seed=308)
+
+
+def create_radial_300bus_30pv() -> pp.pandapowerNet:
+    """300-Bus Baum mit 30 PV."""
+    return create_radial_network(n_buses=300, n_pv=30, seed=309)
+
+
+def create_radial_500bus_50pv() -> pp.pandapowerNet:
+    """500-Bus Baum mit 50 PV (Stress-Test)."""
+    return create_radial_network(n_buses=500, n_pv=50, seed=310)
+
+
+# ── R/X-Variationen (50-Bus Basis) ──
+
+def create_radial_50bus_5pv_rx05() -> pp.pandapowerNet:
+    """50-Bus, 5 PV, R/X=0.5 (ÜN-artig)."""
+    return create_radial_network(n_buses=50, n_pv=5, rx_ratio=0.5, seed=400)
+
+
+def create_radial_50bus_5pv_rx10() -> pp.pandapowerNet:
+    """50-Bus, 5 PV, R/X=1.0."""
+    return create_radial_network(n_buses=50, n_pv=5, rx_ratio=1.0, seed=401)
+
+
+def create_radial_50bus_5pv_rx20() -> pp.pandapowerNet:
+    """50-Bus, 5 PV, R/X=2.0 (NS)."""
+    return create_radial_network(n_buses=50, n_pv=5, rx_ratio=2.0, seed=402)
+
+
+def create_radial_50bus_5pv_rx40() -> pp.pandapowerNet:
+    """50-Bus, 5 PV, R/X=4.0 (Stress)."""
+    return create_radial_network(n_buses=50, n_pv=5, rx_ratio=4.0, seed=403)
+
+
+# ── PV-Durchdringung (50-Bus Basis) ──
+
+def create_radial_50bus_1pv() -> pp.pandapowerNet:
+    """50-Bus, 1 PV (minimal)."""
+    return create_radial_network(n_buses=50, n_pv=1, seed=500)
+
+
+def create_radial_50bus_10pv() -> pp.pandapowerNet:
+    """50-Bus, 10 PV (20%)."""
+    return create_radial_network(n_buses=50, n_pv=10, seed=501)
+
+
+def create_radial_50bus_20pv() -> pp.pandapowerNet:
+    """50-Bus, 20 PV (40%)."""
+    return create_radial_network(n_buses=50, n_pv=20, pv_p_mw=0.15, seed=502)
+
+
+# ── Lastprofil (50-Bus Basis) ──
+
+def create_radial_50bus_5pv_light_load() -> pp.pandapowerNet:
+    """50-Bus, 5 PV, 20 kW/Bus (leicht)."""
+    return create_radial_network(n_buses=50, n_pv=5, load_kw=20.0, seed=600)
+
+
+def create_radial_50bus_5pv_heavy_load() -> pp.pandapowerNet:
+    """50-Bus, 5 PV, 100 kW/Bus (schwer)."""
+    return create_radial_network(n_buses=50, n_pv=5, load_kw=100.0, seed=601)
+
+
+def create_radial_50bus_5pv_very_heavy() -> pp.pandapowerNet:
+    """50-Bus, 5 PV, 150 kW/Bus (η nahe 1)."""
+    return create_radial_network(n_buses=50, n_pv=5, load_kw=150.0, seed=602)
+
+
+# ── Topologie-Variationen ──
+
+def create_chain_50bus_5pv() -> pp.pandapowerNet:
+    """50-Bus Kette mit 5 PV."""
+    return create_radial_network(
+        n_buses=50, n_pv=5, topology="chain", pv_placement="uniform", seed=700
+    )
+
+
+def create_chain_100bus_10pv() -> pp.pandapowerNet:
+    """100-Bus Kette mit 10 PV."""
+    return create_radial_network(
+        n_buses=100, n_pv=10, topology="chain", pv_placement="uniform", seed=701
+    )
+
+
+def create_random_tree_50bus_5pv() -> pp.pandapowerNet:
+    """50-Bus Zufallsbaum mit 5 PV."""
+    return create_radial_network(
+        n_buses=50, n_pv=5, topology="random_tree", seed=702
+    )
+
+
+def create_random_tree_100bus_10pv() -> pp.pandapowerNet:
+    """100-Bus Zufallsbaum mit 10 PV."""
+    return create_radial_network(
+        n_buses=100, n_pv=10, topology="random_tree", seed=703
+    )
+
+
+# ── PV-Platzierung (50-Bus Basis) ──
+
+def create_radial_50bus_5pv_end() -> pp.pandapowerNet:
+    """50-Bus, 5 PV an Leitungsenden."""
+    return create_radial_network(
+        n_buses=50, n_pv=5, pv_placement="end", seed=800
+    )
+
+
+def create_radial_50bus_5pv_random() -> pp.pandapowerNet:
+    """50-Bus, 5 PV zufällig platziert."""
+    return create_radial_network(
+        n_buses=50, n_pv=5, pv_placement="random", seed=801
+    )
+
+
+# ── PV Spannungs-Sollwerte ──
+
+def create_radial_50bus_5pv_high_vm() -> pp.pandapowerNet:
+    """50-Bus, 5 PV mit V_spec=1.05 p.u."""
+    return create_radial_network(
+        n_buses=50, n_pv=5, pv_vm_pu=1.05, pv_vm_std_pu=0.005, seed=900
+    )
+
+
+def create_radial_50bus_5pv_low_vm() -> pp.pandapowerNet:
+    """50-Bus, 5 PV mit V_spec=0.98 p.u."""
+    return create_radial_network(
+        n_buses=50, n_pv=5, pv_vm_pu=0.98, pv_vm_std_pu=0.005, seed=901
+    )
+
+
+def create_radial_50bus_5pv_mixed_vm() -> pp.pandapowerNet:
+    """50-Bus, 5 PV mit unterschiedlichen V_spec."""
+    return create_radial_network(
+        n_buses=50, n_pv=5, pv_vm_pu=1.02, pv_vm_std_pu=0.03, seed=902
+    )
+
+
+# ── IEEE-Netze mit zusätzlichen DG ──
+
+def create_33bus_1dg() -> pp.pandapowerNet:
+    """IEEE 33-Bus + 1 DG an Bus 17."""
+    net = pn.case33bw()
+    pp.create_gen(net, bus=17, p_mw=0.5, vm_pu=1.02, name="DG1")
+    return net
+
+
+def create_33bus_8dg() -> pp.pandapowerNet:
+    """IEEE 33-Bus + 8 DG (extremes PV-Szenario)."""
+    net = pn.case33bw()
+    dg_buses = [3, 6, 9, 12, 15, 18, 24, 30]
+    for i, bus in enumerate(dg_buses):
+        pp.create_gen(net, bus=bus, p_mw=0.3, vm_pu=1.01 + 0.005 * (i % 3),
+                      name=f"DG{i+1}")
+    return net
+
+
+def create_case9() -> pp.pandapowerNet:
+    """IEEE 9-Bus (3 Gen, 2 PV)."""
+    return pn.case9()
+
+
+def create_case39() -> pp.pandapowerNet:
+    """IEEE 39-Bus New England (10 Gen)."""
+    return pn.case39()
+
+
+def _try_case_ieee118() -> pp.pandapowerNet:
+    """IEEE 118-Bus — mit Fallback."""
+    try:
+        return pn.case_ieee118()
+    except AttributeError:
+        return pn.case118()
+
+
+# ══════════════════════════════════════════════════════════════════════
 #  TEST_NETWORKS — Hauptexport für Validierungsskripte
 # ══════════════════════════════════════════════════════════════════════
 
@@ -578,6 +804,347 @@ TEST_NETWORKS: dict[str, dict] = {
 
 
 # ══════════════════════════════════════════════════════════════════════
+#  TEST_NETWORKS_COMPREHENSIVE — Alle Größen und Variationen
+# ══════════════════════════════════════════════════════════════════════
+
+TEST_NETWORKS_COMPREHENSIVE: dict[str, dict] = {
+    # ════════════════════════════════════════════════════════════
+    #  GRÖSSE: Sehr klein (3-10 Busse)
+    # ════════════════════════════════════════════════════════════
+    "4bus_1pv": {
+        "constructor": create_4bus_1pv,
+        "description": "4 Busse, 1 PV, 2 PQ (minimal, handgebaut)",
+        "n_pv": 1,
+        "category": "size_tiny",
+    },
+    "5bus_1pv_chain": {
+        "constructor": create_radial_5bus_1pv,
+        "description": "5-Bus Kette, 1 PV",
+        "n_pv": 1,
+        "category": "size_tiny",
+    },
+    "8bus_2pv": {
+        "constructor": create_radial_8bus_2pv,
+        "description": "8-Bus Baum, 2 PV",
+        "n_pv": 2,
+        "category": "size_tiny",
+    },
+    "case9": {
+        "constructor": create_case9,
+        "description": "IEEE 9-Bus (3 Gen, 2 PV)",
+        "n_pv": 2,
+        "category": "size_tiny",
+    },
+
+    # ════════════════════════════════════════════════════════════
+    #  GRÖSSE: Klein (10-25 Busse)
+    # ════════════════════════════════════════════════════════════
+    "radial_10bus_1pv": {
+        "constructor": create_radial_10bus_1pv,
+        "description": "10-Bus Baum, 1 PV",
+        "n_pv": 1,
+        "category": "size_small",
+    },
+    "radial_15bus_2pv": {
+        "constructor": create_radial_15bus_2pv,
+        "description": "15-Bus Baum, 2 PV",
+        "n_pv": 2,
+        "category": "size_small",
+    },
+    "radial_20bus_3pv": {
+        "constructor": create_radial_20bus_3pv,
+        "description": "20-Bus Baum, 3 PV",
+        "n_pv": 3,
+        "category": "size_small",
+    },
+    "chain_20bus_2pv": {
+        "constructor": create_radial_chain_20bus_2pv,
+        "description": "20-Bus Kette, 2 PV an Enden, R/X=2.0",
+        "n_pv": 2,
+        "category": "size_small",
+    },
+    "radial_25bus_4pv": {
+        "constructor": create_radial_25bus_4pv,
+        "description": "25-Bus Baum, 4 PV",
+        "n_pv": 4,
+        "category": "size_small",
+    },
+
+    # ════════════════════════════════════════════════════════════
+    #  GRÖSSE: Mittel (30-75 Busse)
+    # ════════════════════════════════════════════════════════════
+    "ieee30": {
+        "constructor": create_ieee30,
+        "description": "IEEE 30-Bus vermascht (5 PV)",
+        "n_pv": 5,
+        "category": "size_medium",
+    },
+    "33bus_1dg": {
+        "constructor": create_33bus_1dg,
+        "description": "IEEE 33-Bus + 1 DG",
+        "n_pv": 1,
+        "category": "size_medium",
+    },
+    "33bus_2dg": {
+        "constructor": create_33bus_2dg,
+        "description": "IEEE 33-Bus + 2 DG",
+        "n_pv": 2,
+        "category": "size_medium",
+    },
+    "33bus_5dg": {
+        "constructor": create_33bus_5dg,
+        "description": "IEEE 33-Bus + 5 DG",
+        "n_pv": 5,
+        "category": "size_medium",
+    },
+    "33bus_8dg": {
+        "constructor": create_33bus_8dg,
+        "description": "IEEE 33-Bus + 8 DG (extrem)",
+        "n_pv": 8,
+        "category": "size_medium",
+    },
+    "radial_34bus_3pv": {
+        "constructor": create_radial_34bus_3pv,
+        "description": "34-Bus Baum, 3 PV (Referenz)",
+        "n_pv": 3,
+        "category": "size_medium",
+    },
+    "high_rx_34bus_3pv": {
+        "constructor": create_radial_high_rx_34bus_3pv,
+        "description": "34-Bus, R/X=3.0 (Stress FPI)",
+        "n_pv": 3,
+        "category": "size_medium",
+    },
+    "heavy_load_34bus_3pv": {
+        "constructor": create_radial_heavy_load_34bus_3pv,
+        "description": "34-Bus, 120 kW/Bus (η nahe 1)",
+        "n_pv": 3,
+        "category": "size_medium",
+    },
+    "high_pv_34bus_8pv": {
+        "constructor": create_radial_high_pv_penetration,
+        "description": "34-Bus, 8 PV (hohe Durchdringung)",
+        "n_pv": 8,
+        "category": "size_medium",
+    },
+    "case39": {
+        "constructor": create_case39,
+        "description": "IEEE 39-Bus New England (10 Gen)",
+        "n_pv": 9,
+        "category": "size_medium",
+    },
+    "radial_40bus_4pv": {
+        "constructor": create_radial_40bus_4pv,
+        "description": "40-Bus Baum, 4 PV",
+        "n_pv": 4,
+        "category": "size_medium",
+    },
+    "radial_50bus_5pv": {
+        "constructor": create_radial_50bus_5pv,
+        "description": "50-Bus Baum, 5 PV",
+        "n_pv": 5,
+        "category": "size_medium",
+    },
+    "chain_50bus_5pv": {
+        "constructor": create_chain_50bus_5pv,
+        "description": "50-Bus Kette, 5 PV",
+        "n_pv": 5,
+        "category": "size_medium",
+    },
+    "random_tree_50bus_5pv": {
+        "constructor": create_random_tree_50bus_5pv,
+        "description": "50-Bus Zufallsbaum, 5 PV",
+        "n_pv": 5,
+        "category": "size_medium",
+    },
+    "ieee57": {
+        "constructor": create_ieee57,
+        "description": "IEEE 57-Bus vermascht (6 PV)",
+        "n_pv": 6,
+        "category": "size_medium",
+    },
+    "radial_60bus_6pv": {
+        "constructor": create_radial_60bus_6pv,
+        "description": "60-Bus Baum, 6 PV",
+        "n_pv": 6,
+        "category": "size_medium",
+    },
+    "radial_75bus_8pv": {
+        "constructor": create_radial_75bus_8pv,
+        "description": "75-Bus Baum, 8 PV",
+        "n_pv": 8,
+        "category": "size_medium",
+    },
+
+    # ════════════════════════════════════════════════════════════
+    #  GRÖSSE: Groß (100-300 Busse)
+    # ════════════════════════════════════════════════════════════
+    "radial_100bus_10pv": {
+        "constructor": create_radial_100bus_10pv,
+        "description": "100-Bus Baum, 10 PV",
+        "n_pv": 10,
+        "category": "size_large",
+    },
+    "chain_100bus_10pv": {
+        "constructor": create_chain_100bus_10pv,
+        "description": "100-Bus Kette, 10 PV",
+        "n_pv": 10,
+        "category": "size_large",
+    },
+    "random_tree_100bus_10pv": {
+        "constructor": create_random_tree_100bus_10pv,
+        "description": "100-Bus Zufallsbaum, 10 PV",
+        "n_pv": 10,
+        "category": "size_large",
+    },
+    "radial_150bus_15pv": {
+        "constructor": create_radial_150bus_15pv,
+        "description": "150-Bus Baum, 15 PV",
+        "n_pv": 15,
+        "category": "size_large",
+    },
+    "radial_200bus_20pv": {
+        "constructor": create_radial_200bus_20pv,
+        "description": "200-Bus Baum, 20 PV",
+        "n_pv": 20,
+        "category": "size_large",
+    },
+    "radial_300bus_30pv": {
+        "constructor": create_radial_300bus_30pv,
+        "description": "300-Bus Baum, 30 PV",
+        "n_pv": 30,
+        "category": "size_large",
+    },
+
+    # ════════════════════════════════════════════════════════════
+    #  GRÖSSE: Sehr groß (500+ Busse)
+    # ════════════════════════════════════════════════════════════
+    "radial_500bus_50pv": {
+        "constructor": create_radial_500bus_50pv,
+        "description": "500-Bus Baum, 50 PV (Stress)",
+        "n_pv": 50,
+        "category": "size_xlarge",
+    },
+
+    # ════════════════════════════════════════════════════════════
+    #  VARIATION: R/X-Verhältnis
+    # ════════════════════════════════════════════════════════════
+    "50bus_5pv_rx05": {
+        "constructor": create_radial_50bus_5pv_rx05,
+        "description": "50-Bus, R/X=0.5 (ÜN-artig)",
+        "n_pv": 5,
+        "category": "variation_rx",
+    },
+    "50bus_5pv_rx10": {
+        "constructor": create_radial_50bus_5pv_rx10,
+        "description": "50-Bus, R/X=1.0",
+        "n_pv": 5,
+        "category": "variation_rx",
+    },
+    "50bus_5pv_rx20": {
+        "constructor": create_radial_50bus_5pv_rx20,
+        "description": "50-Bus, R/X=2.0 (NS)",
+        "n_pv": 5,
+        "category": "variation_rx",
+    },
+    "50bus_5pv_rx40": {
+        "constructor": create_radial_50bus_5pv_rx40,
+        "description": "50-Bus, R/X=4.0 (Stress)",
+        "n_pv": 5,
+        "category": "variation_rx",
+    },
+
+    # ════════════════════════════════════════════════════════════
+    #  VARIATION: PV-Durchdringung
+    # ════════════════════════════════════════════════════════════
+    "50bus_1pv": {
+        "constructor": create_radial_50bus_1pv,
+        "description": "50-Bus, 1 PV (minimal)",
+        "n_pv": 1,
+        "category": "variation_pv_count",
+    },
+    "50bus_10pv": {
+        "constructor": create_radial_50bus_10pv,
+        "description": "50-Bus, 10 PV (20%)",
+        "n_pv": 10,
+        "category": "variation_pv_count",
+    },
+    "50bus_20pv": {
+        "constructor": create_radial_50bus_20pv,
+        "description": "50-Bus, 20 PV (40%)",
+        "n_pv": 20,
+        "category": "variation_pv_count",
+    },
+
+    # ════════════════════════════════════════════════════════════
+    #  VARIATION: Lastprofil
+    # ════════════════════════════════════════════════════════════
+    "50bus_5pv_light": {
+        "constructor": create_radial_50bus_5pv_light_load,
+        "description": "50-Bus, 5PV, 20kW/Bus (leicht)",
+        "n_pv": 5,
+        "category": "variation_load",
+    },
+    "50bus_5pv_heavy": {
+        "constructor": create_radial_50bus_5pv_heavy_load,
+        "description": "50-Bus, 5PV, 100kW/Bus (schwer)",
+        "n_pv": 5,
+        "category": "variation_load",
+    },
+    "50bus_5pv_very_heavy": {
+        "constructor": create_radial_50bus_5pv_very_heavy,
+        "description": "50-Bus, 5PV, 150kW/Bus (η nahe 1)",
+        "n_pv": 5,
+        "category": "variation_load",
+    },
+
+    # ════════════════════════════════════════════════════════════
+    #  VARIATION: PV-Platzierung
+    # ════════════════════════════════════════════════════════════
+    "50bus_5pv_uniform": {
+        "constructor": create_radial_50bus_5pv,
+        "description": "50-Bus, 5PV gleichmäßig",
+        "n_pv": 5,
+        "category": "variation_placement",
+    },
+    "50bus_5pv_end": {
+        "constructor": create_radial_50bus_5pv_end,
+        "description": "50-Bus, 5PV an Enden",
+        "n_pv": 5,
+        "category": "variation_placement",
+    },
+    "50bus_5pv_random": {
+        "constructor": create_radial_50bus_5pv_random,
+        "description": "50-Bus, 5PV zufällig",
+        "n_pv": 5,
+        "category": "variation_placement",
+    },
+
+    # ════════════════════════════════════════════════════════════
+    #  VARIATION: PV-Spannungssollwert
+    # ════════════════════════════════════════════════════════════
+    "50bus_5pv_vm105": {
+        "constructor": create_radial_50bus_5pv_high_vm,
+        "description": "50-Bus, 5PV, V_spec=1.05",
+        "n_pv": 5,
+        "category": "variation_vm",
+    },
+    "50bus_5pv_vm098": {
+        "constructor": create_radial_50bus_5pv_low_vm,
+        "description": "50-Bus, 5PV, V_spec=0.98",
+        "n_pv": 5,
+        "category": "variation_vm",
+    },
+    "50bus_5pv_vm_mixed": {
+        "constructor": create_radial_50bus_5pv_mixed_vm,
+        "description": "50-Bus, 5PV, V_spec gestreut",
+        "n_pv": 5,
+        "category": "variation_vm",
+    },
+}
+
+
+# ══════════════════════════════════════════════════════════════════════
 #  Filter-Funktionen für Testauswahl
 # ══════════════════════════════════════════════════════════════════════
 
@@ -603,6 +1170,25 @@ def get_radial_only_networks() -> dict[str, dict]:
 def get_full_test_suite() -> dict[str, dict]:
     """Alle Netze inkl. IEEE vermaschter Netze."""
     return TEST_NETWORKS
+
+
+def get_comprehensive_networks() -> dict[str, dict]:
+    """Alle Netze aus dem erweiterten Katalog."""
+    return TEST_NETWORKS_COMPREHENSIVE
+
+
+def get_size_sweep_networks() -> dict[str, dict]:
+    """Netze aufsteigend nach Größe (für Skalierungstests)."""
+    size_cats = ("size_tiny", "size_small", "size_medium", "size_large", "size_xlarge")
+    return {k: v for k, v in TEST_NETWORKS_COMPREHENSIVE.items()
+            if v["category"] in size_cats}
+
+
+def get_variation_networks(variation: str) -> dict[str, dict]:
+    """Filtert nach Variationstyp: 'rx', 'pv_count', 'load', 'placement', 'vm'."""
+    cat = f"variation_{variation}"
+    return {k: v for k, v in TEST_NETWORKS_COMPREHENSIVE.items()
+            if v["category"] == cat}
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -639,26 +1225,27 @@ def main():
     print("║  TEST-NETZE FÜR PV-KNOTEN VALIDIERUNG (radial_network.py)       ║")
     print("╚═══════════════════════════════════════════════════════════════════╝")
 
-    print(f"\n  Gesamtanzahl definierter Netze: {len(TEST_NETWORKS)}")
+    print(f"\n  TEST_NETWORKS: {len(TEST_NETWORKS)} Netze")
+    print(f"  TEST_NETWORKS_COMPREHENSIVE: {len(TEST_NETWORKS_COMPREHENSIVE)} Netze")
     print(f"{'─'*70}")
-    print(f"  {'Name':<25} {'Kat.':<16} {'#PV':<5} {'Beschreibung'}")
+    print(f"  {'Name':<28} {'Kat.':<20} {'#PV':<5} {'Beschreibung'}")
     print(f"{'─'*70}")
 
-    for name, info in TEST_NETWORKS.items():
+    for name, info in TEST_NETWORKS_COMPREHENSIVE.items():
         print(
-            f"  {name:<25} {info['category']:<16} "
+            f"  {name:<28} {info['category']:<20} "
             f"{info['n_pv']:<5} {info['description']}"
         )
 
     # Alle erzeugen und prüfen
     print(f"\n{'═'*70}")
-    print(f"  ERZEUGUNG & VALIDIERUNG")
+    print(f"  ERZEUGUNG & VALIDIERUNG (Comprehensive)")
     print(f"{'═'*70}")
 
     n_pass = 0
     n_fail = 0
 
-    for name, info in TEST_NETWORKS.items():
+    for name, info in TEST_NETWORKS_COMPREHENSIVE.items():
         try:
             net = info["constructor"]()
             pp.runpp(net, algorithm="nr", tolerance_mva=1e-8)
@@ -672,14 +1259,14 @@ def main():
             status = "✓"
             n_pass += 1
             print(
-                f"  {status} {name:<25} "
+                f"  {status} {name:<28} "
                 f"Busse={n_bus:<4} Sl={n_slack} PV={n_pv:<3} PQ={n_pq:<4} "
                 f"NR={ppc.get('iterations', '?')} iter"
             )
         except Exception as e:
             status = "✗"
             n_fail += 1
-            print(f"  {status} {name:<25} FEHLER: {e}")
+            print(f"  {status} {name:<28} FEHLER: {e}")
 
     print(f"\n{'─'*70}")
     print(f"  Ergebnis: {n_pass} PASS, {n_fail} FAIL")
