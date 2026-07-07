@@ -167,6 +167,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
         "outer_start_indices": [],
         "inner_per_outer": [],
         "pv_ratio": 0.0,
+        "rx_ratio": np.nan,
     }
 
     # 0. Netz erzeugen
@@ -212,6 +213,16 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     record["n_pv"] = n_pv
     record["pv_ratio"] = n_pv / max(record["n_bus"], 1)
     record["n_pq"] = len(network.pq_indices)
+
+    # 2b. R/X ratio from lines
+    try:
+        r_vals = net.line['r_ohm_per_km'].values
+        x_vals = net.line['x_ohm_per_km'].values
+        r_total = np.sum(r_vals)
+        x_total = np.sum(x_vals)
+        record["rx_ratio"] = r_total / x_total if x_total > 1e-12 else np.nan
+    except Exception:
+        record["rx_ratio"] = np.nan
 
     if n_pv == 0:
         record["passed"] = True
@@ -491,8 +502,10 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
 
         rho = rec.get("rho", np.inf)
         rho_str = f"ρ={rho:.2f}" if rho < 100 else "ρ=—"
+        rx = rec.get("rx_ratio", np.nan)
+        rx_str = f"R/X={rx:.1f}" if not np.isnan(rx) else "R/X=—"
         label = (f"{rec['name']} "
-                 f"(η={rec['eta']:.2f}, {rho_str}, PV={rec['n_pv']})")
+                 f"(η={rec['eta']:.2f}, {rho_str}, {rx_str}, PV={rec['n_pv']})")
 
         line, = ax00.loglog(
             iters, errors,
@@ -700,6 +713,10 @@ def main():
                         help="Keinen Plot erzeugen (nur Tabelle)")
     parser.add_argument("--save", type=str, default=None,
                         help="Plot speichern unter diesem Pfad")
+    parser.add_argument("--network", type=str, default=None,
+                        help="Nur dieses Netzwerk testen (Name muss exakt stimmen)")
+    parser.add_argument("--list", action="store_true",
+                        help="Liste aller verfügbaren Netzwerke in der Suite anzeigen")
     args = parser.parse_args()
 
     print("╔════════════════════════════════════════════════════════════════════════════╗")
@@ -722,6 +739,24 @@ def main():
 
     print(f"\n  Suite: '{args.suite}' — {len(networks)} Netze")
     print(f"  ω = {args.omega}, PASS-Schwelle = {args.tol:.0e}\n")
+
+    # Handle --list
+    if args.list:
+        print(f"\n  Verfügbare Netzwerke in Suite '{args.suite}':")
+        for i, name in enumerate(sorted(networks.keys()), 1):
+            print(f"    {i:2}. {name}")
+        print(f"\n{'═'*90}")
+        return
+
+    # Handle --network filter
+    if args.network:
+        if args.network not in networks:
+            print(f"\n  FEHLER: Netzwerk '{args.network}' nicht gefunden in Suite '{args.suite}'")
+            print(f"  Verwende --list um alle Netzwerke anzuzeigen.")
+            print(f"\n{'═'*90}")
+            return
+        networks = {args.network: networks[args.network]}
+        print(f"  → Nur Netzwerk '{args.network}' wird getestet.\n")
 
     # Validierung
     t_start = time.perf_counter()
