@@ -39,6 +39,12 @@ class PandapowerNRSolver(BaseSolver):
             enforce_q_lims=False,
         )
 
+        # Slack-Leistung aus pandapower auslesen
+        base_mva = net._ppc["baseMVA"]
+        p_slack_nr = net.res_ext_grid["p_mw"].values / base_mva
+        q_slack_nr = net.res_ext_grid["q_mvar"].values / base_mva
+        s_slack_nr = (p_slack_nr + 1j * q_slack_nr).reshape(-1, 1)
+
         elapsed = time.perf_counter() - t_start
 
         # --- Spannungen aller Busse ---
@@ -60,6 +66,7 @@ class PandapowerNRSolver(BaseSolver):
             converged=net.converged,
             elapsed_time_s=elapsed,
             max_mismatch=0.0,
+            s_slack=s_slack_nr,
             pv_indices=pv_indices,
             pv_q_pu=pv_q_pu,
             pv_v_setpoint_pu=pv_v_setpoint,
@@ -104,3 +111,63 @@ class PandapowerNRSolver(BaseSolver):
             pv_q_pu[i] = q_gen - q_load
 
         return pv_idx, pv_q_pu, pv_v_setpoint
+
+
+    def solve_timeseries(
+        self,
+        net: pp.pandapowerNet,
+        pq_p_profile_mw: NDArray,      # (n_loads, τ)
+        pq_q_profile_mvar: NDArray,    # (n_loads, τ)
+        pv_p_profile_mw: NDArray | None = None,   # (n_gens, τ), oder None (statisch)
+        verbose: bool = False,
+    ) -> PowerFlowResult:
+        """
+        Sequential NR-Baseline für Zeitreihen (nur für kleine τ ≤ 10000).
+        """
+        import copy
+        t_start = time.perf_counter()
+
+        tau = pq_p_profile_mw.shape[1]
+        n_bus = len(net.bus)
+        V_all = np.zeros((n_bus, tau), dtype=np.complex128)
+        conv_ps = np.zeros(tau, dtype=bool)
+        iters_ps = np.zeros(tau, dtype=np.int32)
+
+        p_load_base = net.load["p_mw"].values.copy()
+        q_load_base = net.load["q_mvar"].values.copy()
+        p_gen_base = net.gen["p_mw"].values.copy() if len(net.gen) > 0 else None
+
+        net_work = copy.deepcopy(net)
+
+        for t in range(tau):
+            net_work.load.loc[:, "p_mw"] = pq_p_profile_mw[:, t]
+            net_work.load.loc[:, "q_mvar"] = pq_q_profile_mvar[:, t]
+            if pv_p_profile_mw is not None and p_gen_base is not None:
+                net_work.gen.loc[:, "p_mw"] = pv_p_profile_mw[:, t]
+
+            try:
+                pp.runpp(net_work, algorithm="nr",
+                         tolerance_mva=self.tol,
+                         max_iteration=self.max_iter,
+                         enforce_q_lims=False)
+                conv_ps[t] = bool(net_work.converged)
+                iters_ps[t] = net_work._ppc.get("iterations", -1)
+                vm = net_work.res_bus["vm_pu"].values
+                va = net_work.res_bus["va_degree"].values
+                V_all[:, t] = vm * np.exp(1j * np.deg2rad(va))
+            except Exception:
+                conv_ps[t] = False
+                iters_ps[t] = -1
+
+            if verbose and (t + 1) % max(1, tau // 20) == 0:
+                print(f"  NR {t+1}/{tau} — {100*(t+1)/tau:.0f}%")
+
+        elapsed = time.perf_counter() - t_start
+
+        return PowerFlowResult(
+            voltages=V_all,
+            iterations=int(np.max(iters_ps)) if tau > 0 else 0,
+            converged=bool(np.all(conv_ps)),
+            elapsed_time_s=elapsed,
+            max_mismatch=0.0,
+        )

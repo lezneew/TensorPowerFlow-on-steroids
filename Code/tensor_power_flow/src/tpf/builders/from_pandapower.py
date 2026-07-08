@@ -1,5 +1,7 @@
 import numpy as np
 import pandapower as pp
+from numpy._typing import NDArray
+
 from tpf.core.network import NetworkData
 
 
@@ -41,6 +43,9 @@ def build_network_from_pandapower(
     # Admittanzmatrix partitionieren
     Y_dd = Y_bus[np.ix_(d_idx, d_idx)]
     Y_ds = Y_bus[np.ix_(d_idx, slack_idx)]
+    # Slack - Blöcke für S_slack - Berechnung
+    Y_ss = Y_bus[np.ix_(slack_idx, slack_idx)]  # (φ × φ)
+    Y_sd = Y_bus[np.ix_(slack_idx, d_idx)]  # (φ × b·φ)
 
     # Slack-Spannung
     v_s = (ppc["bus"][slack_idx, 7]
@@ -105,6 +110,8 @@ def build_network_from_pandapower(
         pv_mask=pv_mask,
         pv_v_setpoint=pv_v_setpoint,
         pv_p_setpoint=pv_p_setpoint,
+        Y_ss=Y_ss,
+        Y_sd=Y_sd,
     )
 
 
@@ -127,3 +134,77 @@ def get_non_slack_indices_from_net(net: pp.pandapowerNet) -> np.ndarray:
     ppc = net._ppc
     bus_types = ppc["bus"][:, 1].astype(int)
     return np.where(bus_types != 3)[0]
+
+
+def build_s_batch_timeseries(
+    network: NetworkData,
+    net: pp.pandapowerNet,
+    pq_p_profile_mw: NDArray,      # (n_pq_loads, τ)
+    pq_q_profile_mvar: NDArray,    # (n_pq_loads, τ)
+    pv_p_profile_mw: NDArray | None = None,  # (n_pv, τ) — None → static from NetworkData
+) -> NDArray:
+    """
+    Baut s_batch ∈ ℂ^(bφ × τ) für zeitreihenparallele Berechnung.
+
+    Konvention:
+      - PQ-Knoten:  s[i, t] = P_load(i, t) + j·Q_load(i, t)  (Verbraucher)
+      - PV-Knoten:  s[i, t] = -P_gen(i, t) + j·0             (Q wird gelöst)
+
+    Parameters
+    ----------
+    network : NetworkData (aus build_network_from_pandapower)
+    net : originales pandapower-Netz (für baseMVA)
+    pq_p_profile_mw, pq_q_profile_mvar : (n_pq_loads, τ)
+        Zeitreihen der PQ-Lasten in MW / MVAr, Reihenfolge = net.load.index.
+    pv_p_profile_mw : (n_pv, τ) | None
+        Zeitreihen der PV-Wirkleistung in MW. Reihenfolge = network.pv_indices.
+        None → nutze network.pv_p_setpoint (statisch, überall gleich).
+
+    Returns
+    -------
+    s_batch : (bφ, τ) complex128
+    """
+    ppc = net._ppc
+    base_mva = ppc["baseMVA"]
+    bphi = network.n_bus_phases
+    tau = pq_p_profile_mw.shape[1]
+
+    s_batch = np.zeros((bphi, tau), dtype=np.complex128)
+
+    # ── 1. PQ-Lasten ──
+    load_buses = net.load["bus"].values
+    ppc_bus_ids = np.arange(len(ppc["bus"]))
+    d_idx = _get_d_indices(net, include_pv=network.has_pv)
+    ppc_to_local = {int(b): i for i, b in enumerate(d_idx)}
+
+    for k, bus in enumerate(load_buses):
+        if int(bus) not in ppc_to_local:
+            continue
+        local = ppc_to_local[int(bus)]
+        p_pu = pq_p_profile_mw[k, :] / base_mva
+        q_pu = pq_q_profile_mvar[k, :] / base_mva
+        s_batch[local, :] += p_pu + 1j * q_pu   # Verbraucher: positiv
+
+    # ── 2. PV-Einspeiser ──
+    if network.has_pv:
+        pv_local = network.pv_indices
+        if pv_p_profile_mw is None:
+            # Statisch: kopiere Setpoint über τ
+            p_pv_static = network.pv_p_setpoint.reshape(-1, 1)
+            s_batch[pv_local, :] = -p_pv_static * np.ones((1, tau)) + 0j
+        else:
+            p_pv_pu = pv_p_profile_mw / base_mva
+            # PV-Konvention: s = -P_gen (Einspeisung)
+            s_batch[pv_local, :] = -p_pv_pu + 0j
+
+    return s_batch
+
+
+def _get_d_indices(net: pp.pandapowerNet, include_pv: bool) -> np.ndarray:
+    ppc = net._ppc
+    bus_types = ppc["bus"][:, 1].astype(int)
+    pq_idx = np.where(bus_types == 1)[0]
+    pv_idx = np.where(bus_types == 2)[0]
+    if include_pv:
+        return np.sort(np.concatenate([pq_idx, pv_idx]))
+    return pq_idx

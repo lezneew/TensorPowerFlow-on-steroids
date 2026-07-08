@@ -163,12 +163,20 @@ class TPFDenseSolver(BaseSolver):
 
         elapsed = time.perf_counter() - t_start
 
+        s_slack = None
+        if network.Y_ss is not None and network.Y_sd is not None:
+            V_mat = V if V.ndim == 2 else V.reshape(-1, 1)
+            v_s = network.v_s.reshape(-1, 1)
+            I_s = network.Y_ss @ v_s + network.Y_sd @ V_mat
+            s_slack = v_s * np.conj(I_s)
+
         return PowerFlowResult(
             voltages=V,
             iterations=n_iter,
             converged=converged,
             elapsed_time_s=elapsed,
             max_mismatch=tol_final,
+            s_slack=s_slack,
         )
 
     # ──────────────────────────────────────────────────────────────────────
