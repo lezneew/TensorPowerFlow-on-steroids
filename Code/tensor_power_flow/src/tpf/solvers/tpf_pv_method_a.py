@@ -88,6 +88,9 @@ class TPFDensePVMethodA(BaseSolver):
         ω < 1.0: Unterdämpft (nötig bei η nahe 1 oder vermaschten Netzen)
     enforce_q_lims : bool
         Wenn True: Q-Grenzen aus NetworkData einhalten (Clamping).
+    cold_start : bool
+        Wenn True: Jede outer iteration startet mit V=1.0 pu (cold start).
+        Wenn False (default): Nutze die Loesung der vorherigen outer iteration (warm start).
     """
 
     def __init__(
@@ -98,12 +101,14 @@ class TPFDensePVMethodA(BaseSolver):
         tol_pv: float = 1e-5,
         omega: float = 1.0,
         enforce_q_lims: bool = False,
+        cold_start: bool = False,
     ):
         super().__init__(tol, max_iter_inner)
         self.max_iter_outer = max_iter_outer
         self.tol_pv = tol_pv
         self.omega = omega
         self.enforce_q_lims = enforce_q_lims
+        self.cold_start = cold_start
 
         # Diagnostik (nach solve() verfügbar)
         self.pv_info: PVConvergenceInfo | None = None
@@ -236,6 +241,9 @@ class TPFDensePVMethodA(BaseSolver):
 
         for ell in range(self.max_iter_outer):
             outer_iter = ell + 1
+
+            if self.cold_start:
+                V = np.ones((bphi, tau), dtype=np.complex128)
 
             # Markiere Start dieser Outer-Iteration in der flachen Historie
             outer_start_indices.append(len(inner_v_change_all))

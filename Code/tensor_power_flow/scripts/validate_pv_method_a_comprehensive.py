@@ -146,7 +146,7 @@ def compute_spectral_radius(network, omega, delta_q=1e-5):
 #  Einzelnetz-Validierung
 # ══════════════════════════════════════════════════════════════════════
 
-def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=True):
+def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False):
     """
     Validiert Methode A gegen NR. Gibt Record mit Konvergenzhistorie zurück.
     """
@@ -250,6 +250,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     solver = TPFDensePVMethodA(
         tol=1e-8, max_iter_inner=50, max_iter_outer=100,
         tol_pv=1e-6, omega=omega, enforce_q_lims=False,
+        cold_start=cold_start,
     )
 
     try:
@@ -311,12 +312,12 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
 #  Batch-Validierung
 # ══════════════════════════════════════════════════════════════════════
 
-def run_validation_suite(networks: dict, omega=1.0, tol_pass=1e-4, verbose=True):
+def run_validation_suite(networks: dict, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False):
     records = []
     for name, info in networks.items():
         record = validate_network(
             info["constructor"], name, omega=omega,
-            tol_pass=tol_pass, verbose=verbose
+            tol_pass=tol_pass, verbose=verbose, cold_start=cold_start
         )
         records.append(record)
     return records
@@ -692,6 +693,45 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
 
 
 # ══════════════════════════════════════════════════════════════════════
+#  Text-Export für Subplot (b): Kumulative Inner-Iteration
+# ══════════════════════════════════════════════════════════════════════
+
+def export_inner_iteration_data(records: list, filepath: str, omega: float):
+    """
+    Exportiert die Daten aus Subplot (b) - kumulative Inner-Iteration.
+    Format: iter, max_delta_V, outer_iter
+    """
+    with open(filepath, 'w') as f:
+        f.write("# Inner iteration convergence data (subplot b)\n")
+        f.write(f"# omega = {omega}\n")
+        f.write("# Columns: iter, max_delta_V, outer_iter\n")
+        f.write("# \n")
+
+        for rec in records:
+            v_changes = rec.get("inner_v_change_all", [])
+            outer_starts = rec.get("outer_start_indices", [])
+            if not v_changes:
+                continue
+
+            f.write(f"# Network: {rec['name']}\n")
+            f.write(f"# n_bus={rec['n_bus']}, n_pv={rec['n_pv']}, "
+                    f"eta={rec['eta']:.4f}, rho={rec.get('rho', np.nan):.4f}, "
+                    f"rx_ratio={rec.get('rx_ratio', np.nan):.2f}\n")
+
+            outer_iter = 1
+            outer_idx = 0
+            for i, delta_v in enumerate(v_changes, 1):
+                while outer_idx + 1 < len(outer_starts) and i > outer_starts[outer_idx + 1]:
+                    outer_iter += 1
+                    outer_idx += 1
+                f.write(f"{i:6d}  {delta_v:.10e}  {outer_iter:2d}\n")
+
+            f.write("# \n")
+
+    print(f"\n  Exportiert: {filepath}")
+
+
+# ══════════════════════════════════════════════════════════════════════
 #  Main
 # ══════════════════════════════════════════════════════════════════════
 
@@ -717,6 +757,12 @@ def main():
                         help="Nur dieses Netzwerk testen (Name muss exakt stimmen)")
     parser.add_argument("--list", action="store_true",
                         help="Liste aller verfügbaren Netzwerke in der Suite anzeigen")
+    parser.add_argument("--export", type=str, default=None,
+                        help="Exportiere subplot (b) Daten in Textdatei")
+    parser.add_argument("--cold-start", action="store_true",
+                        help="Nutze cold start fuer innere FPI (jede outer iteration startet mit V=1.0 pu)")
+    parser.add_argument("--size", type=int, default=None,
+                        help="Filter networks by bus count (e.g., 20 for sz_20_*)")
     args = parser.parse_args()
 
     print("╔════════════════════════════════════════════════════════════════════════════╗")
@@ -737,8 +783,15 @@ def main():
         networks = get_comprehensive_networks()
 
 
+    cold_str = " (COLD START)" if args.cold_start else ""
     print(f"\n  Suite: '{args.suite}' — {len(networks)} Netze")
-    print(f"  ω = {args.omega}, PASS-Schwelle = {args.tol:.0e}\n")
+    print(f"  ω = {args.omega}, PASS-Schwelle = {args.tol:.0e}{cold_str}\n")
+
+    # Handle --size filter (filter networks by bus count prefix, e.g., sz_20_*)
+    if args.size is not None:
+        size_prefix = f"sz_{args.size}_"
+        networks = {k: v for k, v in networks.items() if k.startswith(size_prefix)}
+        print(f"  → Nach Größe gefiltert: '{size_prefix}' → {len(networks)} Netze")
 
     # Handle --list
     if args.list:
@@ -761,12 +814,13 @@ def main():
     # Validierung
     t_start = time.perf_counter()
     records = run_validation_suite(
-        networks, omega=args.omega, tol_pass=args.tol, verbose=True
+        networks, omega=args.omega, tol_pass=args.tol, verbose=True, cold_start=args.cold_start
     )
     t_total = time.perf_counter() - t_start
 
     # Tabelle
-    print_results_table(records, title=f"Methode A — Suite '{args.suite}', ω={args.omega}")
+    cold_str = " (COLD START)" if args.cold_start else ""
+    print_results_table(records, title=f"Methode A — Suite '{args.suite}', ω={args.omega}{cold_str}")
     print_statistics(records)
 
     # Gesamtergebnis
@@ -790,6 +844,10 @@ def main():
             print(f"    - {n_div} divergiert (ω anpassen oder η > 1)")
         if n_acc:
             print(f"    - {n_acc} Genauigkeit unzureichend")
+
+    # Export
+    if args.export:
+        export_inner_iteration_data(records, args.export, omega=args.omega)
 
     # Plot
     if not args.no_plot:
