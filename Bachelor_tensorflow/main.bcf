@@ -2422,6 +2422,7 @@
     <bcf:citekey order="55" intorder="1">Salazar2024</bcf:citekey>
     <bcf:citekey order="56" intorder="1">Garcia2000</bcf:citekey>
     <bcf:citekey order="56" intorder="2">Giraldo2022</bcf:citekey>
+    <bcf:citekey order="57" intorder="1">Salazar2024</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">
@@ -2433,13 +2434,4 @@
     </bcf:sort>
   </bcf:sortingtemplate>
   <!-- DATALISTS -->
-  <bcf:datalist section="0"
-                name="none/global//global/global"
-                type="entry"
-                sortingtemplatename="none"
-                sortingnamekeytemplatename="global"
-                labelprefix=""
-                uniquenametemplatename="global"
-                labelalphanametemplatename="global">
-  </bcf:datalist>
 </bcf:controlfile>

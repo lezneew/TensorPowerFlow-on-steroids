@@ -6,103 +6,185 @@
 \contentsline {chapter}{Tabellenverzeichnis}{xiii}{chapter*.6}%
 \contentsline {chapter}{Symbolverzeichnis}{xv}{chapter*.7}%
 \contentsline {chapter}{Abkürzungsverzeichnis}{xvii}{chapter*.8}%
-\contentsline {chapter}{\numberline {1}Grundlagen der Lastflussberechnung}{1}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Netzmodell und Knotentypen}{1}{section.1.1}%
-\contentsline {subsection}{\numberline {1.1.1}Die Admittanzmatrix}{1}{subsection.1.1.1}%
-\contentsline {subsection}{\numberline {1.1.2}Komplexe Leistung und Spannungsdarstellung}{2}{subsection.1.1.2}%
-\contentsline {subsection}{\numberline {1.1.3}Knotentypen}{2}{subsection.1.1.3}%
-\contentsline {paragraph}{Slack-Knoten ($V\delta $-Knoten).}{3}{section*.10}%
-\contentsline {paragraph}{PQ-Knoten.}{3}{section*.11}%
-\contentsline {paragraph}{PV-Knoten.}{3}{section*.12}%
-\contentsline {subsection}{\numberline {1.1.4}Das ZIP-Lastmodell}{3}{subsection.1.1.4}%
-\contentsline {section}{\numberline {1.2}Newton-Raphson-Verfahren}{4}{section.1.2}%
-\contentsline {subsection}{\numberline {1.2.1}Die polare Standard-Formulierung}{4}{subsection.1.2.1}%
-\contentsline {subsection}{\numberline {1.2.2}Unbekannte und Gleichungen}{4}{subsection.1.2.2}%
-\contentsline {paragraph}{Unbekannte:}{4}{section*.13}%
-\contentsline {paragraph}{Mismatch-Gleichungen:}{5}{section*.14}%
-\contentsline {subsection}{\numberline {1.2.3}Iterationsvorschrift}{5}{subsection.1.2.3}%
-\contentsline {subsection}{\numberline {1.2.4}Die Jacobi-Matrix in Blockform}{5}{subsection.1.2.4}%
-\contentsline {subsection}{\numberline {1.2.5}Elemente der Jacobi-Matrix}{6}{subsection.1.2.5}%
-\contentsline {paragraph}{Außerdiagonalelemente ($k \neq m$):}{6}{section*.16}%
-\contentsline {paragraph}{Diagonalelemente ($k = m$):}{6}{section*.17}%
-\contentsline {paragraph}{Herleitung der Diagonalelemente.}{6}{section*.18}%
-\contentsline {paragraph}{Zusammenhang zwischen den Blöcken.}{7}{section*.19}%
-\contentsline {subsection}{\numberline {1.2.6}Das vollständige Newton-Raphson-System}{7}{subsection.1.2.6}%
-\contentsline {subsection}{\numberline {1.2.7}Behandlung von PV-Knoten}{7}{subsection.1.2.7}%
-\contentsline {subsection}{\numberline {1.2.8}Q-Limits und PV-zu-PQ-Umwandlung}{8}{subsection.1.2.8}%
-\contentsline {subsection}{\numberline {1.2.9}Konvergenzeigenschaften}{8}{subsection.1.2.9}%
-\contentsline {subsection}{\numberline {1.2.10}Grenzen des Newton-Raphson-Verfahrens}{9}{subsection.1.2.10}%
-\contentsline {section}{\numberline {1.3}Current Injection Method und PV-Behandlung}{9}{section.1.3}%
-\contentsline {subsection}{\numberline {1.3.1}Strommismatch-Formulierung}{10}{subsection.1.3.1}%
-\contentsline {subsection}{\numberline {1.3.2}Jacobi-Matrix der CIM}{11}{subsection.1.3.2}%
-\contentsline {subsection}{\numberline {1.3.3}Behandlung von PV-Knoten in der CIM}{13}{subsection.1.3.3}%
-\contentsline {subsection}{\numberline {1.3.4}Q-Limits und PV-zu-PQ-Umwandlung}{15}{subsection.1.3.4}%
-\contentsline {section}{\numberline {1.4}Fixed-Point-Iteration und Konvergenz}{15}{section.1.4}%
-\contentsline {subsection}{\numberline {1.4.1}Laurent-Reihen-Approximation}{16}{subsection.1.4.1}%
-\contentsline {subsection}{\numberline {1.4.2}Herleitung des FPI-Algorithmus}{16}{subsection.1.4.2}%
-\contentsline {subsection}{\numberline {1.4.3}Die Successive Approximation Method (SAM)}{17}{subsection.1.4.3}%
-\contentsline {subsection}{\numberline {1.4.4}Konvergenzbeweis mittels Banach-Fixpunktsatz}{18}{subsection.1.4.4}%
-\contentsline {subsection}{\numberline {1.4.5}Physikalische Interpretation der Konvergenzbedingung}{19}{subsection.1.4.5}%
-\contentsline {chapter}{\numberline {2}Der Tensor Power Flow}{21}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Grundalgorithmus}{21}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Dense- und Sparse-Formulierung}{22}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Motivation: Der Tensor der Lastdaten}{23}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Dense-Formulierung}{23}{subsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.2.3}Sparse-Formulierung}{24}{subsection.2.2.3}%
-\contentsline {section}{\numberline {2.3}Limitation: Keine PV-Knoten}{25}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}Warum PV-Knoten diese Annahme verletzen}{26}{subsection.2.3.1}%
-\contentsline {chapter}{\numberline {3}Methoden zur PV-Knoten-Integration im Tensor Power Flow}{27}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Analyse der Auswirkung von PV-Knoten auf die FPI-Struktur}{28}{section.3.1}%
-\contentsline {subsection}{\numberline {3.1.1}Welche Matrizen werden von Q-Änderungen beeinflusst?}{28}{subsection.3.1.1}%
-\contentsline {paragraph}{Interpretation.}{28}{section*.21}%
-\contentsline {subsection}{\numberline {3.1.2}Umschreibung der Iteration}{29}{subsection.3.1.2}%
-\contentsline {subsection}{\numberline {3.1.3}Konsequenzen für den Konvergenzbeweis}{29}{subsection.3.1.3}%
-\contentsline {section}{\numberline {3.2}Methode A: Äußere Q-Schleife}{30}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Grundidee}{30}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Herleitung der Q-Korrekturformel}{30}{subsection.3.2.2}%
-\contentsline {paragraph}{Thévenin-Äquivalent am Knoten $k$.}{31}{section*.22}%
-\contentsline {paragraph}{Strominjektion als Funktion von $Q_k$.}{31}{section*.23}%
-\contentsline {paragraph}{Linearisierung: Stromänderung bei Q-Variation.}{31}{section*.24}%
-\contentsline {paragraph}{Spannungsänderung über Thévenin-Impedanz.}{31}{section*.25}%
-\contentsline {paragraph}{Änderung des Spannungsbetragsquadrats.}{31}{section*.26}%
-\contentsline {paragraph}{Ergebnis: Q-Korrekturformel.}{32}{section*.27}%
-\contentsline {subsection}{\numberline {3.2.3}Eigenschaften der Korrekturformel}{32}{subsection.3.2.3}%
-\contentsline {subsection}{\numberline {3.2.4}Algorithmus}{33}{subsection.3.2.4}%
-\contentsline {subsection}{\numberline {3.2.5}Rechentechnische Betrachtung}{34}{subsection.3.2.5}%
-\contentsline {paragraph}{Fall $\alpha _{Z,k} = 0$ am PV-Knoten (häufiger Spezialfall).}{34}{section*.28}%
-\contentsline {paragraph}{Fall $\alpha _{Z,k} \neq 0$ (allgemeiner Fall).}{34}{section*.29}%
-\contentsline {paragraph}{Konvergenz der inneren Schleife.}{34}{section*.30}%
-\contentsline {section}{\numberline {3.3}Methode B: Eingebettete Q-Korrektur}{34}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Grundidee}{34}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Mathematische Formulierung}{35}{subsection.3.3.2}%
-\contentsline {paragraph}{Schritt 1: FPI-Schritt mit aktuellen Hilfsmatrizen.}{35}{section*.31}%
-\contentsline {paragraph}{Schritt 2: Spannungsbetrags-Projektion.}{35}{section*.32}%
-\contentsline {paragraph}{Schritt 3: Q-Rückrechnung aus dem Kirchhoff'schen Knotengesetz.}{35}{section*.33}%
-\contentsline {paragraph}{Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren.}{36}{section*.34}%
-\contentsline {paragraph}{Vereinfachung für $\alpha _{Z,k} = \alpha _{I,k} = 0$ am PV-Knoten.}{36}{section*.35}%
-\contentsline {subsection}{\numberline {3.3.3}Algorithmus}{38}{subsection.3.3.3}%
-\contentsline {subsection}{\numberline {3.3.4}Eigenschaften und Diskussion}{39}{subsection.3.3.4}%
-\contentsline {paragraph}{Vergleich mit Methode A.}{39}{section*.36}%
-\contentsline {paragraph}{Kosten der Matrix-Updates.}{39}{section*.37}%
-\contentsline {section}{\numberline {3.4}Tensorformulierung der Methoden}{40}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}Recap: Tensor-Reshape und allgemeine FPI}{40}{subsection.3.4.1}%
-\contentsline {paragraph}{Szenarioabhängigkeit.}{40}{section*.39}%
-\contentsline {paragraph}{Die rettende Eigenschaft: Nur $\bm {A}$ ist szenarioabhängig (für $\alpha _{Z,k} = 0$).}{40}{section*.40}%
-\contentsline {subsection}{\numberline {3.4.2}Umformulierung für den Tensor-Fall}{40}{subsection.3.4.2}%
-\contentsline {paragraph}{Allgemeiner ZIP-Fall ($\alpha _{Z,k} \neq 0$).}{41}{section*.41}%
-\contentsline {subsection}{\numberline {3.4.3}Tensorformulierung von Methode A}{41}{subsection.3.4.3}%
-\contentsline {paragraph}{Innere Schleife (Matrix-Matrix-Multiplikation).}{41}{section*.42}%
-\contentsline {paragraph}{Bemerkung zur Szenarioabhängigkeit.}{41}{section*.43}%
-\contentsline {paragraph}{Äußere Schleife (element-weise, trivial parallel).}{42}{section*.44}%
-\contentsline {subsection}{\numberline {3.4.4}Tensorformulierung von Methode B}{42}{subsection.3.4.4}%
-\contentsline {paragraph}{Schritt 1: FPI (Matrix-Matrix-Multiplikation).}{42}{section*.45}%
-\contentsline {paragraph}{Schritt 2: Projektion (element-weise).}{42}{section*.46}%
-\contentsline {paragraph}{Schritt 3: Stromberechnung und Q-Rückrechnung.}{43}{section*.47}%
-\contentsline {paragraph}{Schritt 4: $\dot {S}$-Update (element-weise).}{43}{section*.48}%
-\contentsline {subsection}{\numberline {3.4.5}Gesamtvergleich der Tensor-Operationen}{43}{subsection.3.4.5}%
-\contentsline {subsection}{\numberline {3.4.6}Zusammenfassung: Warum die Parallelisierung erhalten bleibt}{43}{subsection.3.4.6}%
-\contentsline {chapter}{Literaturverzeichnis}{47}{chapter*.51}%
-\contentsline {chapter}{\numberline {A}Ergänzende Herleitungen}{49}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Vollständige Herleitung der Sensitivitätskette}{49}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Koeffizienten der quadratischen Gleichung}{49}{section.A.2}%
-\contentsline {chapter}{\numberline {B}Zusätzliche Simulationsergebnisse}{51}{appendix.B}%
+\contentsline {chapter}{\numberline {1}Einleitung}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Motivation}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Problemstellung}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Zielsetzung und Forschungsfragen}{1}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Aufbau der Arbeit}{1}{section.1.4}%
+\contentsline {chapter}{\numberline {2}Grundlagen der Lastflussberechnung}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Netzmodell und Knotentypen}{3}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Die Admittanzmatrix}{3}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Komplexe Leistung und Spannungsdarstellung}{4}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Knotentypen}{4}{subsection.2.1.3}%
+\contentsline {paragraph}{Slack-Knoten ($V\delta $-Knoten).}{5}{section*.10}%
+\contentsline {paragraph}{PQ-Knoten.}{5}{section*.11}%
+\contentsline {paragraph}{PV-Knoten.}{5}{section*.12}%
+\contentsline {subsection}{\numberline {2.1.4}Das ZIP-Lastmodell}{5}{subsection.2.1.4}%
+\contentsline {section}{\numberline {2.2}Newton-Raphson-Verfahren}{6}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Die polare Standard-Formulierung}{6}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Unbekannte und Gleichungen}{6}{subsection.2.2.2}%
+\contentsline {paragraph}{Unbekannte:}{6}{section*.13}%
+\contentsline {paragraph}{Mismatch-Gleichungen:}{7}{section*.14}%
+\contentsline {subsection}{\numberline {2.2.3}Iterationsvorschrift}{7}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Die Jacobi-Matrix in Blockform}{7}{subsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.2.5}Elemente der Jacobi-Matrix}{8}{subsection.2.2.5}%
+\contentsline {paragraph}{Außerdiagonalelemente ($k \neq m$):}{8}{section*.16}%
+\contentsline {paragraph}{Diagonalelemente ($k = m$):}{8}{section*.17}%
+\contentsline {paragraph}{Herleitung der Diagonalelemente.}{8}{section*.18}%
+\contentsline {paragraph}{Zusammenhang zwischen den Blöcken.}{9}{section*.19}%
+\contentsline {subsection}{\numberline {2.2.6}Das vollständige Newton-Raphson-System}{9}{subsection.2.2.6}%
+\contentsline {subsection}{\numberline {2.2.7}Behandlung von PV-Knoten}{9}{subsection.2.2.7}%
+\contentsline {subsection}{\numberline {2.2.8}Q-Limits und PV-zu-PQ-Umwandlung}{10}{subsection.2.2.8}%
+\contentsline {subsection}{\numberline {2.2.9}Konvergenzeigenschaften}{10}{subsection.2.2.9}%
+\contentsline {subsection}{\numberline {2.2.10}Grenzen des Newton-Raphson-Verfahrens}{11}{subsection.2.2.10}%
+\contentsline {section}{\numberline {2.3}Current Injection Method und PV-Behandlung}{11}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Strommismatch-Formulierung}{12}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Jacobi-Matrix der CIM}{13}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Behandlung von PV-Knoten in der CIM}{15}{subsection.2.3.3}%
+\contentsline {subsection}{\numberline {2.3.4}Q-Limits und PV-zu-PQ-Umwandlung}{17}{subsection.2.3.4}%
+\contentsline {section}{\numberline {2.4}Fixed-Point-Iteration und Konvergenz}{17}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Laurent-Reihen-Approximation}{18}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Herleitung des FPI-Algorithmus}{18}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}Die Successive Approximation Method (SAM)}{19}{subsection.2.4.3}%
+\contentsline {subsection}{\numberline {2.4.4}Konvergenzbeweis mittels Banach-Fixpunktsatz}{20}{subsection.2.4.4}%
+\contentsline {subsection}{\numberline {2.4.5}Physikalische Interpretation der Konvergenzbedingung}{21}{subsection.2.4.5}%
+\contentsline {chapter}{\numberline {3}Der Tensor Power Flow}{23}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Grundalgorithmus}{23}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Dense- und Sparse-Formulierung}{24}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Motivation: Der Tensor der Lastdaten}{25}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Dense-Formulierung}{25}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Sparse-Formulierung}{26}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}Limitation: Keine PV-Knoten}{27}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Warum PV-Knoten diese Annahme verletzen}{28}{subsection.3.3.1}%
+\contentsline {chapter}{\numberline {4}Methoden zur PV-Knoten-Integration im Tensor Power Flow}{29}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Analyse der Auswirkung von PV-Knoten auf die FPI-Struktur}{30}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Welche Matrizen werden von Q-Änderungen beeinflusst?}{30}{subsection.4.1.1}%
+\contentsline {paragraph}{Interpretation.}{30}{section*.21}%
+\contentsline {subsection}{\numberline {4.1.2}Umschreibung der Iteration}{31}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Konsequenzen für den Konvergenzbeweis}{31}{subsection.4.1.3}%
+\contentsline {section}{\numberline {4.2}Methode A: Äußere Q-Schleife}{32}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Grundidee}{32}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Herleitung der Q-Korrekturformel}{32}{subsection.4.2.2}%
+\contentsline {paragraph}{Thévenin-Äquivalent am Knoten $k$.}{33}{section*.22}%
+\contentsline {paragraph}{Strominjektion als Funktion von $Q_k$.}{33}{section*.23}%
+\contentsline {paragraph}{Linearisierung: Stromänderung bei Q-Variation.}{33}{section*.24}%
+\contentsline {paragraph}{Spannungsänderung über Thévenin-Impedanz.}{33}{section*.25}%
+\contentsline {paragraph}{Änderung des Spannungsbetragsquadrats.}{33}{section*.26}%
+\contentsline {paragraph}{Ergebnis: Q-Korrekturformel.}{34}{section*.27}%
+\contentsline {subsection}{\numberline {4.2.3}Eigenschaften der Korrekturformel}{34}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Algorithmus}{35}{subsection.4.2.4}%
+\contentsline {subsection}{\numberline {4.2.5}Rechentechnische Betrachtung}{36}{subsection.4.2.5}%
+\contentsline {paragraph}{Fall $\alpha _{Z,k} = 0$ am PV-Knoten (häufiger Spezialfall).}{36}{section*.28}%
+\contentsline {paragraph}{Fall $\alpha _{Z,k} \neq 0$ (allgemeiner Fall).}{36}{section*.29}%
+\contentsline {paragraph}{Konvergenz der inneren Schleife.}{36}{section*.30}%
+\contentsline {section}{\numberline {4.3}Methode B: Eingebettete Q-Korrektur}{36}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Grundidee}{36}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Mathematische Formulierung}{37}{subsection.4.3.2}%
+\contentsline {paragraph}{Schritt 1: FPI-Schritt mit aktuellen Hilfsmatrizen.}{37}{section*.31}%
+\contentsline {paragraph}{Schritt 2: Spannungsbetrags-Projektion.}{37}{section*.32}%
+\contentsline {paragraph}{Schritt 3: Q-Rückrechnung aus dem Kirchhoff'schen Knotengesetz.}{37}{section*.33}%
+\contentsline {paragraph}{Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren.}{38}{section*.34}%
+\contentsline {paragraph}{Vereinfachung für $\alpha _{Z,k} = \alpha _{I,k} = 0$ am PV-Knoten.}{38}{section*.35}%
+\contentsline {subsection}{\numberline {4.3.3}Algorithmus}{40}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Eigenschaften und Diskussion}{41}{subsection.4.3.4}%
+\contentsline {paragraph}{Vergleich mit Methode A.}{41}{section*.36}%
+\contentsline {paragraph}{Kosten der Matrix-Updates.}{41}{section*.37}%
+\contentsline {section}{\numberline {4.4}Tensorformulierung der Methoden}{42}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Recap: Tensor-Reshape und allgemeine FPI}{42}{subsection.4.4.1}%
+\contentsline {paragraph}{Szenarioabhängigkeit.}{42}{section*.39}%
+\contentsline {paragraph}{Die rettende Eigenschaft: Nur $\bm {A}$ ist szenarioabhängig (für $\alpha _{Z,k} = 0$).}{42}{section*.40}%
+\contentsline {subsection}{\numberline {4.4.2}Umformulierung für den Tensor-Fall}{42}{subsection.4.4.2}%
+\contentsline {paragraph}{Allgemeiner ZIP-Fall ($\alpha _{Z,k} \neq 0$).}{43}{section*.41}%
+\contentsline {subsection}{\numberline {4.4.3}Tensorformulierung von Methode A}{43}{subsection.4.4.3}%
+\contentsline {paragraph}{Innere Schleife (Matrix-Matrix-Multiplikation).}{43}{section*.42}%
+\contentsline {paragraph}{Bemerkung zur Szenarioabhängigkeit.}{43}{section*.43}%
+\contentsline {paragraph}{Äußere Schleife (element-weise, trivial parallel).}{44}{section*.44}%
+\contentsline {subsection}{\numberline {4.4.4}Tensorformulierung von Methode B}{44}{subsection.4.4.4}%
+\contentsline {paragraph}{Schritt 1: FPI (Matrix-Matrix-Multiplikation).}{44}{section*.45}%
+\contentsline {paragraph}{Schritt 2: Projektion (element-weise).}{44}{section*.46}%
+\contentsline {paragraph}{Schritt 3: Stromberechnung und Q-Rückrechnung.}{45}{section*.47}%
+\contentsline {paragraph}{Schritt 4: $\dot {S}$-Update (element-weise).}{45}{section*.48}%
+\contentsline {subsection}{\numberline {4.4.5}Gesamtvergleich der Tensor-Operationen}{45}{subsection.4.4.5}%
+\contentsline {subsection}{\numberline {4.4.6}Zusammenfassung: Warum die Parallelisierung erhalten bleibt}{45}{subsection.4.4.6}%
+\contentsline {chapter}{\numberline {5}Implementierung und Testdesign}{47}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Programmiersprache und Bibliotheken}{47}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Testnetze}{47}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Szenarien und Parameter}{47}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Referenzmethoden}{47}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Bewertungsmetriken}{47}{section.5.5}%
+\contentsline {chapter}{\numberline {6}Ergebnisse und Diskussion}{49}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Validierung gegen Newton-Raphson-Referenz}{49}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Konvergenzverhalten}{49}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Rechenzeit: Skalierung mit Netzgröße}{49}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Rechenzeit: Skalierung mit Anzahl der Lastflüsse}{49}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Einfluss der Anzahl der PV-Knoten}{49}{section.6.5}%
+\contentsline {section}{\numberline {6.6}GPU vs. CPU}{49}{section.6.6}%
+\contentsline {section}{\numberline {6.7}Vergleich der drei Methoden}{49}{section.6.7}%
+\contentsline {section}{\numberline {6.8}Vergleich mit konventionellen Verfahren}{49}{section.6.8}%
+\contentsline {chapter}{\numberline {7}Zusammenfassung und Ausblick}{51}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Zusammenfassung der Ergebnisse}{51}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Bewertung der Methoden}{51}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Ausblick}{51}{section.7.3}%
+\contentsline {chapter}{\numberline {8}Implementierung des Tensor Power Flow}{53}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Überblick: Vom Netzmodell zur Lösung}{53}{section.8.1}%
+\contentsline {section}{\numberline {8.2}Phase 1: Vorberechnung der konstanten Größen}{54}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}Berechnung der Bus-Impedanzmatrix $Z_B$}{54}{subsection.8.2.1}%
+\contentsline {paragraph}{Bedeutung.}{54}{section*.50}%
+\contentsline {paragraph}{Code-Zuordnung.}{54}{section*.51}%
+\contentsline {paragraph}{Warum ist $Z_B$ konstant?}{54}{section*.52}%
+\contentsline {paragraph}{Komplexität.}{54}{section*.53}%
+\contentsline {subsection}{\numberline {8.2.2}Berechnung des Konstantvektors}{55}{subsection.8.2.2}%
+\contentsline {paragraph}{Physikalische Interpretation.}{55}{section*.54}%
+\contentsline {paragraph}{Code-Zuordnung.}{55}{section*.55}%
+\contentsline {paragraph}{Warum ist $\bm {w}$ konstant?}{55}{section*.56}%
+\contentsline {section}{\numberline {8.3}Phase 2: Initialisierung}{55}{section.8.3}%
+\contentsline {subsection}{\numberline {8.3.1}Flat Start der Spannungen}{56}{subsection.8.3.1}%
+\contentsline {paragraph}{Code-Zuordnung.}{56}{section*.57}%
+\contentsline {paragraph}{Bemerkung.}{56}{section*.58}%
+\contentsline {subsection}{\numberline {8.3.2}Aufbau der Leerlaufspannungsmatri}{56}{subsection.8.3.2}%
+\contentsline {paragraph}{Code-Zuordnung.}{56}{section*.59}%
+\contentsline {subsection}{\numberline {8.3.3}Aufbau der konjugierten Leistungsmatrix $\dot {\bm {S}}^*$}{57}{subsection.8.3.3}%
+\contentsline {paragraph}{Code-Zuordnung.}{57}{section*.60}%
+\contentsline {paragraph}{Warum konjugiert?}{57}{section*.61}%
+\contentsline {subsection}{\numberline {8.3.4}Vorberechnung von}{57}{subsection.8.3.4}%
+\contentsline {paragraph}{Code-Zuordnung.}{57}{section*.62}%
+\contentsline {section}{\numberline {8.4}Phase 3: Die Iterationsschleife (Kern des TPF)}{57}{section.8.4}%
+\contentsline {subsection}{\numberline {8.4.1}Schritt 3.1: Element-weise Inversion der konjugierten Spannung}{58}{subsection.8.4.1}%
+\contentsline {paragraph}{Mathematische Operation.}{58}{section*.63}%
+\contentsline {paragraph}{Code-Zuordnung.}{58}{section*.64}%
+\contentsline {paragraph}{Physikalische Bedeutung.}{58}{section*.65}%
+\contentsline {subsection}{\numberline {8.4.2}Schritt 3.2: Berechnung des konjugierten Stroms (Hadamard-Produkt)}{58}{subsection.8.4.2}%
+\contentsline {paragraph}{Mathematische Operation.}{58}{section*.66}%
+\contentsline {paragraph}{Code-Zuordnung.}{59}{section*.67}%
+\contentsline {paragraph}{Bemerkung zum Hadamard-Produkt.}{59}{section*.68}%
+\contentsline {subsection}{\numberline {8.4.3}Schritt 3.3: Die Kern-Iteration (Matrix-Matrix-Multiplikation)}{59}{subsection.8.4.3}%
+\contentsline {paragraph}{Mathematische Operation.}{59}{section*.69}%
+\contentsline {paragraph}{Code-Zuordnung.}{59}{section*.70}%
+\contentsline {paragraph}{Physikalische Interpretation (spaltenweise für einen Lastfall $j$).}{60}{section*.71}%
+\contentsline {paragraph}{Warum ist dies der Kernschritt?}{60}{section*.72}%
+\contentsline {subsection}{\numberline {8.4.4}Zusammenfassung: Ein vollständiger Iterationsschritt}{60}{subsection.8.4.4}%
+\contentsline {section}{\numberline {8.5}Phase 4: Konvergenzprüfung}{61}{section.8.5}%
+\contentsline {subsection}{\numberline {8.5.1}Berechnung der aus den Spannungen resultierenden Leistung}{61}{subsection.8.5.1}%
+\contentsline {paragraph}{Herleitung des Vorzeichens.}{61}{section*.74}%
+\contentsline {paragraph}{Code-Zuordnung.}{61}{section*.75}%
+\contentsline {subsection}{\numberline {8.5.2}Berechnung des maximalen Mismatches}{62}{subsection.8.5.2}%
+\contentsline {paragraph}{Code-Zuordnung.}{62}{section*.76}%
+\contentsline {paragraph}{Physikalische Bedeutung.}{62}{section*.77}%
+\contentsline {subsection}{\numberline {8.5.3}Abbruchbedingung}{62}{subsection.8.5.3}%
+\contentsline {paragraph}{Code-Zuordnung.}{62}{section*.78}%
+\contentsline {section}{\numberline {8.6}Die Vorzeichenkonvention im Detail}{63}{section.8.6}%
+\contentsline {paragraph}{Ausgangsgleichung (Admittanzform, Injektionskonvention).}{63}{section*.79}%
+\contentsline {paragraph}{Verbraucherkonvention im Code.}{63}{section*.80}%
+\contentsline {paragraph}{Zusammenführung.}{63}{section*.81}%
+\contentsline {paragraph}{Wo kommt das Minus im Code her?}{64}{section*.82}%
+\contentsline {section}{\numberline {8.7}Die Tensor-Struktur: Warum Batch schneller ist}{64}{section.8.7}%
+\contentsline {paragraph}{Sequentielle Version (ein Lastfluss).}{64}{section*.83}%
+\contentsline {paragraph}{Tensorisierte Version (alle Lastflüsse simultan).}{65}{section*.84}%
+\contentsline {paragraph}{Warum ist das schneller?}{65}{section*.85}%
+\contentsline {section}{\numberline {8.8}Zusammenfassung: Der vollständige Algorithmus}{66}{section.8.8}%
+\contentsline {section}{\numberline {8.9}Code-zu-Mathematik-Referenztabelle}{66}{section.8.9}%
+\contentsline {section}{\numberline {8.10}Numerisches Beispiel: 2-Bus-System}{67}{section.8.10}%
+\contentsline {paragraph}{Systemdaten:}{67}{section*.87}%
+\contentsline {paragraph}{Vorberechnung.}{68}{section*.88}%
+\contentsline {paragraph}{Iteration 0 $\to $ 1:}{68}{section*.89}%
+\contentsline {paragraph}{Vergleich mit dem NR-Verhalten.}{68}{section*.90}%
