@@ -111,6 +111,26 @@ class TPFDensePVMethodA(BaseSolver):
         K, L = self._precompute(network)
         Z_B = -K
 
+        # PV diagonal-dominance diagnostic
+        if network.has_pv and network.n_pv > 1:
+            pv = network.pv_indices
+            X_pp = np.imag(Z_B[np.ix_(pv, pv)])
+            diag = np.abs(np.diag(X_pp))
+            off = np.sum(np.abs(X_pp), axis=1) - diag
+            min_ratio = (diag / np.maximum(off, 1e-12)).min()
+            cond_num = np.linalg.cond(X_pp)
+            rho = np.max(np.abs(np.linalg.eigvals(np.eye(len(pv)) - np.diag(1.0 / diag) @ X_pp)))
+            print(f"  [PV diag check] min(diag/off): {min_ratio:.3f}, cond(X_pp): {cond_num:.1f}, rho_Jacobi: {rho:.3f}")
+
+        # Coupled Thévenin: precompute (2*X_pp)^{-1} once
+        A_pv_inv = None
+        if network.has_pv:
+            pv_idx_pre = network.pv_indices
+            X_pp = np.imag(Z_B[np.ix_(pv_idx_pre, pv_idx_pre)])
+            n_pv_pre = len(pv_idx_pre)
+            A_pv = 2.0 * X_pp + 1e-12 * np.eye(n_pv_pre)
+            A_pv_inv = np.linalg.inv(A_pv)
+
         # Output-Arrays
         V_all = np.zeros((bphi, tau), dtype=np.complex128)
         n_pv = network.n_pv
@@ -130,7 +150,7 @@ class TPFDensePVMethodA(BaseSolver):
 
             if network.has_pv:
                 V_c, q_c, info_c = self._solve_chunk_with_pv(
-                    network, s_chunk, K, L, Z_B
+                    network, s_chunk, K, L, Z_B, A_pv_inv
                 )
                 q_pv_all[:, s_start:s_end] = q_c
             else:
@@ -215,7 +235,7 @@ class TPFDensePVMethodA(BaseSolver):
     #  Chunk-Solver: mit PV (Kern-Algorithmus mit per-Szenario-Masken)
     # ══════════════════════════════════════════════════════════════════
 
-    def _solve_chunk_with_pv(self, network, s_chunk, K, L, Z_B):
+    def _solve_chunk_with_pv(self, network, s_chunk, K, L, Z_B, A_pv_inv):
         bphi = network.n_bus_phases
         tau = s_chunk.shape[1]
 
@@ -224,10 +244,6 @@ class TPFDensePVMethodA(BaseSolver):
         v_spec = network.pv_v_setpoint
         v_spec_2d = v_spec.reshape(-1, 1)         # (n_pv, 1)
         v_spec_sq_2d = (v_spec ** 2).reshape(-1, 1)
-
-        X_th = np.imag(Z_B[pv_idx, pv_idx])
-        X_th_safe = np.where(np.abs(X_th) > 1e-10, X_th, 1e-10)
-        X_th_col = X_th_safe.reshape(-1, 1)
 
         s_work = s_chunk.copy()
         p_pv_fixed = s_work[pv_idx, :].real.copy()   # (n_pv, τ) time-varying P
@@ -279,8 +295,9 @@ class TPFDensePVMethodA(BaseSolver):
             if converged_mask.all():
                 break
 
-            # Q-Update (Thévenin)
-            delta_q = (v_spec_sq_2d - v_mag_pv ** 2) / (2.0 * X_th_col)
+            # Q-Update: coupled Newton step in reduced PV-space
+            delta_v_sq = v_spec_sq_2d - v_mag_pv ** 2
+            delta_q = A_pv_inv @ delta_v_sq
 
             # Q einfrieren für bereits konvergierte Szenarien
             delta_q[:, converged_mask] = 0.0
@@ -369,8 +386,11 @@ class TPFDensePVMethodA(BaseSolver):
         pv_idx = network.pv_indices
         n_pv = len(pv_idx)
         v_spec = network.pv_v_setpoint
-        X_th = np.imag(Z_B[pv_idx, pv_idx])
-        X_th_safe = np.where(np.abs(X_th) > 1e-10, X_th, 1e-10)
+
+        # Coupled Thévenin: precompute (2*X_pp)^{-1} once
+        X_pp = np.imag(Z_B[np.ix_(pv_idx, pv_idx)])
+        A_pv = 2.0 * X_pp + 1e-12 * np.eye(n_pv)
+        A_pv_inv = np.linalg.inv(A_pv)
 
         s_work = s_batch.copy()
         p_pv_fixed = s_work[pv_idx, :].real.copy()
@@ -422,8 +442,9 @@ class TPFDensePVMethodA(BaseSolver):
                 converged_outer = True
                 break
 
-            delta_q = ((v_spec_2d ** 2 - v_mag_pv ** 2)
-                       / (2.0 * X_th_safe.reshape(-1, 1)))
+            # Coupled Newton step in reduced PV-space
+            delta_v_sq = v_spec_2d ** 2 - v_mag_pv ** 2
+            delta_q = A_pv_inv @ delta_v_sq
             q_pv = q_pv - self.omega * delta_q
 
             if self.enforce_q_lims:

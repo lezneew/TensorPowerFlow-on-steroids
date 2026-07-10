@@ -1,0 +1,128 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{hyperref}
+
+\title{TPF PV-Methode A: Konvergenzanalyse der äußeren Q-Schleife\\
+	\large Zusammenfassung}
+\author{}
+\date{}
+
+\begin{document}
+	\maketitle
+	
+	\section{Der Algorithmus (Methode A)}
+	Die äußere Schleife aktualisiert die Blindleistung $q$ an den PV-Knoten,
+	während die innere Fixpunktiteration (FPI) die Spannungen berechnet:
+	\begin{equation}
+		q^{(\ell+1)} = q^{(\ell)} - \omega\, D^{-1} g\big(q^{(\ell)}\big),
+		\qquad
+		g_k(q) = V_{\mathrm{spec},k}^2 - |V_k(q)|^2 .
+	\end{equation}
+	\begin{itemize}
+		\item $D = \operatorname{diag}(2X_{kk})$ mit $X_{kk} = \operatorname{Im}(Z_B[k,k])$
+		(Thévenin-Approximation, konstant).
+		\item Innere FPI: $V_{n+1} = K\,(S^\ast \odot V^{\ast-1}) + L$ mit
+		$K = -Y_{dd}^{-1}$, $L = K\,Y_{ds}\,v_s$ (beide konstant).
+	\end{itemize}
+	
+	\section{Herleitung der Jacobi-Matrix $J_G$}
+	Mit dem Update-Operator $G(q) = q - \omega D^{-1} g(q)$ gilt:
+	\begin{align}
+		J_G &= \frac{\partial G}{\partial q}
+		= I - \omega D^{-1}\frac{\partial g}{\partial q}.
+	\end{align}
+	Da $V_{\mathrm{spec}}$ konstant ist, folgt
+	$\dfrac{\partial g}{\partial q} = -H$ mit der wahren Sensitivitätsmatrix
+	\begin{equation}
+		H_{kj} = \frac{\partial |V_k|^2}{\partial q_j}.
+	\end{equation}
+	Einsetzen liefert:
+	\begin{equation}
+		\boxed{\,J_G = I + \omega\, H\, D^{-1}\,},
+		\qquad \text{Konvergenz} \iff \rho(J_G) < 1.
+	\end{equation}
+	\textbf{Bemerkung zur Reihenfolge:} $D^{-1}H$ und $HD^{-1}$ sind ähnlich
+	und besitzen dieselben Eigenwerte; für den Spektralradius $\rho(J_G)$
+	ist die Reihenfolge daher unerheblich.
+	
+	\section{Warum Approximation $D$ statt echter Sensitivität $H$?}
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lll}
+			\toprule
+			& Wahre $H$ & Thévenin $D$ \\
+			\midrule
+			Kosten & $n_{pv}$ volle Lastflüsse & gratis (Diagonale) \\
+			Änderung pro Iteration & ja & nein (konstant) \\
+			Batch-/Tensorstruktur & zerstört & erhalten \\
+			Genauigkeit & exakt & gut bei $H \approx D$ \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	\begin{itemize}
+		\item $K, L, D$ werden \emph{einmalig} vorberechnet $\Rightarrow$ volle
+		Parallelisierbarkeit (Kernvorteil von TPF).
+		\item $H$ müsste pro äußerer Iteration neu bestimmt werden und würde die
+		batched Matrixmultiplikation aufbrechen (vgl.\ Methode B).
+		\item Für radiale Netze mit moderatem $R/X$ gilt $H \approx D$,
+		also $\rho(J_G) < 1$.
+		\item Versagt bei hohem $R/X$ (z.\,B.\ Salazar, $R/X \approx 5.82$)
+		oder starker PV-PV-Kopplung.
+	\end{itemize}
+	
+	\section{Warm-Start der inneren Schleife}
+	Die Spannung $V$ wird \emph{einmal} vor der äußeren Schleife initialisiert
+	und über \texttt{V\_init=V} in jede innere FPI weitergereicht:
+	\begin{itemize}
+		\item $\ell=0$: Flat-Start $V=1$.
+		\item $\ell \geq 1$: Start von der zuvor konvergierten Lösung.
+	\end{itemize}
+	Nur $q$ (und damit $s_{\text{work}}$ an PV-Knoten) ändert sich zwischen
+	äußeren Iterationen.
+	
+	\section{Beobachtungen (Netz \texttt{sz\_20\_r005}, $\omega=1.0$)}
+	Parameter: $n_{bus}=19$, $n_{pv}=1$, $\eta=0.147$, $\rho=0.338$, $R/X=5.82$.
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			\toprule
+			& Warm-Start & Cold-Start \\
+			\midrule
+			Äußere Iterationen        & 9 & 9 \\
+			Innere Iterationen (total)& \textbf{43} & 59 \\
+			Start-Residuum je Outer   & schrumpft $\approx \rho$ & konstant $\sim 1.1\cdot10^{-2}$ \\
+			Innere Iter.\ je Outer    & fallend (7$\to$3) & konstant ($\sim$7) \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	Kernaussagen:
+	\begin{enumerate}
+		\item Die Zahl der \textbf{äußeren} Iterationen ist unabhängig vom
+		Start und durch $\rho(J_G)=0.338$ bestimmt.
+		\item Warm-Start spart $\sim 27\%$ innere Iterationen.
+		\item Die Start-Residuen der inneren FPI schrumpfen beim Warm-Start
+		geometrisch mit dem Faktor $\approx \rho$:
+		\begin{equation}
+			\frac{1.18\text{e-}3}{9.36\text{e-}3}\approx 0.13,\quad
+			\frac{3.50\text{e-}4}{1.18\text{e-}3}\approx 0.30,\quad
+			\frac{1.14\text{e-}4}{3.50\text{e-}4}\approx 0.33 \to \rho.
+		\end{equation}
+		Das ist ein empirischer Fingerabdruck des Spektralradius.
+		\item Beim Cold-Start ($V=1$ pro Outer) geht dieses Signal verloren.
+	\end{enumerate}
+	
+	\section{Fazit}
+	\begin{itemize}
+		\item Die äußere Konvergenz wird durch $\rho(J_G) = \rho(I + \omega H D^{-1})$
+		bestimmt.
+		\item Die Thévenin-Approximation $D$ erhält die Tensor-Performance,
+		setzt aber $H \approx D$ voraus.
+		\item Warm-Start beschleunigt nur die innere Arbeit, nicht die Anzahl
+		äußerer Q-Korrekturen.
+	\end{itemize}
+	
+\end{document}

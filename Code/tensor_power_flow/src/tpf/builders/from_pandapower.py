@@ -195,7 +195,7 @@ def build_s_batch_timeseries(
         else:
             p_pv_pu = pv_p_profile_mw / base_mva
             # PV-Konvention: s = -P_gen (Einspeisung)
-            s_batch[pv_local, :] = -p_pv_pu + 0j
+            s_batch[pv_local, :] -= p_pv_pu
 
     return s_batch
 

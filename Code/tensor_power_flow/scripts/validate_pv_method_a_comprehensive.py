@@ -69,13 +69,17 @@ def compute_eta(Y_dd, s_nom, v_min_pu):
 def compute_spectral_radius(network, omega, delta_q=1e-5):
     """
     Berechnet den Spektralradius der Iterationsmatrix der äußeren Q-Schleife
-    numerisch via Finite-Differenzen.
+    via Finite-Differenzen für die Sensitivitätsmatrix H.
 
-    ρ(I + ω·H·D⁻¹)
+    ρ(I - ω·A_pv_inv @ H)
 
     wobei:
-        D = diag(2·X_kk)           (Thévenin-Approximation)
-        H_kj = ∂|V_k|²/∂Q_j       (wahre Sensitivitätsmatrix, numerisch)
+        A_pv_inv = inv(2·X_pp + ε·I)    (FULL matrix inverse, gekoppelt)
+        H_kj = ∂|V_k|²/∂Q_j            (Sensitivitätsmatrix, numerisch)
+
+    HINWEIS: Die lineare Analyse ergibt typischerweise ρ > 1 (≈2), weil
+    H ≈ -2·X_pp im linearen Regime. Dennoch konvergiert der Solver oft,
+    da die innere FPI nichtlinear ist und zusätzliche Dämpfung bietet.
 
     Parameters
     ----------
@@ -94,22 +98,18 @@ def compute_spectral_radius(network, omega, delta_q=1e-5):
     n_pv = len(pv_idx)
     bphi = network.n_bus_phases
 
-    # Vorberechnung
     Z_B = np.linalg.inv(network.Y_dd)
     K = -Z_B
     L = (K @ network.Y_ds @ network.v_s).reshape(-1, 1)
 
-    # Thévenin-Reaktanz
-    X_kk = np.imag(Z_B[pv_idx, pv_idx])
+    X_pp = np.imag(Z_B[pv_idx, :][:, pv_idx])
+    eps = 1e-10
+    A_pv = 2.0 * X_pp + eps * np.eye(n_pv)
+    A_pv_inv = np.linalg.inv(A_pv)
 
-    # D-Matrix
-    D_inv = np.diag(1.0 / (2.0 * np.where(np.abs(X_kk) > 1e-12, X_kk, 1e-12)))
-
-    # ── Basislösung: Innere FPI mit aktuellem s_nom ──
     s_base = network.s_nom.copy().reshape(-1, 1)
 
     def solve_inner_fpi(s_work, max_iter=200, tol=1e-10):
-        """Löst innere FPI und gibt |V|² an PV-Knoten zurück."""
         V = np.ones((bphi, 1), dtype=np.complex128)
         S_conj = np.conj(s_work)
         for _ in range(max_iter):
@@ -120,22 +120,17 @@ def compute_spectral_radius(network, omega, delta_q=1e-5):
             V = V_new
         return np.abs(V[pv_idx, 0]) ** 2
 
-    # Basislösung
     v2_base = solve_inner_fpi(s_base)
 
-    # ── H-Matrix via Finite-Differenzen ──
     H = np.zeros((n_pv, n_pv))
-
     for j in range(n_pv):
         s_pert = s_base.copy()
         s_pert[pv_idx[j], 0] += 1j * delta_q
         v2_pert = solve_inner_fpi(s_pert)
         H[:, j] = (v2_pert - v2_base) / delta_q
 
-    # ── Iterationsmatrix: J_G = I + ω·H·D⁻¹ ──
-    J_G = np.eye(n_pv) + omega * H @ D_inv
+    J_G = np.eye(n_pv) - omega * A_pv_inv @ H
 
-    # Spektralradius
     eigenvalues = np.linalg.eigvals(J_G)
     rho = float(np.max(np.abs(eigenvalues)))
 

@@ -116,27 +116,29 @@ class PandapowerNRSolver(BaseSolver):
     def solve_timeseries(
         self,
         net: pp.pandapowerNet,
-        pq_p_profile_mw: NDArray,      # (n_loads, τ)
-        pq_q_profile_mvar: NDArray,    # (n_loads, τ)
-        pv_p_profile_mw: NDArray | None = None,   # (n_gens, τ), oder None (statisch)
+        pq_p_profile_mw: NDArray,
+        pq_q_profile_mvar: NDArray,
+        pv_p_profile_mw: NDArray | None = None,
         verbose: bool = False,
     ) -> PowerFlowResult:
-        """
-        Sequential NR-Baseline für Zeitreihen (nur für kleine τ ≤ 10000).
-        """
         import copy
         t_start = time.perf_counter()
+
+        # base_mva einmalig extrahieren (net._ppc ist nach Salazar-validate schon da)
+        if hasattr(net, "_ppc") and net._ppc is not None:
+            base_mva = float(net._ppc["baseMVA"])
+        else:
+            pp.runpp(net, algorithm="nr")
+            base_mva = float(net._ppc["baseMVA"])
 
         tau = pq_p_profile_mw.shape[1]
         n_bus = len(net.bus)
         V_all = np.zeros((n_bus, tau), dtype=np.complex128)
+        s_slack_all = np.zeros((1, tau), dtype=np.complex128)
         conv_ps = np.zeros(tau, dtype=bool)
         iters_ps = np.zeros(tau, dtype=np.int32)
 
-        p_load_base = net.load["p_mw"].values.copy()
-        q_load_base = net.load["q_mvar"].values.copy()
         p_gen_base = net.gen["p_mw"].values.copy() if len(net.gen) > 0 else None
-
         net_work = copy.deepcopy(net)
 
         for t in range(tau):
@@ -152,9 +154,15 @@ class PandapowerNRSolver(BaseSolver):
                          enforce_q_lims=False)
                 conv_ps[t] = bool(net_work.converged)
                 iters_ps[t] = net_work._ppc.get("iterations", -1)
+
                 vm = net_work.res_bus["vm_pu"].values
                 va = net_work.res_bus["va_degree"].values
                 V_all[:, t] = vm * np.exp(1j * np.deg2rad(va))
+
+                # NEU: Slack-Leistung pro Szenario
+                p_s = net_work.res_ext_grid["p_mw"].values[0] / base_mva
+                q_s = net_work.res_ext_grid["q_mvar"].values[0] / base_mva
+                s_slack_all[0, t] = p_s + 1j * q_s
             except Exception:
                 conv_ps[t] = False
                 iters_ps[t] = -1
@@ -170,4 +178,5 @@ class PandapowerNRSolver(BaseSolver):
             converged=bool(np.all(conv_ps)),
             elapsed_time_s=elapsed,
             max_mismatch=0.0,
+            s_slack=s_slack_all,
         )

@@ -34,6 +34,10 @@ class NetworkData:
     pv_q_min: NDArray[np.float64] | None = None       # (n_pv,) Q_min in p.u.
     pv_q_max: NDArray[np.float64] | None = None       # (n_pv,) Q_max in p.u.
 
+    # === Slack-Block (für Post-Processing: S_slack) ===
+    Y_ss: NDArray[np.complex128] | None = None  # (φ × φ)
+    Y_sd: NDArray[np.complex128] | None = None  # (φ × b·φ)
+
     @property
     def n_bus_phases(self) -> int:
         return self.n_buses * self.n_phases
@@ -63,3 +67,9 @@ class NetworkData:
         if self.pv_mask is None:
             return np.arange(self.n_bus_phases)
         return np.where(~self.pv_mask)[0]
+
+
+    @property
+    def has_slack_blocks(self) -> bool:
+        """True wenn Y_ss und Y_sd vorhanden sind (für S_slack-Berechnung)."""
+        return self.Y_ss is not None and self.Y_sd is not None
