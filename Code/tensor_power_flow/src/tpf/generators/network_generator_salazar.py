@@ -59,16 +59,13 @@ class SalazarNetworkConfig:
     Die Defaultwerte reproduzieren exakt das Verhalten des Papers.
     """
 
-    # ── Topologie (Paper: nx.full_rary_tree) ──
     nodes: int = 34
     child: int = 3
 
-    # ── Spannungsebene (Paper: 11 kV, s_base=1000 kVA) ──
     vn_kv: float = 11.0
     s_base_kva: float = 1000.0
     v_slack_pu: float = 1.00
 
-    # ── Leitungsparameter (Paper: R=0.3144/line_factor, X=0.054/line_factor) ──
     r_ohm_per_km: float = 0.3144
     x_ohm_per_km: float = 0.054
     line_factor: float = 3.0
@@ -393,6 +390,7 @@ def create_salazar_network(
     vn_kv: float = 11.0,
     v_slack_pu: float = 1.00,
     seed: int | None = 42,
+    rx_ratio: float | None = None,
 ) -> pp.pandapowerNet:
     """
     Erzeugt ein Netz nach Salazar et al. (2024) mit optionalen PV-Knoten.
@@ -428,11 +426,19 @@ def create_salazar_network(
         Slack-Spannung [p.u.]. Paper: 1.00.
     seed : int | None
         Zufallssamen.
+    rx_ratio : float | None
+        R/X ratio override. If set, computes r_ohm_per_km = x_ohm_per_km * rx_ratio.
+        Default: None (uses default R=0.3144, X=0.054, R/X=5.82)
 
     Returns
     -------
     pandapowerNet
     """
+    r_ohm = 0.3144
+    x_ohm = 0.054
+    if rx_ratio is not None:
+        r_ohm = x_ohm * rx_ratio
+
     config = SalazarNetworkConfig(
         nodes=nodes,
         child=child,
@@ -448,6 +454,8 @@ def create_salazar_network(
         vn_kv=vn_kv,
         v_slack_pu=v_slack_pu,
         seed=seed,
+        r_ohm_per_km=r_ohm,
+        x_ohm_per_km=x_ohm,
     )
     gen = SalazarNetworkGenerator(config)
     return gen.generate()
@@ -1682,6 +1690,87 @@ for key, constructor in _LOW_VM_CONSTRUCTORS.items():
 def get_salazar_low_vm_networks() -> dict[str, dict]:
     """Low-voltage networks for NR-constructor-failing networks."""
     return SALAZAR_LOW_VM_NETWORKS
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  LOW RX NETWORKS — Für Netze mit niedrigerem R/X Ratio
+#  Problem networks mit rx_ratio = 0.5 und 1.0
+# ══════════════════════════════════════════════════════════════════════
+
+_PROBLEM_NETWORKS_RX = [
+    (120, 0.50), (120, 0.60),
+    (200, 0.60),
+    (350, 0.50), (350, 0.60),
+    (500, 0.20), (500, 0.30), (500, 0.40), (500, 0.50), (500, 0.60),
+    (750, 0.20), (750, 0.30), (750, 0.40), (750, 0.50), (750, 0.60),
+    (1000, 0.20), (1000, 0.30), (1000, 0.40), (1000, 0.50), (1000, 0.60),
+    (1500, 0.02), (1500, 0.05), (1500, 0.10), (1500, 0.20), (1500, 0.30),
+    (1500, 0.40), (1500, 0.50), (1500, 0.60),
+]
+
+_RX_VALUES = [0.5, 1.0]
+_RX_NAMES = {0.5: "rx05", 1.0: "rx10"}
+
+
+def _create_salazar_size_ratio_rx(
+    nodes: int, pv_ratio: float, seed: int,
+    pv_vm_offset_pu: float = 0.005,
+    rx_ratio: float | None = None
+):
+    """Erzeugt ein Salazar-Netz mit gegebener Größe, PV-Ratio und R/X Ratio."""
+    n_pv = max(1, int(round(nodes * pv_ratio)))
+    n_pv = min(n_pv, nodes - 3)
+    return create_salazar_network(
+        nodes=nodes, child=3, n_pv=n_pv, seed=seed,
+        pv_vm_offset_pu=pv_vm_offset_pu,
+        rx_ratio=rx_ratio
+    )
+
+
+_LOW_RX_CONSTRUCTORS: dict[str, callable] = {}
+
+for rx_ratio in _RX_VALUES:
+    rx_name = _RX_NAMES[rx_ratio]
+    for nodes, pv_ratio in _PROBLEM_NETWORKS_RX:
+        base_seed = 2000 + nodes + int(pv_ratio * 1000) + int(rx_ratio * 100)
+        key = f"sz_{nodes}_{rx_name}_r{int(pv_ratio*100)}"
+        _LOW_RX_CONSTRUCTORS[key] = lambda n=nodes, p=pv_ratio, s=base_seed, rx=rx_ratio: \
+            _create_salazar_size_ratio_rx(n, p, s, rx_ratio=rx)
+
+SALAZAR_LOW_RX05_NETWORKS: dict[str, dict] = {}
+SALAZAR_LOW_RX10_NETWORKS: dict[str, dict] = {}
+
+for key, constructor in _LOW_RX_CONSTRUCTORS.items():
+    parts = key.split("_")
+    size = int(parts[1])
+    rx_name = parts[2]
+    ratio = int(parts[3][1:]) / 100.0
+
+    n_pv = max(1, int(round(size * ratio)))
+    n_pv = min(n_pv, size - 3)
+
+    network_entry = {
+        "constructor": constructor,
+        "description": f"Salazar {size}-Bus, PV={ratio*100:.0f}%, {rx_name}",
+        "n_pv": n_pv, "n_bus_total": size, "pv_ratio": ratio,
+        "rx_ratio": float(rx_name.replace("rx", "")) / 10.0,
+        "category": f"salazar_{rx_name}",
+    }
+
+    if rx_name == "rx05":
+        SALAZAR_LOW_RX05_NETWORKS[key] = network_entry
+    else:
+        SALAZAR_LOW_RX10_NETWORKS[key] = network_entry
+
+
+def get_salazar_low_rx05_networks() -> dict[str, dict]:
+    """Networks with R/X = 0.5 for testing convergence."""
+    return SALAZAR_LOW_RX05_NETWORKS
+
+
+def get_salazar_low_rx10_networks() -> dict[str, dict]:
+    """Networks with R/X = 1.0 for testing convergence."""
+    return SALAZAR_LOW_RX10_NETWORKS
 
 
 # ══════════════════════════════════════════════════════════════════════
