@@ -177,9 +177,10 @@ def main():
     parser = argparse.ArgumentParser(description="Plot voltage profiles for test networks")
     parser.add_argument(
         "--suite",
-        choices=["salazar_scaling", "salazar_low_vm", "salazar_all"],
+        choices=["salazar_scaling", "salazar_low_vm", "salazar_low_rx05", "salazar_low_rx10", "salazar_all"],
         default="salazar_scaling",
-        help="Network suite to plot: salazar_scaling (default), salazar_low_vm (low voltage), salazar_all (both)"
+        help="Network suite to plot: salazar_scaling (default), salazar_low_vm (low voltage), "
+             "salazar_low_rx05 (R/X=0.5), salazar_low_rx10 (R/X=1.0), salazar_all (all)"
     )
     parser.add_argument(
         "--output-dir",
@@ -200,6 +201,16 @@ def main():
 
     if args.suite in ["salazar_low_vm", "salazar_all"]:
         for name, info in SALAZAR_LOW_VM_NETWORKS.items():
+            all_networks[f"salazar_{name}"] = info
+
+    if args.suite in ["salazar_low_rx05", "salazar_all"]:
+        from tpf.generators.network_generator_salazar import SALAZAR_LOW_RX05_NETWORKS
+        for name, info in SALAZAR_LOW_RX05_NETWORKS.items():
+            all_networks[f"salazar_{name}"] = info
+
+    if args.suite in ["salazar_low_rx10", "salazar_all"]:
+        from tpf.generators.network_generator_salazar import SALAZAR_LOW_RX10_NETWORKS
+        for name, info in SALAZAR_LOW_RX10_NETWORKS.items():
             all_networks[f"salazar_{name}"] = info
 
     # for name, info in SALAZAR_TEST_NETWORKS.items():

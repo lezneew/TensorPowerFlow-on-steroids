@@ -43,6 +43,10 @@ from tpf.generators.network_generator_salazar import (
     SALAZAR_SCALING_NETWORKS,
     get_salazar_low_vm_networks,
     SALAZAR_LOW_VM_NETWORKS,
+    get_salazar_low_rx05_networks,
+    SALAZAR_LOW_RX05_NETWORKS,
+    get_salazar_low_rx10_networks,
+    SALAZAR_LOW_RX10_NETWORKS,
     create_salazar_network,
 )
 from tpf.generators.ieee_pegase_networks import (
@@ -914,11 +918,13 @@ def main():
         description="Validierung + Spektralradius + Konvergenz-Plot: TPF Methode A"
     )
     parser.add_argument(
-        "--suite", choices=["quick", "radial", "salazar", "salazar_scaling", "salazar_low_vm", "full",
+        "--suite", choices=["quick", "radial", "salazar", "salazar_scaling", "salazar_low_vm",
+                            "salazar_low_rx05", "salazar_low_rx10", "full",
                             "ieee", "pegase", "rte", "large", "standard"],
         default="salazar_scaling",
         help="Testsuite: quick (4 Netze), radial (ohne IEEE vermascht), salazar/salazar_scaling, "
              "salazar_low_vm (niedrige PV-Spannung für NR-scheiternde Netze), "
+             "salazar_low_rx05 (R/X=0.5), salazar_low_rx10 (R/X=1.0), "
              "full (alles), ieee (IEEE 9-300), pegase (PEGASE), rte (French), large (>100), standard (alle)"
     )
     parser.add_argument("--omega", type=float, default=1.0,
@@ -962,6 +968,10 @@ def main():
         networks = get_salazar_scaling_networks()
     elif args.suite == "salazar_low_vm":
         networks = get_salazar_low_vm_networks()
+    elif args.suite == "salazar_low_rx05":
+        networks = get_salazar_low_rx05_networks()
+    elif args.suite == "salazar_low_rx10":
+        networks = get_salazar_low_rx10_networks()
     elif args.suite == "ieee":
         networks = get_ieee_networks()
     elif args.suite == "pegase":
