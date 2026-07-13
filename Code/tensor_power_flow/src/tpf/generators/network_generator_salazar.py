@@ -811,12 +811,14 @@ _SIZES = [20, 40, 75, 120, 200, 350, 500, 750, 1000, 1500]
 _PV_RATIOS = [0.02, 0.05, 0.10, 0.15, 0.20, 0.30]
 
 
-def _create_salazar_size_ratio(nodes: int, pv_ratio: float, seed: int):
+def _create_salazar_size_ratio(nodes: int, pv_ratio: float, seed: int, pv_vm_offset_pu: float = 0.005):
     """Erzeugt ein Salazar-Netz mit gegebener Größe und PV-Ratio."""
     n_pv = max(1, int(round(nodes * pv_ratio)))
-    # Sicherstellen: mindestens 2 PQ-Knoten bleiben
     n_pv = min(n_pv, nodes - 3)
-    return create_salazar_network(nodes=nodes, child=3, n_pv=n_pv, seed=seed)
+    return create_salazar_network(
+        nodes=nodes, child=3, n_pv=n_pv, seed=seed,
+        pv_vm_offset_pu=pv_vm_offset_pu
+    )
 
 
 # ── Generierte Konstruktoren für die Testmatrix ──
@@ -833,6 +835,18 @@ def create_salazar_20bus_r010():
 def create_salazar_20bus_r020():
     return _create_salazar_size_ratio(20, 0.20, 2002)
 
+def create_salazar_20bus_r030():
+    return _create_salazar_size_ratio(20, 0.30, 2003)
+
+def create_salazar_20bus_r040():
+    return _create_salazar_size_ratio(20, 0.40, 2004)
+
+def create_salazar_20bus_r050():
+    return _create_salazar_size_ratio(20, 0.50, 2005)
+
+def create_salazar_20bus_r060():
+    return _create_salazar_size_ratio(20, 0.60, 2006)
+
 def create_salazar_40bus_r000():
     return _create_salazar_size_ratio(40, 0.0, 2010)
 
@@ -844,6 +858,18 @@ def create_salazar_40bus_r010():
 
 def create_salazar_40bus_r020():
     return _create_salazar_size_ratio(40, 0.20, 2012)
+
+def create_salazar_40bus_r030():
+    return _create_salazar_size_ratio(40, 0.30, 2013)
+
+def create_salazar_40bus_r040():
+    return _create_salazar_size_ratio(40, 0.40, 2014)
+
+def create_salazar_40bus_r050():
+    return _create_salazar_size_ratio(40, 0.50, 2015)
+
+def create_salazar_40bus_r060():
+    return _create_salazar_size_ratio(40, 0.60, 2016)
 
 def create_salazar_75bus_r000():
     return _create_salazar_size_ratio(75, 0.0, 2020)
@@ -860,6 +886,15 @@ def create_salazar_75bus_r020():
 def create_salazar_75bus_r030():
     return _create_salazar_size_ratio(75, 0.30, 2023)
 
+def create_salazar_75bus_r040():
+    return _create_salazar_size_ratio(75, 0.40, 2024)
+
+def create_salazar_75bus_r050():
+    return _create_salazar_size_ratio(75, 0.50, 2025)
+
+def create_salazar_75bus_r060():
+    return _create_salazar_size_ratio(75, 0.60, 2026)
+
 def create_salazar_120bus_r000():
     return _create_salazar_size_ratio(120, 0.0, 2030)
 
@@ -874,6 +909,15 @@ def create_salazar_120bus_r020():
 
 def create_salazar_120bus_r030():
     return _create_salazar_size_ratio(120, 0.30, 2033)
+
+def create_salazar_120bus_r040():
+    return _create_salazar_size_ratio(120, 0.40, 2034)
+
+def create_salazar_120bus_r050():
+    return _create_salazar_size_ratio(120, 0.50, 2035)
+
+def create_salazar_120bus_r060():
+    return _create_salazar_size_ratio(120, 0.60, 2036)
 
 def create_salazar_200bus_r000():
     return _create_salazar_size_ratio(200, 0.0, 2040)
@@ -893,6 +937,15 @@ def create_salazar_200bus_r020():
 def create_salazar_200bus_r030():
     return _create_salazar_size_ratio(200, 0.30, 2044)
 
+def create_salazar_200bus_r040():
+    return _create_salazar_size_ratio(200, 0.40, 2045)
+
+def create_salazar_200bus_r050():
+    return _create_salazar_size_ratio(200, 0.50, 2046)
+
+def create_salazar_200bus_r060():
+    return _create_salazar_size_ratio(200, 0.60, 2047)
+
 def create_salazar_350bus_r000():
     return _create_salazar_size_ratio(350, 0.0, 2050)
 
@@ -907,6 +960,18 @@ def create_salazar_350bus_r010():
 
 def create_salazar_350bus_r020():
     return _create_salazar_size_ratio(350, 0.20, 2053)
+
+def create_salazar_350bus_r030():
+    return _create_salazar_size_ratio(350, 0.30, 2054)
+
+def create_salazar_350bus_r040():
+    return _create_salazar_size_ratio(350, 0.40, 2055)
+
+def create_salazar_350bus_r050():
+    return _create_salazar_size_ratio(350, 0.50, 2056)
+
+def create_salazar_350bus_r060():
+    return _create_salazar_size_ratio(350, 0.60, 2057)
 
 def create_salazar_500bus_r000():
     return _create_salazar_size_ratio(500, 0.0, 2060)
@@ -923,6 +988,18 @@ def create_salazar_500bus_r010():
 def create_salazar_500bus_r020():
     return _create_salazar_size_ratio(500, 0.20, 2063)
 
+def create_salazar_500bus_r030():
+    return _create_salazar_size_ratio(500, 0.30, 2064)
+
+def create_salazar_500bus_r040():
+    return _create_salazar_size_ratio(500, 0.40, 2065)
+
+def create_salazar_500bus_r050():
+    return _create_salazar_size_ratio(500, 0.50, 2066)
+
+def create_salazar_500bus_r060():
+    return _create_salazar_size_ratio(500, 0.60, 2067)
+
 def create_salazar_750bus_r000():
     return _create_salazar_size_ratio(750, 0.0, 2070)
 
@@ -934,6 +1011,21 @@ def create_salazar_750bus_r005():
 
 def create_salazar_750bus_r010():
     return _create_salazar_size_ratio(750, 0.10, 2072)
+
+def create_salazar_750bus_r020():
+    return _create_salazar_size_ratio(750, 0.20, 2073)
+
+def create_salazar_750bus_r030():
+    return _create_salazar_size_ratio(750, 0.30, 2074)
+
+def create_salazar_750bus_r040():
+    return _create_salazar_size_ratio(750, 0.40, 2075)
+
+def create_salazar_750bus_r050():
+    return _create_salazar_size_ratio(750, 0.50, 2076)
+
+def create_salazar_750bus_r060():
+    return _create_salazar_size_ratio(750, 0.60, 2077)
 
 def create_salazar_1000bus_r000():
     return _create_salazar_size_ratio(1000, 0.0, 2080)
@@ -947,6 +1039,21 @@ def create_salazar_1000bus_r005():
 def create_salazar_1000bus_r010():
     return _create_salazar_size_ratio(1000, 0.10, 2082)
 
+def create_salazar_1000bus_r020():
+    return _create_salazar_size_ratio(1000, 0.20, 2083)
+
+def create_salazar_1000bus_r030():
+    return _create_salazar_size_ratio(1000, 0.30, 2084)
+
+def create_salazar_1000bus_r040():
+    return _create_salazar_size_ratio(1000, 0.40, 2085)
+
+def create_salazar_1000bus_r050():
+    return _create_salazar_size_ratio(1000, 0.50, 2086)
+
+def create_salazar_1000bus_r060():
+    return _create_salazar_size_ratio(1000, 0.60, 2087)
+
 def create_salazar_1500bus_r000():
     return _create_salazar_size_ratio(1500, 0.0, 2090)
 
@@ -958,6 +1065,21 @@ def create_salazar_1500bus_r005():
 
 def create_salazar_1500bus_r010():
     return _create_salazar_size_ratio(1500, 0.10, 2092)
+
+def create_salazar_1500bus_r020():
+    return _create_salazar_size_ratio(1500, 0.20, 2093)
+
+def create_salazar_1500bus_r030():
+    return _create_salazar_size_ratio(1500, 0.30, 2094)
+
+def create_salazar_1500bus_r040():
+    return _create_salazar_size_ratio(1500, 0.40, 2095)
+
+def create_salazar_1500bus_r050():
+    return _create_salazar_size_ratio(1500, 0.50, 2096)
+
+def create_salazar_1500bus_r060():
+    return _create_salazar_size_ratio(1500, 0.60, 2097)
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -990,6 +1112,30 @@ SALAZAR_SCALING_NETWORKS: dict[str, dict] = {
         "n_pv": 4, "n_bus_total": 20, "pv_ratio": 0.20,
         "category": "salazar_scaling",
     },
+    "sz_20_r030": {
+        "constructor": create_salazar_20bus_r030,
+        "description": "Salazar 20-Bus, PV/Total=30%",
+        "n_pv": 6, "n_bus_total": 20, "pv_ratio": 0.30,
+        "category": "salazar_scaling",
+    },
+    "sz_20_r040": {
+        "constructor": create_salazar_20bus_r040,
+        "description": "Salazar 20-Bus, PV/Total=40%",
+        "n_pv": 8, "n_bus_total": 20, "pv_ratio": 0.40,
+        "category": "salazar_scaling",
+    },
+    "sz_20_r050": {
+        "constructor": create_salazar_20bus_r050,
+        "description": "Salazar 20-Bus, PV/Total=50%",
+        "n_pv": 10, "n_bus_total": 20, "pv_ratio": 0.50,
+        "category": "salazar_scaling",
+    },
+    "sz_20_r060": {
+        "constructor": create_salazar_20bus_r060,
+        "description": "Salazar 20-Bus, PV/Total=60%",
+        "n_pv": 12, "n_bus_total": 20, "pv_ratio": 0.60,
+        "category": "salazar_scaling",
+    },
     # ── 40 Bus ──
     "sz_40_r000": {
         "constructor": create_salazar_40bus_r000,
@@ -1013,6 +1159,30 @@ SALAZAR_SCALING_NETWORKS: dict[str, dict] = {
         "constructor": create_salazar_40bus_r020,
         "description": "Salazar 40-Bus, PV/Total=20%",
         "n_pv": 8, "n_bus_total": 40, "pv_ratio": 0.20,
+        "category": "salazar_scaling",
+    },
+    "sz_40_r030": {
+        "constructor": create_salazar_40bus_r030,
+        "description": "Salazar 40-Bus, PV/Total=30%",
+        "n_pv": 12, "n_bus_total": 40, "pv_ratio": 0.30,
+        "category": "salazar_scaling",
+    },
+    "sz_40_r040": {
+        "constructor": create_salazar_40bus_r040,
+        "description": "Salazar 40-Bus, PV/Total=40%",
+        "n_pv": 16, "n_bus_total": 40, "pv_ratio": 0.40,
+        "category": "salazar_scaling",
+    },
+    "sz_40_r050": {
+        "constructor": create_salazar_40bus_r050,
+        "description": "Salazar 40-Bus, PV/Total=50%",
+        "n_pv": 20, "n_bus_total": 40, "pv_ratio": 0.50,
+        "category": "salazar_scaling",
+    },
+    "sz_40_r060": {
+        "constructor": create_salazar_40bus_r060,
+        "description": "Salazar 40-Bus, PV/Total=60%",
+        "n_pv": 24, "n_bus_total": 40, "pv_ratio": 0.60,
         "category": "salazar_scaling",
     },
     # ── 75 Bus ──
@@ -1046,6 +1216,24 @@ SALAZAR_SCALING_NETWORKS: dict[str, dict] = {
         "n_pv": 23, "n_bus_total": 75, "pv_ratio": 0.30,
         "category": "salazar_scaling",
     },
+    "sz_75_r040": {
+        "constructor": create_salazar_75bus_r040,
+        "description": "Salazar 75-Bus, PV/Total=40%",
+        "n_pv": 30, "n_bus_total": 75, "pv_ratio": 0.40,
+        "category": "salazar_scaling",
+    },
+    "sz_75_r050": {
+        "constructor": create_salazar_75bus_r050,
+        "description": "Salazar 75-Bus, PV/Total=50%",
+        "n_pv": 38, "n_bus_total": 75, "pv_ratio": 0.50,
+        "category": "salazar_scaling",
+    },
+    "sz_75_r060": {
+        "constructor": create_salazar_75bus_r060,
+        "description": "Salazar 75-Bus, PV/Total=60%",
+        "n_pv": 45, "n_bus_total": 75, "pv_ratio": 0.60,
+        "category": "salazar_scaling",
+    },
     # ── 120 Bus ──
     "sz_120_r000": {
         "constructor": create_salazar_120bus_r000,
@@ -1075,6 +1263,24 @@ SALAZAR_SCALING_NETWORKS: dict[str, dict] = {
         "constructor": create_salazar_120bus_r030,
         "description": "Salazar 120-Bus, PV/Total=30%",
         "n_pv": 36, "n_bus_total": 120, "pv_ratio": 0.30,
+        "category": "salazar_scaling",
+    },
+    "sz_120_r040": {
+        "constructor": create_salazar_120bus_r040,
+        "description": "Salazar 120-Bus, PV/Total=40%",
+        "n_pv": 48, "n_bus_total": 120, "pv_ratio": 0.40,
+        "category": "salazar_scaling",
+    },
+    "sz_120_r050": {
+        "constructor": create_salazar_120bus_r050,
+        "description": "Salazar 120-Bus, PV/Total=50%",
+        "n_pv": 60, "n_bus_total": 120, "pv_ratio": 0.50,
+        "category": "salazar_scaling",
+    },
+    "sz_120_r060": {
+        "constructor": create_salazar_120bus_r060,
+        "description": "Salazar 120-Bus, PV/Total=60%",
+        "n_pv": 72, "n_bus_total": 120, "pv_ratio": 0.60,
         "category": "salazar_scaling",
     },
     # ── 200 Bus ──
@@ -1114,6 +1320,24 @@ SALAZAR_SCALING_NETWORKS: dict[str, dict] = {
         "n_pv": 60, "n_bus_total": 200, "pv_ratio": 0.30,
         "category": "salazar_scaling",
     },
+    "sz_200_r040": {
+        "constructor": create_salazar_200bus_r040,
+        "description": "Salazar 200-Bus, PV/Total=40%",
+        "n_pv": 80, "n_bus_total": 200, "pv_ratio": 0.40,
+        "category": "salazar_scaling",
+    },
+    "sz_200_r050": {
+        "constructor": create_salazar_200bus_r050,
+        "description": "Salazar 200-Bus, PV/Total=50%",
+        "n_pv": 100, "n_bus_total": 200, "pv_ratio": 0.50,
+        "category": "salazar_scaling",
+    },
+    "sz_200_r060": {
+        "constructor": create_salazar_200bus_r060,
+        "description": "Salazar 200-Bus, PV/Total=60%",
+        "n_pv": 120, "n_bus_total": 200, "pv_ratio": 0.60,
+        "category": "salazar_scaling",
+    },
     # ── 350 Bus ──
     "sz_350_r000": {
         "constructor": create_salazar_350bus_r000,
@@ -1143,6 +1367,30 @@ SALAZAR_SCALING_NETWORKS: dict[str, dict] = {
         "constructor": create_salazar_350bus_r020,
         "description": "Salazar 350-Bus, PV/Total=20%",
         "n_pv": 70, "n_bus_total": 350, "pv_ratio": 0.20,
+        "category": "salazar_scaling",
+    },
+    "sz_350_r030": {
+        "constructor": create_salazar_350bus_r030,
+        "description": "Salazar 350-Bus, PV/Total=30%",
+        "n_pv": 105, "n_bus_total": 350, "pv_ratio": 0.30,
+        "category": "salazar_scaling",
+    },
+    "sz_350_r040": {
+        "constructor": create_salazar_350bus_r040,
+        "description": "Salazar 350-Bus, PV/Total=40%",
+        "n_pv": 140, "n_bus_total": 350, "pv_ratio": 0.40,
+        "category": "salazar_scaling",
+    },
+    "sz_350_r050": {
+        "constructor": create_salazar_350bus_r050,
+        "description": "Salazar 350-Bus, PV/Total=50%",
+        "n_pv": 175, "n_bus_total": 350, "pv_ratio": 0.50,
+        "category": "salazar_scaling",
+    },
+    "sz_350_r060": {
+        "constructor": create_salazar_350bus_r060,
+        "description": "Salazar 350-Bus, PV/Total=60%",
+        "n_pv": 210, "n_bus_total": 350, "pv_ratio": 0.60,
         "category": "salazar_scaling",
     },
     # ── 500 Bus ──
@@ -1176,6 +1424,30 @@ SALAZAR_SCALING_NETWORKS: dict[str, dict] = {
         "n_pv": 100, "n_bus_total": 500, "pv_ratio": 0.20,
         "category": "salazar_scaling",
     },
+    "sz_500_r030": {
+        "constructor": create_salazar_500bus_r030,
+        "description": "Salazar 500-Bus, PV/Total=30%",
+        "n_pv": 150, "n_bus_total": 500, "pv_ratio": 0.30,
+        "category": "salazar_scaling",
+    },
+    "sz_500_r040": {
+        "constructor": create_salazar_500bus_r040,
+        "description": "Salazar 500-Bus, PV/Total=40%",
+        "n_pv": 200, "n_bus_total": 500, "pv_ratio": 0.40,
+        "category": "salazar_scaling",
+    },
+    "sz_500_r050": {
+        "constructor": create_salazar_500bus_r050,
+        "description": "Salazar 500-Bus, PV/Total=50%",
+        "n_pv": 250, "n_bus_total": 500, "pv_ratio": 0.50,
+        "category": "salazar_scaling",
+    },
+    "sz_500_r060": {
+        "constructor": create_salazar_500bus_r060,
+        "description": "Salazar 500-Bus, PV/Total=60%",
+        "n_pv": 300, "n_bus_total": 500, "pv_ratio": 0.60,
+        "category": "salazar_scaling",
+    },
     # ── 750 Bus ──
     "sz_750_r000": {
         "constructor": create_salazar_750bus_r000,
@@ -1199,6 +1471,36 @@ SALAZAR_SCALING_NETWORKS: dict[str, dict] = {
         "constructor": create_salazar_750bus_r010,
         "description": "Salazar 750-Bus, PV/Total=10%",
         "n_pv": 75, "n_bus_total": 750, "pv_ratio": 0.10,
+        "category": "salazar_scaling",
+    },
+    "sz_750_r020": {
+        "constructor": create_salazar_750bus_r020,
+        "description": "Salazar 750-Bus, PV/Total=20%",
+        "n_pv": 150, "n_bus_total": 750, "pv_ratio": 0.20,
+        "category": "salazar_scaling",
+    },
+    "sz_750_r030": {
+        "constructor": create_salazar_750bus_r030,
+        "description": "Salazar 750-Bus, PV/Total=30%",
+        "n_pv": 225, "n_bus_total": 750, "pv_ratio": 0.30,
+        "category": "salazar_scaling",
+    },
+    "sz_750_r040": {
+        "constructor": create_salazar_750bus_r040,
+        "description": "Salazar 750-Bus, PV/Total=40%",
+        "n_pv": 300, "n_bus_total": 750, "pv_ratio": 0.40,
+        "category": "salazar_scaling",
+    },
+    "sz_750_r050": {
+        "constructor": create_salazar_750bus_r050,
+        "description": "Salazar 750-Bus, PV/Total=50%",
+        "n_pv": 375, "n_bus_total": 750, "pv_ratio": 0.50,
+        "category": "salazar_scaling",
+    },
+    "sz_750_r060": {
+        "constructor": create_salazar_750bus_r060,
+        "description": "Salazar 750-Bus, PV/Total=60%",
+        "n_pv": 450, "n_bus_total": 750, "pv_ratio": 0.60,
         "category": "salazar_scaling",
     },
     # ── 1000 Bus ──
@@ -1226,6 +1528,36 @@ SALAZAR_SCALING_NETWORKS: dict[str, dict] = {
         "n_pv": 100, "n_bus_total": 1000, "pv_ratio": 0.10,
         "category": "salazar_scaling",
     },
+    "sz_1000_r020": {
+        "constructor": create_salazar_1000bus_r020,
+        "description": "Salazar 1000-Bus, PV/Total=20%",
+        "n_pv": 200, "n_bus_total": 1000, "pv_ratio": 0.20,
+        "category": "salazar_scaling",
+    },
+    "sz_1000_r030": {
+        "constructor": create_salazar_1000bus_r030,
+        "description": "Salazar 1000-Bus, PV/Total=30%",
+        "n_pv": 300, "n_bus_total": 1000, "pv_ratio": 0.30,
+        "category": "salazar_scaling",
+    },
+    "sz_1000_r040": {
+        "constructor": create_salazar_1000bus_r040,
+        "description": "Salazar 1000-Bus, PV/Total=40%",
+        "n_pv": 400, "n_bus_total": 1000, "pv_ratio": 0.40,
+        "category": "salazar_scaling",
+    },
+    "sz_1000_r050": {
+        "constructor": create_salazar_1000bus_r050,
+        "description": "Salazar 1000-Bus, PV/Total=50%",
+        "n_pv": 500, "n_bus_total": 1000, "pv_ratio": 0.50,
+        "category": "salazar_scaling",
+    },
+    "sz_1000_r060": {
+        "constructor": create_salazar_1000bus_r060,
+        "description": "Salazar 1000-Bus, PV/Total=60%",
+        "n_pv": 600, "n_bus_total": 1000, "pv_ratio": 0.60,
+        "category": "salazar_scaling",
+    },
     # ── 1500 Bus ──
     "sz_1500_r000": {
         "constructor": create_salazar_1500bus_r000,
@@ -1251,12 +1583,105 @@ SALAZAR_SCALING_NETWORKS: dict[str, dict] = {
         "n_pv": 150, "n_bus_total": 1500, "pv_ratio": 0.10,
         "category": "salazar_scaling",
     },
+    "sz_1500_r020": {
+        "constructor": create_salazar_1500bus_r020,
+        "description": "Salazar 1500-Bus, PV/Total=20%",
+        "n_pv": 300, "n_bus_total": 1500, "pv_ratio": 0.20,
+        "category": "salazar_scaling",
+    },
+    "sz_1500_r030": {
+        "constructor": create_salazar_1500bus_r030,
+        "description": "Salazar 1500-Bus, PV/Total=30%",
+        "n_pv": 450, "n_bus_total": 1500, "pv_ratio": 0.30,
+        "category": "salazar_scaling",
+    },
+    "sz_1500_r040": {
+        "constructor": create_salazar_1500bus_r040,
+        "description": "Salazar 1500-Bus, PV/Total=40%",
+        "n_pv": 600, "n_bus_total": 1500, "pv_ratio": 0.40,
+        "category": "salazar_scaling",
+    },
+    "sz_1500_r050": {
+        "constructor": create_salazar_1500bus_r050,
+        "description": "Salazar 1500-Bus, PV/Total=50%",
+        "n_pv": 750, "n_bus_total": 1500, "pv_ratio": 0.50,
+        "category": "salazar_scaling",
+    },
+    "sz_1500_r060": {
+        "constructor": create_salazar_1500bus_r060,
+        "description": "Salazar 1500-Bus, PV/Total=60%",
+        "n_pv": 900, "n_bus_total": 1500, "pv_ratio": 0.60,
+        "category": "salazar_scaling",
+    },
 }
 
 
 def get_salazar_scaling_networks() -> dict[str, dict]:
     """Systematische Testmatrix: 10 Größen × verschiedene PV-Ratios."""
     return SALAZAR_SCALING_NETWORKS
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  LOW VOLTAGE NETWORKS — Für Netze, die bei NR-Konstruktor scheitern
+#  Verwenden negative pv_vm_offset_pu um Spannungsziele zu senken
+# ══════════════════════════════════════════════════════════════════════
+
+_PROBLEM_NETWORKS = [
+    (120, 0.50), (120, 0.60),
+    (200, 0.60),
+    (350, 0.50), (350, 0.60),
+    (500, 0.20), (500, 0.30), (500, 0.40), (500, 0.50), (500, 0.60),
+    (750, 0.20), (750, 0.30), (750, 0.40), (750, 0.50), (750, 0.60),
+    (1000, 0.20), (1000, 0.30), (1000, 0.40), (1000, 0.50), (1000, 0.60),
+    (1500, 0.02), (1500, 0.05), (1500, 0.10), (1500, 0.20), (1500, 0.30),
+    (1500, 0.40), (1500, 0.50), (1500, 0.60),
+]
+
+_LOW_VM_OFFSETS = [-0.02]#, -0.05, -0.10]
+
+def _create_low_vm_constructor(nodes: int, pv_ratio: float, offset: float, base_seed: int):
+    """Helper to create a constructor with specific offset."""
+    def constructor():
+        return _create_salazar_size_ratio(
+            nodes, pv_ratio, base_seed, pv_vm_offset_pu=offset
+        )
+    return constructor
+
+_LOW_VM_CONSTRUCTORS = {}
+_OFFSET_NAMES = {-0.02: "m02", -0.05: "m05", -0.10: "m10"}
+
+for nodes, pv_ratio in _PROBLEM_NETWORKS:
+    base_seed = 2000 + nodes + int(pv_ratio * 1000)
+    for offset in _LOW_VM_OFFSETS:
+        offset_name = _OFFSET_NAMES[offset]
+        key = f"sz_{nodes}_r{int(pv_ratio*100)}_{offset_name}"
+        _LOW_VM_CONSTRUCTORS[key] = _create_low_vm_constructor(
+            nodes, pv_ratio, offset, base_seed + int(-offset * 100)
+        )
+
+SALAZAR_LOW_VM_NETWORKS: dict[str, dict] = {}
+
+for key, constructor in _LOW_VM_CONSTRUCTORS.items():
+    parts = key.split("_")
+    size = int(parts[1][2:])
+    ratio = int(parts[2][1:]) / 100.0
+    offset_str = parts[3]
+    offset = float(offset_str.replace("m", "-").replace("10", "0.10").replace("05", "0.05").replace("02", "0.02"))
+
+    n_pv = max(1, int(round(size * ratio)))
+    n_pv = min(n_pv, size - 3)
+
+    SALAZAR_LOW_VM_NETWORKS[key] = {
+        "constructor": constructor,
+        "description": f"Salazar {size}-Bus, PV={ratio*100:.0f}%, vm_offset={offset:.2f}",
+        "n_pv": n_pv, "n_bus_total": size, "pv_ratio": ratio,
+        "pv_vm_offset_pu": offset,
+        "category": "salazar_low_vm",
+    }
+
+def get_salazar_low_vm_networks() -> dict[str, dict]:
+    """Low-voltage networks for NR-constructor-failing networks."""
+    return SALAZAR_LOW_VM_NETWORKS
 
 
 # ══════════════════════════════════════════════════════════════════════

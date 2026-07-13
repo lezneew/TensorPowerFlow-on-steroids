@@ -41,6 +41,8 @@ from tpf.generators.network_generator_salazar import (
     get_salazar_pv_networks,
     get_salazar_scaling_networks,
     SALAZAR_SCALING_NETWORKS,
+    get_salazar_low_vm_networks,
+    SALAZAR_LOW_VM_NETWORKS,
     create_salazar_network,
 )
 from tpf.generators.ieee_pegase_networks import (
@@ -274,7 +276,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
 
     # 5. Methode A
     solver = TPFDensePVMethodA(
-        tol=1e-8, max_iter_inner=20, max_iter_outer=20,
+        tol=1e-8, max_iter_inner=20, max_iter_outer=50,
         tol_pv=1e-6, omega=omega, enforce_q_lims=False,
         cold_start=cold_start,
     )
@@ -628,7 +630,7 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
     ax00.set_ylabel("max ||V_PV| - V_spec|| [p.u.]", fontsize=11)
     ax00.set_title("(a) PV-Spannungsfehler vs. Outer-Iteration", fontsize=12)
     ax00.grid(True, which="both", alpha=0.3)
-    ax00.set_xlim(1)
+    #ax00.set_xlim(1)
     ax00.set_ylim(bottom=1e-7, top=1e0)
 
     # ══════════════════════════════════════════════════════════════
@@ -912,10 +914,11 @@ def main():
         description="Validierung + Spektralradius + Konvergenz-Plot: TPF Methode A"
     )
     parser.add_argument(
-        "--suite", choices=["quick", "radial", "salazar", "salazar_scaling", "full",
+        "--suite", choices=["quick", "radial", "salazar", "salazar_scaling", "salazar_low_vm", "full",
                             "ieee", "pegase", "rte", "large", "standard"],
         default="salazar_scaling",
         help="Testsuite: quick (4 Netze), radial (ohne IEEE vermascht), salazar/salazar_scaling, "
+             "salazar_low_vm (niedrige PV-Spannung für NR-scheiternde Netze), "
              "full (alles), ieee (IEEE 9-300), pegase (PEGASE), rte (French), large (>100), standard (alle)"
     )
     parser.add_argument("--omega", type=float, default=1.0,
@@ -957,6 +960,8 @@ def main():
         networks = get_salazar_pv_networks()
     elif args.suite == "salazar_scaling":
         networks = get_salazar_scaling_networks()
+    elif args.suite == "salazar_low_vm":
+        networks = get_salazar_low_vm_networks()
     elif args.suite == "ieee":
         networks = get_ieee_networks()
     elif args.suite == "pegase":

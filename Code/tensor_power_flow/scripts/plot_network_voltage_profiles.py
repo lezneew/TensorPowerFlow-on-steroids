@@ -17,7 +17,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
-from tpf.generators.network_generator_salazar import SALAZAR_TEST_NETWORKS, SALAZAR_SCALING_NETWORKS
+from tpf.generators.network_generator_salazar import SALAZAR_TEST_NETWORKS, SALAZAR_SCALING_NETWORKS, SALAZAR_LOW_VM_NETWORKS
 from tpf.generators.radial_network import TEST_NETWORKS
 from setup_test_networks import create_4bus_1pv, create_33bus_with_dg, get_ieee30, get_ieee57
 
@@ -172,12 +172,35 @@ def run_powerflow(net: pp.pandapowerNet) -> bool:
 
 
 def main():
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Plot voltage profiles for test networks")
+    parser.add_argument(
+        "--suite",
+        choices=["salazar_scaling", "salazar_low_vm", "salazar_all"],
+        default="salazar_scaling",
+        help="Network suite to plot: salazar_scaling (default), salazar_low_vm (low voltage), salazar_all (both)"
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="Output directory (default: voltage_profiles)"
+    )
+    args = parser.parse_args()
+
+    output_dir = args.output_dir or OUTPUT_DIR
+    os.makedirs(output_dir, exist_ok=True)
 
     all_networks = {}
 
-    for name, info in SALAZAR_SCALING_NETWORKS.items():
-        all_networks[f"salazar_{name}"] = info
+    if args.suite in ["salazar_scaling", "salazar_all"]:
+        for name, info in SALAZAR_SCALING_NETWORKS.items():
+            all_networks[f"salazar_{name}"] = info
+
+    if args.suite in ["salazar_low_vm", "salazar_all"]:
+        for name, info in SALAZAR_LOW_VM_NETWORKS.items():
+            all_networks[f"salazar_{name}"] = info
 
     # for name, info in SALAZAR_TEST_NETWORKS.items():
     #     all_networks[f"salazar_{name}"] = info
@@ -210,6 +233,7 @@ def main():
     # for name, info in setup_networks.items():
     #     all_networks[name] = info
 
+    print(f"Suite: {args.suite}")
     print(f"Total networks to process: {len(all_networks)}")
 
     converged = 0
@@ -232,7 +256,7 @@ def main():
             continue
 
         try:
-            if plot_network(net, name, OUTPUT_DIR):
+            if plot_network(net, name, output_dir):
                 converged += 1
             else:
                 failed += 1
@@ -242,7 +266,7 @@ def main():
 
     print(f"\n{'='*60}")
     print(f"RESULTS: {converged} plots saved, {skipped} skipped (no converge), {failed} failed")
-    print(f"Output directory: {OUTPUT_DIR}/")
+    print(f"Output directory: {output_dir}/")
     print(f"{'='*60}")
 
 
