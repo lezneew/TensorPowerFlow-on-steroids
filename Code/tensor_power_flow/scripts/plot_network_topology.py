@@ -40,6 +40,9 @@ from tpf.generators.network_generator_salazar import (
     get_salazar_pv_networks,
     get_salazar_scaling_networks,
 )
+from tpf.generators.ieee_pegase_networks import (
+    get_all_standard_networks
+)
 
 
 def generate_radial_coordinates(net):
@@ -466,7 +469,7 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='Plot network topology and contraction matrices')
-    parser.add_argument('--suite', choices=['salazar', 'salazar_pv', 'salazar_scaling', 'all'],
+    parser.add_argument('--suite', choices=['salazar', 'salazar_pv', 'salazar_scaling', 'all', 'standard'],
                         default='salazar', help='Test suite to plot')
     parser.add_argument('--omega', type=float, default=1.0, help='Relaxation factor omega (default: 1.0)')
     parser.add_argument('--output', type=str, default='topology', help='Output directory (default: topology)')
@@ -484,6 +487,8 @@ def main():
         networks.update(get_salazar_pv_networks())
     if args.suite in ('salazar_scaling', 'all'):
         networks.update(get_salazar_scaling_networks())
+    if args.suite in ('standard', 'all'):
+        networks.update(get_all_standard_networks())
     
     print(f"\n  Suite: '{args.suite}' - {len(networks)} networks")
     print(f"  omega = {args.omega}")

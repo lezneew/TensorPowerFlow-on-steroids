@@ -428,6 +428,10 @@ def create_ieee57() -> pp.pandapowerNet:
     """IEEE 57-Bus: 6 PV-Knoten."""
     return pn.case57()
 
+def pegase() -> pp.pandapowerNet:
+    """IEEE 57-Bus: 6 PV-Knoten."""
+    return pn.case9241pegase()
+
 
 def create_radial_10bus_1pv() -> pp.pandapowerNet:
     """Generiertes 10-Bus Radialnetz mit 1 PV (klein, einfach)."""
@@ -740,6 +744,12 @@ TEST_NETWORKS: dict[str, dict] = {
     },
     "ieee57": {
         "constructor": create_ieee57,
+        "description": "IEEE 57-Bus vermascht (6 PV)",
+        "n_pv": 6,
+        "category": "ieee_meshed",
+    },
+    "pegase9000": {
+        "constructor": pegase,
         "description": "IEEE 57-Bus vermascht (6 PV)",
         "n_pv": 6,
         "category": "ieee_meshed",

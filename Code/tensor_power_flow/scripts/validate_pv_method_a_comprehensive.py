@@ -43,6 +43,27 @@ from tpf.generators.network_generator_salazar import (
     SALAZAR_SCALING_NETWORKS,
     create_salazar_network,
 )
+from tpf.generators.ieee_pegase_networks import (
+    IEE_PEGASE_NETWORKS,
+    get_ieee_networks,
+    get_pegase_networks,
+    get_rte_networks,
+    get_large_networks,
+    get_all_standard_networks,
+)
+
+try:
+    from convergence_analysis import (
+        compute_spectral_radius_diagonal,
+        compute_spectral_radius_corrected,
+        compute_empirical_contraction,
+        compute_all_convergence_metrics,
+    )
+except ImportError:
+    compute_spectral_radius_diagonal = None
+    compute_spectral_radius_corrected = None
+    compute_empirical_contraction = None
+    compute_all_convergence_metrics = None
 
 # ══════════════════════════════════════════════════════════════════════
 #  η-Berechnung
@@ -141,21 +162,31 @@ def compute_spectral_radius(network, omega, delta_q=1e-5):
 #  Einzelnetz-Validierung
 # ══════════════════════════════════════════════════════════════════════
 
-def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False):
+def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False, analysis="full"):
     """
     Validiert Methode A gegen NR. Gibt Record mit Konvergenzhistorie zurück.
+
+    Parameters
+    ----------
+    analysis : str
+        Konvergenz-Analysemodus: "full" (alle), "diagonal" (rho_diag),
+        "corrected" (rho_corr), "contraction" (kappa)
     """
     record = {
         "name": name,
         "n_bus": 0, "n_pv": 0, "n_pq": 0,
         "eta": np.inf,
         "rho": np.inf,
+        "rho_diag": np.inf,
+        "rho_corr": np.inf,
+        "contraction": np.inf,
         "nr_converged": False, "nr_iter": -1, "nr_time_ms": 0.0,
         "tpf_converged": False, "tpf_outer_iter": 0,
         "tpf_inner_iter_total": 0, "tpf_time_ms": 0.0,
         "max_v_error": np.inf, "mean_v_error": np.inf,
         "max_angle_error_deg": np.inf, "max_pv_v_error": np.inf,
         "speedup": 0.0, "passed": False, "error": None,
+        "analysis_mode": analysis,
         # Konvergenz-Historie für Plots
         "pv_v_errors": [],
         "inner_v_change_all": [],
@@ -171,7 +202,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     except Exception as e:
         record["error"] = f"Constructor: {str(e)[:50]}"
         if verbose:
-            print(f"  ✗ {name:<30} FEHLER (Constructor): {e}")
+            print(f"  X {name:<30} FEHLER (Constructor): {e}")
         return record
 
     # 1. NR-Referenz
@@ -181,13 +212,13 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     except Exception as e:
         record["error"] = f"NR: {str(e)[:50]}"
         if verbose:
-            print(f"  ✗ {name:<30} FEHLER (NR): {e}")
+            print(f"  X {name:<30} FEHLER (NR): {e}")
         return record
 
     if not nr_result.converged:
         record["error"] = "NR divergiert"
         if verbose:
-            print(f"  ✗ {name:<30} NR divergiert")
+            print(f"  X {name:<30} NR divergiert")
         return record
 
     record["nr_converged"] = True
@@ -200,7 +231,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     except Exception as e:
         record["error"] = f"Builder: {str(e)[:50]}"
         if verbose:
-            print(f"  ✗ {name:<30} FEHLER (Builder): {e}")
+            print(f"  X {name:<30} FEHLER (Builder): {e}")
         return record
 
     n_pv = network.n_pv
@@ -222,7 +253,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     if n_pv == 0:
         record["passed"] = True
         if verbose:
-            print(f"  ─ {name:<30} keine PV (übersprungen)")
+            print(f"  - {name:<30} keine PV (übersprungen)")
         return record
 
     # 3. η
@@ -243,7 +274,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
 
     # 5. Methode A
     solver = TPFDensePVMethodA(
-        tol=1e-8, max_iter_inner=50, max_iter_outer=100,
+        tol=1e-8, max_iter_inner=20, max_iter_outer=20,
         tol_pv=1e-6, omega=omega, enforce_q_lims=False,
         cold_start=cold_start,
     )
@@ -253,7 +284,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     except Exception as e:
         record["error"] = f"TPF: {str(e)[:50]}"
         if verbose:
-            print(f"  ✗ {name:<30} FEHLER (TPF): {e}")
+            print(f"  X {name:<30} FEHLER (TPF): {e}")
         return record
 
     record["tpf_converged"] = result.converged
@@ -269,6 +300,20 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
         record["outer_start_indices"] = pv_info.outer_start_indices or []
         record["inner_per_outer"] = pv_info.inner_iterations_per_outer or []
 
+    # 5b. Erweiterte Konvergenz-Analyse (rho_diag, rho_corr, contraction)
+    if analysis in ["full", "diagonal", "corrected",
+                    "contraction"] and n_pv > 0 and compute_spectral_radius_diagonal is not None:
+        pv_error_history = record["pv_v_errors"]
+        try:
+            if analysis in ["diagonal", "full"]:
+                record["rho_diag"] = compute_spectral_radius_diagonal(network, omega)
+            if analysis in ["corrected", "full"]:
+                record["rho_corr"] = compute_spectral_radius_corrected(network, omega)
+            if analysis in ["contraction", "full"]:
+                record["contraction"] = compute_empirical_contraction(pv_error_history)
+        except Exception:
+            pass
+
     # 6. Vergleich
     v_tpf = result.voltages.flatten()
     v_nr = nr_result.voltages[d_idx]
@@ -276,7 +321,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     if v_tpf.shape[0] != v_nr.shape[0]:
         record["error"] = f"Dim mismatch: TPF={v_tpf.shape[0]} NR={v_nr.shape[0]}"
         if verbose:
-            print(f"  ✗ {name:<30} Dimensionsfehler")
+            print(f"  X {name:<30} Dimensionsfehler")
         return record
 
     mag_err = np.abs(np.abs(v_tpf) - np.abs(v_nr))
@@ -293,12 +338,22 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     record["passed"] = record["max_v_error"] < tol_pass and result.converged
 
     if verbose:
-        status = "✓" if record["passed"] else "✗"
+        status = "PASS" if record["passed"] else "FAIL"
         eta_str = f"{record['eta']:.3f}" if record['eta'] < 100 else f"{record['eta']:.0f}"
         rho_str = f"{record['rho']:.4f}" if record['rho'] < 100 else "—"
+
+        # Show additional metrics if computed
+        extra = ""
+        if record.get("rho_diag", np.inf) < np.inf:
+            extra += f" rho_diag={record['rho_diag']:.3f}"
+        if record.get("rho_corr", np.inf) < np.inf:
+            extra += f" rho_corr={record['rho_corr']:.3f}"
+        if record.get("contraction", np.inf) < np.inf:
+            extra += f" kappa={record['contraction']:.3f}"
+
         print(f"  {status} {name:<30} n={record['n_bus']:<4} PV={n_pv:<3} "
-              f"η={eta_str:<7} ρ={rho_str:<7} ΔV={record['max_v_error']:.2e} "
-              f"out={record['tpf_outer_iter']}")
+              f"eta={eta_str:<7} rho={rho_str:<7} dV={record['max_v_error']:.2e} "
+              f"out={record['tpf_outer_iter']}{extra}")
 
     return record
 
@@ -307,12 +362,13 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
 #  Batch-Validierung
 # ══════════════════════════════════════════════════════════════════════
 
-def run_validation_suite(networks: dict, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False):
+def run_validation_suite(networks: dict, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False, analysis="full"):
     records = []
     for name, info in networks.items():
         record = validate_network(
             info["constructor"], name, omega=omega,
-            tol_pass=tol_pass, verbose=verbose, cold_start=cold_start
+            tol_pass=tol_pass, verbose=verbose, cold_start=cold_start,
+            analysis=analysis
         )
         records.append(record)
     return records
@@ -322,20 +378,26 @@ def run_validation_suite(networks: dict, omega=1.0, tol_pass=1e-4, verbose=True,
 #  Ergebnistabelle MIT Spektralradius
 # ══════════════════════════════════════════════════════════════════════
 
-def print_results_table(records: list, title: str = ""):
-    print(f"\n{'═'*160}")
+def print_results_table(records: list, title: str = "", show_analysis: bool = False):
+    print(f"\n{'='*200}")
     if title:
         print(f"  {title}")
-        print(f"{'═'*160}")
+        print(f"{'='*200}")
 
-    hdr = (f"  {'Netz':<30} {'n_d':<5} {'PV':<4} "
-           f"{'η':<8} {'ρ(J_G)':<8} "
-           f"{'NR It':<6} {'NR ms':<7} "
-           f"{'Out':<5} {'Inn':<5} {'TPF ms':<7} "
-           f"{'max ΔV':<10} {'PV ΔV':<10} {'Δθ°':<8} "
-           f"{'Status'}")
+    if show_analysis:
+        hdr = (f"  {'Netz':<28} {'n_d':<5} {'PV':<3} "
+               f"{'eta':<7} {'rho':<7} {'rho_diag':<8} {'rho_corr':<8} {'kappa':<7} "
+               f"{'Out':<4} {'Inn':<4} {'TPF ms':<7} "
+               f"{'max dV':<10} {'Status'}")
+    else:
+        hdr = (f"  {'Netz':<30} {'n_d':<5} {'PV':<4} "
+               f"{'eta':<8} {'rho(J_G)':<8} "
+               f"{'NR It':<6} {'NR ms':<7} "
+               f"{'Out':<5} {'Inn':<5} {'TPF ms':<7} "
+               f"{'max dV':<10} {'PV dV':<10} {'dTheta':<8} "
+               f"{'Status'}")
     print(hdr)
-    print(f"  {'─'*158}")
+    print(f"  {'-'*198}")
 
     for r in records:
         if r["n_pv"] == 0:
@@ -344,48 +406,79 @@ def print_results_table(records: list, title: str = ""):
         eta = r["eta"]
         eta_str = f"{eta:.4f}" if eta < 100 else f"{eta:.1f}"
 
-        rho = r.get("rho", np.inf)
-        rho_str = f"{rho:.4f}" if rho < 100 else "—"
+        if show_analysis:
+            rho = r.get("rho", np.inf)
+            rho_str = f"{rho:.3f}" if rho < 100 else "—"
 
-        max_v = r["max_v_error"]
-        max_v_str = f"{max_v:.2e}" if max_v < 100 else "—"
+            rho_diag = r.get("rho_diag", np.inf)
+            rho_diag_str = f"{rho_diag:.3f}" if rho_diag < 100 and np.isfinite(rho_diag) else "—"
 
-        pv_v = r.get("max_pv_v_error", np.inf)
-        pv_v_str = f"{pv_v:.2e}" if pv_v < 100 else "—"
+            rho_corr = r.get("rho_corr", np.inf)
+            rho_corr_str = f"{rho_corr:.3f}" if rho_corr < 100 and np.isfinite(rho_corr) else "—"
 
-        angle = r.get("max_angle_error_deg", np.inf)
-        angle_str = f"{angle:.4f}" if angle < 100 else "—"
+            contraction = r.get("contraction", np.inf)
+            contraction_str = f"{contraction:.3f}" if contraction < 100 and np.isfinite(contraction) else "—"
 
-        if r["passed"]:
-            status = "✓ PASS"
-        elif not r.get("tpf_converged"):
-            status = "✗ DIV"
-        elif r.get("error"):
-            status = "✗ ERR"
+            if r["passed"]:
+                status = "PASS"
+            elif not r.get("tpf_converged"):
+                status = "DIV"
+            elif r.get("error"):
+                status = "ERR"
+            else:
+                status = "FAIL"
+
+            max_v = r["max_v_error"]
+            max_v_str = f"{max_v:.2e}" if max_v < 100 else "—"
+
+            print(f"  {r['name']:<28} {r['n_bus']:<5} {r['n_pv']:<3} "
+                  f"{eta_str:<7} {rho_str:<7} {rho_diag_str:<8} {rho_corr_str:<8} {contraction_str:<7} "
+                  f"{r.get('tpf_outer_iter', 0):<4} {r.get('tpf_inner_iter_total', 0):<4} "
+                  f"{r.get('tpf_time_ms', 0):<7.1f} "
+                  f"{max_v_str:<10} {status}")
         else:
-            status = "✗ FAIL"
+            rho = r.get("rho", np.inf)
+            rho_str = f"{rho:.4f}" if rho < 100 else "—"
 
-        print(f"  {r['name']:<30} {r['n_bus']:<5} {r['n_pv']:<4} "
-              f"{eta_str:<8} {rho_str:<8} "
-              f"{r.get('nr_iter', -1):<6} {r.get('nr_time_ms', 0):<7.1f} "
-              f"{r.get('tpf_outer_iter', 0):<5} {r.get('tpf_inner_iter_total', 0):<5} "
-              f"{r.get('tpf_time_ms', 0):<7.1f} "
-              f"{max_v_str:<10} {pv_v_str:<10} {angle_str:<8} "
-              f"{status}")
+            max_v = r["max_v_error"]
+            max_v_str = f"{max_v:.2e}" if max_v < 100 else "—"
+
+            pv_v = r.get("max_pv_v_error", np.inf)
+            pv_v_str = f"{pv_v:.2e}" if pv_v < 100 else "—"
+
+            angle = r.get("max_angle_error_deg", np.inf)
+            angle_str = f"{angle:.4f}" if angle < 100 else "—"
+
+            if r["passed"]:
+                status = "PASS"
+            elif not r.get("tpf_converged"):
+                status = "DIV"
+            elif r.get("error"):
+                status = "ERR"
+            else:
+                status = "FAIL"
+
+            print(f"  {r['name']:<30} {r['n_bus']:<5} {r['n_pv']:<4} "
+                  f"{eta_str:<8} {rho_str:<8} "
+                  f"{r.get('nr_iter', -1):<6} {r.get('nr_time_ms', 0):<7.1f} "
+                  f"{r.get('tpf_outer_iter', 0):<5} {r.get('tpf_inner_iter_total', 0):<5} "
+                  f"{r.get('tpf_time_ms', 0):<7.1f} "
+                  f"{max_v_str:<10} {pv_v_str:<10} {angle_str:<8} "
+                  f"{status}")
 
 
-def print_statistics(records: list):
+def print_statistics(records: list, show_analysis: bool = False):
     tested = [r for r in records if r["n_pv"] > 0]
     passed = [r for r in tested if r["passed"]]
     converged = [r for r in tested if r.get("tpf_converged")]
     diverged = [r for r in tested if not r.get("tpf_converged") and r.get("nr_converged")]
 
-    print(f"\n{'═'*90}")
+    print(f"\n{'='*120}")
     print(f"  STATISTIKEN")
-    print(f"{'═'*90}")
+    print(f"{'='*120}")
     print(f"  Netze mit PV getestet:    {len(tested)}")
     print(f"  PASS:                     {len(passed)} ({100*len(passed)/max(len(tested),1):.0f}%)")
-    print(f"  FAIL (konvergiert, ΔV):   {len([r for r in tested if r.get('tpf_converged') and not r['passed']])}")
+    print(f"  FAIL (konvergiert, dV):   {len([r for r in tested if r.get('tpf_converged') and not r['passed']])}")
     print(f"  FAIL (divergiert):        {len(diverged)}")
 
     if converged:
@@ -395,15 +488,15 @@ def print_statistics(records: list):
         outer_iters = [r["tpf_outer_iter"] for r in converged if r["tpf_outer_iter"] > 0]
 
         if etas:
-            print(f"\n  η (konvergierte):")
+            print(f"\n  eta (konvergierte):")
             print(f"    min={min(etas):.4f}  max={max(etas):.4f}  "
                   f"median={np.median(etas):.4f}")
         if rhos:
-            print(f"  ρ(J_G) (konvergierte):")
+            print(f"  rho(J_G) (konvergierte):")
             print(f"    min={min(rhos):.4f}  max={max(rhos):.4f}  "
                   f"median={np.median(rhos):.4f}")
         if v_errors:
-            print(f"  max|ΔV| (konvergierte):")
+            print(f"  max|dV| (konvergierte):")
             print(f"    min={min(v_errors):.2e}  max={max(v_errors):.2e}  "
                   f"median={np.median(v_errors):.2e}")
         if outer_iters:
@@ -411,35 +504,52 @@ def print_statistics(records: list):
             print(f"    min={min(outer_iters)}  max={max(outer_iters)}  "
                   f"median={np.median(outer_iters):.0f}")
 
-    # ── ρ vs. Konvergenz Analyse ──
-    print(f"\n  {'─'*60}")
-    print(f"  ρ-ANALYSE (Spektralradius der äußeren Schleife):")
-    print(f"  {'─'*60}")
+    # -- rho vs. Konvergenz Analyse --
+    print(f"\n  {'-'*80}")
+    print(f"  KONVERGENZ-ANALYSE: Vorhersagekraft der verschiedenen Metriken")
+    print(f"  {'-'*80}")
 
-    rho_conv = [r["rho"] for r in passed if r["rho"] < np.inf]
-    rho_div = [r["rho"] for r in diverged if r["rho"] < np.inf]
-
-    if rho_conv:
-        print(f"    Konvergiert (PASS): ρ ∈ [{min(rho_conv):.4f}, {max(rho_conv):.4f}]")
-        n_rho_lt1 = sum(1 for r in rho_conv if r < 1.0)
-        print(f"      davon ρ < 1: {n_rho_lt1}/{len(rho_conv)}")
-    if rho_div:
-        print(f"    Divergiert:         ρ ∈ [{min(rho_div):.4f}, {max(rho_div):.4f}]")
-        n_rho_gt1 = sum(1 for r in rho_div if r >= 1.0)
-        print(f"      davon ρ ≥ 1: {n_rho_gt1}/{len(rho_div)}")
-
-    # Korrelation ρ < 1 ↔ Konvergenz
     all_with_rho = [r for r in tested if r["rho"] < np.inf and r.get("nr_converged")]
-    if all_with_rho:
-        correct_prediction = sum(
-            1 for r in all_with_rho
-            if (r["rho"] < 1.0 and r["passed"]) or (r["rho"] >= 1.0 and not r["passed"])
-        )
-        print(f"\n    Vorhersagekraft von ρ < 1 ↔ Konvergenz:")
-        print(f"      Korrekt: {correct_prediction}/{len(all_with_rho)} "
-              f"({100*correct_prediction/len(all_with_rho):.0f}%)")
 
-    print(f"{'═'*90}")
+    if all_with_rho:
+        def count_correct(metric_key, threshold=1.0):
+            return sum(
+                1 for r in all_with_rho
+                if r.get(metric_key, np.inf) < np.inf
+                and ((r[metric_key] < threshold and r["passed"]) or
+                     (r[metric_key] >= threshold and not r["passed"]))
+            )
+
+        def count_available(metric_key):
+            return sum(1 for r in all_with_rho if r.get(metric_key, np.inf) < np.inf)
+
+        # Original ρ
+        n_correct_rho = count_correct("rho")
+        n_avail_rho = count_available("rho")
+        if n_avail_rho > 0:
+            print(f"    rho (voll):   {n_correct_rho:2d}/{n_avail_rho} korrekt ({100*n_correct_rho/max(n_avail_rho,1):.0f}%)")
+
+        # ρ_diag
+        n_correct_diag = count_correct("rho_diag")
+        n_avail_diag = count_available("rho_diag")
+        if n_avail_diag > 0:
+            print(f"    rho_diag:     {n_correct_diag:2d}/{n_avail_diag} korrekt ({100*n_correct_diag/max(n_avail_diag,1):.0f}%)")
+
+        # ρ_corr
+        n_correct_corr = count_correct("rho_corr")
+        n_avail_corr = count_available("rho_corr")
+        if n_avail_corr > 0:
+            print(f"    rho_corr:     {n_correct_corr:2d}/{n_avail_corr} korrekt ({100*n_correct_corr/max(n_avail_corr,1):.0f}%)")
+
+        # κ (contraction)
+        n_correct_kappa = count_correct("contraction")
+        n_avail_kappa = count_available("contraction")
+        if n_avail_kappa > 0:
+            print(f"    kappa:        {n_correct_kappa:2d}/{n_avail_kappa} korrekt ({100*n_correct_kappa/max(n_avail_kappa,1):.0f}%)")
+
+        print(f"\n    Regel: Wert < 1.0 bedeutet Konvergenz vorhergesagt")
+
+    print(f"{'='*120}")
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -470,7 +580,7 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
                    and r.get("tpf_time_ms", 0) > 0]
 
     if not plot_data and not timing_data:
-        print("  ⚠ Keine Daten zum Plotten vorhanden.")
+        print("  ! Keine Daten zum Plotten vorhanden.")
         return
 
     fig, axes = plt.subplots(2, 2, figsize=(18, 14), layout="constrained")
@@ -497,9 +607,9 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
         alpha = 0.85 if rec["tpf_converged"] else 0.6
 
         rho = rec.get("rho", np.inf)
-        rho_str = f"ρ={rho:.2f}" if rho < 100 else "ρ=—"
+        rho_str = f"rho={rho:.2f}" if rho < 100 else "rho=--"
         rx = rec.get("rx_ratio", np.nan)
-        rx_str = f"R/X={rx:.1f}" if not np.isnan(rx) else "R/X=—"
+        rx_str = f"R/X={rx:.1f}" if not np.isnan(rx) else "R/X=--"
         label = (f"{rec['name']} "
                  f"(η={rec['eta']:.2f}, {rho_str}, {rx_str}, PV={rec['n_pv']})")
 
@@ -514,11 +624,11 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
     # ax00.axhline(y=1e-6, color="green", linestyle=":", linewidth=2.0)
     # ax00.axhline(y=1e-4, color="darkorange", linestyle="-.", linewidth=1.5)
 
-    ax00.set_xlabel("Äußere Iteration ℓ", fontsize=11)
+    ax00.set_xlabel("Aeuszere Iteration l", fontsize=11)
     ax00.set_ylabel("max ||V_PV| - V_spec|| [p.u.]", fontsize=11)
     ax00.set_title("(a) PV-Spannungsfehler vs. Outer-Iteration", fontsize=12)
     ax00.grid(True, which="both", alpha=0.3)
-    ax00.set_xlim(1,100)
+    ax00.set_xlim(1)
     ax00.set_ylim(bottom=1e-7, top=1e0)
 
     # ══════════════════════════════════════════════════════════════
@@ -557,32 +667,59 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
     ax01.set_xlim(left=0.5)
 
     # ══════════════════════════════════════════════════════════════
-    #  (1,0) Solver-Zeit vs. Netzgröße — NUR konvergierte
+    #  (1,0) Solver-Zeit vs. Netzgröße — NUR konvergierte (Box Plots)
     # ══════════════════════════════════════════════════════════════
     ax10 = axes[1, 0]
 
     if timing_data:
-        sorted_by_size = sorted(timing_data, key=lambda r: r["n_bus"])
-        n_bus_vals = np.array([r["n_bus"] for r in sorted_by_size])
-        nr_times = np.array([r["nr_time_ms"] for r in sorted_by_size])
-        tpf_times = np.array([r["tpf_time_ms"] for r in sorted_by_size])
+        from collections import defaultdict
+        nr_by_size = defaultdict(list)
+        tpf_by_size = defaultdict(list)
+        for r in timing_data:
+            nr_by_size[r["n_bus"]].append(r["nr_time_ms"])
+            tpf_by_size[r["n_bus"]].append(r["tpf_time_ms"])
 
-        ax10.scatter(n_bus_vals, nr_times,
-                     color="tab:red", marker="s", s=60, zorder=5, alpha=0.8)
-        ax10.scatter(n_bus_vals, tpf_times,
-                     color="tab:blue", marker="o", s=60, zorder=5, alpha=0.8)
+        sizes = sorted(nr_by_size.keys())
 
-        ax10.plot(n_bus_vals, nr_times,
-                  color="tab:red", linestyle="--", linewidth=1.0, alpha=0.5)
-        ax10.plot(n_bus_vals, tpf_times,
-                  color="tab:blue", linestyle="--", linewidth=1.0, alpha=0.5)
+        if sizes:
+            box_width = 0.25
+            positions_nr = np.arange(len(sizes)) - box_width / 2
+            positions_tpf = np.arange(len(sizes)) + box_width / 2
 
-        ax10.set_yscale("log")
-        ax10.set_xscale("log")
+            bp_nr = ax10.boxplot(
+                [nr_by_size[s] for s in sizes],
+                positions=positions_nr,
+                widths=box_width * 0.8,
+                patch_artist=True,
+                boxprops=dict(facecolor="tab:red", alpha=0.6),
+                medianprops=dict(color="darkred", linewidth=1.5),
+                whiskerprops=dict(color="tab:red", linewidth=1.2),
+                capprops=dict(color="tab:red", linewidth=1.2),
+                flierprops=dict(marker="s", markerfacecolor="tab:red",
+                                markersize=4, alpha=0.6),
+            )
 
-    ax10.set_xlabel("Netzgröße (Anzahl Busse im d-Block)", fontsize=11)
+            bp_tpf = ax10.boxplot(
+                [tpf_by_size[s] for s in sizes],
+                positions=positions_tpf,
+                widths=box_width * 0.8,
+                patch_artist=True,
+                boxprops=dict(facecolor="tab:blue", alpha=0.6),
+                medianprops=dict(color="darkblue", linewidth=1.5),
+                whiskerprops=dict(color="tab:blue", linewidth=1.2),
+                capprops=dict(color="tab:blue", linewidth=1.2),
+                flierprops=dict(marker="o", markerfacecolor="tab:blue",
+                                markersize=4, alpha=0.6),
+            )
+
+            ax10.set_xticks(range(len(sizes)))
+            ax10.set_xticklabels(sizes)
+            ax10.set_xlim(-0.5, len(sizes) - 0.5)
+            ax10.set_yscale("log")
+
+    ax10.set_xlabel("Netzgroesse (Anzahl Busse im d-Block)", fontsize=11)
     ax10.set_ylabel("Rechenzeit [ms]", fontsize=11)
-    ax10.set_title("(c) Rechenzeit vs. Netzgröße (nur konvergierte)", fontsize=12)
+    ax10.set_title("(c) Rechenzeit vs. Netzgroesse (nur konvergierte)", fontsize=12)
     ax10.grid(True, which="both", alpha=0.3)
 
     # ══════════════════════════════════════════════════════════════
@@ -628,11 +765,49 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
                 textcoords="offset points", xytext=(3, 3),
             )
 
+        # Verbindungslinien nach Netzgröße gruppiert
+        from collections import defaultdict
+        nr_by_size = defaultdict(list)
+        tpf_by_size = defaultdict(list)
+        for r in timing_data:
+            ratio = r.get("pv_ratio", r["n_pv"] / max(r["n_bus"], 1))
+            nr_by_size[r["n_bus"]].append((ratio, r["nr_time_ms"]))
+            tpf_by_size[r["n_bus"]].append((ratio, r["tpf_time_ms"]))
+
+        # DEBUG: Print data for n=119
+        if 119 in tpf_by_size:
+            import sys
+            print(f"\n  DEBUG n=119: {len(tpf_by_size[119])} points", flush=True)
+            for i, (ratio, time_ms) in enumerate(sorted(tpf_by_size[119], key=lambda x: x[0])):
+                print(f"    point {i}: pv_ratio={ratio*100:.2f}%, time={time_ms:.1f}ms", flush=True)
+
+        for size in sorted(nr_by_size.keys()):
+            nr_points = sorted(nr_by_size[size], key=lambda x: x[0])
+            nr_x = [p[0] * 100 for p in nr_points]
+            nr_y = [p[1] for p in nr_points]
+            if len(nr_x) > 1:
+                ax11.plot(nr_x, nr_y, color="tab:red", linestyle="-", linewidth=1.0, alpha=0.5, zorder=2)
+
+            tpf_points = sorted(tpf_by_size[size], key=lambda x: x[0])
+            tpf_x = [p[0] * 100 for p in tpf_points]
+            tpf_y = [p[1] for p in tpf_points]
+            if len(tpf_x) > 1:
+                ax11.plot(tpf_x, tpf_y, color="tab:blue", linestyle="-", linewidth=1.0, alpha=0.5, zorder=2)
+
+            if tpf_y:
+                max_idx = np.argmax(tpf_y)
+                ax11.annotate(
+                    f"n={size}",
+                    (tpf_x[max_idx], tpf_y[max_idx]),
+                    fontsize=7, color="tab:blue", fontweight="bold",
+                    textcoords="offset points", xytext=(5, 0),
+                )
+
         ax11.set_yscale("log")
 
         # Colorbar für Netzgröße
         cbar = plt.colorbar(sc_tpf, ax=ax11, pad=0.02, fraction=0.04)
-        cbar.set_label("Netzgröße (normiert)", fontsize=9)
+        cbar.set_label("Netzgroesse (normiert)", fontsize=9)
         # Setze Colorbar-Ticks auf tatsächliche Busgrößen
         tick_vals = np.linspace(0, 1, 5)
         tick_labels = [f"{int(n_bus_arr.min() + t * (n_bus_arr.max() - n_bus_arr.min()))}"
@@ -677,7 +852,7 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
 
     fig.suptitle(
         f"Methode A: Konvergenz & Performance — {len(plot_data)} Netze "
-        f"({n_conv} konv., {n_div} div.), ω = {omega}",
+        f"({n_conv} konv., {n_div} div.), w = {omega}",
         fontsize=14, y=1.06,
     )
     if save_path:
@@ -737,11 +912,14 @@ def main():
         description="Validierung + Spektralradius + Konvergenz-Plot: TPF Methode A"
     )
     parser.add_argument(
-        "--suite", choices=["quick", "radial", "salazar", "salazar_scaling", "full"], default="salazar_scaling",
-        help="Testsuite: quick (4 Netze), radial (ohne IEEE vermascht), full (alles)"
+        "--suite", choices=["quick", "radial", "salazar", "salazar_scaling", "full",
+                            "ieee", "pegase", "rte", "large", "standard"],
+        default="salazar_scaling",
+        help="Testsuite: quick (4 Netze), radial (ohne IEEE vermascht), salazar/salazar_scaling, "
+             "full (alles), ieee (IEEE 9-300), pegase (PEGASE), rte (French), large (>100), standard (alle)"
     )
     parser.add_argument("--omega", type=float, default=1.0,
-                        help="Q-Relaxationsfaktor ω (default: 1.0)")
+                        help="Q-Relaxationsfaktor w (default: 1.0)")
     parser.add_argument("--tol", type=float, default=1e-4,
                         help="PASS-Schwelle für max|ΔV| (default: 1e-4)")
     parser.add_argument("--no-plot", action="store_true",
@@ -758,12 +936,17 @@ def main():
                         help="Nutze cold start fuer innere FPI (jede outer iteration startet mit V=1.0 pu)")
     parser.add_argument("--size", type=int, default=None,
                         help="Filter networks by bus count (e.g., 20 for sz_20_*)")
+    parser.add_argument("--analysis", choices=["full", "diagonal", "corrected", "contraction"],
+                        default="full",
+                        help="Konvergenz-Analyse-Methode: full (alle), diagonal (ρ_diag), "
+                             "corrected (ρ_corr), contraction (κ)")
     args = parser.parse_args()
 
-    print("╔════════════════════════════════════════════════════════════════════════════╗")
-    print("║  VALIDIERUNG + SPEKTRALRADIUS + KONVERGENZ-PLOT: TPF Methode A            ║")
-    print("║  Berechnet ρ(J_G) numerisch für jedes Netz                                ║")
-    print("╚════════════════════════════════════════════════════════════════════════════╝")
+    print("+========================================================================+")
+    print("|  VALIDIERUNG + SPEKTRALRADIUS + KONVERGENZ-PLOT: TPF Methode A            |")
+    print("|  Berechnet rho(J_G) numerisch fuer jedes Netz                            |")
+    print("|  Analysemodus: {:<57}  |".format(args.analysis))
+    print("+========================================================================+")
 
     # Netze laden
     if args.suite == "quick":
@@ -774,26 +957,36 @@ def main():
         networks = get_salazar_pv_networks()
     elif args.suite == "salazar_scaling":
         networks = get_salazar_scaling_networks()
+    elif args.suite == "ieee":
+        networks = get_ieee_networks()
+    elif args.suite == "pegase":
+        networks = get_pegase_networks()
+    elif args.suite == "rte":
+        networks = get_rte_networks()
+    elif args.suite == "large":
+        networks = get_large_networks()
+    elif args.suite == "standard":
+        networks = get_all_standard_networks()
     else:
         networks = get_comprehensive_networks()
 
 
     cold_str = " (COLD START)" if args.cold_start else ""
-    print(f"\n  Suite: '{args.suite}' — {len(networks)} Netze")
-    print(f"  ω = {args.omega}, PASS-Schwelle = {args.tol:.0e}{cold_str}\n")
+    print(f"\n  Suite: '{args.suite}' - {len(networks)} Netze")
+    print(f"  w = {args.omega}, PASS-Schwelle = {args.tol:.0e}{cold_str}\n")
 
     # Handle --size filter (filter networks by bus count prefix, e.g., sz_20_*)
     if args.size is not None:
         size_prefix = f"sz_{args.size}_"
         networks = {k: v for k, v in networks.items() if k.startswith(size_prefix)}
-        print(f"  → Nach Größe gefiltert: '{size_prefix}' → {len(networks)} Netze")
+        print(f"  -> Nach Groesse gefiltert: '{size_prefix}' -> {len(networks)} Netze")
 
     # Handle --list
     if args.list:
         print(f"\n  Verfügbare Netzwerke in Suite '{args.suite}':")
         for i, name in enumerate(sorted(networks.keys()), 1):
             print(f"    {i:2}. {name}")
-        print(f"\n{'═'*90}")
+        print(f"\n{'='*90}")
         return
 
     # Handle --network filter
@@ -801,22 +994,29 @@ def main():
         if args.network not in networks:
             print(f"\n  FEHLER: Netzwerk '{args.network}' nicht gefunden in Suite '{args.suite}'")
             print(f"  Verwende --list um alle Netzwerke anzuzeigen.")
-            print(f"\n{'═'*90}")
+            print(f"\n{'='*90}")
             return
         networks = {args.network: networks[args.network]}
-        print(f"  → Nur Netzwerk '{args.network}' wird getestet.\n")
+        print(f"  -> Nur Netzwerk '{args.network}' wird getestet.\n")
 
     # Validierung
     t_start = time.perf_counter()
     records = run_validation_suite(
-        networks, omega=args.omega, tol_pass=args.tol, verbose=True, cold_start=args.cold_start
+        networks, omega=args.omega, tol_pass=args.tol, verbose=True,
+        cold_start=args.cold_start, analysis=args.analysis
     )
     t_total = time.perf_counter() - t_start
 
+    # Determine if we should show analysis columns
+    show_analysis = args.analysis in ["full", "diagonal", "corrected", "contraction"] or any(
+        r.get("rho_diag", np.inf) < np.inf or r.get("rho_corr", np.inf) < np.inf or r.get("contraction", np.inf) < np.inf
+        for r in records
+    )
+
     # Tabelle
     cold_str = " (COLD START)" if args.cold_start else ""
-    print_results_table(records, title=f"Methode A — Suite '{args.suite}', ω={args.omega}{cold_str}")
-    print_statistics(records)
+    print_results_table(records, title=f"Methode A — Suite '{args.suite}', w={args.omega}{cold_str}", show_analysis=show_analysis)
+    print_statistics(records, show_analysis=show_analysis)
 
     # Gesamtergebnis
     tested = [r for r in records if r["n_pv"] > 0]
@@ -828,15 +1028,15 @@ def main():
           f"({100*n_pass/max(n_total,1):.0f}%)")
 
     if n_pass == n_total:
-        print(f"\n  ✓ METHODE A VALIDIERT FÜR ALLE {n_total} TESTNETZE!")
+        print(f"\n  [OK] METHODE A VALIDIERT FUER ALLE {n_total} TESTNETZE!")
     else:
         n_div = sum(1 for r in tested if not r.get("tpf_converged")
                     and r.get("nr_converged"))
         n_acc = sum(1 for r in tested if r.get("tpf_converged")
                     and not r["passed"])
-        print(f"\n  ⚠ {n_total - n_pass} Tests fehlgeschlagen:")
+        print(f"\n  ! {n_total - n_pass} Tests fehlgeschlagen:")
         if n_div:
-            print(f"    - {n_div} divergiert (ω anpassen oder η > 1)")
+            print(f"    - {n_div} divergiert (w anpassen oder eta > 1)")
         if n_acc:
             print(f"    - {n_acc} Genauigkeit unzureichend")
 
@@ -844,12 +1044,35 @@ def main():
     if args.export:
         export_inner_iteration_data(records, args.export, omega=args.omega)
 
+    # DEBUG: Print timing_data structure before plotting
+    timing_data = [r for r in records
+                   if r["n_pv"] > 0
+                   and r.get("nr_converged")
+                   and r.get("tpf_converged")
+                   and r.get("nr_time_ms", 0) > 0
+                   and r.get("tpf_time_ms", 0) > 0]
+    from collections import defaultdict
+    tpf_by_size = defaultdict(list)
+    for r in timing_data:
+        ratio = r.get("pv_ratio", r["n_pv"] / max(r["n_bus"], 1))
+        tpf_by_size[r["n_bus"]].append((ratio, r["tpf_time_ms"]))
+
+    # Print detailed summary of all n_bus groups including network names
+    import sys
+    for size in sorted(tpf_by_size.keys()):
+        # Get detailed info including network names
+        size_records = [r for r in timing_data if r['n_bus'] == size]
+        size_records_sorted = sorted(size_records, key=lambda r: r.get('pv_ratio', 0))
+        sys.stderr.write(f"  n={size}: {len(size_records)} records\n")
+        for r in size_records_sorted:
+            sys.stderr.write(f"    {r['name']}: pv_ratio={r.get('pv_ratio', 0)*100:.2f}%, time={r['tpf_time_ms']:.1f}ms\n")
+
     # Plot
     if not args.no_plot:
         save_path = args.save or f"convergence_method_a_{args.suite}_omega{args.omega}.png"
         plot_convergence(records, omega=args.omega, save_path=save_path)
 
-    print(f"\n{'═'*90}")
+    print(f"\n{'='*90}")
 
 
 if __name__ == "__main__":
