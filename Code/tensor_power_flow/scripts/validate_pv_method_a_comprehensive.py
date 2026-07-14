@@ -20,6 +20,7 @@ import sys
 import os
 import time
 import warnings
+from datetime import datetime
 
 warnings.filterwarnings("ignore")
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
@@ -908,6 +909,233 @@ def export_inner_iteration_data(records: list, filepath: str, omega: float):
 
 
 # ══════════════════════════════════════════════════════════════════════
+#  TXT and CSV Export Functions
+# ══════════════════════════════════════════════════════════════════════
+
+def save_results_to_file(records: list, filepath: str, suite: str, omega: float,
+                          tol_pass: float, show_analysis: bool = False):
+    """
+    Saves validation results to a formatted TXT file.
+    """
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    with open(filepath, 'w') as f:
+        f.write("=" * 200 + "\n")
+        f.write("VALIDATION RESULTS: TPF Methode A\n")
+        f.write("=" * 200 + "\n")
+        f.write(f"Suite:         {suite}\n")
+        f.write(f"Omega (w):     {omega}\n")
+        f.write(f"Analysis:      {'full' if show_analysis else 'basic'}\n")
+        f.write(f"Tolerance:     {tol_pass} (PASS threshold)\n")
+        f.write(f"Timestamp:     {timestamp}\n")
+        f.write("=" * 200 + "\n\n")
+
+        tested = [r for r in records if r["n_pv"] > 0]
+        if not tested:
+            f.write("No networks with PV to report.\n")
+            return
+
+        if show_analysis:
+            hdr = (f"{'Netz':<22} {'n_d':<5} {'PV':<3} {'PQ':<4} {'PV%':<5} {'R/X':<5} "
+                   f"{'eta':<8} {'rho(J_G)':<10} {'rho_diag':<9} {'rho_corr':<9} {'kappa':<7} "
+                   f"{'Out':<4} {'Inn':<5} {'TPF ms':<8} {'max dV':<11} {'Status':<6}\n")
+        else:
+            hdr = (f"{'Netz':<22} {'n_d':<5} {'PV':<3} {'PQ':<4} {'PV%':<5} {'R/X':<5} "
+                   f"{'eta':<8} {'rho(J_G)':<10} {'NR It':<6} {'NR ms':<7} "
+                   f"{'Out':<4} {'Inn':<5} {'TPF ms':<8} {'Speedup':<8} "
+                   f"{'max dV':<11} {'mean dV':<11} {'PV dV':<11} {'dTheta(deg)':<10} {'Status':<6}\n")
+
+        f.write(hdr)
+        f.write("-" * 200 + "\n")
+
+        for r in tested:
+            name = r['name'][:22]
+            n_bus = r['n_bus']
+            n_pv = r['n_pv']
+            n_pq = r.get('n_pq', 0)
+            pv_pct = r.get('pv_ratio', 0) * 100
+            rx = r.get('rx_ratio', np.nan)
+            rx_str = f"{rx:.2f}" if not np.isnan(rx) else "—"
+
+            eta = r["eta"]
+            eta_str = f"{eta:.4f}" if eta < 100 else f"{eta:.1f}"
+
+            rho = r.get("rho", np.inf)
+            rho_str = f"{rho:.4f}" if rho < 100 else "—"
+
+            nr_iter = r.get('nr_iter', -1)
+            nr_ms = r.get('nr_time_ms', 0)
+            out_iter = r.get('tpf_outer_iter', 0)
+            inn_iter = r.get('tpf_inner_iter_total', 0)
+            tpf_ms = r.get('tpf_time_ms', 0)
+
+            speedup = r.get('speedup', 0)
+            speedup_str = f"{speedup:.1f}x" if speedup > 0 else "—"
+
+            max_v = r["max_v_error"]
+            max_v_str = f"{max_v:.2e}" if max_v < 100 else "—"
+
+            mean_v = r.get("mean_v_error", np.inf)
+            mean_v_str = f"{mean_v:.2e}" if mean_v < 100 else "—"
+
+            pv_v = r.get("max_pv_v_error", np.inf)
+            pv_v_str = f"{pv_v:.2e}" if pv_v < 100 else "—"
+
+            angle = r.get("max_angle_error_deg", np.inf)
+            angle_str = f"{angle:.4f}" if angle < 100 else "—"
+
+            if r["passed"]:
+                status = "PASS"
+            elif not r.get("tpf_converged"):
+                status = "DIV"
+            elif r.get("error"):
+                status = "ERR"
+            else:
+                status = "FAIL"
+
+            if show_analysis:
+                rho_diag = r.get("rho_diag", np.inf)
+                rho_diag_str = f"{rho_diag:.3f}" if rho_diag < 100 and np.isfinite(rho_diag) else "—"
+
+                rho_corr = r.get("rho_corr", np.inf)
+                rho_corr_str = f"{rho_corr:.3f}" if rho_corr < 100 and np.isfinite(rho_corr) else "—"
+
+                contraction = r.get("contraction", np.inf)
+                contraction_str = f"{contraction:.3f}" if contraction < 100 and np.isfinite(contraction) else "—"
+
+                f.write(f"{name:<22} {n_bus:<5} {n_pv:<3} {n_pq:<4} {pv_pct:<5.1f} {rx_str:<5} "
+                        f"{eta_str:<8} {rho_str:<10} {rho_diag_str:<9} {rho_corr_str:<9} {contraction_str:<7} "
+                        f"{out_iter:<4} {inn_iter:<5} {tpf_ms:<8.1f} {max_v_str:<11} {status:<6}\n")
+            else:
+                f.write(f"{name:<22} {n_bus:<5} {n_pv:<3} {n_pq:<4} {pv_pct:<5.1f} {rx_str:<5} "
+                        f"{eta_str:<8} {rho_str:<10} {nr_iter:<6} {nr_ms:<7.1f} "
+                        f"{out_iter:<4} {inn_iter:<5} {tpf_ms:<8.1f} {speedup_str:<8} "
+                        f"{max_v_str:<11} {mean_v_str:<11} {pv_v_str:<11} {angle_str:<10} {status:<6}\n")
+
+        f.write("\n")
+        f.write("=" * 200 + "\n")
+        f.write("STATISTICS\n")
+        f.write("=" * 200 + "\n")
+
+        passed = [r for r in tested if r["passed"]]
+        converged = [r for r in tested if r.get("tpf_converged")]
+        diverged = [r for r in tested if not r.get("tpf_converged") and r.get("nr_converged")]
+
+        f.write(f"  Networks tested with PV:    {len(tested)}\n")
+        f.write(f"  PASS:                       {len(passed)} ({100*len(passed)/max(len(tested),1):.0f}%)\n")
+        f.write(f"  FAIL (converged, dV):       {len([r for r in tested if r.get('tpf_converged') and not r['passed']])}\n")
+        f.write(f"  FAIL (diverged):            {len(diverged)}\n")
+
+        if converged:
+            etas = [r["eta"] for r in converged if r["eta"] < np.inf]
+            rhos = [r["rho"] for r in converged if r["rho"] < np.inf]
+            v_errors = [r["max_v_error"] for r in converged if r["max_v_error"] < np.inf]
+            outer_iters = [r["tpf_outer_iter"] for r in converged if r["tpf_outer_iter"] > 0]
+
+            if etas:
+                f.write(f"\n  eta (converged):\n")
+                f.write(f"    min={min(etas):.4f}  max={max(etas):.4f}  median={np.median(etas):.4f}\n")
+            if rhos:
+                f.write(f"  rho(J_G) (converged):\n")
+                f.write(f"    min={min(rhos):.4f}  max={max(rhos):.4f}  median={np.median(rhos):.4f}\n")
+            if v_errors:
+                f.write(f"  max|dV| (converged):\n")
+                f.write(f"    min={min(v_errors):.2e}  max={max(v_errors):.2e}  median={np.median(v_errors):.2e}\n")
+            if outer_iters:
+                f.write(f"  Outer iterations:\n")
+                f.write(f"    min={min(outer_iters)}  max={max(outer_iters)}  median={np.median(outer_iters):.0f}\n")
+
+        all_with_rho = [r for r in tested if r["rho"] < np.inf and r.get("nr_converged")]
+        if show_analysis and all_with_rho:
+            f.write(f"\n  {'-' * 80}\n")
+            f.write(f"  CONVERGENCE ANALYSIS: Prediction accuracy of metrics\n")
+            f.write(f"  {'-' * 80}\n")
+
+            def count_correct(metric_key, threshold=1.0):
+                return sum(
+                    1 for r in all_with_rho
+                    if r.get(metric_key, np.inf) < np.inf
+                    and ((r[metric_key] < threshold and r["passed"]) or
+                         (r[metric_key] >= threshold and not r["passed"]))
+                )
+
+            def count_available(metric_key):
+                return sum(1 for r in all_with_rho if r.get(metric_key, np.inf) < np.inf)
+
+            n_correct_rho = count_correct("rho")
+            n_avail_rho = count_available("rho")
+            if n_avail_rho > 0:
+                f.write(f"    rho (full):    {n_correct_rho:2d}/{n_avail_rho} correct ({100*n_correct_rho/max(n_avail_rho,1):.0f}%)\n")
+
+            n_correct_diag = count_correct("rho_diag")
+            n_avail_diag = count_available("rho_diag")
+            if n_avail_diag > 0:
+                f.write(f"    rho_diag:      {n_correct_diag:2d}/{n_avail_diag} correct ({100*n_correct_diag/max(n_avail_diag,1):.0f}%)\n")
+
+            n_correct_corr = count_correct("rho_corr")
+            n_avail_corr = count_available("rho_corr")
+            if n_avail_corr > 0:
+                f.write(f"    rho_corr:      {n_correct_corr:2d}/{n_avail_corr} correct ({100*n_correct_corr/max(n_avail_corr,1):.0f}%)\n")
+
+            n_correct_kappa = count_correct("contraction")
+            n_avail_kappa = count_available("contraction")
+            if n_avail_kappa > 0:
+                f.write(f"    kappa:         {n_correct_kappa:2d}/{n_avail_kappa} correct ({100*n_correct_kappa/max(n_avail_kappa,1):.0f}%)\n")
+
+            f.write(f"\n    Rule: value < 1.0 predicts convergence\n")
+
+        failed = [r for r in tested if not r["passed"]]
+        if failed:
+            f.write("\nFAILED NETWORKS:\n")
+            for r in failed:
+                reason = "DIV" if not r.get("tpf_converged") else ("ERR: " + r.get("error", "dV") if r.get("error") else "accuracy")
+                f.write(f"  {r['name']:<22} {reason}\n")
+
+        f.write("=" * 200 + "\n")
+
+    print(f"\n  TXT saved: {filepath}")
+
+
+def save_csv(records: list, filepath: str):
+    """
+    Saves validation results to a CSV file for programmatic analysis.
+    """
+    import csv
+
+    fieldnames = [
+        "name", "n_bus", "n_pv", "n_pq", "pv_ratio", "rx_ratio",
+        "eta", "rho", "rho_diag", "rho_corr", "contraction",
+        "nr_converged", "nr_iter", "nr_time_ms",
+        "tpf_converged", "tpf_outer_iter", "tpf_inner_iter_total", "tpf_time_ms",
+        "max_v_error", "mean_v_error", "max_angle_error_deg", "max_pv_v_error",
+        "speedup", "passed", "error"
+    ]
+
+    with open(filepath, 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for r in records:
+            if r["n_pv"] == 0:
+                continue
+
+            row = {k: r.get(k, np.nan) for k in fieldnames}
+            row["nr_converged"] = bool(row["nr_converged"])
+            row["tpf_converged"] = bool(row["tpf_converged"])
+            row["passed"] = bool(row["passed"])
+
+            for key in ["eta", "rho", "rho_diag", "rho_corr", "contraction",
+                        "max_v_error", "mean_v_error", "max_angle_error_deg",
+                        "max_pv_v_error", "rx_ratio", "speedup"]:
+                if row[key] is None or not np.isfinite(row[key]):
+                    row[key] = np.nan
+
+            writer.writerow(row)
+
+    print(f"  CSV saved: {filepath}")
+
+
+# ══════════════════════════════════════════════════════════════════════
 #  Main
 # ══════════════════════════════════════════════════════════════════════
 
@@ -949,6 +1177,8 @@ def main():
                         default="full",
                         help="Konvergenz-Analyse-Methode: full (alle), diagonal (ρ_diag), "
                              "corrected (ρ_corr), contraction (κ)")
+    parser.add_argument("--output-dir", "-d", type=str, default="./tau_benchmark_results",
+                        help="Output directory for TXT/CSV results (default: ./tau_benchmark_results)")
     args = parser.parse_args()
 
     print("+========================================================================+")
@@ -1058,6 +1288,17 @@ def main():
     # Export
     if args.export:
         export_inner_iteration_data(records, args.export, omega=args.omega)
+
+    # Save TXT and CSV results
+    output_dir = args.output_dir
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        txt_path = os.path.join(output_dir, f"validation_{args.suite}_w{args.omega}_{timestamp}.txt")
+        csv_path = os.path.join(output_dir, f"validation_{args.suite}_w{args.omega}_{timestamp}.csv")
+
+        save_results_to_file(records, txt_path, args.suite, args.omega, args.tol, show_analysis=show_analysis)
+        save_csv(records, csv_path)
 
     # DEBUG: Print timing_data structure before plotting
     timing_data = [r for r in records
