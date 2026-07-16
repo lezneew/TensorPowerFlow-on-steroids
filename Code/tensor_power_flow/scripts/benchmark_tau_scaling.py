@@ -189,9 +189,10 @@ def get_completed_networks(output_dir: str) -> set:
         return completed
     for f in os.listdir(output_dir):
         if f.startswith("tau_scaling_") and (f.endswith(".txt") or f.endswith(".csv")):
-            parts = f.split("_")
+            name_without_ext = f.rsplit(".", 1)[0]
+            parts = name_without_ext.split("_")
             if len(parts) >= 3:
-                network_name = "_".join(parts[2:-1])
+                network_name = "_".join(parts[2:-2])
                 completed.add(network_name)
     return completed
 
@@ -208,7 +209,7 @@ def check_convergence(network_name: str, tau: int, seed: int = 42):
 
 
 def run_batch_benchmark(network_names: list[str], tau_values: list[int], output_dir: str,
-                        convergence_tau: int = 10, seed: int = 42):
+                        convergence_tau: int = 10, seed: int = 42, force: bool = False):
     """Run batch benchmark for multiple networks. Returns summary list."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     all_results = []
@@ -217,10 +218,14 @@ def run_batch_benchmark(network_names: list[str], tau_values: list[int], output_
     already_exists = []
 
     completed = get_completed_networks(output_dir)
-    networks_to_run = [n for n in network_names if n not in completed]
-    already_exists = [n for n in network_names if n in completed]
+    if force:
+        networks_to_run = list(network_names)
+        already_exists = []
+    else:
+        networks_to_run = [n for n in network_names if n not in completed]
+        already_exists = [n for n in network_names if n in completed]
 
-    if already_exists:
+    if already_exists and not force:
         print(f"\n{'='*80}")
         print(f"  Found {len(already_exists)} existing results, will skip:")
         for net in already_exists[:10]:
@@ -331,6 +336,8 @@ def main():
                         help="Filter networks by prefix (e.g., 'sz_', 'ieee_')")
     parser.add_argument("--convergence-tau", "-c", type=int, default=10,
                         help="Tau value for convergence check (default: 10)")
+    parser.add_argument("--force", "-F", action="store_true",
+                        help="Force re-run even if results already exist")
     args = parser.parse_args()
 
     tau_values = [int(x.strip()) for x in args.tau.split(",")]
@@ -345,7 +352,7 @@ def main():
             return
 
         run_batch_benchmark(network_names, tau_values, output_dir,
-                            convergence_tau=args.convergence_tau)
+                            convergence_tau=args.convergence_tau, force=args.force)
         return
 
     if args.network not in ALL_SALAZAR_NETWORKS:

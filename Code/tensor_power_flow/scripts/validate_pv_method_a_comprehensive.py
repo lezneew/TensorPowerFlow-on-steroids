@@ -1136,6 +1136,69 @@ def save_csv(records: list, filepath: str):
 
 
 # ══════════════════════════════════════════════════════════════════════
+#  Suite Helpers
+# ══════════════════════════════════════════════════════════════════════
+
+VALID_SUITES = [
+    "quick", "radial", "salazar", "salazar_scaling",
+    "salazar_low_vm", "salazar_low_rx05", "salazar_low_rx10",
+    "full", "ieee", "pegase", "rte", "large", "standard"
+]
+
+
+def get_suite_networks(suite_name: str) -> dict:
+    """Get networks for a single suite name."""
+    if suite_name == "quick":
+        return get_quick_test_networks()
+    elif suite_name == "radial":
+        return get_radial_only_networks()
+    elif suite_name == "salazar":
+        return get_salazar_pv_networks()
+    elif suite_name == "salazar_scaling":
+        return get_salazar_scaling_networks()
+    elif suite_name == "salazar_low_vm":
+        return get_salazar_low_vm_networks()
+    elif suite_name == "salazar_low_rx05":
+        return get_salazar_low_rx05_networks()
+    elif suite_name == "salazar_low_rx10":
+        return get_salazar_low_rx10_networks()
+    elif suite_name == "ieee":
+        return get_ieee_networks()
+    elif suite_name == "pegase":
+        return get_pegase_networks()
+    elif suite_name == "rte":
+        return get_rte_networks()
+    elif suite_name == "large":
+        return get_large_networks()
+    elif suite_name == "standard":
+        return get_all_standard_networks()
+    elif suite_name == "full":
+        return get_comprehensive_networks()
+    else:
+        raise ValueError(f"Unknown suite: '{suite_name}'. Valid: {VALID_SUITES}")
+
+
+def parse_suites(suite_str: str) -> dict:
+    """
+    Parse suite string (comma-separated or 'all') and return combined networks.
+    """
+    if suite_str == "all":
+        networks = {}
+        for s in VALID_SUITES:
+            networks.update(get_suite_networks(s))
+        return networks
+    else:
+        suite_names = [x.strip() for x in suite_str.split(",")]
+        for s in suite_names:
+            if s not in VALID_SUITES:
+                raise ValueError(f"Unknown suite: '{s}'. Valid: {VALID_SUITES}")
+        networks = {}
+        for s in suite_names:
+            networks.update(get_suite_networks(s))
+        return networks
+
+
+# ══════════════════════════════════════════════════════════════════════
 #  Main
 # ══════════════════════════════════════════════════════════════════════
 
@@ -1146,14 +1209,10 @@ def main():
         description="Validierung + Spektralradius + Konvergenz-Plot: TPF Methode A"
     )
     parser.add_argument(
-        "--suite", choices=["quick", "radial", "salazar", "salazar_scaling", "salazar_low_vm",
-                            "salazar_low_rx05", "salazar_low_rx10", "full",
-                            "ieee", "pegase", "rte", "large", "standard"],
-        default="salazar_scaling",
-        help="Testsuite: quick (4 Netze), radial (ohne IEEE vermascht), salazar/salazar_scaling, "
-             "salazar_low_vm (niedrige PV-Spannung für NR-scheiternde Netze), "
-             "salazar_low_rx05 (R/X=0.5), salazar_low_rx10 (R/X=1.0), "
-             "full (alles), ieee (IEEE 9-300), pegase (PEGASE), rte (French), large (>100), standard (alle)"
+        "--suite", type=str, default="salazar_scaling",
+        help="Test suite: comma-separated (e.g., 'salazar_scaling,ieee,pegase') or 'all' for all suites. "
+             "Available: quick, radial, salazar, salazar_scaling, salazar_low_vm, salazar_low_rx05, "
+             "salazar_low_rx10, full, ieee, pegase, rte, large, standard. Default: salazar_scaling"
     )
     parser.add_argument("--omega", type=float, default=1.0,
                         help="Q-Relaxationsfaktor w (default: 1.0)")
@@ -1188,32 +1247,7 @@ def main():
     print("+========================================================================+")
 
     # Netze laden
-    if args.suite == "quick":
-        networks = get_quick_test_networks()
-    elif args.suite == "radial":
-        networks = get_radial_only_networks()
-    elif args.suite == "salazar":
-        networks = get_salazar_pv_networks()
-    elif args.suite == "salazar_scaling":
-        networks = get_salazar_scaling_networks()
-    elif args.suite == "salazar_low_vm":
-        networks = get_salazar_low_vm_networks()
-    elif args.suite == "salazar_low_rx05":
-        networks = get_salazar_low_rx05_networks()
-    elif args.suite == "salazar_low_rx10":
-        networks = get_salazar_low_rx10_networks()
-    elif args.suite == "ieee":
-        networks = get_ieee_networks()
-    elif args.suite == "pegase":
-        networks = get_pegase_networks()
-    elif args.suite == "rte":
-        networks = get_rte_networks()
-    elif args.suite == "large":
-        networks = get_large_networks()
-    elif args.suite == "standard":
-        networks = get_all_standard_networks()
-    else:
-        networks = get_comprehensive_networks()
+    networks = parse_suites(args.suite)
 
 
     cold_str = " (COLD START)" if args.cold_start else ""

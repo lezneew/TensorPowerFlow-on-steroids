@@ -1774,6 +1774,81 @@ def get_salazar_low_rx10_networks() -> dict[str, dict]:
 
 
 # ══════════════════════════════════════════════════════════════════════
+#  LOW RX SMALL NETWORKS — Für Netze mit niedrigem R/X und kleinen Größen
+#  R/X = 0.5 und 1.0 für Bus-Größen: 4, 6, 10, 20, 40, 60, 80, 100
+# ══════════════════════════════════════════════════════════════════════
+
+_SMALL_SIZES = [4, 6, 10, 20, 40, 60, 80, 100]
+_SMALL_PV_RATIOS = [0.25, 0.17, 0.10, 0.05, 0.025, 0.017, 0.013, 0.01]
+
+_SMALL_CONSTRUCTORS_RX05: dict[str, callable] = {}
+_SMALL_CONSTRUCTORS_RX10: dict[str, callable] = {}
+
+for idx, size in enumerate(_SMALL_SIZES):
+    pv_ratio = _SMALL_PV_RATIOS[idx]
+    seed = 5000 + size
+
+    key_rx05 = f"sz_{size}_rx05_r{int(pv_ratio*100)}"
+    _SMALL_CONSTRUCTORS_RX05[key_rx05] = lambda n=size, p=pv_ratio, s=seed: \
+        _create_salazar_size_ratio_rx(n, p, s, rx_ratio=0.5)
+
+    key_rx10 = f"sz_{size}_rx10_r{int(pv_ratio*100)}"
+    _SMALL_CONSTRUCTORS_RX10[key_rx10] = lambda n=size, p=pv_ratio, s=seed: \
+        _create_salazar_size_ratio_rx(n, p, s, rx_ratio=1.0)
+
+
+SALAZAR_LOW_RX05_SMALL_NETWORKS: dict[str, dict] = {}
+SALAZAR_LOW_RX10_SMALL_NETWORKS: dict[str, dict] = {}
+
+for key, constructor in _SMALL_CONSTRUCTORS_RX05.items():
+    size = int(key.split("_")[1])
+    ratio = float(key.split("_")[3].replace("r", "")) / 100.0
+
+    n_pv = max(1, int(round(size * ratio)))
+    n_pv = min(n_pv, size - 3)
+
+    SALAZAR_LOW_RX05_SMALL_NETWORKS[key] = {
+        "constructor": constructor,
+        "description": f"Salazar {size}-Bus, PV={ratio*100:.0f}%, rx05",
+        "n_pv": n_pv, "n_bus_total": size, "pv_ratio": ratio,
+        "rx_ratio": 0.5,
+        "category": "salazar_rx05_small",
+    }
+
+for key, constructor in _SMALL_CONSTRUCTORS_RX10.items():
+    size = int(key.split("_")[1])
+    ratio = float(key.split("_")[3].replace("r", "")) / 100.0
+
+    n_pv = max(1, int(round(size * ratio)))
+    n_pv = min(n_pv, size - 3)
+
+    SALAZAR_LOW_RX10_SMALL_NETWORKS[key] = {
+        "constructor": constructor,
+        "description": f"Salazar {size}-Bus, PV={ratio*100:.0f}%, rx10",
+        "n_pv": n_pv, "n_bus_total": size, "pv_ratio": ratio,
+        "rx_ratio": 1.0,
+        "category": "salazar_rx10_small",
+    }
+
+
+def get_salazar_low_rx05_small_networks() -> dict[str, dict]:
+    """Small networks with R/X = 0.5 (sizes: 4, 6, 10, 20, 40, 60, 80, 100)."""
+    return SALAZAR_LOW_RX05_SMALL_NETWORKS
+
+
+def get_salazar_low_rx10_small_networks() -> dict[str, dict]:
+    """Small networks with R/X = 1.0 (sizes: 4, 6, 10, 20, 40, 60, 80, 100)."""
+    return SALAZAR_LOW_RX10_SMALL_NETWORKS
+
+
+def get_salazar_low_rx_small_networks() -> dict[str, dict]:
+    """All small networks with low R/X (both 0.5 and 1.0)."""
+    combined = dict(SALAZAR_LOW_RX05_SMALL_NETWORKS)
+    combined.update(SALAZAR_LOW_RX10_SMALL_NETWORKS)
+    return combined
+
+
+# ══════════════════════════════════════════════════════════════════════
 #  PQ-ONLY NETZE — Paper-Reproduktion für Baseline-Performance
 #  Keine PV-Knoten, nur Slack + PQ. Für reinen TPF vs. NR Vergleich.
 #  Größen: 9 bis 5000 (wie im Paper, Fig. 5)
