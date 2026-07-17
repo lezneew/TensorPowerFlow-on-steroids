@@ -117,9 +117,9 @@ def main():
 
     # ── 4. Methode B loesen (MIT Historie) ──
     solver_b = TPFDensePVMethodB(
-        tol=1e-10,
+        tol=1e-6,
         max_iter=200,
-        tol_pv=1e-8,
+        tol_pv=1e-6,
         enforce_q_lims=False,
         track_convergence=True,
     )
