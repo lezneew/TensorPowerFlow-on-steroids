@@ -1,18 +1,20 @@
-# tensor_power_flow/scripts/validate_pv_method_a_comprehensive.py
+# tensor_power_flow/scripts/validate_pv_method_b_comprehensive.py
 """
-Umfassende Validierung: TPF Methode A mit Spektralradius + Konvergenz-Plot
-==========================================================================
+Umfassende Validierung: TPF Methode B mit Spektralradius + Konvergenz-Plot
+===========================================================================
 
-Validiert Methode A gegen NR für alle TEST_NETWORKS und plottet:
-- Links:  PV |V|-Fehler vs. Outer-Iteration
-- Rechts: Gesamtnetz max(|ΔV|) vs. kumulative Inner-Iteration (ALLE Busse)
+Validiert Methode B gegen NR für alle TEST_NETWORKS und plottet:
+- Links:  PV |V|-Fehler vs. Iteration
+- Rechts: Gesamtnetz max(|ΔV|) vs. kumulative Iteration (ALLE Busse)
 
-NEU: Berechnet ρ(I + ω·H·D⁻¹) numerisch für jedes Netz.
+Methode B verwendet Single-Pass mit eingebetteter Q-Korrektur:
+- Q wird EXAKT aus der Netzgleichung zurückgerechnet
+- Alle Matrizen werden in jeder Iteration aktualisiert
 
 Aufruf:
-    python scripts/validate_pv_method_a_comprehensive.py
-    python scripts/validate_pv_method_a_comprehensive.py --suite full --omega 1.0
-    python scripts/validate_pv_method_a_comprehensive.py --no-plot
+    python scripts/validate_pv_method_b_comprehensive.py
+    python scripts/validate_pv_method_b_comprehensive.py --suite full --omega 1.0 --omega-q 1.0
+    python scripts/validate_pv_method_b_comprehensive.py --no-plot
 """
 
 import numpy as np
@@ -28,7 +30,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 import pandapower as pp
 
 from tpf.builders.from_pandapower import build_network_from_pandapower
-from tpf.solvers.tpf_pv_method_a import TPFDensePVMethodA
+from tpf.solvers.tpf_pv_method_b import TPFDensePVMethodB
 from tpf.solvers.nr_reference import PandapowerNRSolver
 from tpf.generators.radial_network import (
     TEST_NETWORKS,
@@ -169,9 +171,9 @@ def compute_spectral_radius(network, omega, delta_q=1e-5):
 #  Einzelnetz-Validierung
 # ══════════════════════════════════════════════════════════════════════
 
-def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False, analysis="full"):
+def validate_network(net_constructor, name, omega=1.0, omega_q=1.0, tol_pass=1e-4, verbose=True, analysis="full"):
     """
-    Validiert Methode A gegen NR. Gibt Record mit Konvergenzhistorie zurück.
+    Validiert Methode B gegen NR. Gibt Record mit Konvergenzhistorie zurück.
 
     Parameters
     ----------
@@ -213,7 +215,8 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
         return record
 
     # 1. NR-Referenz
-    nr_solver = PandapowerNRSolver(tol=1e-8, max_iter=100)
+
+    nr_solver = PandapowerNRSolver(tol=1e-8, max_iter=200)
     try:
         nr_result = nr_solver.solve_from_net(net)
     except Exception as e:
@@ -279,11 +282,10 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     except Exception:
         record["rho"] = np.inf
 
-    # 5. Methode A
-    solver = TPFDensePVMethodA(
-        tol=1e-6, max_iter_inner=20, max_iter_outer=50,
-        tol_pv=1e-6, omega=omega, enforce_q_lims=False,
-        cold_start=cold_start,
+    # 5. Methode B
+    solver = TPFDensePVMethodB(
+        tol=1e-8, max_iter=200,
+        tol_pv=1e-6, omega=omega, omega_q=omega_q, enforce_q_lims=False,
     )
 
     try:
@@ -300,12 +302,12 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
 
     if solver.pv_info:
         pv_info = solver.pv_info
-        record["tpf_outer_iter"] = pv_info.outer_iterations
+        record["tpf_outer_iter"] = pv_info.iterations
         record["max_pv_v_error"] = pv_info.pv_v_error_final
         record["pv_v_errors"] = pv_info.pv_v_error_history or []
-        record["inner_v_change_all"] = pv_info.inner_v_change_all or []
-        record["outer_start_indices"] = pv_info.outer_start_indices or []
-        record["inner_per_outer"] = pv_info.inner_iterations_per_outer or []
+        record["inner_v_change_all"] = pv_info.voltage_change_history or []
+        record["outer_start_indices"] = [1]
+        record["inner_per_outer"] = [pv_info.iterations]
 
     # 5b. Erweiterte Konvergenz-Analyse (rho_diag, rho_corr, contraction)
     if analysis in ["full", "diagonal", "corrected",
@@ -369,13 +371,12 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
 #  Batch-Validierung
 # ══════════════════════════════════════════════════════════════════════
 
-def run_validation_suite(networks: dict, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False, analysis="full"):
+def run_validation_suite(networks: dict, omega=1.0, omega_q=1.0, tol_pass=1e-4, verbose=True, analysis="full"):
     records = []
     for name, info in networks.items():
         record = validate_network(
-            info["constructor"], name, omega=omega,
-            tol_pass=tol_pass, verbose=verbose, cold_start=cold_start,
-            analysis=analysis
+            info["constructor"], name, omega=omega, omega_q=omega_q,
+            tol_pass=tol_pass, verbose=verbose, analysis=analysis
         )
         records.append(record)
     return records
@@ -631,9 +632,9 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
     # ax00.axhline(y=1e-6, color="green", linestyle=":", linewidth=2.0)
     # ax00.axhline(y=1e-4, color="darkorange", linestyle="-.", linewidth=1.5)
 
-    ax00.set_xlabel("Aeuszere Iteration l", fontsize=11)
+    ax00.set_xlabel("Iteration l", fontsize=11)
     ax00.set_ylabel("max ||V_PV| - V_spec|| [p.u.]", fontsize=11)
-    ax00.set_title("(a) PV-Spannungsfehler vs. Outer-Iteration", fontsize=12)
+    ax00.set_title("(a) PV-Spannungsfehler vs. Iteration", fontsize=12)
     ax00.grid(True, which="both", alpha=0.3)
     #ax00.set_xlim(1)
     ax00.set_ylim(bottom=1e-7, top=1e0)
@@ -666,7 +667,7 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
     # ax01.axhline(y=1e-8, color="green", linestyle=":", linewidth=2.0)
     # ax01.axhline(y=1e-6, color="blue", linestyle="-.", linewidth=1.0)
 
-    ax01.set_xlabel("Kumulative Inner-Iteration", fontsize=11)
+    ax01.set_xlabel("Iteration", fontsize=11)
     ax01.set_ylabel("max ||V_new| - |V_old|| [p.u.]", fontsize=11)
     ax01.set_title("(b) Gesamtnetz-Konvergenz (alle Busse)", fontsize=12)
     ax01.grid(True, which="both", alpha=0.3)
@@ -759,7 +760,7 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
             pv_ratios * 100, tpf_times_r,
             c=size_norm, cmap=size_cmap, marker="o", s=60,
             edgecolors="tab:blue", linewidths=1.5, zorder=5, alpha=0.8,
-            label="TPF Methode A",
+            label="TPF Methode B",
         )
 
         # Annotationen: Netzgröße an TPF-Punkten
@@ -837,7 +838,7 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
         Line2D([0], [0], color="tab:red", marker="s", linestyle="--",
                markersize=8, label="NR (pandapower)"),
         Line2D([0], [0], color="tab:blue", marker="o", linestyle="--",
-               markersize=8, label="TPF Methode A"),
+               markersize=8, label="TPF Methode B"),
         Line2D([0], [0], color="green", linestyle=":", linewidth=2,
                label="tol_pv = 1e-6"),
         Line2D([0], [0], color="darkorange", linestyle="-.", linewidth=1.5,
@@ -858,7 +859,7 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
     )
 
     fig.suptitle(
-        f"Methode A: Konvergenz & Performance — {len(plot_data)} Netze "
+        f"Methode B: Konvergenz & Performance — {len(plot_data)} Netze "
         f"({n_conv} konv., {n_div} div.), w = {omega}",
         fontsize=14, y=1.06,
     )
@@ -921,7 +922,7 @@ def save_results_to_file(records: list, filepath: str, suite: str, omega: float,
 
     with open(filepath, 'w') as f:
         f.write("=" * 200 + "\n")
-        f.write("VALIDATION RESULTS: TPF Methode A\n")
+        f.write("VALIDATION RESULTS: TPF Methode B\n")
         f.write("=" * 200 + "\n")
         f.write(f"Suite:         {suite}\n")
         f.write(f"Omega (w):     {omega}\n")
@@ -1206,7 +1207,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Validierung + Spektralradius + Konvergenz-Plot: TPF Methode A"
+        description="Validierung + Spektralradius + Konvergenz-Plot: TPF Methode B"
     )
     parser.add_argument(
         "--suite", type=str, default="salazar_scaling",
@@ -1216,7 +1217,9 @@ def main():
     )
     parser.add_argument("--omega", type=float, default=1.0,
                         help="Q-Relaxationsfaktor w (default: 1.0)")
-    parser.add_argument("--tol", type=float, default=1e-6,
+    parser.add_argument("--omega-q", type=float, default=1.0,
+                        help="Q-Relaxationsfaktor fuer eingebettete Q-Korrektur (default: 1.0)")
+    parser.add_argument("--tol", type=float, default=1e-4,
                         help="PASS-Schwelle für max|ΔV| (default: 1e-4)")
     parser.add_argument("--no-plot", action="store_true",
                         help="Keinen Plot erzeugen (nur Tabelle)")
@@ -1228,8 +1231,6 @@ def main():
                         help="Liste aller verfügbaren Netzwerke in der Suite anzeigen")
     parser.add_argument("--export", type=str, default=None,
                         help="Exportiere subplot (b) Daten in Textdatei")
-    parser.add_argument("--cold-start", action="store_true",
-                        help="Nutze cold start fuer innere FPI (jede outer iteration startet mit V=1.0 pu)")
     parser.add_argument("--size", type=int, default=None,
                         help="Filter networks by bus count (e.g., 20 for sz_20_*)")
     parser.add_argument("--analysis", choices=["full", "diagonal", "corrected", "contraction"],
@@ -1241,8 +1242,8 @@ def main():
     args = parser.parse_args()
 
     print("+========================================================================+")
-    print("|  VALIDIERUNG + SPEKTRALRADIUS + KONVERGENZ-PLOT: TPF Methode A            |")
-    print("|  Berechnet rho(J_G) numerisch fuer jedes Netz                            |")
+    print("|  VALIDIERUNG + SPEKTRALRADIUS + KONVERGENZ-PLOT: TPF Methode B            |")
+    print("|  Single-Pass mit eingebetteter Q-Korrektur                              |")
     print("|  Analysemodus: {:<57}  |".format(args.analysis))
     print("+========================================================================+")
 
@@ -1250,9 +1251,8 @@ def main():
     networks = parse_suites(args.suite)
 
 
-    cold_str = " (COLD START)" if args.cold_start else ""
     print(f"\n  Suite: '{args.suite}' - {len(networks)} Netze")
-    print(f"  w = {args.omega}, PASS-Schwelle = {args.tol:.0e}{cold_str}\n")
+    print(f"  w = {args.omega}, w_q = {args.omega_q}, PASS-Schwelle = {args.tol:.0e}\n")
 
     # Handle --size filter (filter networks by bus count prefix, e.g., sz_20_*)
     if args.size is not None:
@@ -1281,8 +1281,8 @@ def main():
     # Validierung
     t_start = time.perf_counter()
     records = run_validation_suite(
-        networks, omega=args.omega, tol_pass=args.tol, verbose=True,
-        cold_start=args.cold_start, analysis=args.analysis
+        networks, omega=args.omega, omega_q=args.omega_q, tol_pass=args.tol, verbose=True,
+        analysis=args.analysis
     )
     t_total = time.perf_counter() - t_start
 
@@ -1293,8 +1293,7 @@ def main():
     )
 
     # Tabelle
-    cold_str = " (COLD START)" if args.cold_start else ""
-    print_results_table(records, title=f"Methode A — Suite '{args.suite}', w={args.omega}{cold_str}", show_analysis=show_analysis)
+    print_results_table(records, title=f"Methode B — Suite '{args.suite}', w={args.omega}, w_q={args.omega_q}", show_analysis=show_analysis)
     print_statistics(records, show_analysis=show_analysis)
 
     # Gesamtergebnis
@@ -1307,7 +1306,7 @@ def main():
           f"({100*n_pass/max(n_total,1):.0f}%)")
 
     if n_pass == n_total:
-        print(f"\n  [OK] METHODE A VALIDIERT FUER ALLE {n_total} TESTNETZE!")
+        print(f"\n  [OK] METHODE B VALIDIERT FUER ALLE {n_total} TESTNETZE!")
     else:
         n_div = sum(1 for r in tested if not r.get("tpf_converged")
                     and r.get("nr_converged"))
@@ -1315,7 +1314,7 @@ def main():
                     and not r["passed"])
         print(f"\n  ! {n_total - n_pass} Tests fehlgeschlagen:")
         if n_div:
-            print(f"    - {n_div} divergiert (w anpassen oder eta > 1)")
+            print(f"    - {n_div} divergiert (w oder w_q anpassen)")
         if n_acc:
             print(f"    - {n_acc} Genauigkeit unzureichend")
 
@@ -1328,8 +1327,8 @@ def main():
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        txt_path = os.path.join(output_dir, f"validation_{args.suite}_w{args.omega}_{timestamp}.txt")
-        csv_path = os.path.join(output_dir, f"validation_{args.suite}_w{args.omega}_{timestamp}.csv")
+        txt_path = os.path.join(output_dir, f"validation_method_b_{args.suite}_w{args.omega}_wq{args.omega_q}_{timestamp}.txt")
+        csv_path = os.path.join(output_dir, f"validation_method_b_{args.suite}_w{args.omega}_wq{args.omega_q}_{timestamp}.csv")
 
         save_results_to_file(records, txt_path, args.suite, args.omega, args.tol, show_analysis=show_analysis)
         save_csv(records, csv_path)
@@ -1359,7 +1358,7 @@ def main():
 
     # Plot
     if not args.no_plot:
-        save_path = args.save or f"convergence_method_a_{args.suite}_omega{args.omega}.png"
+        save_path = args.save or f"convergence_method_b_{args.suite}_omega{args.omega}_omegaq{args.omega_q}.png"
         plot_convergence(records, omega=args.omega, save_path=save_path)
 
     print(f"\n{'='*90}")

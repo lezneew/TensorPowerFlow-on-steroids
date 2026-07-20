@@ -45,7 +45,7 @@ class TPFDensePVMethodA(BaseSolver):
         tol: float = 1e-6,
         max_iter_inner: int = 50,
         max_iter_outer: int = 30,
-        tol_pv: float = 1e-5,
+        tol_pv: float = 1e-6,
         omega: float = 1.0,
         enforce_q_lims: bool = False,
         cold_start: bool = False,

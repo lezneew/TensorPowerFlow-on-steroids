@@ -1,0 +1,12 @@
+Batch Benchmark Summary
+Generated: 2026-07-15T11:06:44.711699
+================================================================================
+
+SUCCESSFUL: 0 networks
+
+SKIPPED (no convergence): 1 networks
+  - sz_1000_r40_m02
+
+ALREADY EXISTS: 0 networks
+
+FAILED (errors): 0 networks
