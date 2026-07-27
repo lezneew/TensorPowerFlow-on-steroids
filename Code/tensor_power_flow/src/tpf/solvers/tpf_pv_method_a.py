@@ -30,6 +30,9 @@ class PVConvergenceInfo:
     inner_v_change_all: list[float] = field(default_factory=list)
     outer_start_indices: list[int] = field(default_factory=list)
 
+    inner_fpi_time_ms: list[float] = field(default_factory=list)
+    total_inner_fpi_time_ms: float = 0.0
+
     # NEU: Per-Szenario-Tracking (für τ > 1)
     outer_iterations_per_scenario: NDArray | None = None   # (τ,) int32
     inner_iterations_per_scenario: NDArray | None = None   # (τ,) int32
@@ -49,6 +52,8 @@ class TPFDensePVMethodA(BaseSolver):
         omega: float = 1.0,
         enforce_q_lims: bool = False,
         cold_start: bool = False,
+        max_iter_inner_per_outer: int | None = None,
+        adaptive_inner: bool = False,
     ):
         super().__init__(tol, max_iter_inner)
         self.max_iter_outer = max_iter_outer
@@ -56,6 +61,8 @@ class TPFDensePVMethodA(BaseSolver):
         self.omega = omega
         self.enforce_q_lims = enforce_q_lims
         self.cold_start = cold_start
+        self.max_iter_inner_per_outer = max_iter_inner_per_outer
+        self.adaptive_inner = adaptive_inner
         self.pv_info: PVConvergenceInfo | None = None
 
     # ══════════════════════════════════════════════════════════════════
@@ -269,22 +276,28 @@ class TPFDensePVMethodA(BaseSolver):
 
         err_per_col = np.full(tau, np.inf)
 
+        inner_limit = self.max_iter_inner_per_outer if self.max_iter_inner_per_outer is not None else self.max_iter
+        use_two_phase = self.max_iter_inner_per_outer is not None and self.max_iter_inner_per_outer < self.max_iter
+
         for ell in range(self.max_iter_outer):
             if self.cold_start:
                 V = np.ones((bphi, tau), dtype=np.complex128)
 
+            v_mag_pv = np.abs(V[pv_idx, :])
+            err_per_col = np.max(np.abs(v_mag_pv - v_spec_2d), axis=0)
+
             S_conj = np.conj(s_work)
             V, n_inner, _, _, _ = self._inner_fpi(
-                K, L, S_conj, bphi, tau, V_init=V, collect_history=False
+                K, L, S_conj, bphi, tau, V_init=V, collect_history=False,
+                max_iter_override=inner_limit if not use_two_phase else self.max_iter_inner_per_outer,
+                outer_error=err_per_col if self.adaptive_inner else None
             )
 
-            # Inner-Iterationen NUR für noch aktive Szenarien zählen
             active = ~converged_mask
             inner_iters[active] += n_inner
 
-            # PV-Fehler pro Spalte
-            v_mag_pv = np.abs(V[pv_idx, :])                       # (n_pv, τ)
-            err_per_col = np.max(np.abs(v_mag_pv - v_spec_2d), axis=0)  # (τ,)
+            v_mag_pv = np.abs(V[pv_idx, :])
+            err_per_col = np.max(np.abs(v_mag_pv - v_spec_2d), axis=0)
 
             # Neu konvergierte Szenarien
             newly_conv = (err_per_col < self.tol_pv) & (~converged_mask)
@@ -293,7 +306,10 @@ class TPFDensePVMethodA(BaseSolver):
             converged_mask |= newly_conv
 
             if converged_mask.all():
-                break
+                if not use_two_phase:
+                    break
+                else:
+                    break
 
             # Q-Update: coupled Newton step in reduced PV-space
             delta_v_sq = v_spec_sq_2d - v_mag_pv ** 2
@@ -311,6 +327,29 @@ class TPFDensePVMethodA(BaseSolver):
                 q_pv = np.minimum(q_pv, q_max_col)
 
             s_work[pv_idx, :] = p_pv_fixed + 1j * q_pv
+
+        if use_two_phase:
+            if self.cold_start:
+                V = np.ones((bphi, tau), dtype=np.complex128)
+
+            v_mag_pv = np.abs(V[pv_idx, :])
+            err_per_col = np.max(np.abs(v_mag_pv - v_spec_2d), axis=0)
+
+            S_conj = np.conj(s_work)
+            V, n_inner, _, _, _ = self._inner_fpi(
+                K, L, S_conj, bphi, tau, V_init=V, collect_history=False,
+                max_iter_override=self.max_iter,
+                outer_error=err_per_col if self.adaptive_inner else None
+            )
+
+            inner_iters += n_inner
+            v_mag_pv = np.abs(V[pv_idx, :])
+            err_per_col = np.max(np.abs(v_mag_pv - v_spec_2d), axis=0)
+
+            newly_conv = (err_per_col < self.tol_pv) & (~converged_mask)
+            outer_iters[newly_conv] += 1
+            pv_v_error[newly_conv] = err_per_col[newly_conv]
+            converged_mask |= newly_conv
 
         # Log & continue: nicht-konvergierte Szenarien behalten letzten Zustand
         still_div = ~converged_mask
@@ -414,6 +453,12 @@ class TPFDensePVMethodA(BaseSolver):
         v_change_history = []
         inner_v_change_all = []
         outer_start_indices = []
+        inner_fpi_time_ms = []
+
+        inner_limit = self.max_iter_inner_per_outer if self.max_iter_inner_per_outer is not None else self.max_iter
+        use_two_phase = self.max_iter_inner_per_outer is not None and self.max_iter_inner_per_outer < self.max_iter
+
+        phase1_converged = False
 
         for ell in range(self.max_iter_outer):
             outer_iter = ell + 1
@@ -421,26 +466,35 @@ class TPFDensePVMethodA(BaseSolver):
                 V = np.ones((bphi, tau), dtype=np.complex128)
             outer_start_indices.append(len(inner_v_change_all))
 
+            v_spec_2d = v_spec.reshape(-1, 1)
+            v_mag_pv = np.abs(V[pv_idx, :])
+            pv_v_error = np.max(np.abs(v_mag_pv - v_spec_2d))
+
             S_conj = np.conj(s_work)
+            t_inner_start = time.perf_counter()
             V, n_inner, converged_inner, tol_inner, inner_history = self._inner_fpi(
-                K, L, S_conj, bphi, tau, V_init=V, collect_history=True
+                K, L, S_conj, bphi, tau, V_init=V, collect_history=True,
+                max_iter_override=inner_limit if not use_two_phase else self.max_iter_inner_per_outer,
+                outer_error=pv_v_error if self.adaptive_inner else None
             )
+            t_inner_end = time.perf_counter()
+            inner_fpi_time_ms.append((t_inner_end - t_inner_start) * 1000)
             inner_iter_total += n_inner
             inner_iter_log.append(n_inner)
             inner_v_change_all.extend(inner_history)
 
-            if not converged_inner:
-                break
-
             v_mag_pv = np.abs(V[pv_idx, :])
-            v_spec_2d = v_spec.reshape(-1, 1)
             pv_v_error = np.max(np.abs(v_mag_pv - v_spec_2d))
             pv_v_error_history.append(float(pv_v_error))
             v_change_history.append(float(tol_inner))
 
             if pv_v_error < self.tol_pv:
-                converged_outer = True
-                break
+                phase1_converged = True
+                if not use_two_phase:
+                    converged_outer = True
+                    break
+                else:
+                    break
 
             # Coupled Newton step in reduced PV-space
             delta_v_sq = v_spec_2d ** 2 - v_mag_pv ** 2
@@ -453,7 +507,33 @@ class TPFDensePVMethodA(BaseSolver):
 
             s_work[pv_idx, :] = p_pv_fixed + 1j * q_pv
 
+        if use_two_phase:
+            outer_start_indices.append(len(inner_v_change_all))
+            outer_iter += 1
+            v_mag_pv = np.abs(V[pv_idx, :])
+            v_spec_2d = v_spec.reshape(-1, 1)
+            pv_v_error = np.max(np.abs(v_mag_pv - v_spec_2d))
+            S_conj = np.conj(s_work)
+            t_inner_start = time.perf_counter()
+            V, n_inner, converged_inner, tol_inner, inner_history = self._inner_fpi(
+                K, L, S_conj, bphi, tau, V_init=V, collect_history=True,
+                max_iter_override=self.max_iter,
+                outer_error=pv_v_error if self.adaptive_inner else None
+            )
+            t_inner_end = time.perf_counter()
+            inner_fpi_time_ms.append((t_inner_end - t_inner_start) * 1000)
+            inner_iter_total += n_inner
+            inner_iter_log.append(n_inner)
+            inner_v_change_all.extend(inner_history)
+
+            v_mag_pv = np.abs(V[pv_idx, :])
+            pv_v_error = np.max(np.abs(v_mag_pv - v_spec_2d))
+            pv_v_error_history.append(float(pv_v_error))
+            v_change_history.append(float(tol_inner))
+            converged_outer = pv_v_error < self.tol_pv
+
         elapsed = time.perf_counter() - t_start
+        total_inner_time = sum(inner_fpi_time_ms)
         self.pv_info = PVConvergenceInfo(
             outer_iterations=outer_iter,
             inner_iterations_total=inner_iter_total,
@@ -467,6 +547,8 @@ class TPFDensePVMethodA(BaseSolver):
             v_change_history=v_change_history,
             inner_v_change_all=inner_v_change_all,
             outer_start_indices=outer_start_indices,
+            inner_fpi_time_ms=inner_fpi_time_ms,
+            total_inner_fpi_time_ms=total_inner_time,
         )
         s_slack = self._compute_slack_power(network, V)
         return PowerFlowResult(
@@ -515,7 +597,8 @@ class TPFDensePVMethodA(BaseSolver):
 
 
     def _inner_fpi(self, K, L, S_conj, bphi, tau,
-                   V_init=None, collect_history=False):
+                   V_init=None, collect_history=False, max_iter_override=None,
+                   outer_error=None):
         if V_init is not None:
             V = V_init.copy()
         else:
@@ -527,7 +610,14 @@ class TPFDensePVMethodA(BaseSolver):
         tol_val = np.inf
         history = []
 
-        for n in range(self.max_iter):
+        max_iter = max_iter_override if max_iter_override is not None else self.max_iter
+
+        if self.adaptive_inner and outer_error is not None:
+            adaptive_tol = max(self.tol, 0.1 * outer_error)
+        else:
+            adaptive_tol = self.tol
+
+        for n in range(max_iter):
             LAMBDA = S_conj * (1.0 / np.conj(V))
             V_new = K @ LAMBDA + L_col
             tol_val = float(np.max(np.abs(np.abs(V_new) - np.abs(V))))
@@ -535,7 +625,7 @@ class TPFDensePVMethodA(BaseSolver):
             V = V_new
             if collect_history:
                 history.append(tol_val)
-            if tol_val < self.tol:
+            if tol_val < adaptive_tol:
                 converged = True
                 break
         return V, n_iter, converged, tol_val, history
