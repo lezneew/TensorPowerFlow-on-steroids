@@ -46,11 +46,15 @@ from tpf.generators.ieee_pegase_networks import (
     get_large_networks,
     get_all_standard_networks,
 )
+from tpf.generators.network_generator_oberrhein import (
+    get_oberrhein_networks,
+    get_oberrhein_real_world,
+)
 
 VALID_SUITES = [
     "quick", "radial", "salazar", "salazar_scaling",
     "salazar_low_vm", "salazar_low_rx05", "salazar_low_rx10",
-    "ieee", "pegase", "rte", "large", "standard", "full"
+    "ieee", "pegase", "rte", "large", "standard", "full", "real_world"
 ]
 
 
@@ -82,6 +86,8 @@ def get_suite_networks(suite_name: str) -> dict:
         return get_all_standard_networks()
     elif suite_name == "full":
         return get_comprehensive_networks()
+    elif suite_name == "real_world":
+        return get_oberrhein_networks()
     else:
         raise ValueError(f"Unknown suite: '{suite_name}'. Valid: {VALID_SUITES}")
 
@@ -468,7 +474,7 @@ def main():
     parser.add_argument(
         "--omega", type=float, default=1.0,
         help="Relaxation factor omega (default: 1.0)"
-    )in me
+    )
     parser.add_argument(
         "--show-plot", action="store_true",
         help="Show convergence plot"

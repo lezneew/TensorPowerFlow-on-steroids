@@ -613,7 +613,7 @@ class TPFDensePVMethodA(BaseSolver):
         max_iter = max_iter_override if max_iter_override is not None else self.max_iter
 
         if self.adaptive_inner and outer_error is not None:
-            adaptive_tol = max(self.tol, 0.1 * outer_error)
+            adaptive_tol = max(self.tol, 1 * outer_error)
         else:
             adaptive_tol = self.tol
 

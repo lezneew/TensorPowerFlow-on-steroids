@@ -31,6 +31,8 @@ import networkx as nx
 from dataclasses import dataclass
 from typing import Literal
 
+from .network_generator_oberrhein import create_mv_oberrhein
+
 
 # ══════════════════════════════════════════════════════════════════════
 #  Konfiguration
@@ -748,11 +750,18 @@ TEST_NETWORKS: dict[str, dict] = {
         "n_pv": 6,
         "category": "ieee_meshed",
     },
-    "pegase9000": {
+"pegase9000": {
         "constructor": pegase,
-        "description": "IEEE 57-Bus vermascht (6 PV)",
+        "description": "IEEE 57-Bus vermaszt (6 PV)",
         "n_pv": 6,
         "category": "ieee_meshed",
+    },
+    # ── Real-world distribution networks ──
+    "mv_oberrhein": {
+        "constructor": create_mv_oberrhein,
+        "description": "German MV Oberrhein (179 buses, 153 DG, real-world)",
+        "n_pv": 153,
+        "category": "real_world",
     },
     # ── Generierte Radialnetze (skalierbar) ──
     "radial_10bus_1pv": {

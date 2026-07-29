@@ -30,20 +30,43 @@ from tpf.builders.from_pandapower import build_network_from_pandapower
 from tpf.solvers.tpf_pv_method_a import TPFDensePVMethodA
 from tpf.solvers.nr_reference import PandapowerNRSolver
 from tpf.generators.radial_network import get_quick_test_networks
-from tpf.generators.network_generator_salazar import get_salazar_scaling_networks
+from tpf.generators.network_generator_salazar import (
+    create_salazar_network,
+    get_salazar_scaling_networks,
+    get_salazar_all_networks,
+    get_salazar_pv_networks,
+    get_salazar_small_pv_networks,
+    get_salazar_large_pv_networks,
+    get_salazar_paper_networks,
+    get_salazar_low_rx05_networks,
+    get_salazar_low_rx10_networks,
+)
 
-VALID_SUITES = ["quick", "salazar_scaling"]
+VALID_SUITES = [
+    "quick",
+    "salazar_scaling",
+    "salazar_all",
+    "salazar_pv",
+    "salazar_small_pv",
+    "salazar_large_pv",
+    "salazar_paper",
+]
 
 
 def get_suite_networks(suite_name: str) -> dict:
     """Get networks for a single suite name."""
-    if suite_name == "quick":
-        return get_quick_test_networks()
-    elif suite_name == "salazar_scaling":
-        return get_salazar_scaling_networks()
-    else:
+    suites = {
+        "quick": get_quick_test_networks,
+        "salazar_scaling": get_salazar_scaling_networks,
+        "salazar_all": get_salazar_all_networks,
+        "salazar_pv": get_salazar_pv_networks,
+        "salazar_small_pv": get_salazar_small_pv_networks,
+        "salazar_large_pv": get_salazar_large_pv_networks,
+        "salazar_paper": get_salazar_paper_networks,
+    }
+    if suite_name not in suites:
         raise ValueError(f"Unknown suite: '{suite_name}'. Valid: {VALID_SUITES}")
-
+    return suites[suite_name]()
 
 def test_full_method_a(network, max_inner=50, omega=1.0):
     """Test Method A with no inner iteration optimization."""

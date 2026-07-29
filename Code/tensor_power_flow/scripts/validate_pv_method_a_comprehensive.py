@@ -13,6 +13,7 @@ Aufruf:
     python scripts/validate_pv_method_a_comprehensive.py
     python scripts/validate_pv_method_a_comprehensive.py --suite full --omega 1.0
     python scripts/validate_pv_method_a_comprehensive.py --no-plot
+    python scripts/validate_pv_method_a_comprehensive.py --adaptive-inner
 """
 
 import numpy as np
@@ -29,6 +30,7 @@ import pandapower as pp
 
 from tpf.builders.from_pandapower import build_network_from_pandapower
 from tpf.solvers.tpf_pv_method_a import TPFDensePVMethodA
+from tpf.solvers import TPFSparsePVMethodA
 from tpf.solvers.nr_reference import PandapowerNRSolver
 from tpf.generators.radial_network import (
     TEST_NETWORKS,
@@ -57,6 +59,10 @@ from tpf.generators.ieee_pegase_networks import (
     get_rte_networks,
     get_large_networks,
     get_all_standard_networks,
+)
+from tpf.generators.network_generator_oberrhein import (
+    MV_OBERHEIN_NETWORKS,
+    get_oberrhein_networks,
 )
 
 try:
@@ -169,7 +175,7 @@ def compute_spectral_radius(network, omega, delta_q=1e-5):
 #  Einzelnetz-Validierung
 # ══════════════════════════════════════════════════════════════════════
 
-def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False, analysis="full"):
+def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False, analysis="full", adaptive_inner=False, sparse=False, sparse_solver=None):
     """
     Validiert Methode A gegen NR. Gibt Record mit Konvergenzhistorie zurück.
 
@@ -178,6 +184,10 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     analysis : str
         Konvergenz-Analysemodus: "full" (alle), "diagonal" (rho_diag),
         "corrected" (rho_corr), "contraction" (kappa)
+    adaptive_inner : bool
+        Enable adaptive inner iteration control
+    sparse : bool
+        Include sparse solver (TPFSparsePVMethodA) results
     """
     record = {
         "name": name,
@@ -202,6 +212,14 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
         "pv_ratio": 0.0,
         "rx_ratio": np.nan,
     }
+    
+    # Sparse fields
+    if sparse:
+        record.update({
+            "sparse_converged": False, "sparse_outer_iter": 0,
+            "sparse_inner_iter_total": 0, "sparse_time_ms": 0.0,
+            "sparse_max_v_error": np.inf, "sparse_max_pv_v_error": np.inf,
+        })
 
     # 0. Netz erzeugen
     try:
@@ -262,6 +280,15 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
         if verbose:
             print(f"  - {name:<30} keine PV (übersprungen)")
         return record
+    
+    # Prepare for sparse solver if requested
+    sparse_solver = None
+    if sparse:
+        sparse_solver = TPFSparsePVMethodA(
+            tol=1e-8, max_iter_inner=50, max_iter_outer=30,
+            tol_pv=1e-6, omega=omega, enforce_q_lims=False,
+            cold_start=cold_start, adaptive_inner=False,
+        )
 
     # 3. η
     ppc = net._ppc
@@ -283,7 +310,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     solver = TPFDensePVMethodA(
         tol=1e-6, max_iter_inner=20, max_iter_outer=50,
         tol_pv=1e-6, omega=omega, enforce_q_lims=False,
-        cold_start=cold_start,
+        cold_start=cold_start, adaptive_inner=adaptive_inner,
     )
 
     try:
@@ -321,7 +348,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
         except Exception:
             pass
 
-    # 6. Vergleich
+    # 6. Vergleich (TPF vs NR)
     v_tpf = result.voltages.flatten()
     v_nr = nr_result.voltages[d_idx]
 
@@ -340,7 +367,88 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
 
     if record["tpf_time_ms"] > 0:
         record["speedup"] = record["nr_time_ms"] / record["tpf_time_ms"]
+    
+    # 5c. Sparse solver (optional)
+    sparse_result = None
+    if sparse and sparse_solver:
+        try:
+            sparse_result = sparse_solver.solve(network)
+            record["sparse_converged"] = sparse_result.converged
+            record["sparse_time_ms"] = sparse_result.elapsed_time_s * 1000
+            record["sparse_inner_iter_total"] = sparse_result.iterations
+            if sparse_solver.pv_info:
+                pv_info = sparse_solver.pv_info
+                record["sparse_outer_iter"] = pv_info.outer_iterations
+                record["sparse_max_pv_v_error"] = pv_info.pv_v_error_final
+        except Exception as e:
+            record["error"] = f"SPARSE: {str(e)[:50]}"
+            if verbose:
+                print(f"  X {name:<30} FEHLER (SPARSE): {e}")
 
+    # 6. Vergleich (TPF vs NR)
+    v_tpf = result.voltages.flatten()
+    v_nr = nr_result.voltages[d_idx]
+
+    if v_tpf.shape[0] != v_nr.shape[0]:
+        record["error"] = f"Dim mismatch: TPF={v_tpf.shape[0]} NR={v_nr.shape[0]}"
+        if verbose:
+            print(f"  X {name:<30} Dimensionsfehler")
+        return record
+
+    mag_err = np.abs(np.abs(v_tpf) - np.abs(v_nr))
+    record["max_v_error"] = float(np.max(mag_err))
+    record["mean_v_error"] = float(np.mean(mag_err))
+
+    angle_err = np.abs(np.angle(v_tpf, deg=True) - np.angle(v_nr, deg=True))
+    record["max_angle_error_deg"] = float(np.max(angle_err))
+
+    if record["tpf_time_ms"] > 0:
+        record["speedup"] = record["nr_time_ms"] / record["tpf_time_ms"]
+    
+    # 5c. Sparse solver (optional)
+    sparse_result = None
+    if sparse and sparse_solver:
+        try:
+            sparse_result = sparse_solver.solve(network)
+            record["sparse_converged"] = sparse_result.converged
+            record["sparse_time_ms"] = sparse_result.elapsed_time_s * 1000
+            record["sparse_inner_iter_total"] = sparse_result.iterations
+            if sparse_solver.pv_info:
+                pv_info = sparse_solver.pv_info
+                record["sparse_outer_iter"] = pv_info.outer_iterations
+                record["sparse_max_pv_v_error"] = pv_info.pv_v_error_final
+        except Exception as e:
+            record["error"] = f"SPARSE: {str(e)[:50]}"
+            if verbose:
+                print(f"  X {name:<30} FEHLER (SPARSE): {e}")
+
+    # 6. Vergleich (TPF vs NR)
+    v_tpf = result.voltages.flatten()
+    v_nr = nr_result.voltages[d_idx]
+
+    if v_tpf.shape[0] != v_nr.shape[0]:
+        record["error"] = f"Dim mismatch: TPF={v_tpf.shape[0]} NR={v_nr.shape[0]}"
+        if verbose:
+            print(f"  X {name:<30} Dimensionsfehler")
+        return record
+
+    mag_err = np.abs(np.abs(v_tpf) - np.abs(v_nr))
+    record["max_v_error"] = float(np.max(mag_err))
+    record["mean_v_error"] = float(np.mean(mag_err))
+
+    angle_err = np.abs(np.angle(v_tpf, deg=True) - np.angle(v_nr, deg=True))
+    record["max_angle_error_deg"] = float(np.max(angle_err))
+
+    if record["tpf_time_ms"] > 0:
+        record["speedup"] = record["nr_time_ms"] / record["tpf_time_ms"]
+    
+    # Validate sparse against NR if requested
+    if sparse and sparse_result and sparse_result.converged:
+        v_sparse = sparse_result.voltages.flatten()
+        if v_sparse.shape[0] == v_nr.shape[0]:
+            mag_err_sparse = np.abs(np.abs(v_sparse) - np.abs(v_nr))
+            record["sparse_max_v_error"] = float(np.max(mag_err_sparse))
+    
     # 7. PASS/FAIL
     record["passed"] = record["max_v_error"] < tol_pass and result.converged
 
@@ -361,7 +469,13 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
         print(f"  {status} {name:<30} n={record['n_bus']:<4} PV={n_pv:<3} "
               f"eta={eta_str:<7} rho={rho_str:<7} dV={record['max_v_error']:.2e} "
               f"out={record['tpf_outer_iter']}{extra}")
-
+        
+        # Print sparse info if available
+        if sparse and sparse_result:
+            sp_status = "PASS" if record["sparse_max_v_error"] < tol_pass else "FAIL" if record["sparse_converged"] else "DIV"
+            print(f"     Sparse: {sp_status} dV={record.get('sparse_max_v_error', np.inf):.2e} "
+                  f"time={record.get('sparse_time_ms', 0):.1f}ms out={record.get('sparse_outer_iter', 0)}")
+    
     return record
 
 
@@ -369,13 +483,23 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
 #  Batch-Validierung
 # ══════════════════════════════════════════════════════════════════════
 
-def run_validation_suite(networks: dict, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False, analysis="full"):
+def run_validation_suite(networks: dict, omega=1.0, tol_pass=1e-4, verbose=True, cold_start=False, analysis="full", adaptive_inner=False, sparse=False):
     records = []
+    sparse_solver = None
+    if sparse:
+        try:
+            from tpf.solvers import TPFSparsePVMethodA
+            sparse_solver = TPFSparsePVMethodA(omega=omega, tol=1e-8, max_iter_outer=50, max_iter_inner=30)
+        except Exception as e:
+            if verbose:
+                print(f"  W: Sparse solver nicht verfügbar: {e}")
+    
     for name, info in networks.items():
         record = validate_network(
             info["constructor"], name, omega=omega,
             tol_pass=tol_pass, verbose=verbose, cold_start=cold_start,
-            analysis=analysis
+            analysis=analysis, adaptive_inner=adaptive_inner,
+            sparse=sparse, sparse_solver=sparse_solver
         )
         records.append(record)
     return records
@@ -402,7 +526,7 @@ def print_results_table(records: list, title: str = "", show_analysis: bool = Fa
                f"{'NR It':<6} {'NR ms':<7} "
                f"{'Out':<5} {'Inn':<5} {'TPF ms':<7} "
                f"{'max dV':<10} {'PV dV':<10} {'dTheta':<8} "
-               f"{'Status'}")
+               f"{'SParse':<7} {'Status'}")
     print(hdr)
     print(f"  {'-'*198}")
 
@@ -471,7 +595,7 @@ def print_results_table(records: list, title: str = "", show_analysis: bool = Fa
                   f"{r.get('tpf_outer_iter', 0):<5} {r.get('tpf_inner_iter_total', 0):<5} "
                   f"{r.get('tpf_time_ms', 0):<7.1f} "
                   f"{max_v_str:<10} {pv_v_str:<10} {angle_str:<8} "
-                  f"{status}")
+                  f"{('+' if r.get('sparse_converged') else '-'):<7} {status}")
 
 
 def print_statistics(records: list, show_analysis: bool = False):
@@ -479,6 +603,7 @@ def print_statistics(records: list, show_analysis: bool = False):
     passed = [r for r in tested if r["passed"]]
     converged = [r for r in tested if r.get("tpf_converged")]
     diverged = [r for r in tested if not r.get("tpf_converged") and r.get("nr_converged")]
+    converged_sparse = [r for r in tested if r.get("sparse_converged")]
 
     print(f"\n{'='*120}")
     print(f"  STATISTIKEN")
@@ -487,6 +612,9 @@ def print_statistics(records: list, show_analysis: bool = False):
     print(f"  PASS:                     {len(passed)} ({100*len(passed)/max(len(tested),1):.0f}%)")
     print(f"  FAIL (konvergiert, dV):   {len([r for r in tested if r.get('tpf_converged') and not r['passed']])}")
     print(f"  FAIL (divergiert):        {len(diverged)}")
+    
+    if converged_sparse:
+        print(f"  SPARSE konvergiert:       {len(converged_sparse)} ({100*len(converged_sparse)/max(len(tested),1):.0f}%)")
 
     if converged:
         etas = [r["eta"] for r in converged if r["eta"] < np.inf]
@@ -586,7 +714,14 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
                    and r.get("nr_time_ms", 0) > 0
                    and r.get("tpf_time_ms", 0) > 0]
 
-    if not plot_data and not timing_data:
+    timing_data_sparse = [r for r in records
+                          if r["n_pv"] > 0
+                          and r.get("nr_converged")
+                          and r.get("sparse_converged")
+                          and r.get("nr_time_ms", 0) > 0
+                          and r.get("sparse_time_ms", 0) > 0]
+
+    if not plot_data and not timing_data and not timing_data_sparse:
         print("  ! Keine Daten zum Plotten vorhanden.")
         return
 
@@ -689,9 +824,10 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
         sizes = sorted(nr_by_size.keys())
 
         if sizes:
-            box_width = 0.25
-            positions_nr = np.arange(len(sizes)) - box_width / 2
-            positions_tpf = np.arange(len(sizes)) + box_width / 2
+            box_width = 0.18
+            positions_nr = np.arange(len(sizes)) - box_width
+            positions_tpf = np.arange(len(sizes))
+            positions_sparse = np.arange(len(sizes)) + box_width
 
             bp_nr = ax10.boxplot(
                 [nr_by_size[s] for s in sizes],
@@ -719,6 +855,24 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
                                 markersize=4, alpha=0.6),
             )
 
+            # Sparse solver boxplot (green triangle)
+            sparse_by_size = defaultdict(list)
+            for r in timing_data_sparse:
+                sparse_by_size[r["n_bus"]].append(r["sparse_time_ms"])
+            
+            bp_sparse = ax10.boxplot(
+                [sparse_by_size[s] for s in sizes],
+                positions=positions_sparse,
+                widths=box_width * 0.8,
+                patch_artist=True,
+                boxprops=dict(facecolor="tab:green", alpha=0.6),
+                medianprops=dict(color="darkgreen", linewidth=1.5),
+                whiskerprops=dict(color="tab:green", linewidth=1.2),
+                capprops=dict(color="tab:green", linewidth=1.2),
+                flierprops=dict(marker="^", markerfacecolor="tab:green",
+                                markersize=4, alpha=0.6),
+            )
+
             ax10.set_xticks(range(len(sizes)))
             ax10.set_xticklabels(sizes)
             ax10.set_xlim(-0.5, len(sizes) - 0.5)
@@ -734,13 +888,13 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
     # ══════════════════════════════════════════════════════════════
     ax11 = axes[1, 1]
 
-    if timing_data:
+    if timing_data or timing_data_sparse:
+        all_timing = timing_data + timing_data_sparse
         # PV-Ratio berechnen
         pv_ratios = np.array([r.get("pv_ratio", r["n_pv"] / max(r["n_bus"], 1))
-                              for r in timing_data])
-        nr_times_r = np.array([r["nr_time_ms"] for r in timing_data])
-        tpf_times_r = np.array([r["tpf_time_ms"] for r in timing_data])
-        n_bus_arr = np.array([r["n_bus"] for r in timing_data])
+                              for r in all_timing])
+        nr_times_r = np.array([r["nr_time_ms"] for r in all_timing])
+        n_bus_arr = np.array([r["n_bus"] for r in all_timing])
 
         # Farbe nach Netzgröße
         size_norm = (n_bus_arr - n_bus_arr.min()) / max(n_bus_arr.max() - n_bus_arr.min(), 1)
@@ -754,13 +908,20 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
             label="NR (pandapower)",
         )
 
-        # TPF Zeiten
-        sc_tpf = ax11.scatter(
-            pv_ratios * 100, tpf_times_r,
-            c=size_norm, cmap=size_cmap, marker="o", s=60,
-            edgecolors="tab:blue", linewidths=1.5, zorder=5, alpha=0.8,
-            label="TPF Methode A",
-        )
+        if timing_data:
+            tpf_times_r = np.array([r["tpf_time_ms"] for r in timing_data])
+            tpf_ratios = np.array([r.get("pv_ratio", r["n_pv"] / max(r["n_bus"], 1))
+                                   for r in timing_data])
+            tpf_n_bus = np.array([r["n_bus"] for r in timing_data])
+            tpf_size_norm = (tpf_n_bus - tpf_n_bus.min()) / max(tpf_n_bus.max() - tpf_n_bus.min(), 1)
+
+            # TPF Zeiten
+            sc_tpf = ax11.scatter(
+                tpf_ratios * 100, tpf_times_r,
+                c=tpf_size_norm, cmap=size_cmap, marker="o", s=60,
+                edgecolors="tab:blue", linewidths=1.5, zorder=5, alpha=0.8,
+                label="TPF Methode A",
+            )
 
         # Annotationen: Netzgröße an TPF-Punkten
         for r in timing_data:
@@ -771,6 +932,31 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
                 fontsize=5, alpha=0.5,
                 textcoords="offset points", xytext=(3, 3),
             )
+
+        if timing_data_sparse:
+            sparse_times_r = np.array([r["sparse_time_ms"] for r in timing_data_sparse])
+            sparse_ratios = np.array([r.get("pv_ratio", r["n_pv"] / max(r["n_bus"], 1))
+                                      for r in timing_data_sparse])
+            sparse_n_bus = np.array([r["n_bus"] for r in timing_data_sparse])
+            sparse_size_norm = (sparse_n_bus - sparse_n_bus.min()) / max(sparse_n_bus.max() - sparse_n_bus.min(), 1)
+
+            # Sparse Zeiten (green triangle)
+            sc_sparse = ax11.scatter(
+                sparse_ratios * 100, sparse_times_r,
+                c=sparse_size_norm, cmap=size_cmap, marker="^", s=70,
+                edgecolors="tab:green", linewidths=1.5, zorder=5, alpha=0.9,
+                label="TPF Sparse",
+            )
+
+            # Sparse Annotationen
+            for r in timing_data_sparse:
+                ratio = r.get("pv_ratio", r["n_pv"] / max(r["n_bus"], 1))
+                ax11.annotate(
+                    f"n={r['n_bus']}",
+                    (ratio * 100, r["sparse_time_ms"]),
+                    fontsize=5, color="tab:green", alpha=0.6,
+                    textcoords="offset points", xytext=(3, -3),
+                )
 
         # Verbindungslinien nach Netzgröße gruppiert
         from collections import defaultdict
@@ -813,7 +999,8 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
         ax11.set_yscale("log")
 
         # Colorbar für Netzgröße
-        cbar = plt.colorbar(sc_tpf, ax=ax11, pad=0.02, fraction=0.04)
+        sc_color = sc_sparse if timing_data_sparse else sc_tpf
+        cbar = plt.colorbar(sc_color, ax=ax11, pad=0.02, fraction=0.04)
         cbar.set_label("Netzgroesse (normiert)", fontsize=9)
         # Setze Colorbar-Ticks auf tatsächliche Busgrößen
         tick_vals = np.linspace(0, 1, 5)
@@ -837,7 +1024,9 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
         Line2D([0], [0], color="tab:red", marker="s", linestyle="--",
                markersize=8, label="NR (pandapower)"),
         Line2D([0], [0], color="tab:blue", marker="o", linestyle="--",
-               markersize=8, label="TPF Methode A"),
+               markersize=8, label="TPF Methode A (dense)"),
+        Line2D([0], [0], color="tab:green", marker="^", linestyle="--",
+               markersize=8, label="TPF Methode A (sparse)"),
         Line2D([0], [0], color="green", linestyle=":", linewidth=2,
                label="tol_pv = 1e-6"),
         Line2D([0], [0], color="darkorange", linestyle="-.", linewidth=1.5,
@@ -913,7 +1102,7 @@ def export_inner_iteration_data(records: list, filepath: str, omega: float):
 # ══════════════════════════════════════════════════════════════════════
 
 def save_results_to_file(records: list, filepath: str, suite: str, omega: float,
-                          tol_pass: float, show_analysis: bool = False):
+                          tol_pass: float, show_analysis: bool = False, adaptive_inner: bool = False):
     """
     Saves validation results to a formatted TXT file.
     """
@@ -927,6 +1116,7 @@ def save_results_to_file(records: list, filepath: str, suite: str, omega: float,
         f.write(f"Omega (w):     {omega}\n")
         f.write(f"Analysis:      {'full' if show_analysis else 'basic'}\n")
         f.write(f"Tolerance:     {tol_pass} (PASS threshold)\n")
+        f.write(f"Adaptive inner: {'enabled' if adaptive_inner else 'disabled'}\n")
         f.write(f"Timestamp:     {timestamp}\n")
         f.write("=" * 200 + "\n\n")
 
@@ -1108,7 +1298,9 @@ def save_csv(records: list, filepath: str):
         "nr_converged", "nr_iter", "nr_time_ms",
         "tpf_converged", "tpf_outer_iter", "tpf_inner_iter_total", "tpf_time_ms",
         "max_v_error", "mean_v_error", "max_angle_error_deg", "max_pv_v_error",
-        "speedup", "passed", "error"
+        "speedup", "passed", "error",
+        "sparse_converged", "sparse_outer_iter", "sparse_inner_iter_total", "sparse_time_ms",
+        "sparse_max_v_error", "sparse_max_pv_v_error"
     ]
 
     with open(filepath, 'w', newline='') as f:
@@ -1123,10 +1315,13 @@ def save_csv(records: list, filepath: str):
             row["nr_converged"] = bool(row["nr_converged"])
             row["tpf_converged"] = bool(row["tpf_converged"])
             row["passed"] = bool(row["passed"])
+            if "sparse_converged" in row:
+                row["sparse_converged"] = bool(row["sparse_converged"])
 
             for key in ["eta", "rho", "rho_diag", "rho_corr", "contraction",
                         "max_v_error", "mean_v_error", "max_angle_error_deg",
-                        "max_pv_v_error", "rx_ratio", "speedup"]:
+                        "max_pv_v_error", "rx_ratio", "speedup",
+                        "sparse_max_v_error", "sparse_max_pv_v_error"]:
                 if row[key] is None or not np.isfinite(row[key]):
                     row[key] = np.nan
 
@@ -1142,7 +1337,7 @@ def save_csv(records: list, filepath: str):
 VALID_SUITES = [
     "quick", "radial", "salazar", "salazar_scaling",
     "salazar_low_vm", "salazar_low_rx05", "salazar_low_rx10",
-    "full", "ieee", "pegase", "rte", "large", "standard"
+    "full", "ieee", "pegase", "rte", "large", "standard", "real_world"
 ]
 
 
@@ -1174,6 +1369,8 @@ def get_suite_networks(suite_name: str) -> dict:
         return get_all_standard_networks()
     elif suite_name == "full":
         return get_comprehensive_networks()
+    elif suite_name == "real_world":
+        return get_oberrhein_networks()
     else:
         raise ValueError(f"Unknown suite: '{suite_name}'. Valid: {VALID_SUITES}")
 
@@ -1230,8 +1427,12 @@ def main():
                         help="Exportiere subplot (b) Daten in Textdatei")
     parser.add_argument("--cold-start", action="store_true",
                         help="Nutze cold start fuer innere FPI (jede outer iteration startet mit V=1.0 pu)")
+    parser.add_argument("--adaptive-inner", action="store_true",
+                        help="Enable adaptive inner iteration control (adaptive tolerance)")
     parser.add_argument("--size", type=int, default=None,
                         help="Filter networks by bus count (e.g., 20 for sz_20_*)")
+    parser.add_argument("--sparse", action="store_true",
+                        help="Sparse Solver aktivieren (TPF mit sparse KLU)")
     parser.add_argument("--analysis", choices=["full", "diagonal", "corrected", "contraction"],
                         default="full",
                         help="Konvergenz-Analyse-Methode: full (alle), diagonal (ρ_diag), "
@@ -1251,8 +1452,9 @@ def main():
 
 
     cold_str = " (COLD START)" if args.cold_start else ""
+    adapt_str = " (ADAPTIVE INNER)" if args.adaptive_inner else ""
     print(f"\n  Suite: '{args.suite}' - {len(networks)} Netze")
-    print(f"  w = {args.omega}, PASS-Schwelle = {args.tol:.0e}{cold_str}\n")
+    print(f"  w = {args.omega}, PASS-Schwelle = {args.tol:.0e}{cold_str}{adapt_str}\n")
 
     # Handle --size filter (filter networks by bus count prefix, e.g., sz_20_*)
     if args.size is not None:
@@ -1282,7 +1484,8 @@ def main():
     t_start = time.perf_counter()
     records = run_validation_suite(
         networks, omega=args.omega, tol_pass=args.tol, verbose=True,
-        cold_start=args.cold_start, analysis=args.analysis
+        cold_start=args.cold_start, analysis=args.analysis,
+        adaptive_inner=args.adaptive_inner, sparse=args.sparse
     )
     t_total = time.perf_counter() - t_start
 
@@ -1294,7 +1497,8 @@ def main():
 
     # Tabelle
     cold_str = " (COLD START)" if args.cold_start else ""
-    print_results_table(records, title=f"Methode A — Suite '{args.suite}', w={args.omega}{cold_str}", show_analysis=show_analysis)
+    sparse_str = " (SPARSE)" if args.sparse else ""
+    print_results_table(records, title=f"Methode A — Suite '{args.suite}', w={args.omega}{cold_str}{sparse_str}", show_analysis=show_analysis)
     print_statistics(records, show_analysis=show_analysis)
 
     # Gesamtergebnis
@@ -1331,7 +1535,7 @@ def main():
         txt_path = os.path.join(output_dir, f"validation_{args.suite}_w{args.omega}_{timestamp}.txt")
         csv_path = os.path.join(output_dir, f"validation_{args.suite}_w{args.omega}_{timestamp}.csv")
 
-        save_results_to_file(records, txt_path, args.suite, args.omega, args.tol, show_analysis=show_analysis)
+        save_results_to_file(records, txt_path, args.suite, args.omega, args.tol, show_analysis=show_analysis, adaptive_inner=args.adaptive_inner)
         save_csv(records, csv_path)
 
     # DEBUG: Print timing_data structure before plotting
@@ -1359,7 +1563,8 @@ def main():
 
     # Plot
     if not args.no_plot:
-        save_path = args.save or f"convergence_method_a_{args.suite}_omega{args.omega}.png"
+        plot_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_path = args.save or f"convergence_method_a_{args.suite}_omega{args.omega}_tol_{plot_ts}.png"
         plot_convergence(records, omega=args.omega, save_path=save_path)
 
     print(f"\n{'='*90}")
