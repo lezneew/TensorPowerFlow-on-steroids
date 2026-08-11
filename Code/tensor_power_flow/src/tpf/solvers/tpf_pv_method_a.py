@@ -54,6 +54,7 @@ class TPFDensePVMethodA(BaseSolver):
         cold_start: bool = False,
         max_iter_inner_per_outer: int | None = None,
         adaptive_inner: bool = False,
+        use_decoupled: bool = False,
     ):
         super().__init__(tol, max_iter_inner)
         self.max_iter_outer = max_iter_outer
@@ -63,6 +64,7 @@ class TPFDensePVMethodA(BaseSolver):
         self.cold_start = cold_start
         self.max_iter_inner_per_outer = max_iter_inner_per_outer
         self.adaptive_inner = adaptive_inner
+        self.use_decoupled = use_decoupled
         self.pv_info: PVConvergenceInfo | None = None
 
     # ══════════════════════════════════════════════════════════════════
@@ -396,12 +398,24 @@ class TPFDensePVMethodA(BaseSolver):
         tau = s_batch.shape[1]
 
         K, L = self._precompute(network)
-        V, n_iter, converged, tol_val, _ = self._inner_fpi(
-            K, L, np.conj(s_batch), bphi, tau, collect_history=False
+        V, n_iter, converged, tol_val, inner_history = self._inner_fpi(
+            K, L, np.conj(s_batch), bphi, tau, collect_history=True
         )
 
         elapsed = time.perf_counter() - t_start
-        self.pv_info = None
+
+        self.pv_info = PVConvergenceInfo(
+            outer_iterations=1,
+            inner_iterations_total=n_iter,
+            inner_iterations_per_outer=[n_iter],
+            pv_v_error_final=0.0,
+            pv_q_final=np.array([]),
+            pv_v_final=np.array([]),
+            converged_inner=converged,
+            converged_outer=converged,
+            inner_v_change_all=inner_history,
+            outer_start_indices=[0],
+        )
 
         s_slack = self._compute_slack_power(network, V)
 
@@ -411,7 +425,7 @@ class TPFDensePVMethodA(BaseSolver):
             converged=converged,
             elapsed_time_s=elapsed,
             max_mismatch=tol_val,
-            s_slack=s_slack,  # NEU
+            s_slack=s_slack,
         )
 
     def _solve_with_pv(self, network, s_batch, t_start):
@@ -496,9 +510,13 @@ class TPFDensePVMethodA(BaseSolver):
                 else:
                     break
 
-            # Coupled Newton step in reduced PV-space
+            # Q-update: decoupled (diagonal) or coupled
             delta_v_sq = v_spec_2d ** 2 - v_mag_pv ** 2
-            delta_q = A_pv_inv @ delta_v_sq
+            if self.use_decoupled:
+                X_pp_diag = np.diag(np.imag(Z_B[np.ix_(pv_idx, pv_idx)]))
+                delta_q = delta_v_sq / (2.0 * X_pp_diag.reshape(-1, 1))
+            else:
+                delta_q = A_pv_inv @ delta_v_sq
             q_pv = q_pv - self.omega * delta_q
 
             if self.enforce_q_lims:

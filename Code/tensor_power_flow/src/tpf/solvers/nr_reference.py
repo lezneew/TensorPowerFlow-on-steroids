@@ -11,7 +11,7 @@ from numpy.typing import NDArray
 class PandapowerNRSolver(BaseSolver):
     """Wrapper um pandapower Newton-Raphson als Referenzlösung (mit PV-Support)."""
 
-    def __init__(self, tol: float = 1e-6, max_iter: int = 100):
+    def __init__(self, tol: float = 1e-8, max_iter: int = 100):
         super().__init__(tol, max_iter)
 
     def solve(self, network: NetworkData) -> PowerFlowResult:

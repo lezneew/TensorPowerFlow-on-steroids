@@ -1,24 +1,257 @@
-%======================================================================
-\chapter{Implementierung und Testdesign}
-\label{ch:implementierung}
-%======================================================================
+\chapter{Implementierung}
+\label{chap:implementierung}
 
-\section{Programmiersprache und Bibliotheken}
-\label{sec:software}
-% TODO
+Dieses Kapitel beschreibt die softwaretechnische Umsetzung der in
+Kapitel~\ref{ch:methoden_pv} vorgestellten Verfahren. Abschnitt~\ref{sec:architektur}
+erläutert die modulare Architektur der entwickelten Python-Bibliothek \texttt{tpf},
+Abschnitt~\ref{sec:testnetze} beschreibt die verwendeten Testnetze sowie den Aufbau
+der Simulationskampagne.
 
-\section{Testnetze}
+\section{Softwarearchitektur der \texttt{tpf}-Bibliothek}
+\label{sec:architektur}
+
+Die Implementierung erfolgt in Python unter Verwendung von \texttt{NumPy} für die
+dichten Tensoroperationen, \texttt{SciPy} für die dünnbesetzte lineare Algebra sowie
+\texttt{pandapower} für die Referenzlösung und den Netzimport. Die Bibliothek ist
+modular aufgebaut und trennt Datenstrukturen, Netzaufbau, Netzgeneratoren und Löser
+strikt voneinander. Damit lassen sich einzelne Komponenten unabhängig testen und
+austauschen.
+
+\subsection{Modulübersicht}
+
+Tabelle~\ref{tab:module} gibt einen Überblick über die zentralen Pakete der Bibliothek.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Modulstruktur der \texttt{tpf}-Bibliothek.}
+	\label{tab:module}
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Paket} & \textbf{Modul} & \textbf{Aufgabe} \\
+		\midrule
+		\texttt{core}       & \texttt{network.py}    & Zentrale Datenstruktur \texttt{NetworkData} \\
+		& \texttt{results.py}    & Ergebniscontainer \texttt{PowerFlowResult} \\
+		\midrule
+		\texttt{builders}   & \texttt{from\_pandapower.py} & Adapter pandapower $\rightarrow$ \texttt{NetworkData} \\
+		\midrule
+		\texttt{solvers}    & \texttt{base\_solver.py}     & Abstrakte Basisklasse \texttt{BaseSolver} \\
+		& \texttt{tpf\_dense.py}       & Dense-TPF (PQ, volles ZIP-Modell) \\
+		& \texttt{tpf\_sparse.py}      & Sparse-TPF (PQ und PV, Methode~A) \\
+		& \texttt{tpf\_pv\_method\_a.py} & Dense-TPF mit PV (äußere Q-Schleife) \\
+		& \texttt{tpf\_pv\_method\_b.py} & Dense-TPF mit PV (eingebettete Korrektur) \\
+		& \texttt{nr\_reference.py}    & Newton-Raphson-Referenz (pandapower) \\
+		\midrule
+		\texttt{generators} & \texttt{network\_generator\_salazar.py} &  Baum nach Salazar et al. \\
+		& \texttt{radial\_network.py}  & Radiale Verteilnetze mit DG \\
+		& \texttt{ieee\_pegase\_networks.py} & IEEE-, PEGASE- und RTE-Netze \\
+		& \texttt{network\_generator\_oberrhein.py} & Reales MV-Oberrhein-Netz \\
+		& \texttt{profile\_generators.py} & Zeitreihenprofile (Last, PV) \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Kern-Datenstrukturen}
+
+Das gesamte Netzmodell wird in der unveränderlichen Datenklasse \texttt{NetworkData}
+gekapselt. Sie enthält die partitionierten Blöcke der Admittanzmatrix
+($\mathbf{Y}_{dd}$, $\mathbf{Y}_{ds}$ sowie optional $\mathbf{Y}_{ss}$,
+$\mathbf{Y}_{sd}$ für die Slack-Leistung), die Slack-Spannung $\mathbf{v}_s$, die
+nominalen Knotenleistungen $\mathbf{s}_{\mathrm{nom}}$ und die
+ZIP-Koeffizienten $\boldsymbol{\alpha}_P$, $\boldsymbol{\alpha}_I$,
+$\boldsymbol{\alpha}_Z$. Die Unterscheidung der Knotentypen erfolgt über eine boolesche
+Maske \texttt{pv\_mask}. Abgeleitete Eigenschaften wie \texttt{pv\_indices},
+\texttt{pq\_indices} und \texttt{has\_pv} werden als \texttt{@property} bereitgestellt.
+Für die PV-Knoten werden zusätzlich der Spannungssollwert
+$|\mathbf{V}^{\mathrm{spec}}|$ sowie die Blindleistungsgrenzen $Q_{\min}$, $Q_{\max}$
+hinterlegt.
+
+Die Trennung von Slack- und Nicht-Slack-Knoten wird bereits im Adapter
+\texttt{build\_network\_from\_pandapower} vorgenommen. 
+
+Die Ergebnisse einer Berechnung werden im Container \texttt{PowerFlowResult}
+zusammengefasst. Dieser enthält die komplexen Spannungen (als Vektor für $\tau=1$ oder
+als Matrix $(b\varphi \times \tau)$), die Iterationszahl, das Konvergenzflag, die
+Rechenzeit, das Residuum sowie die PV-spezifischen Größen (berechnete Blindleistung,
+Sollspannung) und die Slack-Leistung.
+
+\subsection{Löser-Hierarchie}
+
+Alle Löser erben von der abstrakten Basisklasse \texttt{BaseSolver}, die die
+Schnittstelle \texttt{solve()} für einen einzelnen Lastfluss und \texttt{solve\_batch()}
+für die tensorisierte Lösung von $\tau$ Szenarien vorschreibt. Diese einheitliche
+Schnittstelle ermöglicht einen austauschbaren Vergleich der Verfahren.\\
+
+Der \texttt{TPFDenseSolver} implementiert den
+Grundalgorithmus nach Salazar Duque et al. Für reine Constant-Power-Lasten
+($\alpha_P=1$, $\alpha_I=\alpha_Z=0$) wird die Impedanzmatrix
+$\mathbf{K}=-\mathbf{Y}_{dd}^{-1}$ und der Konstantvektor
+$\mathbf{L}=\mathbf{K}\,\mathbf{Y}_{ds}\mathbf{v}_s$ einmalig vorberechnet. Die
+Iterationsvorschrift
+\begin{equation}
+	\mathbf{V}^{(n+1)} = \mathbf{K}\,\bigl(\mathbf{S}^{*}\odot \mathbf{V}^{*(-1)}_{(n)}\bigr) + \mathbf{L}
+	\label{eq:fpi-cp}
+\end{equation}
+wird als einzelne Matrix-Matrix-Multiplikation über alle $\tau$ Spalten
+gleichzeitig ausgeführt. Für das volle ZIP-Modell wird zwischen dem Fall
+$\alpha_Z=0$ (weiterhin konstante Matrix $\mathbf{K}$) und $\alpha_Z\neq 0$
+%(pro Szenario unterschiedliche Systemmatrix, gelöst als \emph{batched} Matrixprodukt)
+unterschieden. Als Konvergenzkriterium dient
+$\max\bigl|\,|\mathbf{V}^{(n+1)}|-|\mathbf{V}^{(n)}|\,\bigr| < \text{tol}$,
+das ohne zusätzliche Matrixmultiplikation auskommt.
+
+Der \texttt{TPFSparseConstantPower} vermeidet die explizite
+Invertierung von $\mathbf{Y}_{dd}$. Stattdessen wird das System
+$\mathbf{M}\,\mathbf{V} = \mathbf{V}^{*(-1)} + \mathbf{H}$ mit
+$\mathbf{M}=-\operatorname{diag}(\mathbf{s}^{*})^{-1}\mathbf{Y}_{dd}$ aufgestellt und
+über \texttt{scipy.sparse.linalg.spsolve} gelöst. Da $\mathbf{M}$ im
+Constant-Power-Fall konstant bleibt, kann die Faktorisierung wiederverwendet werden.
+Für mehrere Szenarien wird eine blockdiagonale Struktur aufgebaut.
+
+Der \texttt{TPFDensePVMethodA} realisiert die äußere
+Q-Schleife. Die innere Schleife entspricht dem Standard-FPI nach
+Gleichung~\eqref{eq:fpi-cp}; die äußere Schleife aktualisiert die Blindleistung an den
+PV-Knoten. Statt der rein diagonalen Sensitivität wird ein gekoppelter
+Newton-Schritt im reduzierten PV-Raum verwendet:
+\begin{equation}
+	\Delta \mathbf{Q} = \mathbf{A}_{\mathrm{PV}}^{-1}\,\bigl(|\mathbf{V}^{\mathrm{spec}}|^{2} - |\mathbf{V}_{\mathrm{PV}}|^{2}\bigr),
+	\qquad
+	\mathbf{A}_{\mathrm{PV}} = 2\,\mathbf{X}_{pp},
+\end{equation}
+wobei $\mathbf{X}_{pp}=\operatorname{Im}(\mathbf{Z}_{B}[\text{PV},\text{PV}])$ die
+Thévenin-Reaktanzen enthält und $\mathbf{A}_{\mathrm{PV}}^{-1}$ einmalig vorberechnet
+wird. Der Relaxationsfaktor $\omega$ steuert die Schrittweite. Für lange Zeitreihen ($\tau > 50\,000$) stellt die
+Methode \texttt{solve\_timeseries} ein automatisches Chunking bereit, das die
+Szenarien in speichereffiziente Blöcke aufteilt und pro Szenario eine eigene
+Konvergenzmaske führt.
+
+Der \texttt{TPFDensePVMethodB} integriert die
+Q-Korrektur direkt in jede Iteration. Nach dem FPI-Schritt wird die Spannung an den
+PV-Knoten auf den Sollbetrag projiziert
+\begin{equation}
+	\mathbf{v}_k \leftarrow |V_k^{\mathrm{spec}}|\,\frac{\mathbf{v}_k}{|\mathbf{v}_k|},
+	\qquad k \in \Omega_{\mathrm{PV}},
+\end{equation}
+und die Blindleistung anschließend exakt aus dem Kirchhoffschen Knotengesetz
+zurückgerechnet ($Q_k = \operatorname{Im}(v_k\,i_k^{*})$). Die Hilfsmatrizen
+$\mathbf{A}$, $\mathbf{B}$, $\mathbf{F}$, $\mathbf{w}$ werden in jeder Iteration
+aktualisiert, was gegenüber Methode~A einen höheren Rechenaufwand. Ein optionaler Relaxationsfaktor $\omega_Q$ dämpft das Q-Update.
+
+Der \texttt{PandapowerNRSolver} verwendet den
+Newton-Raphson-Löser von pandapower. Er extrahiert die Spannungen, die Slack-Leistung
+und die PV-Knoten-Ergebnisse aus dem gelösten PPC und stellt zusätzlich eine
+Zeitreihenmethode \texttt{solve\_timeseries} bereit, die als sequenzielle  für
+den Speedup-Vergleich dient.
+
+\subsection{Konvergenz-Instrumentierung}
+
+Zur Beantwortung der Forschungsfragen zur Konvergenz (F3) sind beide PV-Löser
+instrumentiert. Über die Datenklassen \texttt{PVConvergenceInfo} bzw.
+\texttt{PVConvergenceInfoB} werden pro Iteration der Kontraktionsfaktor, eine
+Näherung des Spektralradius $\rho$, der Spannungsfehler an den PV-Knoten sowie die
+Verläufe von Spannung und Blindleistung protokolliert. Diese Zusatzinformationen
+erlauben die spätere Analyse des Konvergenzverhaltens in Abhängigkeit von der
+Netztopologie und Parametrierung.
+
+\section{Testnetze und Simulationskampagne}
 \label{sec:testnetze}
-% TODO
 
-\section{Szenarien und Parameter}
-\label{sec:szenarien}
-% TODO
+\subsection{Verwendete Testnetze}
 
-\section{Referenzmethoden}
-\label{sec:referenzmethoden}
-% TODO
+Die Validierung und Bewertung erfolgt auf einer breiten Palette von Testnetzen, die
+über die Generator-Module reproduzierbar (feste Zufallssamen) erzeugt werden.
+Tabelle~\ref{tab:netzklassen} fasst die eingesetzten Netzklassen zusammen.
 
-\section{Bewertungsmetriken}
-\label{sec:metriken}
-% TODO
+\begin{table}[htbp]
+	\centering
+	\caption{Übersicht der verwendeten Netzklassen.}
+	\label{tab:netzklassen}
+	\begin{tabular}{llll}
+		\toprule
+		\textbf{Netzklasse} & \textbf{Größe} & \textbf{$R/X$} & \textbf{Charakteristik} \\
+		\midrule
+		Salazar-Netze     & 20--5000 Busse & $\sim 5{,}82$ & $k$-ärer Baum, hohes $R/X$ \\
+		Salazar (Variation) & 4--3000 Busse & $0{,}5$; $1{,}0$ & abgesenktes $R/X$ \\
+		IEEE-Standardnetze & 4--300 Busse & variabel & etablierte Referenz \\
+%		PEGASE/RTE        & 1354--9241 Busse & variabel & große vermaschte Netze \\
+%		Radiale Verteilnetze & 4--500 Busse & einstellbar & Baum/Kette mit DG \\
+%		MV Oberrhein      & 179 Busse & $\sim 1{,}22$ & reales Verteilnetz, 153 DG \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Der \texttt{SalazarNetworkGenerator} repliziert die
+Netzgenerierung aus der Referenzarbeit: eine $k$-äre Baumtopologie
+(\texttt{nx.full\_rary\_tree}), identische Leitungsparameter und normalverteilte Lasten.
+Wegen des hohen $R/X$-Verhältnisses von etwa $5{,}82$ ist die Q--V-Kopplung schwach.
+Die PV-Sollspannungen werden daher standardmäßig aus dem natürlichen Spannungsprofil
+eines vorgeschalteten PQ-Lastflusses zuzüglich eines kleinen Offsets abgeleitet
+(\texttt{pv\_vm\_mode="natural"}), um die Konvergenz der Referenzlösung sicherzustellen.
+Ergänzend stehen systematische Testmatrizen mit abgesenktem $R/X$ ($0{,}5$ und $1{,}0$)
+zur Verfügung.
+
+Der \texttt{RadialNetworkGenerator} erzeugt
+parametrierbare Verteilnetze mit einstellbarem $R/X$-Verhältnis, Lastniveau,
+PV-Durchdringung und -Platzierung (\emph{uniform}, \emph{end}, \emph{random}). Über die
+Kataloge \texttt{TEST\_NETWORKS} und \texttt{IEE\_PEGASE\_NETWORKS} werden zusätzlich
+etablierte IEEE-Netze sowie große PEGASE-/RTE-Netze bereitgestellt.
+
+\subsection{Zeitreihenprofile}
+
+Für die tensorisierte Zeitreihensimulation erzeugt das Modul
+\texttt{profile\_generators.py} synthetische Last- und Einspeiseprofile. PV-Profile
+folgen einem Tages-Cosinus (mit optionaler stochastischer Variabilität oder
+Wolkendurchgängen), Lastprofile einem Doppelspitzen-Tagesgang. Die Profile werden über
+\texttt{build\_s\_batch\_timeseries} in die Leistungsmatrix
+$\mathbf{S}\in\mathbb{C}^{b\varphi \times \tau}$ überführt, wobei PQ-Knoten in
+Verbraucher- und PV-Knoten in Einspeisekonvention behandelt werden.
+
+\subsection{Aufbau der Simulationskampagne}
+
+Zur Beantwortung der Forschungsfragen F2--F4 werden die in
+Tabelle~\ref{tab:variationsparameter} aufgeführten Parameter systematisch variiert.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Variationsparameter der Simulationskampagne.}
+	\label{tab:variationsparameter}
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Parameter} & \textbf{Symbol} & \textbf{Wertebereich} \\
+		\midrule
+		Netzgröße               & $b$          & $\{20, 100, 500, 1000, 5000\}$ \\
+		PV-Anteil               & $n_{\mathrm{PV}}/b$ & $\{0, 2, 5, 10, 20, 30, 50\}\,\%$ \\
+		Gleichzeitige Lastflüsse & $\tau$      & $\{1, 100, 10\,000, 525\,600\}$ \\
+		Lastfaktor              & $\lambda$    & $[0{,}5;\ \lambda_{\mathrm{mlp}})$ \\
+		$R/X$-Verhältnis        & --           & $\{0{,}5;\ 1;\ 5;\ 40\}$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Jede Kombination wird mit allen TPF-Varianten (Methode~A und~B) sowie der Newton-Raphson-Referenz gelöst. Erfasst werden die in
+Tabelle~\ref{tab:metriken} definierten Bewertungsmetriken.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Bewertungsmetriken.}
+	\label{tab:metriken}
+	\begin{tabular}{ll}
+		\toprule
+		\textbf{Metrik} & \textbf{Definition} \\
+		\midrule
+		Spannungsfehler       & $\epsilon_V = \max_k \bigl|\,|V_k| - |V_k^{\mathrm{NR}}|\,\bigr|$ \\
+		Blindleistungsfehler  & $\epsilon_Q = \max_k |Q_k - Q_k^{\mathrm{NR}}|$ \\
+		Iterationen           & Anzahl bis $\epsilon < 10^{-6}$~p.u. \\
+		Rechenzeit            & Wandzeit \texttt{elapsed\_time\_s} \\
+		Speedup               & $t_{\mathrm{NR}} / t_{\mathrm{Methode}}$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Validierungs- und Ausführungsumgebung}
+
+Alle TPF-Ergebnisse werden knotenweise gegen die Newton-Raphson-Lösung von pandapower
+validiert. Die Rechenzeiten werden über
+\texttt{time.perf\_counter} gemessen; für Zeitreihen wird die Newton-Raphson-Referenz
+sequenziell pro Szenario ausgeführt, während der TPF alle Szenarien tensorisiert
+parallel löst. Die Experimente laufen auf einem Standard-Laptop
+(Intel Core~i7, CPU-basiert)

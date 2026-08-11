@@ -133,12 +133,20 @@ class TPFDensePVMethodB(BaseSolver):
         tau = s_batch.shape[1]
 
         K, L = self._precompute_constant_power(network)
-        V, n_iter, converged, tol_val, _ = self._inner_fpi(
-            K, L, np.conj(s_batch), bphi, tau, collect_history=False
+        V, n_iter, converged, tol_val, inner_history = self._inner_fpi(
+            K, L, np.conj(s_batch), bphi, tau, collect_history=True
         )
 
         elapsed = time.perf_counter() - t_start
-        self.pv_info = None
+
+        self.pv_info = PVConvergenceInfoB(
+            iterations=n_iter,
+            pv_v_error_final=0.0,
+            pv_q_final=np.array([]),
+            pv_v_final=np.array([]),
+            converged=converged,
+            voltage_change_history=inner_history,
+        )
 
         return PowerFlowResult(
             voltages=V,

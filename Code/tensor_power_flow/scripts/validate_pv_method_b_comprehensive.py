@@ -189,6 +189,9 @@ def validate_network(net_constructor, name, omega=1.0, omega_q=1.0, tol_pass=1e-
         "rho_diag": np.inf,
         "rho_corr": np.inf,
         "contraction": np.inf,
+        "rho_inner_exact": np.inf,
+        "inner_exists": True,
+        "inner_exists_ratio": np.inf,
         "nr_converged": False, "nr_iter": -1, "nr_time_ms": 0.0,
         "tpf_converged": False, "tpf_outer_iter": 0,
         "tpf_inner_iter_total": 0, "tpf_time_ms": 0.0,
@@ -260,11 +263,21 @@ def validate_network(net_constructor, name, omega=1.0, omega_q=1.0, tol_pass=1e-
     except Exception:
         record["rx_ratio"] = np.nan
 
+    # Set PV-specific metrics to NaN for no-PV networks (will be computed below if PV exists)
     if n_pv == 0:
-        record["passed"] = True
-        if verbose:
-            print(f"  - {name:<30} keine PV (übersprungen)")
-        return record
+        record["rho"] = np.nan
+        record["rho_diag"] = np.nan
+        record["rho_corr"] = np.nan
+        record["contraction"] = np.nan
+        record["rho_inner_exact"] = np.nan
+        record["inner_exists"] = True
+        record["inner_exists_ratio"] = np.nan
+        record["tpf_outer_iter"] = 0
+        record["max_pv_v_error"] = np.nan
+        record["pv_v_errors"] = []
+        record["inner_v_change_all"] = []
+        record["outer_start_indices"] = []
+        record["inner_per_outer"] = []
 
     # 3. η
     ppc = net._ppc
@@ -275,12 +288,14 @@ def validate_network(net_constructor, name, omega=1.0, omega_q=1.0, tol_pass=1e-
     v_min_d = float(np.min(np.abs(nr_result.voltages[d_idx]))) if len(d_idx) > 0 else 1.0
     record["eta"] = compute_eta(network.Y_dd, network.s_nom, v_min_d)
 
-    # 4. Spektralradius ρ(J_G)
-    try:
-        rho = compute_spectral_radius(network, omega)
-        record["rho"] = rho
-    except Exception:
-        record["rho"] = np.inf
+    # 4. Spektralradius ρ(J_G) - only for networks with PV
+    if n_pv > 0:
+        try:
+            rho = compute_spectral_radius(network, omega)
+            record["rho"] = rho
+        except Exception:
+            record["rho"] = np.nan
+    # else: rho already set to nan above for no-PV
 
     # 5. Methode B
     solver = TPFDensePVMethodB(
@@ -323,6 +338,21 @@ def validate_network(net_constructor, name, omega=1.0, omega_q=1.0, tol_pass=1e-
         except Exception:
             pass
 
+    # 5c. Inner Loop Exakte Analyse (ρ(JJ̄) und Existence)
+    if n_pv > 0 and result.converged and result.voltages is not None:
+        try:
+            from convergence_analysis import (
+                compute_inner_spectral_radius_exact,
+                check_inner_existence,
+            )
+            v_solution = result.voltages
+            record["rho_inner_exact"] = compute_inner_spectral_radius_exact(network, v_solution)
+            exists, ratio = check_inner_existence(network)
+            record["inner_exists"] = exists
+            record["inner_exists_ratio"] = ratio
+        except Exception:
+            pass
+
     # 6. Vergleich
     v_tpf = result.voltages.flatten()
     v_nr = nr_result.voltages[d_idx]
@@ -344,21 +374,29 @@ def validate_network(net_constructor, name, omega=1.0, omega_q=1.0, tol_pass=1e-
         record["speedup"] = record["nr_time_ms"] / record["tpf_time_ms"]
 
     # 7. PASS/FAIL
-    record["passed"] = record["max_v_error"] < tol_pass and result.converged
+    if n_pv == 0:
+        record["passed"] = record["max_v_error"] < tol_pass and result.converged
+    else:
+        record["passed"] = record["max_v_error"] < tol_pass and result.converged
 
     if verbose:
-        status = "PASS" if record["passed"] else "FAIL"
+        if n_pv == 0:
+            status = "no-PV"
+        else:
+            status = "PASS" if record["passed"] else "FAIL"
         eta_str = f"{record['eta']:.3f}" if record['eta'] < 100 else f"{record['eta']:.0f}"
-        rho_str = f"{record['rho']:.4f}" if record['rho'] < 100 else "—"
+        rho_val = record.get('rho', np.nan)
+        rho_str = f"{rho_val:.4f}" if not np.isnan(rho_val) and rho_val < 100 else "—"
 
         # Show additional metrics if computed
         extra = ""
-        if record.get("rho_diag", np.inf) < np.inf:
-            extra += f" rho_diag={record['rho_diag']:.3f}"
-        if record.get("rho_corr", np.inf) < np.inf:
-            extra += f" rho_corr={record['rho_corr']:.3f}"
-        if record.get("contraction", np.inf) < np.inf:
-            extra += f" kappa={record['contraction']:.3f}"
+        if n_pv > 0:
+            if record.get("rho_diag", np.inf) < np.inf:
+                extra += f" rho_diag={record['rho_diag']:.3f}"
+            if record.get("rho_corr", np.inf) < np.inf:
+                extra += f" rho_corr={record['rho_corr']:.3f}"
+            if record.get("contraction", np.inf) < np.inf:
+                extra += f" kappa={record['contraction']:.3f}"
 
         print(f"  {status} {name:<30} n={record['n_bus']:<4} PV={n_pv:<3} "
               f"eta={eta_str:<7} rho={rho_str:<7} dV={record['max_v_error']:.2e} "
@@ -394,7 +432,8 @@ def print_results_table(records: list, title: str = "", show_analysis: bool = Fa
 
     if show_analysis:
         hdr = (f"  {'Netz':<28} {'n_d':<5} {'PV':<3} "
-               f"{'eta':<7} {'rho':<7} {'rho_diag':<8} {'rho_corr':<8} {'kappa':<7} "
+               f"{'eta':<6} {'rhoJJac':<9} {'Exists':<7} "
+               f"{'rhoFull':<8} {'rhoDiag':<8} {'kappa':<7} "
                f"{'Out':<4} {'Inn':<4} {'TPF ms':<7} "
                f"{'max dV':<10} {'Status'}")
     else:
@@ -408,9 +447,6 @@ def print_results_table(records: list, title: str = "", show_analysis: bool = Fa
     print(f"  {'-'*198}")
 
     for r in records:
-        if r["n_pv"] == 0:
-            continue
-
         eta = r["eta"]
         eta_str = f"{eta:.4f}" if eta < 100 else f"{eta:.1f}"
 
@@ -418,11 +454,14 @@ def print_results_table(records: list, title: str = "", show_analysis: bool = Fa
             rho = r.get("rho", np.inf)
             rho_str = f"{rho:.3f}" if rho < 100 else "—"
 
+            rho_inner_exact = r.get("rho_inner_exact", np.inf)
+            rho_inner_str = f"{rho_inner_exact:.3f}" if rho_inner_exact < 100 and np.isfinite(rho_inner_exact) else "—"
+
+            inner_exists = r.get("inner_exists", True)
+            exists_str = "OK" if inner_exists else "FAIL"
+
             rho_diag = r.get("rho_diag", np.inf)
             rho_diag_str = f"{rho_diag:.3f}" if rho_diag < 100 and np.isfinite(rho_diag) else "—"
-
-            rho_corr = r.get("rho_corr", np.inf)
-            rho_corr_str = f"{rho_corr:.3f}" if rho_corr < 100 and np.isfinite(rho_corr) else "—"
 
             contraction = r.get("contraction", np.inf)
             contraction_str = f"{contraction:.3f}" if contraction < 100 and np.isfinite(contraction) else "—"
@@ -440,7 +479,8 @@ def print_results_table(records: list, title: str = "", show_analysis: bool = Fa
             max_v_str = f"{max_v:.2e}" if max_v < 100 else "—"
 
             print(f"  {r['name']:<28} {r['n_bus']:<5} {r['n_pv']:<3} "
-                  f"{eta_str:<7} {rho_str:<7} {rho_diag_str:<8} {rho_corr_str:<8} {contraction_str:<7} "
+                  f"{eta_str:<6} {rho_inner_str:<9} {exists_str:<7} "
+                  f"{rho_str:<8} {rho_diag_str:<8} {contraction_str:<7} "
                   f"{r.get('tpf_outer_iter', 0):<4} {r.get('tpf_inner_iter_total', 0):<4} "
                   f"{r.get('tpf_time_ms', 0):<7.1f} "
                   f"{max_v_str:<10} {status}")
@@ -476,17 +516,27 @@ def print_results_table(records: list, title: str = "", show_analysis: bool = Fa
 
 
 def print_statistics(records: list, show_analysis: bool = False):
-    tested = [r for r in records if r["n_pv"] > 0]
-    passed = [r for r in tested if r["passed"]]
-    converged = [r for r in tested if r.get("tpf_converged")]
-    diverged = [r for r in tested if not r.get("tpf_converged") and r.get("nr_converged")]
+    tested_all = records
+    tested_pv = [r for r in records if r["n_pv"] > 0]
+    tested_no_pv = [r for r in records if r["n_pv"] == 0]
+
+    passed_all = [r for r in tested_all if r["passed"]]
+    passed_pv = [r for r in tested_pv if r["passed"]]
+    passed_no_pv = [r for r in tested_no_pv if r["passed"]]
+
+    converged = [r for r in tested_pv if r.get("tpf_converged")]
+    diverged = [r for r in tested_pv if not r.get("tpf_converged") and r.get("nr_converged")]
 
     print(f"\n{'='*120}")
     print(f"  STATISTIKEN")
     print(f"{'='*120}")
-    print(f"  Netze mit PV getestet:    {len(tested)}")
-    print(f"  PASS:                     {len(passed)} ({100*len(passed)/max(len(tested),1):.0f}%)")
-    print(f"  FAIL (konvergiert, dV):   {len([r for r in tested if r.get('tpf_converged') and not r['passed']])}")
+    print(f"  Netze gesamt getestet:    {len(tested_all)}")
+    print(f"  Netze mit PV getestet:    {len(tested_pv)}")
+    print(f"  Netze ohne PV getestet:   {len(tested_no_pv)}")
+    print(f"  PASS (alle):              {len(passed_all)} ({100*len(passed_all)/max(len(tested_all),1):.0f}%)")
+    print(f"  PASS (mit PV):            {len(passed_pv)} ({100*len(passed_pv)/max(len(tested_pv),1):.0f}%)")
+    print(f"  PASS (ohne PV):           {len(passed_no_pv)} ({100*len(passed_no_pv)/max(len(tested_no_pv),1):.0f}%)")
+    print(f"  FAIL (konvergiert, dV):   {len([r for r in tested_pv if r.get('tpf_converged') and not r['passed']])}")
     print(f"  FAIL (divergiert):        {len(diverged)}")
 
     if converged:
@@ -517,7 +567,7 @@ def print_statistics(records: list, show_analysis: bool = False):
     print(f"  KONVERGENZ-ANALYSE: Vorhersagekraft der verschiedenen Metriken")
     print(f"  {'-'*80}")
 
-    all_with_rho = [r for r in tested if r["rho"] < np.inf and r.get("nr_converged")]
+    all_with_rho = [r for r in tested_pv if r["rho"] < np.inf and r.get("nr_converged")]
 
     if all_with_rho:
         def count_correct(metric_key, threshold=1.0):
@@ -577,12 +627,10 @@ def plot_convergence(records: list, omega: float, save_path: str = None):
     from matplotlib.lines import Line2D
 
     plot_data = [r for r in records
-                 if r["n_pv"] > 0
-                 and (r["pv_v_errors"] or r["inner_v_change_all"])]
+                 if r["inner_v_change_all"]]
 
     timing_data = [r for r in records
-                   if r["n_pv"] > 0
-                   and r.get("nr_converged")
+                   if r.get("nr_converged")
                    and r.get("tpf_converged")
                    and r.get("nr_time_ms", 0) > 0
                    and r.get("tpf_time_ms", 0) > 0]
@@ -931,9 +979,11 @@ def save_results_to_file(records: list, filepath: str, suite: str, omega: float,
         f.write(f"Timestamp:     {timestamp}\n")
         f.write("=" * 200 + "\n\n")
 
-        tested = [r for r in records if r["n_pv"] > 0]
-        if not tested:
-            f.write("No networks with PV to report.\n")
+        tested_all = records
+        tested_pv = [r for r in records if r["n_pv"] > 0]
+        tested_no_pv = [r for r in records if r["n_pv"] == 0]
+        if not tested_all:
+            f.write("No networks to report.\n")
             return
 
         if show_analysis:
@@ -949,7 +999,7 @@ def save_results_to_file(records: list, filepath: str, suite: str, omega: float,
         f.write(hdr)
         f.write("-" * 200 + "\n")
 
-        for r in tested:
+        for r in tested_all:
             name = r['name'][:22]
             n_bus = r['n_bus']
             n_pv = r['n_pv']
@@ -1018,13 +1068,19 @@ def save_results_to_file(records: list, filepath: str, suite: str, omega: float,
         f.write("STATISTICS\n")
         f.write("=" * 200 + "\n")
 
-        passed = [r for r in tested if r["passed"]]
-        converged = [r for r in tested if r.get("tpf_converged")]
-        diverged = [r for r in tested if not r.get("tpf_converged") and r.get("nr_converged")]
+        passed_all = [r for r in tested_all if r["passed"]]
+        passed_pv = [r for r in tested_pv if r["passed"]]
+        passed_no_pv = [r for r in tested_no_pv if r["passed"]]
+        converged = [r for r in tested_pv if r.get("tpf_converged")]
+        diverged = [r for r in tested_pv if not r.get("tpf_converged") and r.get("nr_converged")]
 
-        f.write(f"  Networks tested with PV:    {len(tested)}\n")
-        f.write(f"  PASS:                       {len(passed)} ({100*len(passed)/max(len(tested),1):.0f}%)\n")
-        f.write(f"  FAIL (converged, dV):       {len([r for r in tested if r.get('tpf_converged') and not r['passed']])}\n")
+        f.write(f"  Networks tested total:      {len(tested_all)}\n")
+        f.write(f"  Networks tested with PV:    {len(tested_pv)}\n")
+        f.write(f"  Networks tested no-PV:      {len(tested_no_pv)}\n")
+        f.write(f"  PASS (all):                 {len(passed_all)} ({100*len(passed_all)/max(len(tested_all),1):.0f}%)\n")
+        f.write(f"  PASS (with PV):             {len(passed_pv)} ({100*len(passed_pv)/max(len(tested_pv),1):.0f}%)\n")
+        f.write(f"  PASS (no PV):               {len(passed_no_pv)} ({100*len(passed_no_pv)/max(len(tested_no_pv),1):.0f}%)\n")
+        f.write(f"  FAIL (converged, dV):       {len([r for r in tested_pv if r.get('tpf_converged') and not r['passed']])}\n")
         f.write(f"  FAIL (diverged):            {len(diverged)}\n")
 
         if converged:
@@ -1046,7 +1102,7 @@ def save_results_to_file(records: list, filepath: str, suite: str, omega: float,
                 f.write(f"  Outer iterations:\n")
                 f.write(f"    min={min(outer_iters)}  max={max(outer_iters)}  median={np.median(outer_iters):.0f}\n")
 
-        all_with_rho = [r for r in tested if r["rho"] < np.inf and r.get("nr_converged")]
+        all_with_rho = [r for r in tested_pv if r["rho"] < np.inf and r.get("nr_converged")]
         if show_analysis and all_with_rho:
             f.write(f"\n  {'-' * 80}\n")
             f.write(f"  CONVERGENCE ANALYSIS: Prediction accuracy of metrics\n")
@@ -1085,7 +1141,7 @@ def save_results_to_file(records: list, filepath: str, suite: str, omega: float,
 
             f.write(f"\n    Rule: value < 1.0 predicts convergence\n")
 
-        failed = [r for r in tested if not r["passed"]]
+        failed = [r for r in tested_all if not r["passed"]]
         if failed:
             f.write("\nFAILED NETWORKS:\n")
             for r in failed:
@@ -1297,22 +1353,30 @@ def main():
     print_statistics(records, show_analysis=show_analysis)
 
     # Gesamtergebnis
-    tested = [r for r in records if r["n_pv"] > 0]
-    n_pass = sum(1 for r in tested if r["passed"])
-    n_total = len(tested)
+    tested_all = records
+    tested_pv = [r for r in records if r["n_pv"] > 0]
+    tested_no_pv = [r for r in records if r["n_pv"] == 0]
+    n_pass_all = sum(1 for r in tested_all if r["passed"])
+    n_pass_pv = sum(1 for r in tested_pv if r["passed"])
+    n_pass_no_pv = sum(1 for r in tested_no_pv if r["passed"])
+    n_total_all = len(tested_all)
+    n_total_pv = len(tested_pv)
+    n_total_no_pv = len(tested_no_pv)
 
     print(f"\n  Gesamtzeit: {t_total:.1f} s")
-    print(f"  Gesamtergebnis: {n_pass}/{n_total} PASS "
-          f"({100*n_pass/max(n_total,1):.0f}%)")
+    print(f"  Gesamtergebnis: {n_pass_all}/{n_total_all} PASS "
+          f"({100*n_pass_all/max(n_total_all,1):.0f}%)")
+    print(f"    - mit PV:    {n_pass_pv}/{n_total_pv} PASS")
+    print(f"    - ohne PV:   {n_pass_no_pv}/{n_total_no_pv} PASS")
 
-    if n_pass == n_total:
-        print(f"\n  [OK] METHODE B VALIDIERT FUER ALLE {n_total} TESTNETZE!")
+    if n_pass_all == n_total_all:
+        print(f"\n  [OK] METHODE B VALIDIERT FUER ALLE {n_total_all} TESTNETZE!")
     else:
-        n_div = sum(1 for r in tested if not r.get("tpf_converged")
+        n_div = sum(1 for r in tested_pv if not r.get("tpf_converged")
                     and r.get("nr_converged"))
-        n_acc = sum(1 for r in tested if r.get("tpf_converged")
+        n_acc = sum(1 for r in tested_pv if r.get("tpf_converged")
                     and not r["passed"])
-        print(f"\n  ! {n_total - n_pass} Tests fehlgeschlagen:")
+        print(f"\n  ! {n_total_all - n_pass_all} Tests fehlgeschlagen:")
         if n_div:
             print(f"    - {n_div} divergiert (w oder w_q anpassen)")
         if n_acc:

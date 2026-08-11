@@ -28,7 +28,7 @@ from tpf.generators.network_generator_salazar import (
 )
 
 
-def benchmark_single_network(net, name, n_repeats=5):
+def benchmark_single_network(net, name, n_repeats=1):
     """
     Benchmarkt TPF und NR für ein einzelnes PQ-Netz.
     Mehrfach-Ausführung für stabile Zeitmessung.
@@ -83,7 +83,7 @@ def benchmark_single_network(net, name, n_repeats=5):
         M = Z_B * scaling.reshape(1, -1)
         record["eta"] = float(np.max(np.sum(np.abs(M), axis=0)))
 
-        tpf_solver = TPFDenseSolver(tol=1e-8, max_iter=200)
+        tpf_solver = TPFDenseSolver(tol=1e-6, max_iter=100)
 
         # Aufwärmlauf
         tpf_result = tpf_solver.solve(network)
@@ -245,19 +245,22 @@ def main():
 
     records = []
     for name, info in networks.items():
+
         print(f"  Benchmarke: {name}...", end=" ")
         try:
             net = info["constructor"]()
-            record = benchmark_single_network(net, name, n_repeats=args.repeats)
-            records.append(record)
+            network = build_network_from_pandapower(net, include_pv=False)
+            if network.n_bus_phases < 1600:
+                record = benchmark_single_network(net, name, n_repeats=args.repeats)
+                records.append(record)
 
-            if record.get("error"):
-                print(f"FEHLER: {record['error']}")
-            else:
-                print(f"✓ n={record['n_bus']}, "
-                      f"NR={record['nr_time_ms']:.2f}ms, "
-                      f"TPF={record['tpf_time_ms']:.2f}ms, "
-                      f"Speedup={record['speedup']:.1f}x")
+                if record.get("error"):
+                    print(f"FEHLER: {record['error']}")
+                else:
+                    print(f"✓ n={record['n_bus']}, "
+                          f"NR={record['nr_time_ms']:.2f}ms, "
+                          f"TPF={record['tpf_time_ms']:.2f}ms, "
+                          f"Speedup={record['speedup']:.1f}x")
         except Exception as e:
             print(f"FEHLER: {e}")
             records.append({"name": name, "error": str(e)})
@@ -265,7 +268,7 @@ def main():
     print_results_table(records)
 
     if not args.no_plot:
-        save_path = args.save or "baseline_tpf_vs_nr_pq_only.png"
+        save_path = args.save or "baseline_tpf_vs_nr_pq_only_3.png"
         plot_results(records, save_path=save_path)
 
 

@@ -56,15 +56,14 @@ def collect_convergence_data(networks: dict, omega: float = 1.0):
             net = info["constructor"]()
             network = build_network_from_pandapower(net, include_pv=True)
 
-            if network.n_pv == 0:
-                print("keine PV → übersprungen")
-                continue
-
-            # η berechnen
-            Z_B = np.linalg.inv(network.Y_dd)
-            scaling = np.conj(network.s_nom)
-            M = Z_B * scaling.reshape(1, -1)
-            eta = np.max(np.sum(np.abs(M), axis=0))
+            # η berechnen (for no-PV, set to NaN)
+            if network.n_pv > 0:
+                Z_B = np.linalg.inv(network.Y_dd)
+                scaling = np.conj(network.s_nom)
+                M = Z_B * scaling.reshape(1, -1)
+                eta = np.max(np.sum(np.abs(M), axis=0))
+            else:
+                eta = np.nan
 
             # Solve
             result = solver.solve(network)
@@ -81,7 +80,6 @@ def collect_convergence_data(networks: dict, omega: float = 1.0):
                     "pv_v_errors": pv_info.pv_v_error_history,
                     "inner_tols": pv_info.v_change_history,
                     "inner_per_outer": pv_info.inner_iterations_per_outer,
-                    # NEU: Gesamtnetz-Fehler (alle Busse)
                     "inner_v_change_all": pv_info.inner_v_change_all,
                     "outer_start_indices": pv_info.outer_start_indices,
                 }
@@ -89,6 +87,23 @@ def collect_convergence_data(networks: dict, omega: float = 1.0):
                 status = "✓" if result.converged else "✗"
                 print(f"{status} ({record['outer_iter']} outer, "
                       f"{pv_info.inner_iterations_total} inner total)")
+            elif network.n_pv == 0:
+                record = {
+                    "name": name,
+                    "eta": eta,
+                    "n_pv": network.n_pv,
+                    "n_bus": network.n_bus_phases,
+                    "converged": result.converged,
+                    "outer_iter": 0,
+                    "pv_v_errors": [],
+                    "inner_tols": result.history if hasattr(result, 'history') else [],
+                    "inner_per_outer": [],
+                    "inner_v_change_all": [],
+                    "outer_start_indices": [],
+                }
+                data.append(record)
+                status = "✓" if result.converged else "✗"
+                print(f"{status} (no-PV, {result.iterations} inner)")
             else:
                 print("keine Historie verfügbar")
 

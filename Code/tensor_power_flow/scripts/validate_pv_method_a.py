@@ -65,6 +65,9 @@ def validate_single_network(net, name, tol_pass=1e-4):
         "n_pv": 0,
         "n_pq": 0,
         "eta": np.inf,
+        "rho_inner_exact": np.inf,
+        "inner_exists": True,
+        "inner_exists_ratio": np.inf,
         "nr_converged": False,
         "nr_iter": -1,
         "nr_time_ms": 0.0,
@@ -123,25 +126,28 @@ def validate_single_network(net, name, tol_pass=1e-4):
     print(f"  [Netz] d-Block: {network.n_bus_phases} Knoten "
           f"(PQ={n_pq}, PV={n_pv})")
 
+    # Handle no-PV networks: set PV-specific metrics to NaN
     if n_pv == 0:
-        record["error"] = "Keine PV-Knoten"
-        print(f"  ⚠ Keine PV-Knoten — übersprungen")
-        record["passed"] = True
-        return record
+        record["eta"] = np.nan
+        record["rho"] = np.nan
+        record["tpf_inner_iter"] = 0
+        record["tpf_outer_iter"] = 0
 
     # ── 3. Kontraktionsfaktor η ──
-    # v_min aus NR-Ergebnis (für den d-Block)
-    ppc = net._ppc
-    bus_types = ppc["bus"][:, 1].astype(int)
-    pv_idx_ppc = np.where(bus_types == 2)[0]
-    pq_idx_ppc = np.where(bus_types == 1)[0]
-    d_idx = np.sort(np.concatenate([pq_idx_ppc, pv_idx_ppc]))
-    v_min_d = float(np.min(np.abs(nr_result.voltages[d_idx])))
+    if n_pv > 0:
+        ppc = net._ppc
+        bus_types = ppc["bus"][:, 1].astype(int)
+        pv_idx_ppc = np.where(bus_types == 2)[0]
+        pq_idx_ppc = np.where(bus_types == 1)[0]
+        d_idx = np.sort(np.concatenate([pq_idx_ppc, pv_idx_ppc]))
+        v_min_d = float(np.min(np.abs(nr_result.voltages[d_idx])))
 
-    eta = compute_eta(network.Y_dd, network.s_nom, v_min_d)
-    record["eta"] = eta
-    eta_status = "✓" if eta < 1.0 else "⚠" if eta < 2.0 else "✗"
-    print(f"  [η] Kontraktionsfaktor: {eta:.4f} {eta_status}")
+        eta = compute_eta(network.Y_dd, network.s_nom, v_min_d)
+        record["eta"] = eta
+        eta_status = "✓" if eta < 1.0 else "⚠" if eta < 2.0 else "✗"
+        print(f"  [η] Kontraktionsfaktor: {eta:.4f} {eta_status}")
+    else:
+        print(f"  [η] Kontraktionsfaktor: N/A (keine PV)")
 
     # ── 4. Methode A lösen ──
     solver_a = TPFDensePVMethodA(
@@ -180,6 +186,25 @@ def validate_single_network(net, name, tol_pass=1e-4):
     if record["tpf_time_ms"] > 0:
         record["speedup"] = record["nr_time_ms"] / record["tpf_time_ms"]
     print(f"  [Speedup] NR/TPF-A: {record['speedup']:.2f}x")
+
+    # ── 5b. Inner Loop Exakte Analyse (ρ(JJ̄) und Existence)
+    if n_pv > 0 and result_a.converged and result_a.voltages is not None:
+        try:
+            from convergence_analysis import (
+                compute_inner_spectral_radius_exact,
+                check_inner_existence,
+            )
+            v_solution = result_a.voltages
+            record["rho_inner_exact"] = compute_inner_spectral_radius_exact(network, v_solution)
+            exists, ratio = check_inner_existence(network)
+            record["inner_exists"] = exists
+            record["inner_exists_ratio"] = ratio
+            exists_status = "✓" if exists else "✗"
+            rho_inner = record["rho_inner_exact"]
+            rho_status = "✓" if rho_inner < 1.0 else "⚠" if rho_inner < 2.0 else "✗"
+            print(f"  [Inner] ρ(JJ̄): {rho_inner:.4f} {rho_status}, Existence: {ratio:.4f} {exists_status}")
+        except Exception as e:
+            print(f"  [Inner] Analyse fehlgeschlagen: {e}")
 
     # ── 6. Vergleich mit NR ──
     v_tpf = result_a.voltages.flatten()
@@ -220,9 +245,14 @@ def validate_single_network(net, name, tol_pass=1e-4):
                   f"{v_spec_i:<10.4f} {dv:<10.2e}")
 
     # ── 8. PASS/FAIL ──
-    passed = max_mag_err < tol_pass and result_a.converged
-    record["passed"] = passed
-    status = "✓ PASS" if passed else "✗ FAIL"
+    if n_pv == 0:
+        passed = max_mag_err < tol_pass and result_a.converged
+        record["passed"] = passed
+        status = "✓ PASS (no-PV)" if passed else "✗ FAIL (no-PV)"
+    else:
+        passed = max_mag_err < tol_pass and result_a.converged
+        record["passed"] = passed
+        status = "✓ PASS" if passed else "✗ FAIL"
     print(f"\n  Ergebnis: {status}")
 
     return record
@@ -244,14 +274,14 @@ def print_summary_table(records: list[dict]):
 
     # Header
     hdr = (f"  {'Netz':<22} {'n_d':<5} {'PV':<4} {'PQ':<5} "
-           f"{'η':<8} {'η ok':<5} "
+           f"{'η':<6} {'ρ(JJ̄)':<8} {'Exists':<7} "
            f"{'NR It':<6} {'NR ms':<8} "
            f"{'A Out':<6} {'A Inn':<6} {'A ms':<8} "
            f"{'Speed':<7} "
            f"{'max ΔV':<10} {'mean ΔV':<10} {'max Δθ°':<8} "
            f"{'PV ΔV':<10} {'Status'}")
     print(hdr)
-    print(f"  {'─'*138}")
+    print(f"  {'─'*145}")
 
     for r in records:
         namelong = r["name"]
@@ -268,7 +298,14 @@ def print_summary_table(records: list[dict]):
         # η formatieren
         eta = r["eta"]
         eta_str = f"{eta:.4f}" if eta < 100 else f"{eta:.1f}"
-        eta_ok = "✓" if eta < 1.0 else "⚠" if eta < 2.0 else "✗"
+
+        # Inner rho(JJ̄) formatieren
+        rho_inner = r.get("rho_inner_exact", np.inf)
+        rho_inner_str = f"{rho_inner:.4f}" if rho_inner < 100 and np.isfinite(rho_inner) else "—"
+
+        # Inner Existence formatieren
+        inner_exists = r.get("inner_exists", True)
+        exists_str = "OK" if inner_exists else "FAIL"
 
         # Fehler formatieren
         max_v = r["max_v_error"]
@@ -294,7 +331,7 @@ def print_summary_table(records: list[dict]):
             status = "✗ FAIL"
 
         print(f"  {name:<22} {r['n_bus']:<5} {r['n_pv']:<4} {r['n_pq']:<5} "
-              f"{eta_str:<8} {eta_ok:<5} "
+              f"{eta_str:<6} {rho_inner_str:<8} {exists_str:<7} "
               f"{r['nr_iter']:<6} {r['nr_time_ms']:<8.2f} "
               f"{r['tpf_outer_iter']:<6} {r['tpf_inner_iter_total']:<6} "
               f"{r['tpf_time_ms']:<8.2f} "

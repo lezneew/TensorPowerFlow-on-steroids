@@ -279,14 +279,157 @@ def compute_empirical_contraction(pv_v_error_history: List[float]) -> float:
 
 
 # =============================================================================
-# Kombiniert: Alle drei Metriken
+# NEU: Inner Loop Exakte Analyse (ρ(JJ̄) und Existence)
+# =============================================================================
+
+def compute_inner_spectral_radius_exact(network, v_solution: np.ndarray) -> float:
+    """
+    Berechnet den exakten Spektralradius für die antiholomorphe FPI.
+
+    Die FPI ist eine Fixpunkt-Iteration: v_{n+1} = f(v̄_n)
+    Da sie antiholomorph ist (Abhängigkeit von konjugiertem v), muss für die
+    lineare Analyse der Operator J·conj(J) verwendet werden.
+
+    J = ∂f/∂v̄ = -Z_B · diag(s*/v̄*²)
+    ρ_eff = sqrt(ρ(J @ conj(J)))
+
+    Parameters
+    ----------
+    network : NetworkData
+    v_solution : np.ndarray
+        Konvergierte Spannungslösung (komplex)
+
+    Returns
+    -------
+    float
+        Effektiver Spektralradius ρ_eff = sqrt(ρ(JJ̄))
+    """
+    n = network.n_bus_phases
+    if n == 0:
+        return np.inf
+
+    try:
+        Z_B = np.linalg.inv(network.Y_dd)
+    except np.linalg.LinAlgError:
+        return np.inf
+
+    K = -Z_B
+
+    v_conj = np.conj(v_solution.flatten())
+    s_conj = np.conj(network.s_nom.flatten())
+
+    scale = s_conj / (v_conj ** 2)
+    J = K * scale.reshape(1, -1)
+
+    M = J @ np.conj(J)
+    eigenvalues = np.linalg.eigvals(M)
+    rho_squared = np.max(np.abs(eigenvalues))
+    rho_eff = float(np.sqrt(rho_squared))
+
+    return rho_eff
+
+
+def compute_inner_banach_eta(network, v_min_pu: float = 1.0) -> float:
+    """
+    Berechnet die Banach-Schranke η (a-priori).
+
+    Aus dem Paper, Gl. (7):
+        k = ||Z_B · diag(1⊘z_l)||_1
+        wobei z_l = s* |v|²
+
+    Praktische Approximation:
+        η = ||Z_B ⊙ diag(s*)||_1 / v_min²
+
+    Parameters
+    ----------
+    network : NetworkData
+    v_min_pu : float
+        Minimale erwartete Spannung in p.u. (default: 1.0)
+
+    Returns
+    -------
+    float
+        Banach-Schranke η, Werte < 1 garantieren Konvergenz
+    """
+    n = network.n_bus_phases
+    if n == 0 or v_min_pu < 1e-6:
+        return np.inf
+
+    try:
+        Z_B = np.linalg.inv(network.Y_dd)
+    except np.linalg.LinAlgError:
+        return np.inf
+
+    s_conj = np.conj(network.s_nom.flatten())
+    M = Z_B * s_conj.reshape(1, -1)
+    matrix_1_norm = np.max(np.sum(np.abs(M), axis=0))
+
+    eta = matrix_1_norm / (v_min_pu ** 2)
+    return float(eta)
+
+
+def check_inner_existence(network) -> tuple[bool, float]:
+    """
+    Prüft die Existence-Bedingung aus Paper Gl. (14):
+
+        ||v₀||₂ ≥ 4 · ||s|| · ||z_s||
+
+    wobei:
+        - v₀ = Startspannung (typisch: 1.0 pu flach)
+        - s = Scheinleistung
+        - z_s = Diagonale von Z_B (Thévenin-Impedanz vom Slack)
+
+    Wird diese Bedingung verletzt, existiert keine Lösung → Divergenz
+    ist physikalisch garantiert, unabhängig vom numerischen Verfahren.
+
+    Parameters
+    ----------
+    network : NetworkData
+
+    Returns
+    -------
+    tuple[bool, float]
+        (exists, ratio) - exists=True wenn Bedingung erfüllt,
+        ratio = ||v₀||₂ / (4·||s||·||z_s||) (Verhältnis > 1 bedeutet exists)
+    """
+    n = network.n_bus_phases
+    if n == 0:
+        return False, 0.0
+
+    try:
+        Z_B = np.linalg.inv(network.Y_dd)
+    except np.linalg.LinAlgError:
+        return False, 0.0
+
+    v0_norm = np.sqrt(n) * 1.0
+
+    s_norm = np.linalg.norm(network.s_nom.flatten())
+
+    z_s_diag = np.diag(Z_B)
+    z_s_norm = np.linalg.norm(z_s_diag)
+
+    if s_norm < 1e-15 or z_s_norm < 1e-15:
+        return True, np.inf
+
+    rhs = 4.0 * s_norm * z_s_norm
+    ratio = v0_norm / rhs
+
+    exists = ratio >= 1.0
+
+    return exists, float(ratio)
+
+
+# =============================================================================
+# Kombiniert: Alle Metriken (Inner + Outer)
 # =============================================================================
 
 def compute_all_convergence_metrics(network, omega: float = 1.0,
                                     pv_v_error_history: Optional[List[float]] = None,
-                                    delta_q: float = 1e-5) -> Dict[str, float]:
+                                    delta_q: float = 1e-5,
+                                    v_solution: Optional[np.ndarray] = None,
+                                    v_min_pu: float = 1.0) -> Dict[str, float]:
     """
-    Berechnet alle drei Konvergenz-Metriken.
+    Berechnet alle Konvergenz-Metriken für Inner und Outer Loop.
 
     Parameters
     ----------
@@ -297,10 +440,21 @@ def compute_all_convergence_metrics(network, omega: float = 1.0,
         PV-Spannungsfehler Historie vom Solver
     delta_q : float
         Perturbation für Finite-Differenzen (default: 1e-5)
+    v_solution : np.ndarray, optional
+        Konvergierte Spannungslösung für exakte Inner-Loop Analyse
+    v_min_pu : float
+        Minimale Spannung für Banach-Schranke (default: 1.0)
 
     Returns
     -------
     dict mit:
+        Inner Loop:
+        - eta_banach: Banach a-priori Schranke
+        - rho_inner_exact: ρ(JJ̄) - exakter Spektralradius
+        - inner_exists: Existence-Bedingung erfüllt (True/False)
+        - inner_exists_ratio: ||v₀||₂ / (4·||s||·||z_s||)
+
+        Outer Loop:
         - rho_full: Volle Matrix (numerisch)
         - rho_diag: Diagonale-only
         - rho_corr: Korrigierte Sensitivität
@@ -309,11 +463,36 @@ def compute_all_convergence_metrics(network, omega: float = 1.0,
     from validate_pv_method_a_comprehensive import compute_spectral_radius
 
     result = {
+        "eta_banach": np.inf,
+        "rho_inner_exact": np.inf,
+        "inner_exists": False,
+        "inner_exists_ratio": 0.0,
         "rho_full": np.inf,
         "rho_diag": np.inf,
         "rho_corr": np.inf,
         "contraction": np.inf,
     }
+
+    if network.n_bus_phases == 0:
+        return result
+
+    try:
+        result["eta_banach"] = compute_inner_banach_eta(network, v_min_pu)
+    except Exception:
+        pass
+
+    try:
+        exists, ratio = check_inner_existence(network)
+        result["inner_exists"] = exists
+        result["inner_exists_ratio"] = ratio
+    except Exception:
+        pass
+
+    if v_solution is not None:
+        try:
+            result["rho_inner_exact"] = compute_inner_spectral_radius_exact(network, v_solution)
+        except Exception:
+            pass
 
     if not network.has_pv or network.n_pv == 0:
         return result

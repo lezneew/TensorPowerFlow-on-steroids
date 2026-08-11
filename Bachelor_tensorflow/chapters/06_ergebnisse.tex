@@ -2,35 +2,441 @@
 \chapter{Ergebnisse und Diskussion}
 \label{ch:ergebnisse}
 %======================================================================
+\section{Optimierung der Methode A}
+\label{sec:Optimierung der Methode A}
 
-\section{Validierung gegen Newton-Raphson-Referenz}
-\label{sec:validierung}
-% TODO
 
-\section{Konvergenzverhalten}
-\label{sec:konvergenz}
-% TODO
+Die in Abschnitt~\ref{subsec:methode_a_herleitung} hergeleitete Methode~A besteht
+aus zwei verschachtelten Schleifen: einer inneren Fixpunktiteration, die den
+Lastfluss bei gegebener Blindleistungseinspeisung löst, und einer äußeren
+Schleife, die diese Einspeisung so korrigiert, dass die Spannungsvorgaben der
+PV-Knoten eingehalten werden. Diese Struktur eröffnet drei voneinander
+unabhängige Ansatzpunkte zur Optimierung: die Genauigkeit der
+Sensitivitätsbeziehung, mit der die äußere Korrektur bestimmt wird, die
+Initialisierung der inneren Schleife und deren Abbruchkriterium.\\
 
-\section{Rechenzeit: Skalierung mit Netzgröße}
-\label{sec:skalierung_netz}
-% TODO
+Zunächst wird in
+Abschnitt~\ref{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität}
+gezeigt, dass die entkoppelte Theveninnäherung nur begrenzt zu Konvergenz führt und durch die vollständige Berücksichtigung der
+PV-PV-Kopplung ersetzt werden muss. Diese Maßnahme betrifft die Robustheit des
+Verfahrens und ist Voraussetzung für alle weiteren Untersuchungen. Anschließend
+werden in den Abschnitten~\ref{subsec:ergebnisse_warmstart}
+und~\ref{subsec:ergebnisse_adaptiv} zwei rein rechenzeitbezogene Maßnahmen
+betrachtet: die Übernahme des Spannungszustands zwischen den äußeren Iterationen
+(Warm Start) und die Kopplung der inneren Abbruchtoleranz an das äußere
+Residuum.\\
 
-\section{Rechenzeit: Skalierung mit Anzahl der Lastflüsse}
-\label{sec:skalierung_tau}
-% TODO
+Als Bewertungsmaßstab dienen die Anzahl der äußeren Iterationen, die
+Gesamtzahl der inneren Fixpunktschritte. Die Untersuchungen erfolgen exemplarisch zur Visualisierung an einem radialen
+40-Knoten-Netz und werden anschließend über den in
+Abschnitt~\ref{sec:testnetze} eingeführten Skalierungsdatensatz auf Netzgrößen
+bis $1000$ Knoten und PV-Anteile bis $60\,\%$ übertragen, um die
+Verallgemeinerbarkeit der Ergebnisse zu prüfen. Die als vorteilhaft
+identifizierten Einstellungen werden jeweils für die folgenden Untersuchungen
+übernommen.
 
-\section{Einfluss der Anzahl der PV-Knoten}
-\label{sec:einfluss_npv}
-% TODO
 
-\section{GPU vs. CPU}
-\label{sec:gpu_cpu}
-% TODO
 
-\section{Vergleich der drei Methoden}
-\label{sec:vergleich_methoden}
-% TODO
+\subsection{Entkoppelte vs. gekoppelte Sensitivität}
+\label{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität}
 
-\section{Vergleich mit konventionellen Verfahren}
-\label{sec:vergleich_konventionell}
-% TODO
+Die in Abschnitt~\ref{subsec:methode_a_herleitung} eingeführte Q-Korrektur von
+Methode~A wurde zunächst als entkoppelte Theveninnäherung eingeführt und verwendet bloß die Diagonalelemente $2X^{(\ell)}_{kk}$ Gl.~\eqref{eq:methode_a_dQ_scalar} der Reaktanz.
+Diese Vereinfachung vernachlässigt
+jedoch die Kopplung zwischen den PV-Knoten, die in den Nebendiagonalelementen
+$X^{(\ell)}_{pp,kj}$ ($k\neq j$) kodiert ist. In diesem Abschnitt wird
+untersucht, wie sich diese fehlende Kopplung auf das Konvergenzverhalten auswirkt.
+
+
+\begin{figure}[htbp]
+	\centering
+	\input{figures/outer_convergence_error_decoupled.pgf}
+	\caption{Konvergenzverhalten eines 40 Knoten Netzes mit $n_\mathrm{pv}=4$ und $n_\mathrm{pv}=8$ PV Knoten. Abgebildet wird der maximale Spannungsfehler des Verteilernetzes gegen die Iterationsschritte der äußeren Q-Korrektur.}
+	\label{fig:outer_convergence_decoupled}
+\end{figure}
+
+Abbildung~\ref{fig:outer_convergence_decoupled} zeigt den maximalen
+Spannungsfehler über die Iterationen
+der äußeren Q-Korrektur exemplarisch für ein radiales 40-Knoten-Netz. Verglichen werden zwei
+Varianten mit $n_\mathrm{pv}=4$ bzw.\ $n_\mathrm{pv}=8$ PV-Knoten bei sonst
+identischer Netztopologie und Parametrierung.\\
+
+ Der Spannungsfehler fällt für das $n_\mathrm{pv}=4$ monoton und
+	nähert sich zunehmend einem linear-konvergenten Verlauf an. Die
+	Konvergenzschwelle von $\epsilon_V < 10^{-6}\,\text{p.u.}$ wird nach
+	$15$ äußeren Iterationen erreicht.
+Für das $n_\mathrm{pv}=8$ Netz stagniert der Fehler bereits nach wenigen
+	Iterationen und verbessert
+	sich über die gesamten $100$ dargestellten Iterationen praktisch nicht mehr.
+	Die äußere Schleife konvergiert nicht.\\
+	
+	
+Der Übergang von Konvergenz zu Stagnation bei bloßer Verdopplung der
+PV-Knotenzahl lässt sich unmittelbar auf die diagonale Approximation
+zurückführen. Die gekoppelte Sensitivitätsbeziehung lautet nach
+Gl.~\eqref{eq:sensitivity_matrix}
+$\Delta\bigl(|\vect{V}_{pv}|^2\bigr) = 2\,\vect{X}^{(\ell)}_{pp}\,\Delta\vect{Q}$,
+während die diagonale Näherung effektiv $\vect{X}^{(\ell)}_{pp} \approx
+\diag(X^{(\ell)}_{kk})$ setzt. Diese Näherung ist nur dann gerechtfertigt, wenn
+$\vect{X}^{(\ell)}_{pp}$ diagonaldominant ist.
+Je mehr PV-Knoten sich einen
+gemeinsamen Pfad zum Slack teilen, desto größer werden diese Kopplungsterme in
+Summe. Bei $n_\mathrm{pv}=8$ liegen die PV-Knoten so dicht, dass die
+Näherung verletzt wird, wie in Abbildung \ref{fig:x_pp_heatmaps} erkennbar ist, da bei $n_\mathrm{PV}=8$ hohe Werte in den in den Nebendiagonalen vorkommen. Physikalisch
+bedeutet dies, dass eine Q-Anpassung am Knoten $k$ die Spannung an einem
+benachbarten PV-Knoten $j$ mit verändert, was die diagonale Korrektur nicht
+berücksichtigt.
+
+\begin{figure}[htbp]
+	\centering
+    \import{figures/}{x_pp_heatmaps.pgf}
+	\caption{PV-PV-Reaktanzmatrizen $\vect{X}_{pp}$ des 40-Knoten-Netzes bei 4 und 8 PV-Knoten.}
+	\label{fig:x_pp_heatmaps}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering
+	\input{figures/max_pv_convergence.pgf}
+	\caption{Korrelation zwischen der maximalen Anzahl an PV-Bussen unter Konvergenz gegenüber der Netzgröße $n$.}
+	\label{fig:max_pv_convergence}
+\end{figure}
+
+Weiterhin ist beobachtbar, dass die maximale Anzahl der PV-Knoten nicht von der Größe des Netzes abhängt wie in Abbildung \ref{fig:max_pv_convergence} experimentell festgestellt wird. Hier wurde die Anzahl der PV-Knoten wurde für jede Netzgröße erhöht bis keine Konvergenz mehr eintritt. Somit ist bei der Verwendung der entkoppelten Näherung zu beachten dass ab einem Anteil von $\sim10$ PV-Knoten mit Divergenz zu rechnen ist.\\
+
+Aus der Eigenschaft, dass nur begrenzt viele PV Knoten vorkommen dürfen, wird die Berücksichtigung der PV-PV-Kopplung motiviert.\\
+
+Die gekoppelte Variante ersetzt die elementweise Division durch $2X^{(\ell)}_{kk}$
+durch die Lösung des vollen linearen Systems nach
+Gl.~\eqref{eq:methode_a_dQ_coupled},
+\begin{equation}
+	\Delta\vect{Q} = \tfrac{1}{2}\,\bigl(\vect{X}^{(\ell)}_{pp}\bigr)^{-1}
+	\bigl(|\vect{V}^{\spec}_{pv}|^2 - |\vect{v}^{(\ell)}_{pv}|^2\bigr),
+\end{equation}
+und berücksichtigt damit die Nebendiagonalelemente von
+$\vect{X}^{(\ell)}_{pp}$ explizit.
+
+\begin{figure}[htbp]
+	\centering
+	\input{figures/outer_convergence_error_coupled.pgf}
+	\caption{Konvergenzverhalten der gekoppelten Q-Korrektur für das
+		40-Knoten-Netz bei $n_\mathrm{pv} \in \{5, 10, 20, 30, 40\}$ PV-Knoten.
+		Abgebildet wird der maximale Spannungsfehler gegen die Iterationsschritte der
+		äußeren Q-Korrektur.}
+	\label{fig:outer_convergence_error_coupled}
+\end{figure}
+
+Abbildung~\ref{fig:outer_convergence_error_coupled} zeigt das
+Konvergenzverhalten für dasselbe 40-Knoten-Netz bei einer PV-Bestückung von
+$n_\mathrm{pv}=5$ bis $n_\mathrm{pv}=40$. Der Fall $n_\mathrm{pv}=40$
+entspricht dabei dem Grenzfall, in dem sämtliche Nicht-Slack-Knoten als
+PV-Knoten modelliert sind und die Kopplungsterme somit maximal wirksam werden.\\
+
+Alle betrachteten Konfigurationen erreichen die Konvergenzschwelle
+$\epsilon_V < 10^{-6}\,\text{p.u.}$ innerhalb von $8$ bis $9$ äußeren
+Iterationen. Die Iterationszahl ist damit nahezu unabhängig von der Anzahl der
+PV-Knoten.
+Die im entkoppelten Fall beobachtete Divergenzgrenze von etwa
+$n_\mathrm{pv}\approx 10$ (Abbildung~\ref{fig:max_pv_convergence}) entfällt
+vollständig.\\
+
+Dieses Ergebnis bestätigt die in
+Abschnitt~\ref{sec:validierung} formulierte Erklärung: Die Stagnation der
+entkoppelten Variante ist keine Eigenschaft der äußeren Schleife selbst, sondern
+allein eine Folge der vernachlässigten PV-PV-Kopplung. Sobald
+$\vect{X}^{(\ell)}_{pp}$ vollständig einbezogen wird, entspricht die Korrektur
+einem konsistenten Newton-Schritt auf dem Residuum
+$|\vect{V}^{\spec}_{pv}|^2 - |\vect{v}_{pv}|^2$, und die einzelnen PV-Knoten
+korrigieren sich nicht mehr gegenseitig weg.\\
+
+Auffällig ist ferner die Form der Fehlerverläufe: Nach einer flacheren
+Anfangsphase fällt der Fehler über mehrere Dekaden zunehmend steiler ab. Dieses
+beschleunigende Verhalten ist darauf zurückzuführen, dass
+$\vect{X}^{(\ell)}_{pp}$ eine \emph{linearisierte} Sensitivität darstellt: Mit
+schrumpfendem Residuum verliert der bei der Linearisierung vernachlässigte
+Term höherer Ordnung (vgl.\ Abschnitt~\ref{subsec:methode_a_herleitung}) an
+Gewicht, sodass der Korrekturschritt zunehmend exakt wird.\\
+
+Der Preis für die verbesserte Robustheit ist der Verlust der reinen
+elementweisen Operation: Statt einer Division tritt pro äußerer Iteration eine
+Lösung der Dimension $n_\mathrm{pv}\times n_\mathrm{pv}$ auf. Dieser Aufwand
+fällt jedoch kaum ins Gewicht.
+$\vect{X}^{(\ell)}_{pp}$ ist bei fester Netztopologie über alle Iterationen und
+Lastszenarien hinweg konstant, sodass eine einmalige Faktorisierung genügt und
+pro Iteration lediglich ein Vor-/Rückwärtseinsetzen verbleibt.\\
+
+
+Die gekoppelte Q-Korrektur ist der entkoppelten Variante klar vorzuziehen: Sie
+konvergiert für alle untersuchten PV-Anteile in $8$ bis $9$ Iterationen, ist
+robust gegenüber der PV-Knotenzahl. Die entkoppelte Variante bleibt lediglich für Netze
+mit sehr wenigen, elektrisch weit auseinanderliegenden PV-Knoten eine
+Alternative. Alle folgenden Untersuchungen zu Methode~A verwenden daher die
+gekoppelte Formulierung.
+
+\subsection{Warm-Start der inneren Schleife}
+\label{subsec:ergebnisse_warmstart}
+
+
+%\todo{-innere schleife immer mit cold start- idee: das ergebnis der letzten inneren schleife für nächste innere schleife als startpunkt- im plot einmal der gesamt iterationsverlauf exemplarisch für ein 40 knoten netz mit 4 pv knoten r"$\max(|V_{neu}| - |V_{alt}|)$ [p.u.]" vs iteration. erkennbar ist sägezahnverhalten der äußeren und inneren schleife. bei cold start sind die peaks konstant auf einer ebene. bei warm start  gehen die peaks der äußeren schleife runter und es braucht weniger innere iterationen bis zur nächsten äußeren iteration   Cold start: 0.69 ms, 106 inner iterations Warm start: 0.44 ms, 70 inner iterations Speedup: 1.55x, bei beidem 17 äußere iterationen. }
+	
+	
+Die Q-Korrektur der äußeren Schleife verändert in jeder Iteration lediglich die
+Blindleistungseinspeisung an den PV-Knoten, während Topologie, Lasten und
+Wirkleistungen unverändert bleiben. Die Lösung des inneren
+Fixpunktverfahrens verschiebt sich dadurch nur geringfügig. Wird die innere
+Schleife dennoch in jeder äußeren Iteration mit dem Flat-Start
+$\vect{v}^{(0)} = \vect{1}$ initialisiert (\emph{Cold Start}), so wird diese
+Information verworfen und der bereits erreichte Lösungsfortschritt in jedem
+Durchlauf erneut erarbeitet. Alternativ kann die konvergierte Spannung der
+vorangegangenen inneren Schleife als Startwert der nächsten verwendet werden
+(\emph{Warm Start}).
+
+\begin{figure}[htbp]
+	\centering
+	\input{figures/inner_start_comparison.pgf}
+	\caption{Gesamtiterationsverlauf für ein 40-Knoten-Netz mit
+		$n_\mathrm{pv}=4$ PV-Knoten bei Cold Start (oben) und Warm Start (unten).
+		Abgebildet ist die Spannungsänderung $\max\bigl(|V_\mathrm{neu}| -
+		|V_\mathrm{alt}|\bigr)$ je innerer Iteration über alle äußeren Iterationen
+		hinweg.}
+	\label{fig:inner_start_comparison}
+\end{figure}
+
+Abbildung~\ref{fig:inner_start_comparison} zeigt den vollständigen Iterationsverlauf
+beider Varianten exemplarisch für ein 40-Knoten-Netz mit $n_\mathrm{pv}=4$
+PV-Knoten. In beiden Fällen ist ein charakteristisches Sägezahnmuster
+erkennbar. Innerhalb einer äußeren Iteration fällt die Spannungsänderung
+monoton ab, bis das innere Abbruchkriterium erreicht ist. Die anschließende
+Q-Korrektur führt zu einem Sprung der Einspeisung und damit zu einem erneuten
+Anstieg der Spannungsänderung, wodurch die nächste Zahnflanke beginnt. Jeder
+Zahn entspricht somit einem vollständigen Durchlauf der inneren Schleife.\\
+
+Die beiden Varianten unterscheiden sich jedoch deutlich in der Einhüllenden
+dieses Musters. Bei Cold Start liegen die Spitzenwerte der Zähne über den
+gesamten Verlauf auf annähernd konstantem Niveau, da die innere Schleife stets
+denselben Abstand zwischen Flat-Start und Lösung überwinden muss.
+Entsprechend bleibt auch die Zahnbreite, also die Anzahl der benötigten inneren
+Iterationen, über alle äußeren Iterationen nahezu unverändert. Bei Warm Start
+hingegen nehmen die Spitzenwerte von äußerer zu äußerer Iteration ab: Sie
+spiegeln unmittelbar die Größe der Q-Korrektur $\Delta\vect{Q}^{(\ell)}$ wider,
+die mit fortschreitender äußerer Konvergenz kleiner wird. Damit sinkt zugleich
+die Zahnbreite, sodass gegen Ende nur noch wenige innere Iterationen bis zum
+Erreichen des inneren Abbruchkriteriums erforderlich sind.\\
+
+Quantitativ reduziert der Warm Start die Gesamtzahl der inneren Iterationen von
+$106$ auf $70$, was einer Einsparung von etwa $34\,\%$ entspricht. Die
+Rechenzeit sinkt von $0{,}69\,\mathrm{ms}$ auf $0{,}44\,\mathrm{ms}$ und damit
+um den Faktor $1{,}55$. Dass der Zeitgewinn dem Verhältnis der inneren
+Iterationszahlen ($106/70 \approx 1{,}51$) entspricht, bestätigt, dass die
+Laufzeit vollständig von der inneren Schleife dominiert wird und der Mehraufwand
+der äußeren Korrektur und der Übernahme des Startvektors
+vernachlässigbar sind.\\
+
+Entscheidend ist dabei, dass die Anzahl der äußeren Iterationen in beiden
+Varianten identisch bei $17$ liegt. Der Warm Start beeinflusst ausschließlich
+den Weg, auf dem die innere Schleife ihren Fixpunkt erreicht, nicht jedoch den
+Fixpunkt selbst. Der Warm Start ist damit eine
+rein rechenzeitbezogene Optimierung, die das Konvergenzverhalten und die
+Genauigkeit der Gesamtlösung unverändert lässt.\\
+
+Implementierungsseitig erfordert der Warm Start lediglich, den Spannungstensor
+zwischen den äußeren Iterationen nicht zurückzusetzen. Die Batch-Struktur des
+Tensor-Power-Flow bleibt vollständig erhalten, da jedes Lastszenario seinen
+eigenen Startvektor entlang der Batch-Dimension mitführt. Zusätzlicher
+Speicherbedarf entsteht nicht, weil der Spannungstensor ohnehin vorgehalten
+wird. Der Warm Start wird daher in allen folgenden Untersuchungen als
+Standardeinstellung verwendet.\\
+
+
+
+%
+%\begin{table}[htbp]
+%	\centering
+%	\begin{tabular}{r|r|r|r|r|r|r|r}
+%		\hline
+%		$n_{bus}$ & $n_{PV}$ & Inner & Outer & $t_{cold}$ (ms) & $t_{warm}$ (ms) & Speedup & Conv\\
+%		\hline
+%		1000 & 0 & 5 & 1 & 71.5 & 74.7 & 0.96 & Ja\\
+%		1000 & 20 & 47 & 8 & 107.7 & 89.7 & 1.20 & Ja\\
+%		1000 & 50 & 47 & 8 & 97.1 & 92.1 & 1.05 & Ja\\
+%		1000 & 100 & 41 & 7 & 94.9 & 114.5 & 0.83 & Ja\\
+%		120 & 0 & 3 & 1 & 1.0 & 1.2 & 0.84 & Ja\\
+%		120 & 6 & 27 & 6 & 2.8 & 1.8 & 1.54 & Ja\\
+%		120 & 12 & 87 & 14 & 5.2 & 8.5 & 0.61 & Ja\\
+%		120 & 24 & 38 & 8 & 3.5 & 2.7 & 1.27 & Ja\\
+%		120 & 36 & 60 & 10 & 4.1 & 3.0 & 1.38 & Ja\\
+%		200 & 0 & 4 & 1 & 2.5 & 2.6 & 0.94 & Ja\\
+%		200 & 4 & 44 & 9 & 6.2 & 4.3 & 1.44 & Ja\\
+%		200 & 10 & 29 & 6 & 4.7 & 6.0 & 0.79 & Ja\\
+%		200 & 20 & 34 & 7 & 4.8 & 3.9 & 1.24 & Ja\\
+%		200 & 40 & 39 & 8 & 5.7 & 5.7 & 1.00 & Ja\\
+%		200 & 60 & 66 & 10 & 7.3 & 6.0 & 1.22 & Ja\\
+%		200 & 80 & 95 & 14 & 9.9 & 7.3 & 1.35 & Ja\\
+%		200 & 100 & 284 & 41 & 25.1 & 20.6 & 1.22 & Ja\\
+%		20 & 0 & 3 & 1 & 0.2 & 0.1 & 2.32 & Ja\\
+%		20 & 1 & 43 & 9 & 0.8 & 0.4 & 1.79 & Ja\\
+%		20 & 2 & 23 & 6 & 0.8 & 0.5 & 1.54 & Ja\\
+%		20 & 4 & 43 & 9 & 0.5 & 0.4 & 1.22 & Ja\\
+%		20 & 6 & 43 & 9 & 0.6 & 0.5 & 1.21 & Ja\\
+%		20 & 8 & 38 & 8 & 0.7 & 0.4 & 1.60 & Ja\\
+%		20 & 10 & 66 & 12 & 0.9 & 0.6 & 1.35 & Ja\\
+%		20 & 12 & 72 & 13 & 0.8 & 0.7 & 1.19 & Ja\\
+%		350 & 0 & 4 & 1 & 9.1 & 7.1 & 1.28 & Ja\\
+%		350 & 7 & 34 & 7 & 9.0 & 10.0 & 0.90 & Ja\\
+%		350 & 18 & 49 & 10 & 10.4 & 9.1 & 1.15 & Ja\\
+%		350 & 35 & 39 & 8 & 9.0 & 9.2 & 0.97 & Ja\\
+%		350 & 70 & 102 & 15 & 16.3 & 15.3 & 1.06 & Ja\\
+%		350 & 105 & 186 & 27 & 26.8 & 21.1 & 1.27 & Ja\\
+%		350 & 140 & 144 & 21 & 20.0 & 19.0 & 1.06 & Ja\\
+%		40 & 0 & 3 & 1 & 0.4 & 0.5 & 0.70 & Ja\\
+%		40 & 2 & 23 & 6 & 0.7 & 0.6 & 1.19 & Ja\\
+%		40 & 4 & 23 & 6 & 0.8 & 0.5 & 1.61 & Ja\\
+%		40 & 8 & 48 & 10 & 1.2 & 0.8 & 1.55 & Ja\\
+%		40 & 12 & 92 & 14 & 1.5 & 1.0 & 1.45 & Ja\\
+%		40 & 16 & 48 & 10 & 1.0 & 1.5 & 0.68 & Ja\\
+%		40 & 20 & 58 & 12 & 1.7 & 1.3 & 1.35 & Ja\\
+%		40 & 24 & 92 & 14 & 1.6 & 1.3 & 1.22 & Ja\\
+%		500 & 0 & 5 & 1 & 13.7 & 13.8 & 0.99 & Ja\\
+%		500 & 10 & 40 & 8 & 17.2 & 17.7 & 0.97 & Ja\\
+%		500 & 25 & 45 & 9 & 20.3 & 19.8 & 1.03 & Ja\\
+%		500 & 50 & 59 & 9 & 20.2 & 23.2 & 0.87 & Ja\\
+%		750 & 0 & 5 & 1 & 34.7 & 35.5 & 0.98 & Ja\\
+%		750 & 15 & 35 & 7 & 47.1 & 44.1 & 1.07 & Ja\\
+%		750 & 38 & 81 & 12 & 54.9 & 46.8 & 1.17 & Ja\\
+%		750 & 75 & 81 & 12 & 53.2 & 45.1 & 1.18 & Ja\\
+%		75 & 0 & 3 & 1 & 0.4 & 0.5 & 0.80 & Ja\\
+%		75 & 4 & 33 & 7 & 1.0 & 0.8 & 1.25 & Ja\\
+%		75 & 8 & 33 & 7 & 1.5 & 1.3 & 1.21 & Ja\\
+%		75 & 15 & 33 & 7 & 1.2 & 0.9 & 1.40 & Ja\\
+%		75 & 22 & 122 & 18 & 3.2 & 1.6 & 2.01 & Ja\\
+%		75 & 30 & 43 & 9 & 1.2 & 0.9 & 1.36 & Ja\\
+%		75 & 38 & 129 & 19 & 3.1 & 1.6 & 2.00 & Ja\\
+%		75 & 45 & 79 & 12 & 2.2 & 1.5 & 1.50 & Ja\\
+%		\hline
+%	\end{tabular}
+%	\caption{Salazar Skalierungsnetze: Kaltstart vs Warmstart}
+%	\label{tab:salazar_scaling_cold_warm}
+%\end{table}
+%
+
+
+\todo{-inner loop komplett konvergieren lassen vs adaptiv anzahl an inneren iteration bis zu nächsten äußeren schleife begrenzen -sägezahn charakter kann reduziert werden ein}
+
+
+\subsection{Adaptive innere Toleranz}
+\label{subsec:ergebnisse_adaptiv}
+
+Der Warm Start reduziert die Zahnbreite des Sägezahnmusters, lässt die innere
+Abbruchtoleranz jedoch unverändert. In jeder äußeren Iteration wird die innere
+Schleife bis auf die Endtoleranz $\epsilon_\mathrm{in}\,\text{p.u.}$
+austeriert, obwohl der zugehörige Q-Zustand noch weit vom Sollwert entfernt ist.
+Der dabei erzielte Genauigkeitsüberschuss ist wertlos, weil die anschließende
+Q-Korrektur den Arbeitspunkt ohnehin wieder verschiebt. Die äußere Schleife
+benötigt lediglich einen Spannungszustand, der genau genug ist, um die
+Korrekturrichtung $\Delta\vect{Q}^{(\ell)}$ verlässlich zu bestimmen.\\
+
+
+\begin{figure}[htbp]
+	\centering
+	\input{figures/adaptive_inner_comparison.pgf}
+	\caption{Gesamtiterationsverlauf für ein 40-Knoten-Netz bei fixierter
+		innerer Toleranz $\epsilon_\mathrm{in}=10^{-8}\,\text{p.u.}$ (oben) und
+		adaptiver innerer Toleranz nach Gl.~\eqref{eq:adaptive_tol} (unten).
+		Abgebildet ist die innere Schrittweite
+		$\max\bigl(|V_\mathrm{neu}|-|V_\mathrm{alt}|\bigr)$ über alle inneren
+		Iterationen hinweg.}
+	\label{fig:adaptive_inner_comparison}
+\end{figure}
+
+Die Implementierung ist inspiriert von Dembo et al.~\cite{Dembo1982} und koppelt die innere Toleranz an das äußere Residuum.
+Mit
+\begin{equation}
+	\epsilon_V^{(\ell)}
+	= \max_{k\in\mathcal{PV}}
+	\bigl|\,|v_k^{(\ell)}| - |V_k^{\spec}|\,\bigr|
+\end{equation}
+wird die in der Iteration $\ell$ wirksame innere Toleranz zu
+\begin{equation}
+	\epsilon_\mathrm{in}^{(\ell)}
+	= \max\Bigl\{\epsilon_\mathrm{in}^{\min},\;
+	\epsilon_V^{(\ell-1)}\Bigr\},\quad
+	\epsilon_\mathrm{in}^{\min}=10^{-6}\,\text{p.u.}
+	\label{eq:adaptive_tol}
+\end{equation}
+gesetzt, wobei $\epsilon_V^{(\ell-1)}$ aus dem Spannungszustand zu Beginn der
+äußeren Iteration ausgewertet
+wird. 
+Solange das äußere Residuum groß
+ist, genügt eine grobe innere Lösung. Mit fallendem $\epsilon_V^{(\ell)}$
+verschärft sich die Forderung automatisch. Das Maximum in
+Gl.~\eqref{eq:adaptive_tol} wirkt als Untergrenze und stellt sicher, dass die
+innere Toleranz die Endgenauigkeit $\epsilon_\mathrm{in}^{\min}$ nie
+unterschreitet. \\
+
+Voraussetzung für die Wirksamkeit ist der in
+Abschnitt~\ref{subsec:ergebnisse_warmstart} eingeführte Warm Start. Nur wenn der
+unvollständig konvergierte Spannungszustand als Startwert der nächsten inneren
+Schleife übernommen wird, geht der abgebrochene Lösungsfortschritt nicht
+verloren. \\
+
+
+
+Abbildung~\ref{fig:adaptive_inner_comparison} stellt beide Varianten für dasselbe
+40-Knoten-Netz gegenüber und macht die Wirkung der Toleranzkopplung unmittelbar
+sichtbar. Bei fixierter innerer Toleranz (oberer Verlauf) bleibt das in
+Abschnitt~\ref{subsec:ergebnisse_warmstart} beschriebene Sägezahnmuster in
+vollem Umfang erhalten. 
+Der adaptive Verlauf (unterer Teil) zeigt dieses Muster nicht mehr. Da die
+innere Schleife nach Gl.~\eqref{eq:adaptive_tol} bereits abbricht, sobald die
+Schrittweite unter $\epsilon_V^{(\ell-1)}$ fällt, genügen in den frühen
+äußeren Iterationen wenige innere
+Iterationen. Das Sägezahnmuster minimiert sich dadurch. Der verbleibende, gegen Ende leicht flachere
+Bereich entspricht der Phase, in der die Untergrenze
+$\epsilon_\mathrm{in}^{\min}$ greift und die innere Schleife wieder auf volle
+Genauigkeit gelöst wird.\\
+
+Quantitativ reduziert sich die Gesamtzahl der inneren Iterationen im gezeigten
+Beispiel von etwa $55$ auf etwa $23$, also um mehr als die Hälfte.  Die adaptive
+Toleranz beschleunigt die Auswertung der äußeren Residuumsfunktion, ohne die
+äußere Konvergenzrate zu verschlechtern. Dies bestätigt die theoretische
+Erwartung an ein inexaktes Newton-Verfahren. Solange die innere Genauigkeit
+proportional zum äußeren Residuum mitgeführt wird, bleibt die Korrekturrichtung
+$\Delta\vect{Q}^{(\ell)}$ hinreichend genau, um die äußere Konvergenz zu tragen.
+Die Genauigkeit der Endlösung ist ebenfalls unbeeinflusst, da das äußere
+Abbruchkriterium unverändert am tatsächlichen Spannungsresiduum
+$\epsilon_V^{(\ell)}$ geprüft wird und der Fixpunkt allein durch die exakt
+gelöste letzte innere Schleife definiert ist.\\
+
+\begin{figure}[H]
+	\centering
+	\input{figures/salazar_adaptive_speedup.pgf}
+	\caption{Einsparung der Iterationen
+		$\mathrm{Iter}_\mathrm{fix}/\mathrm{Iter}_\mathrm{adapt}$ der adaptiven
+		inneren Toleranz gegenüber der fixierten Toleranz, aufgetragen über der
+		Netzgröße $n_\mathrm{bus}$. Jeder Boxplot fasst die Ergebnisse mehrerer
+		PV-Anteile derselben Netzgröße zusammen. Die Box umfasst den
+		Interquartilsabstand, die horizontale Linie den Median, die Raute den
+		Mittelwert, die Whisker den $1{,}5$-fachen Interquartilsabstand und die
+		Kreise die außerhalb liegenden Einzelkonfigurationen.}
+	\label{fig:salazar_adaptive_speedup}
+\end{figure}
+
+Um die Effektivität dieser Maßnahme beurteilen zu können, werden in Abbildung \ref{fig:salazar_adaptive_speedup} die Einsparungen der Anzahl an Iterationen für verschiedene Netze aufgetragen. Dabei werden Netzgrößen bis zu 1000 Bussen analysiert. Dabei entspricht ein Eintrag in der Abbildung einer Netzgröße bei verschiedenen PV-Bus Anteilen (bis 60\%).
+Hier ist zumal Erkennbar, dass die Einsparung je nach Größe durchaus schwankt und besonders bei dem großen 1000-Knoten-Netz eine kleinerer Beitrag erkennbar ist. 
+Dieser Abfall der Einsparung ist konsistent mit der Erwartung, da größere Netze längere Pfade enthalten die Kontraktion insgesamt geringer ausfällt.
+Dennoch ist im Durchschnitt mit einer Einsparung von $\sim 1.6$, entsprechend einer Einsparung von rund einem
+Drittel der Iterationen, zu rechnen. Bei einzelnen Netzkonfigurationen ist darüber hinaus eine Beschleunigung vom Faktor 3 möglich.\\
+
+Insgesamt bestätigt
+Abbildung~\ref{fig:salazar_adaptive_speedup} damit die Übertragbarkeit des am
+40-Knoten-Netz demonstrierten Verhaltens auf den gesamten untersuchten
+Größenbereich. Die adaptive innere Toleranz wird daher in allen folgenden
+Untersuchungen gemeinsam mit dem Warm Start als Standardeinstellung verwendet.
+
+
+
+
+
+
+\section{Einzelner Lastfluss}
+
+
