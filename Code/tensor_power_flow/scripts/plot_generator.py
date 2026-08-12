@@ -1,4 +1,4 @@
-USE_PGF = False
+USE_PGF = True
 
 import sys
 import os
@@ -1510,6 +1510,119 @@ def plot_timing_vs_pv_ratio(save_name="timing_vs_pv_ratio.pgf"):
     plt.close(fig)
 
 
+def plot_subplot_c_from_csv(save_name="timing_vs_size_from_csv.pgf"):
+    """
+    Plot subplot (c): Solver time vs network size (n_bus) - boxplot.
+    Reads data from the CSV file exported by validation suite.
+    """
+    import csv
+    from collections import defaultdict
+
+    # csv_path = Path(
+    #     r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Code\tensor_power_flow\tau_benchmark_results\validation_salazar_scaling_w1.0_20260806_170258.csv")
+    # csv_path = Path(
+    #     r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Code\tensor_power_flow\tau_benchmark_results\test.csv")
+    csv_path = Path(
+        r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Code\tensor_power_flow\scripts\tau_benchmark_results\test2.csv")
+
+    if not csv_path.exists():
+        print(f"  ! CSV file not found: {csv_path}")
+        return
+
+    print(f"  Reading timing data from: {csv_path}")
+
+    with open(csv_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        records = list(reader)
+
+    nr_by_size = defaultdict(list)
+    tpf_by_size = defaultdict(list)
+    sparse_by_size = defaultdict(list)
+    has_sparse = False
+
+    for r in records:
+        try:
+            n_bus = int(r["n_bus"])
+            nr_time = float(r["nr_time_ms"]) if r.get("nr_time_ms") else np.nan
+            tpf_time = float(r["tpf_time_ms"]) if r.get("tpf_time_ms") else np.nan
+            sparse_time = float(r["sparse_time_ms"]) if r.get("sparse_time_ms") else np.nan
+
+            if nr_time > 0 and not np.isnan(nr_time):
+                nr_by_size[n_bus].append(nr_time)
+            if tpf_time > 0 and not np.isnan(tpf_time):
+                tpf_by_size[n_bus].append(tpf_time)
+            if sparse_time > 0 and not np.isnan(sparse_time):
+                sparse_by_size[n_bus].append(sparse_time)
+                has_sparse = True
+        except (ValueError, KeyError):
+            continue
+
+    sizes = sorted(nr_by_size.keys())
+    if not sizes:
+        print("  ! No valid timing data found")
+        return
+
+    print(f"  Found data for {len(sizes)} sizes: {sizes}, sparse={has_sparse}")
+
+    fig, ax = plt.subplots(figsize=(5.91, 4.5))
+    box_width = 0.18
+
+    pos_nr = np.arange(len(sizes)) - box_width
+    pos_tpf = np.arange(len(sizes))
+    pos_sparse = np.arange(len(sizes)) + box_width if has_sparse else None
+
+    ax.boxplot([nr_by_size[s] for s in sizes], positions=pos_nr, widths=box_width * 0.8,
+               patch_artist=True,
+               boxprops=dict(facecolor="tab:red", alpha=0.6),
+               medianprops=dict(color="darkred", linewidth=1.5),
+               whiskerprops=dict(color="tab:red", linewidth=1.2),
+               capprops=dict(color="tab:red", linewidth=1.2),
+               flierprops=dict(marker="s", markerfacecolor="tab:red", markersize=4, alpha=0.6))
+
+    ax.boxplot([tpf_by_size[s] for s in sizes], positions=pos_tpf, widths=box_width * 0.8,
+               patch_artist=True,
+               boxprops=dict(facecolor="tab:blue", alpha=0.6),
+               medianprops=dict(color="darkblue", linewidth=1.5),
+               whiskerprops=dict(color="tab:blue", linewidth=1.2),
+               capprops=dict(color="tab:blue", linewidth=1.2),
+               flierprops=dict(marker="o", markerfacecolor="tab:blue", markersize=4, alpha=0.6))
+
+    if has_sparse:
+        ax.boxplot([sparse_by_size[s] for s in sizes], positions=pos_sparse, widths=box_width * 0.8,
+                   patch_artist=True,
+                   boxprops=dict(facecolor="tab:green", alpha=0.6),
+                   medianprops=dict(color="darkgreen", linewidth=1.5),
+                   whiskerprops=dict(color="tab:green", linewidth=1.2),
+                   capprops=dict(color="tab:green", linewidth=1.2),
+                   flierprops=dict(marker="^", markerfacecolor="tab:green", markersize=4, alpha=0.6))
+
+    ax.set_xticks(range(len(sizes)))
+    ax.set_xticklabels(sizes)
+    ax.set_xlim(-0.5, len(sizes) - 0.5)
+    ax.set_yscale("log")
+    ax.set_xlabel(r"$n_{\mathrm{bus}}$", fontsize=12)
+    ax.set_ylabel("Rechenzeit [ms]", fontsize=12)
+    ax.grid(True, which="both", alpha=0.3)
+
+    legend_items = [
+        plt.Rectangle((0, 0), 1, 1, fc="tab:red", alpha=0.6),
+        plt.Rectangle((0, 0), 1, 1, fc="tab:blue", alpha=0.6),
+    ]
+    legend_labels = ["NR (pandapower)", "TPF Methode A (dense)"]
+    if has_sparse:
+        legend_items.append(plt.Rectangle((0, 0), 1, 1, fc="tab:green", alpha=0.6))
+        legend_labels.append("TPF Methode A (sparse)")
+    ax.legend(legend_items, legend_labels, fontsize=9, loc="upper left")
+
+    plt.tight_layout()
+    save_path = SAVE_DIR / save_name
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    print(f"\n  Plot saved: {save_path}")
+    if not USE_PGF:
+        plt.show()
+    plt.close(fig)
+
 if __name__ == "__main__":
     # print_salazar_scaling_table()
     # plot_max_pv_convergence()
@@ -1521,5 +1634,6 @@ if __name__ == "__main__":
     # plot_salazar_adaptive_speedup()
     # plot_pq_scaling_time()
     # plot_baseline_tpf_vs_nr()
-    plot_timing_vs_size()
+    # plot_timing_vs_size()
+    plot_subplot_c_from_csv()
     # plot_timing_vs_pv_ratio()
