@@ -1,0 +1,7 @@
+mode,variant,konv_quote,outer_med,inner_med,rho_star_med,n
+const_x,coupled,0.7435897435897436,3.0,16.0,4.6416,117
+const_x,decoupled,0.09401709401709402,32.0,115.0,0.1,117
+const_x,exact,0.0,,,0.1,117
+const_z,coupled,0.8888888888888888,3.0,16.5,7.3208,117
+const_z,decoupled,0.1282051282051282,31.0,114.0,0.1,117
+const_z,exact,0.0,,,0.1,117

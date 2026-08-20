@@ -1,0 +1,137 @@
+==================================================================================
+KENNZAHLEN  Abschnitt 'Mehrere Lastfluesse'
+==================================================================================
+Laeufe (aktueller Stand): 109
+Szenarien gesamt        : 1 733 271
+min(conv_frac)          : 1.000000
+Wiederholungen          : [np.int64(5)]
+warm_mode               : ['flat']
+tau-Stuetzstellen       : [np.int64(1), np.int64(10), np.int64(50), np.int64(100), np.int64(500), np.int64(1000), np.int64(5000), np.int64(10000), np.int64(50000), np.int64(100000)]
+
+--- Vorberechnung (Median je Netzgroesse, ms) ---
+  n=  40:     0.14  (min    0.05, max     0.30, Streufaktor  5.8)
+  n= 200:    62.83  (min   14.63, max   208.70, Streufaktor 14.3)
+  n= 500:   152.35  (min   50.37, max   254.24, Streufaktor  5.0)
+  n=1000:   255.91  (min  156.95, max   560.03, Streufaktor  3.6)
+
+--- Anteil Vorberechnung / tau mit t_pre = t_solve ---
+  n=40.0 pv=0.0%: tau=1  45.3%, tau=100000.0  0.02%, Umschlag bei tau=     21, Gewinn tau=1 -> Plateau x  30.9
+  n=40.0 pv=30.0%: tau=1  19.3%, tau=100000.0  0.01%, Umschlag bei tau=      4, Gewinn tau=1 -> Plateau x  23.6
+  n=40.0 pv=50.0%: tau=1  26.3%, tau=100000.0  0.01%, Umschlag bei tau=      4, Gewinn tau=1 -> Plateau x  16.9
+  n=200.0 pv=0.0%: tau=1  93.7%, tau=100000.0  0.55%, Umschlag bei tau=    550, Gewinn tau=1 -> Plateau x 213.2
+  n=200.0 pv=30.0%: tau=1  79.0%, tau=100000.0  0.30%, Umschlag bei tau=    176, Gewinn tau=1 -> Plateau x  78.1
+  n=200.0 pv=50.0%: tau=1  80.2%, tau=100000.0  0.12%, Umschlag bei tau=    138, Gewinn tau=1 -> Plateau x  93.2
+  n=500.0 pv=0.0%: tau=1  96.0%, tau=100000.0  0.35%, Umschlag bei tau=    313, Gewinn tau=1 -> Plateau x 117.0
+  n=500.0 pv=30.0%: tau=1  84.4%, tau=100000.0  0.07%, Umschlag bei tau=     67, Gewinn tau=1 -> Plateau x  50.0
+  n=500.0 pv=50.0%: tau=1  92.0%, tau=100000.0  0.05%, Umschlag bei tau=     48, Gewinn tau=1 -> Plateau x  60.1
+  n=1000.0 pv=0.0%: tau=1  96.1%, tau=100000.0  0.15%, Umschlag bei tau=    123, Gewinn tau=1 -> Plateau x  79.2
+  n=1000.0 pv=30.0%: tau=1  89.2%, tau=50000.0  0.04%, Umschlag bei tau=     22, Gewinn tau=1 -> Plateau x  28.0
+  Gewinn-Spanne: 17 .. 213 (Median 60)
+
+--- Plateau (Median ueber tau >= 10000) ---
+    n  pv%  n_pv  k_in k_out k_in/k_out   ms/Szen   Szen/s   GF/s  NR ms  SU roh  SU korr tau* roh tau* korr
+   40    0     0     6     0        nan    0.0067   149241   11.0   16.1  2405.6   1621.6      1.0       1.0
+   40   30    12    26     5        5.2    0.0336    29754    9.5   17.3   513.5    322.0      1.0       1.0
+   40   50    20    27     5        5.4    0.0372    26880    8.9   16.3   437.1    266.5      1.0       1.0
+  200    0     0    12     0        nan    0.1143     8746   33.5   19.3   169.1    115.9      1.0       1.1
+  200   30    60    46     6        7.7    0.3572     2800   41.1   18.5    51.9     29.4      1.0       1.2
+  200   50   100    52     7        7.4    0.4537     2204   36.2   19.7    43.5     26.8      1.5       2.5
+  500    0     0    19     0        nan    0.4871     2053   78.0   20.1    41.3     27.6      2.0       2.9
+  500   30   150    89     8       11.1    2.2739      440   78.7   21.4     9.4      5.9     11.2      19.7
+  500   50   250   123    10       12.3    3.1765      315   77.4   20.9     6.6      4.1     12.1      22.2
+ 1000    0     0    27     0        nan    2.0883      479  103.5   22.8    10.9      7.5     11.7      18.0
+ 1000   30   300   137     9       15.2   11.8139       85   93.0   28.3     2.4      1.5     19.0      32.1
+  max. tau* (korr.): 32.1
+
+--- PV-Anteil: Verhaeltnisse zu 0 % PV (aktueller Stand) ---
+  n=  40 pv=30.0% (n_pv=12.0): k_in x 4.33   t_inf x 5.02   P  11.0 ->   9.5   Erwartung aus k_in und P: x 5.06
+  n=  40 pv=50.0% (n_pv=20.0): k_in x 4.50   t_inf x 5.55   P  11.0 ->   8.9   Erwartung aus k_in und P: x 5.59
+  n= 200 pv=30.0% (n_pv=60.0): k_in x 3.83   t_inf x 3.12   P  33.5 ->  41.1   Erwartung aus k_in und P: x 3.13
+  n= 200 pv=50.0% (n_pv=100.0): k_in x 4.33   t_inf x 3.97   P  33.5 ->  36.2   Erwartung aus k_in und P: x 4.01
+  n= 500 pv=30.0% (n_pv=150.0): k_in x 4.68   t_inf x 4.67   P  78.0 ->  78.7   Erwartung aus k_in und P: x 4.64
+  n= 500 pv=50.0% (n_pv=250.0): k_in x 6.47   t_inf x 6.52   P  78.0 ->  77.4   Erwartung aus k_in und P: x 6.53
+  n=1000 pv=30.0% (n_pv=300.0): k_in x 5.07   t_inf x 5.66   P 103.5 ->  93.0   Erwartung aus k_in und P: x 5.64
+
+--- PV-Diagnostik (X_pp) ---
+  n=40.0 pv=30.0% n_pv=12.0: cond=    15.1  rho_Jacobi=  1.36  min(diag/off)=0.5000  |Q|max= 2.28 p.u.  k_out=5.0  k_in/k_out=  5.2 (PQ: 6)
+  n=40.0 pv=50.0% n_pv=20.0: cond=    80.3  rho_Jacobi=  5.23  min(diag/off)=0.1429  |Q|max= 4.06 p.u.  k_out=5.0  k_in/k_out=  5.4 (PQ: 6)
+  n=200.0 pv=30.0% n_pv=60.0: cond=   231.4  rho_Jacobi= 11.13  min(diag/off)=0.0435  |Q|max= 1.38 p.u.  k_out=6.0  k_in/k_out=  7.7 (PQ: 12)
+  n=200.0 pv=50.0% n_pv=100.0: cond=   377.1  rho_Jacobi= 15.81  min(diag/off)=0.0256  |Q|max= 3.36 p.u.  k_out=7.0  k_in/k_out=  7.4 (PQ: 12)
+  n=500.0 pv=30.0% n_pv=150.0: cond=   573.8  rho_Jacobi= 22.23  min(diag/off)=0.0183  |Q|max= 2.55 p.u.  k_out=8.0  k_in/k_out= 11.1 (PQ: 19)
+  n=500.0 pv=50.0% n_pv=250.0: cond=  1208.0  rho_Jacobi= 39.18  min(diag/off)=0.0112  |Q|max= 3.43 p.u.  k_out=10.0  k_in/k_out= 12.3 (PQ: 19)
+  n=1000.0 pv=30.0% n_pv=300.0: cond=   872.2  rho_Jacobi= 32.71  min(diag/off)=0.0125  |Q|max= 2.56 p.u.  k_out=9.0  k_in/k_out= 15.2 (PQ: 27)
+
+--- Ensembleeffekt und Spannungen ---
+  n=40.0 pv=0.0%: k_in 5.0 -> 6.0   k_out 0.0 -> 0.0   v_min,min 0.9984 -> 0.9966
+  n=40.0 pv=30.0%: k_in 23.0 -> 26.0   k_out 5.0 -> 5.0   v_min,min 0.9980 -> 0.9980
+  n=40.0 pv=50.0%: k_in 23.0 -> 27.0   k_out 5.0 -> 5.0   v_min,min 0.9993 -> 0.9992
+  n=200.0 pv=0.0%: k_in 9.0 -> 12.0   k_out 0.0 -> 0.0   v_min,min 0.9841 -> 0.9643
+  n=200.0 pv=30.0%: k_in 37.0 -> 46.0   k_out 6.0 -> 6.0   v_min,min 0.9728 -> 0.9728
+  n=200.0 pv=50.0%: k_in 41.0 -> 52.0   k_out 6.0 -> 7.0   v_min,min 0.9664 -> 0.9663
+  n=500.0 pv=0.0%: k_in 13.0 -> 19.0   k_out 0.0 -> 0.0   v_min,min 0.9600 -> 0.8951
+  n=500.0 pv=30.0%: k_in 60.0 -> 89.0   k_out 7.0 -> 8.0   v_min,min 0.9490 -> 0.9479
+  n=500.0 pv=50.0%: k_in 61.0 -> 123.0   k_out 7.0 -> 10.0   v_min,min 0.9498 -> 0.9496
+  n=1000.0 pv=0.0%: k_in 14.0 -> 27.0   k_out 0.0 -> 0.0   v_min,min 0.9463 -> 0.8418
+  n=1000.0 pv=30.0%: k_in 63.0 -> 137.0   k_out 7.0 -> 9.0   v_min,min 0.9490 -> 0.9478
+
+--- Genauigkeit gegen NR (nur gemessene Referenz) ---
+  PQ : dv_max 1.22e-11 p.u., dtheta_max 3.11e-10 deg
+  PV : dv_max 1.00e-09 p.u., dtheta_max 2.33e-08 deg
+  max. pv_v_err_max 1.00e-09 p.u., max |Q| 4.06 p.u.
+
+--- Jahreszeitreihe 15 min (tau = 35040) ---
+  n=40.0 pv=0.0%: TPF     0.23 s   NR    564.8 s (  9.4 min)   Faktor 2405.6
+  n=40.0 pv=30.0%: TPF     1.18 s   NR    604.8 s ( 10.1 min)   Faktor  513.5
+  n=40.0 pv=50.0%: TPF     1.30 s   NR    569.8 s (  9.5 min)   Faktor  437.1
+  n=200.0 pv=0.0%: TPF     4.01 s   NR    677.3 s ( 11.3 min)   Faktor  169.1
+  n=200.0 pv=30.0%: TPF    12.52 s   NR    649.2 s ( 10.8 min)   Faktor   51.9
+  n=200.0 pv=50.0%: TPF    15.90 s   NR    691.3 s ( 11.5 min)   Faktor   43.5
+  n=500.0 pv=0.0%: TPF    17.07 s   NR    705.2 s ( 11.8 min)   Faktor   41.3
+  n=500.0 pv=30.0%: TPF    79.68 s   NR    749.5 s ( 12.5 min)   Faktor    9.4
+  n=500.0 pv=50.0%: TPF   111.30 s   NR    733.1 s ( 12.2 min)   Faktor    6.6
+  n=1000.0 pv=0.0%: TPF    73.17 s   NR    798.9 s ( 13.3 min)   Faktor   10.9
+  n=1000.0 pv=30.0%: TPF   413.96 s   NR    993.1 s ( 16.6 min)   Faktor    2.4
+
+==================================================================================
+ALT-SWEEP (frueherer Solverstand, Abb. 2)
+==================================================================================
+Dateien: 30, Messkampagnen: ['20260714_011946', '20260714_132034', '20260714_202744', '20260716_151615', '20260727_195637']
+verworfene Doppelmessungen: ['tau_scaling_sz_500_r000_20260714_194609.csv']
+    n  pv%  n_pv   ms/Szen   x PQ   NR ms  t_ges(tau_max)     SU div ab tau         Kampagne
+   20    0     0    0.0674   1.00   18.68             6.1 316.51          -  20260714_011946
+   20    5     1    0.0604   0.90   19.20             6.3 303.50          -  20260714_011946
+   20   10     2    0.0266   0.39   17.83             3.5 516.64          -  20260714_011946
+   20   20     4    0.0544   0.81   18.14             6.7 271.00          -  20260714_011946
+   20   30     6    0.0528   0.78   18.16             6.7 271.10          -  20260714_011946
+   20   40     8    0.0485   0.72   17.94             5.3 336.14          -  20260714_011946
+   20   50    10    0.0939   1.39   18.21             9.4 192.81          -  20260714_011946
+   20   60    12    0.0951   1.41   18.23             9.6 189.22          -  20260714_011946
+   40    0     0    0.0584   1.00   18.12             6.4 283.84          -  20260714_011946
+   40    5     2    0.0581   0.99   18.13             6.5 279.25          -  20260714_011946
+   40   10     4    0.0621   1.06   18.19             6.8 268.89          -  20260714_011946
+   40   20     8    0.1875   3.21   18.48            19.2  96.14          -  20260714_011946
+   40   30    12    0.2456   4.20   18.50            24.6  74.74          -  20260714_011946
+   40   40    16    0.1685   2.88   21.77            23.5  92.50          -  20260727_195637
+   40   50    20    0.2143   3.67   19.41            21.4  82.90          -  20260727_195637
+   40   60    24    0.2953   5.05   17.76            29.5  60.25          -  20260727_195637
+   75    0     0    0.1890   1.00   17.82            18.9  95.92          -  20260727_195637
+   75    5     4    0.1909   1.01   17.81            19.1  93.33          -  20260727_195637
+   75   10     8    0.1665   0.88   17.71            20.4  87.01          -  20260727_195637
+   75   20    15    0.1983   1.05   17.81            20.8  85.72          -  20260727_195637
+   75   30    22    0.8167   4.32   18.32            83.6  21.92          -  20260727_195637
+  500    0     0    3.0895   1.00   22.65           342.8   7.14          -  20260714_132034
+  500    2    10    6.4339   2.08   25.68           630.5   3.86          -  20260714_132034
+  500    5    25    6.9865   2.26   23.65           672.1   3.59          -  20260714_132034
+  500   10    50   12.4652   4.03   28.59          1246.5   2.40          -  20260714_132034
+  750    0     0   18.1395   1.00   25.17          1814.0   1.53       1000  20260716_151615
+  750    2    15   20.6857   1.14   26.09          2078.4   1.26       1000  20260716_151615
+ 1000    0     0   20.4705   1.00   27.47          2008.2   1.42          -  20260714_202744
+ 1000    2    20   34.0749   1.66   48.19          4507.6   1.07       1000  20260714_202744
+ 1000    5    50   54.6113   2.67   48.28          5512.0   0.88       1000  20260714_202744
+
+--- Alt gegen aktuell (gleiche (n, pv)) ---
+  n=  40 pv= 0%: TPF   0.0584 ->   0.0067 ms/Szen (x 8.72)   NR  18.12 ->  16.12 ms (x1.12)
+  n=  40 pv=30%: TPF   0.2456 ->   0.0336 ms/Szen (x 7.31)   NR  18.50 ->  17.26 ms (x1.07)
+  n=  40 pv=50%: TPF   0.2143 ->   0.0372 ms/Szen (x 5.76)   NR  19.41 ->  16.26 ms (x1.19)
+  n= 500 pv= 0%: TPF   3.0895 ->   0.4871 ms/Szen (x 6.34)   NR  22.65 ->  20.12 ms (x1.13)
+  n=1000 pv= 0%: TPF  20.4705 ->   2.0883 ms/Szen (x 9.80)   NR  27.47 ->  22.80 ms (x1.20)

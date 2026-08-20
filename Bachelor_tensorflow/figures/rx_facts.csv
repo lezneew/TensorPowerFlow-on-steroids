@@ -1,0 +1,251 @@
+key,value,unit,note
+inner.eta_fit_vs_emp_max_pct,0.746,%,Konsistenz Log-Fit gegen empirische Rate
+inner.fit_r2_min,0.148466,,kleinstes R^2 des geometrischen Fits
+inner.crossing.rho,0.147,,|z| in beiden Modi gleich
+inner.eta_lo.const_x.n40,0.01292,,
+inner.eta_hi.const_x.n40,0.17845,,bei rho=10
+inner.eta_growth.const_x.n40,13.81,,
+inner.eta_rise_pct.const_x.n40,1281.0,%,
+inner.vmin_lo.const_x.n40,0.9971,p.u.,
+inner.vmin_hi.const_x.n40,0.832,p.u.,
+inner.k_lo.const_x.n40,7.0,,
+inner.k_hi.const_x.n40,16.0,,
+inner.eta_pred_hi.const_x.n40,0.1856,,eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+inner.pred_err_pct.const_x.n40,4.01,%,
+inner.vmin_factor.const_x.n40,1.436,,
+inner.k_pred_lo.const_x.n40,6.4,,ln(tol)/ln(eta)
+inner.k_pred_hi.const_x.n40,16.0,,ln(tol)/ln(eta)
+inner.eta_lo.const_z.n40,0.01302,,
+inner.eta_hi.const_z.n40,0.0133,,bei rho=10
+inner.eta_growth.const_z.n40,1.02,,
+inner.eta_rise_pct.const_z.n40,2.2,%,
+inner.vmin_lo.const_z.n40,0.9971,p.u.,
+inner.vmin_hi.const_z.n40,0.9855,p.u.,
+inner.k_lo.const_z.n40,7.0,,
+inner.k_hi.const_z.n40,7.0,,
+inner.eta_pred_hi.const_z.n40,0.01333,,eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+inner.pred_err_pct.const_z.n40,0.2,%,
+inner.vmin_factor.const_z.n40,1.024,,
+inner.k_pred_lo.const_z.n40,6.4,,ln(tol)/ln(eta)
+inner.k_pred_hi.const_z.n40,6.4,,ln(tol)/ln(eta)
+inner.eta_lo.const_x.n120,0.0336,,
+inner.eta_hi.const_x.n120,0.53432,,bei rho=6.8129
+inner.eta_growth.const_x.n120,15.9,,
+inner.eta_rise_pct.const_x.n120,1490.1,%,
+inner.vmin_lo.const_x.n120,0.9924,p.u.,
+inner.vmin_hi.const_x.n120,0.6231,p.u.,
+inner.k_lo.const_x.n120,9.0,,
+inner.k_hi.const_x.n120,42.0,,
+inner.eta_pred_hi.const_x.n120,0.58391,,eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+inner.pred_err_pct.const_x.n120,9.28,%,
+inner.vmin_factor.const_x.n120,2.536,,
+inner.k_pred_lo.const_x.n120,8.1,,ln(tol)/ln(eta)
+inner.k_pred_hi.const_x.n120,44.1,,ln(tol)/ln(eta)
+inner.eta_lo.const_z.n120,0.03387,,
+inner.eta_hi.const_z.n120,0.03583,,bei rho=10
+inner.eta_growth.const_z.n120,1.06,,
+inner.eta_rise_pct.const_z.n120,5.8,%,
+inner.vmin_lo.const_z.n120,0.9923,p.u.,
+inner.vmin_hi.const_z.n120,0.9629,p.u.,
+inner.k_lo.const_z.n120,9.0,,
+inner.k_hi.const_z.n120,9.0,,
+inner.eta_pred_hi.const_z.n120,0.03597,,eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+inner.pred_err_pct.const_z.n120,0.4,%,
+inner.vmin_factor.const_z.n120,1.062,,
+inner.k_pred_lo.const_z.n120,8.2,,ln(tol)/ln(eta)
+inner.k_pred_hi.const_z.n120,8.3,,ln(tol)/ln(eta)
+inner.eta_lo.const_x.n350,0.10843,,
+inner.eta_hi.const_x.n350,0.62632,,bei rho=2.1544
+inner.eta_growth.const_x.n350,5.78,,
+inner.eta_rise_pct.const_x.n350,477.6,%,
+inner.vmin_lo.const_x.n350,0.9727,p.u.,
+inner.vmin_hi.const_x.n350,0.6045,p.u.,
+inner.k_lo.const_x.n350,13.0,,
+inner.k_hi.const_x.n350,55.0,,
+inner.eta_pred_hi.const_x.n350,0.66364,,eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+inner.pred_err_pct.const_x.n350,5.96,%,
+inner.vmin_factor.const_x.n350,2.59,,
+inner.k_pred_lo.const_x.n350,12.4,,ln(tol)/ln(eta)
+inner.k_pred_hi.const_x.n350,59.1,,ln(tol)/ln(eta)
+inner.eta_lo.const_z.n350,0.10934,,
+inner.eta_hi.const_z.n350,0.13306,,bei rho=10
+inner.eta_growth.const_z.n350,1.22,,
+inner.eta_rise_pct.const_z.n350,21.7,%,
+inner.vmin_lo.const_z.n350,0.9725,p.u.,
+inner.vmin_hi.const_z.n350,0.8774,p.u.,
+inner.k_lo.const_z.n350,13.0,,
+inner.k_hi.const_z.n350,14.0,,
+inner.eta_pred_hi.const_z.n350,0.13432,,eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+inner.pred_err_pct.const_z.n350,0.94,%,
+inner.vmin_factor.const_z.n350,1.228,,
+inner.k_pred_lo.const_z.n350,12.5,,ln(tol)/ln(eta)
+inner.k_pred_hi.const_z.n350,13.7,,ln(tol)/ln(eta)
+inner.eta_max_success,0.626,,
+inner.nonconv.eta_1.const_x.n120.rho10,3.732,,
+inner.nonconv.eta_2.const_x.n120.rho10,1.928,,
+inner.nonconv.eta_inf.const_x.n120.rho10,1.908,,
+inner.nonconv.v_min.const_x.n120.rho10,0.432,,
+inner.nonconv.eta_1.const_x.n350.rho3.1623,5.284,,
+inner.nonconv.eta_2.const_x.n350.rho3.1623,2.28,,
+inner.nonconv.eta_inf.const_x.n350.rho3.1623,2.16,,
+inner.nonconv.v_min.const_x.n350.rho3.1623,0.405,,
+inner.nonconv.eta_1.const_x.n350.rho4.6416,4.157,,
+inner.nonconv.eta_2.const_x.n350.rho4.6416,1.794,,
+inner.nonconv.eta_inf.const_x.n350.rho4.6416,1.699,,
+inner.nonconv.v_min.const_x.n350.rho4.6416,0.546,,
+inner.nonconv.eta_1.const_x.n350.rho6.8129,5.896,,
+inner.nonconv.eta_2.const_x.n350.rho6.8129,2.544,,
+inner.nonconv.eta_inf.const_x.n350.rho6.8129,2.411,,
+inner.nonconv.v_min.const_x.n350.rho6.8129,0.552,,
+inner.nonconv.eta_1.const_x.n350.rho10,3.701,,
+inner.nonconv.eta_2.const_x.n350.rho10,1.597,,
+inner.nonconv.eta_inf.const_x.n350.rho10,1.513,,
+inner.nonconv.v_min.const_x.n350.rho10,0.842,,
+kappa.mean.n40,0.0129,,
+kappa.spread_pct.n40,3.4,%,
+kappa.points.n40,26,,
+kappa.mean.n120,0.0331,,
+kappa.spread_pct.n120,7.7,%,
+kappa.points.n120,25,,
+kappa.mean.n350,0.1026,,
+kappa.spread_pct.n350,4.9,%,
+kappa.points.n350,22,,
+kappa.spread_pct_max,7.7,%,
+kappa.exponent_in_n,0.956,,log-log-Fit kappa_bar(n)
+kappa.kappa1,0.000293,,"kappa_bar/n, Vorfaktor in Gl. eta-empirisch"
+kappa.from_eta2.n120.const_x.rho10,0.036,,Einordnung des divergenten Laufs
+kappa.from_eta2.n350.const_x.rho3.1623,0.114,,Einordnung des divergenten Laufs
+kappa.from_eta2.n350.const_x.rho4.6416,0.114,,Einordnung des divergenten Laufs
+kappa.from_eta2.n350.const_x.rho6.8129,0.114,,Einordnung des divergenten Laufs
+kappa.from_eta2.n350.const_x.rho10,0.114,,Einordnung des divergenten Laufs
+outer.q_growth.pv0.10,20.2,,
+outer.sens_slope.pv0.10,1.21,,log-log-Steigung eps_lin(rho)
+outer.q_growth.pv0.25,30.1,,
+outer.sens_slope.pv0.25,1.19,,log-log-Steigung eps_lin(rho)
+outer.q_growth.pv0.50,18.7,,
+outer.sens_slope.pv0.50,1.19,,log-log-Steigung eps_lin(rho)
+outer.lever_expected,10.0,,sqrt(1+rho^2) ueber den Sweep
+outer.sens_corr_q,0.75,,
+outer.inner_per_outer_conv_med,4.5,,
+outer.inner_per_outer.Divergenz,114.6-196.8,,
+outer.inner_per_outer.Grenzzyklus,5.0-5.2,,
+outer.k_max_below_limit,17,,max. k_out fuer eps_lin<=0.6
+outer.ms_per_inner_slope.n40,-0.12,,
+outer.ms_per_inner_slope.n120,-0.18,,
+outer.ms_per_inner_slope.n350,-0.84,,
+outer.quote.const_x.coupled,74.4,%,117 Laeufe
+outer.k_out_med.const_x.coupled,3.0,,
+outer.k_in_med.const_x.coupled,16.0,,
+outer.rho_star_med.const_x.coupled,4.64,,
+outer.quote.const_x.decoupled,9.4,%,117 Laeufe
+outer.k_out_med.const_x.decoupled,32.0,,
+outer.k_in_med.const_x.decoupled,115.0,,
+outer.rho_star_med.const_x.decoupled,0.1,,
+outer.quote.const_x.exact,0.0,%,117 Laeufe
+outer.rho_star_med.const_x.exact,0.1,,
+outer.quote.const_z.coupled,88.9,%,117 Laeufe
+outer.k_out_med.const_z.coupled,3.0,,
+outer.k_in_med.const_z.coupled,16.5,,
+outer.rho_star_med.const_z.coupled,7.32,,
+outer.quote.const_z.decoupled,12.8,%,117 Laeufe
+outer.k_out_med.const_z.decoupled,31.0,,
+outer.k_in_med.const_z.decoupled,114.0,,
+outer.rho_star_med.const_z.decoupled,0.1,,
+outer.quote.const_z.exact,0.0,%,117 Laeufe
+outer.rho_star_med.const_z.exact,0.1,,
+xpp.cond_xpp_var_pct.n40.pv0.10,0.0,%,Variation ueber rho
+xpp.rho_jacobi_var_pct.n40.pv0.10,0.0,%,Variation ueber rho
+xpp.diag_dom_min_var_pct.n40.pv0.10,0.0,%,Variation ueber rho
+xpp.cond_xpp_var_pct.n40.pv0.25,0.0,%,Variation ueber rho
+xpp.rho_jacobi_var_pct.n40.pv0.25,0.0,%,Variation ueber rho
+xpp.diag_dom_min_var_pct.n40.pv0.25,0.0,%,Variation ueber rho
+xpp.cond_xpp_var_pct.n40.pv0.50,0.0,%,Variation ueber rho
+xpp.rho_jacobi_var_pct.n40.pv0.50,0.0,%,Variation ueber rho
+xpp.diag_dom_min_var_pct.n40.pv0.50,0.0,%,Variation ueber rho
+xpp.cond_xpp_var_pct.n120.pv0.10,0.0,%,Variation ueber rho
+xpp.rho_jacobi_var_pct.n120.pv0.10,0.0,%,Variation ueber rho
+xpp.diag_dom_min_var_pct.n120.pv0.10,0.0,%,Variation ueber rho
+xpp.cond_xpp_var_pct.n120.pv0.25,0.0,%,Variation ueber rho
+xpp.rho_jacobi_var_pct.n120.pv0.25,0.0,%,Variation ueber rho
+xpp.diag_dom_min_var_pct.n120.pv0.25,0.0,%,Variation ueber rho
+xpp.cond_xpp_var_pct.n120.pv0.50,0.0,%,Variation ueber rho
+xpp.rho_jacobi_var_pct.n120.pv0.50,0.0,%,Variation ueber rho
+xpp.diag_dom_min_var_pct.n120.pv0.50,0.0,%,Variation ueber rho
+xpp.cond_xpp_var_pct.n350.pv0.10,0.0,%,Variation ueber rho
+xpp.rho_jacobi_var_pct.n350.pv0.10,0.0,%,Variation ueber rho
+xpp.diag_dom_min_var_pct.n350.pv0.10,0.0,%,Variation ueber rho
+xpp.cond_xpp_var_pct.n350.pv0.25,0.0,%,Variation ueber rho
+xpp.rho_jacobi_var_pct.n350.pv0.25,0.0,%,Variation ueber rho
+xpp.diag_dom_min_var_pct.n350.pv0.25,0.0,%,Variation ueber rho
+xpp.cond_xpp_var_pct.n350.pv0.50,0.0,%,Variation ueber rho
+xpp.rho_jacobi_var_pct.n350.pv0.50,0.0,%,Variation ueber rho
+xpp.diag_dom_min_var_pct.n350.pv0.50,0.0,%,Variation ueber rho
+xpp.cond_var_pct_max,0.0,%,groesste Variation von cond(X_pp) ueber rho
+xpp.cond_growth_npv.n40,21.52,,n_pv 4->20
+xpp.first_pv_rhoJ_gt1.n40,0.25,,kleinster PV-Anteil mit rho_J>1
+xpp.cond_growth_npv.n120,28.71,,n_pv 12->60
+xpp.first_pv_rhoJ_gt1.n120,0.1,,kleinster PV-Anteil mit rho_J>1
+xpp.cond_growth_npv.n350,21.58,,n_pv 35->175
+xpp.first_pv_rhoJ_gt1.n350,0.1,,kleinster PV-Anteil mit rho_J>1
+outer.plateau.n40.npv4,3,,
+outer.rho_star.const_z.n40.npv4,10.0,,Grenzzyklus
+outer.plateau.n40.npv10,3,,
+outer.rho_star.const_z.n40.npv10,10.0,,Grenzzyklus
+outer.plateau.n40.npv20,3,,
+outer.rho_star.const_z.n40.npv20,10.0,,Grenzzyklus
+outer.plateau.n120.npv12,3,,
+outer.k_at_rho_max.n120.npv12,43.0,,
+outer.plateau.n120.npv30,3,,
+outer.k_at_rho_max.n120.npv30,36.0,,
+outer.plateau.n120.npv60,3,,
+outer.k_at_rho_max.n120.npv60,35.0,,
+outer.plateau.n350.npv35,4,,
+outer.rho_star.const_z.n350.npv35,3.16,,Divergenz
+outer.plateau.n350.npv88,3,,
+outer.rho_star.const_z.n350.npv88,4.64,,Divergenz
+outer.plateau.n350.npv175,3,,
+outer.rho_star.const_z.n350.npv175,4.64,,Divergenz
+fail.count.Divergenz,10,,
+fail.eps_V.Divergenz,3.56e-01-8.92e-01,p.u.,
+fail.q_max.Divergenz,617-4.67e+04,p.u.,
+fail.eps_lin.Divergenz,0.999-1.014,,
+fail.count.Grenzzyklus,3,,
+fail.eps_V.Grenzzyklus,9.64e-07-2.58e-05,p.u.,
+fail.q_max.Grenzzyklus,6.22-17.1,p.u.,
+fail.eps_lin.Grenzzyklus,0.916-0.968,,
+pred.spearman_outer.sens_error_median,0.899,,
+pred.spearman_inner.sens_error_median,0.892,,
+pred.spearman_outer.sens_error_max,0.898,,
+pred.spearman_inner.sens_error_max,0.885,,
+pred.spearman_outer.rx,0.537,,
+pred.spearman_inner.rx,0.511,,
+pred.spearman_outer.q_max_final,0.35,,
+pred.spearman_inner.q_max_final,0.249,,
+pred.spearman_outer.v_min,-0.329,,
+pred.spearman_inner.v_min,-0.593,,
+pred.spearman_outer.rho_jacobi,-0.24,,
+pred.spearman_inner.rho_jacobi,-0.089,,
+pred.spearman_outer.cond_xpp,-0.239,,
+pred.spearman_inner.cond_xpp,-0.087,,
+pred.spearman_outer.n_pv,-0.19,,
+pred.spearman_inner.n_pv,0.038,,
+pred.spearman_outer.eta_pub,0.155,,
+pred.spearman_inner.eta_pub,0.447,,
+pred.spearman_outer.nodes,-0.068,,
+pred.spearman_inner.nodes,0.222,,
+pred.n_runs,217,,"konvergente PV-Laeufe, alle Modi"
+nr.faelle.beide,191,,
+nr.vmin_med.beide,0.978,p.u.,
+nr.eta2_med.beide,0.035,,
+nr.rho_min.beide,0.1,,
+nr.faelle.keines,41,,
+nr.vmin_med.keines,0.884,p.u.,
+nr.eta2_med.keines,0.142,,
+nr.rho_min.keines,2.15,,
+nr.faelle.nur NR,2,,
+nr.vmin_med.nur NR,0.989,p.u.,
+nr.eta2_med.nur NR,0.012,,
+nr.rho_min.nur NR,10.0,,
+nr.faelle.nur TPF,0,,
+nr.n_runs,234,,gekoppelte PV-Laeufe beider Modi
+nr.skipped_in_keines,0,,nicht konstruierbare Faelle
