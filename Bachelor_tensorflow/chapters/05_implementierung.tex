@@ -38,7 +38,7 @@ Tabelle~\ref{tab:module} gibt einen Überblick über die zentralen Pakete der Bi
 		& \texttt{tpf\_dense.py}       & Dense-TPF (PQ, volles ZIP-Modell) \\
 		& \texttt{tpf\_sparse.py}      & Sparse-TPF (PQ und PV, Methode~A) \\
 		& \texttt{tpf\_pv\_method\_a.py} & Dense-TPF mit PV (äußere Q-Schleife) \\
-		& \texttt{tpf\_pv\_method\_b.py} & Dense-TPF mit PV (eingebettete Korrektur) \\
+%		& \texttt{tpf\_pv\_method\_b.py} & Dense-TPF mit PV (eingebettete Korrektur) \\
 		& \texttt{nr\_reference.py}    & Newton-Raphson-Referenz (pandapower) \\
 		\midrule
 		\texttt{generators} & \texttt{network\_generator\_salazar.py} &  Baum nach Salazar et al. \\
@@ -218,8 +218,8 @@ Tabelle~\ref{tab:variationsparameter} aufgeführten Parameter systematisch varii
 		\toprule
 		\textbf{Parameter} & \textbf{Symbol} & \textbf{Wertebereich} \\
 		\midrule
-		Netzgröße               & $b$          & $\{20, 100, 500, 1000, 5000\}$ \\
-		PV-Anteil               & $n_{\mathrm{PV}}/b$ & $\{0, 2, 5, 10, 20, 30, 50\}\,\%$ \\
+		Netzgröße               & $b$          & $[20, 1000]$ \\
+		PV-Anteil               & $n_{\mathrm{PV}}/b$ & $[0, 2, 5, 10, 20, 30, 50]\,\%$ \\
 		Gleichzeitige Lastflüsse & $\tau$      & $\{1, 100, 10\,000, 525\,600\}$ \\
 		Lastfaktor              & $\lambda$    & $[0{,}5;\ \lambda_{\mathrm{mlp}})$ \\
 		$R/X$-Verhältnis        & --           & $\{0{,}5;\ 1;\ 5;\ 40\}$ \\

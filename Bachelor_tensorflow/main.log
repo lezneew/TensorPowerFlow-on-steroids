@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.3)  7 JUL 2026 15:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.3)  19 AUG 2026 19:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -760,6 +760,13 @@ Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 \f@nch@widthR=\skip81
 \@temptokenb=\toks35
 )
+
+Package fancyhdr Warning: \fancyhead's `E' option without twoside option is use
+less.
+(fancyhdr)                Please consider using the `twoside' option on input l
+ine 68.
+
+
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/todonotes\todono
 tes.sty
 Package: todonotes 2024/01/05 v1.1.7 Todonotes source and documentation.
@@ -1390,6 +1397,10 @@ Package: xparse 2023-10-10 L3 Experimental document command parser
 )
 Package: blx-case-expl3 2023/03/05 v3.19 expl3 case changing code for biblatex
 ))
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/import\import.st
+y
+Package: import 2020/04/01  v 6.2
+)
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperre
 f.sty
 Package: hyperref 2023-11-26 v7.01g Hypertext links for LaTeX
@@ -1629,6 +1640,43 @@ File: tikzlibrarybackgrounds.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@layerbox@background=\box98
 \pgf@layerboxsaved@background=\box99
 )
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/siunitx\siunitx.
+sty
+Package: siunitx 2025-04-19 v3.4.9 A comprehensive (SI) units package
+\l__siunitx_number_uncert_offset_int=\count480
+\l__siunitx_number_exponent_fixed_int=\count481
+\l__siunitx_number_min_decimal_int=\count482
+\l__siunitx_number_min_integer_int=\count483
+\l__siunitx_number_round_precision_int=\count484
+\l__siunitx_number_lower_threshold_int=\count485
+\l__siunitx_number_upper_threshold_int=\count486
+\l__siunitx_number_group_first_int=\count487
+\l__siunitx_number_group_size_int=\count488
+\l__siunitx_number_group_minimum_int=\count489
+\l__siunitx_angle_tmp_dim=\dimen320
+\l__siunitx_angle_marker_box=\box100
+\l__siunitx_angle_unit_box=\box101
+\l__siunitx_compound_count_int=\count490
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/translations\tra
+nslations.sty
+Package: translations 2022/02/05 v1.12 internationalization of LaTeX2e packages
+ (CN)
+)
+\l__siunitx_table_tmp_box=\box102
+\l__siunitx_table_tmp_dim=\dimen321
+\l__siunitx_table_column_width_dim=\dimen322
+\l__siunitx_table_integer_box=\box103
+\l__siunitx_table_decimal_box=\box104
+\l__siunitx_table_uncert_box=\box105
+\l__siunitx_table_before_box=\box106
+\l__siunitx_table_after_box=\box107
+\l__siunitx_table_before_dim=\dimen323
+\l__siunitx_table_carry_dim=\dimen324
+\l__siunitx_unit_tmp_int=\count491
+\l__siunitx_unit_position_int=\count492
+\l__siunitx_unit_total_int=\count493
+)
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/setspace\setspac
 e.sty
 Package: setspace 2022/12/04 v6.7b set line spacing
@@ -1646,63 +1694,50 @@ Package: amsthm 2020/05/29 v2.20.6
 \thm@headsep=\skip107
 \dth@everypar=\toks55
 )
-\c@theorem=\count480
+\c@theorem=\count494
 )
 
 Package biblatex Warning: 'babel/polyglossia' detected but 'csquotes' missing.
 (biblatex)                Loading 'csquotes' recommended.
 
-\@quotelevel=\count481
-\@quotereset=\count482
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 14
+\@quotelevel=\count495
+\@quotereset=\count496
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 16
 .
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-(main.aux
-
-LaTeX Warning: Label `eq:q_limits' multiply defined.
-
-
-LaTeX Warning: Label `eq:q_limits@cref' multiply defined.
-
-
-LaTeX Warning: Label `alg:tpf_dense' multiply defined.
-
-
-LaTeX Warning: Label `alg:tpf_dense@cref' multiply defined.
-
-)
+(main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 14.
-LaTeX Font Info:    ... okay on input line 14.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 14.
-LaTeX Font Info:    ... okay on input line 14.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 14.
-LaTeX Font Info:    ... okay on input line 14.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 14.
-LaTeX Font Info:    ... okay on input line 14.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 14.
-LaTeX Font Info:    ... okay on input line 14.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 14.
-LaTeX Font Info:    ... okay on input line 14.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 14.
-LaTeX Font Info:    ... okay on input line 14.
-LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 14.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 16.
 LaTeX Font Info:    Trying to load font information for T2A+cmr on input line 1
-4.
+6.
 
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/cyrillic\t2acmr.
 fd
 File: t2acmr.fd 2001/08/11 v1.0a Computer Modern Cyrillic font definitions
 )
-LaTeX Font Info:    ... okay on input line 14.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 14.
-LaTeX Font Info:    ... okay on input line 14.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 14.
-LaTeX Font Info:    ... okay on input line 14.
-LaTeX Info: Redefining \th on input line 14.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Info: Redefining \th on input line 16.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -1712,7 +1747,7 @@ LaTeX Info: Redefining \th on input line 14.
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * bindingoffset: 14.22636pt
-* modes: twoside 
+* modes: 
 * h-part:(L,W,R)=(85.35826pt, 426.79137pt, 71.13188pt)
 * v-part:(T,H,B)=(71.13188pt, 702.78308pt, 71.13188pt)
 * \paperwidth=597.50787pt
@@ -1720,13 +1755,13 @@ LaTeX Info: Redefining \th on input line 14.
 * \textwidth=426.79137pt
 * \textheight=702.78308pt
 * \oddsidemargin=27.31464pt
-* \evensidemargin=-1.1381pt
+* \evensidemargin=13.08827pt
 * \topmargin=-38.1381pt
 * \headheight=12.0pt
 * \headsep=25.0pt
 * \topskip=12.0pt
 * \footskip=30.0pt
-* \marginparwidth=85.0pt
+* \marginparwidth=35.0pt
 * \marginparsep=10.0pt
 * \columnsep=10.0pt
 * \skip\footins=10.8pt plus 4.0pt minus 2.0pt
@@ -1734,27 +1769,27 @@ LaTeX Info: Redefining \th on input line 14.
 * \voffset=0.0pt
 * \mag=1000
 * \@twocolumnfalse
-* \@twosidetrue
-* \@mparswitchtrue
+* \@twosidefalse
+* \@mparswitchfalse
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Info: Redefining \microtypecontext on input line 14.
-Package microtype Info: Applying patch `item' on input line 14.
-Package microtype Info: Applying patch `toc' on input line 14.
-Package microtype Info: Applying patch `eqnum' on input line 14.
+LaTeX Info: Redefining \microtypecontext on input line 16.
+Package microtype Info: Applying patch `item' on input line 16.
+Package microtype Info: Applying patch `toc' on input line 16.
+Package microtype Info: Applying patch `eqnum' on input line 16.
 
-Package microtype Warning: Unable to apply patch `footnote' on input line 14.
+Package microtype Warning: Unable to apply patch `footnote' on input line 16.
 
-Package microtype Info: Applying patch `verbatim' on input line 14.
-LaTeX Info: Redefining \microtypesetup on input line 14.
+Package microtype Info: Applying patch `verbatim' on input line 16.
+LaTeX Info: Redefining \microtypesetup on input line 16.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 14.
+LaTeX Info: Redefining \showhyphens on input line 16.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -1767,16 +1802,16 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp
 -pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count483
-\scratchdimen=\dimen320
-\scratchbox=\box100
-\nofMPsegments=\count484
-\nofMParguments=\count485
+\scratchcounter=\count497
+\scratchdimen=\dimen325
+\scratchbox=\box108
+\nofMPsegments=\count498
+\nofMParguments=\count499
 \everyMPshowfont=\toks56
-\MPscratchCnt=\count486
-\MPscratchDim=\dimen321
-\MPnumerator=\count487
-\makeMPintoPDFobject=\count488
+\MPscratchCnt=\count500
+\MPscratchDim=\dimen326
+\MPnumerator=\count501
+\makeMPintoPDFobject=\count502
 \everyMPtoPDFconversion=\toks57
 )
 (C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\eps
@@ -1793,7 +1828,14 @@ Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
-\c@lstlisting=\count489
+\c@lstlisting=\count503
+
+
+Package todonotes Warning: The length marginparwidth is less than 2cm and will 
+most likely cause issues with the appearance of inserted todonotes. The issue c
+an be solved by adding a line like \setlength {\marginparwidth }{2cm} prior to 
+loading the todonotes package. on input line 16.
+
 Package biblatex Info: Trying to load language 'ngerman'...
 Package biblatex Info: ... file 'ngerman.lbx' found.
 
@@ -1828,14 +1870,53 @@ Package biblatex Info: Automatic encoding selection.
 
 Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'main.bbl' found.
- (main.bbl)
-Package biblatex Info: Reference section=0 on input line 14.
-Package biblatex Info: Reference segment=0 on input line 14.
-Package hyperref Info: Link coloring ON on input line 14.
+ (main.bbl
+
+Package biblatex Warning: The following entry could not be found
+(biblatex)                in the database:
+(biblatex)                bibid
+(biblatex)                Please verify the spelling and rerun
+(biblatex)                LaTeX afterwards.
+
+
+Package biblatex Warning: The following entry could not be found
+(biblatex)                in the database:
+(biblatex)                pandapower
+(biblatex)                Please verify the spelling and rerun
+(biblatex)                LaTeX afterwards.
+
+
+Package biblatex Warning: The following entry could not be found
+(biblatex)                in the database:
+(biblatex)                stott1974
+(biblatex)                Please verify the spelling and rerun
+(biblatex)                LaTeX afterwards.
+
+
+Package biblatex Warning: The following entry could not be found
+(biblatex)                in the database:
+(biblatex)                tinney1967
+(biblatex)                Please verify the spelling and rerun
+(biblatex)                LaTeX afterwards.
+
+)
+Package biblatex Info: Reference section=0 on input line 16.
+Package biblatex Info: Reference segment=0 on input line 16.
+Package hyperref Info: Link coloring ON on input line 16.
  (main.out) (main.out)
 \@outlinefile=\write5
 \openout5 = `main.out'.
 
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/translations/dic
+ts\translations-basic-dictionary-german.trsl
+File: translations-basic-dictionary-german.trsl (german translation file `trans
+lations-basic-dictionary')
+)
+Package translations Info: loading dictionary `translations-basic-dictionary' f
+or `german'. on input line 16.
+Package translations Info: no dictionary file `translations-basic-dictionary-ru
+ssian.trsl' found. on input line 16.
  (config/titlepage.tex
 Package microtype Info: Character `029' is missing
 (microtype)             in font `T1/lmr/m/sc/14.4'.
@@ -1892,65 +1973,39 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 ) [1
 
 {C:/Users/sgrigorevski/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Use
-rs/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}]
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[2
-
-])
+rs/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}])
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 33.
+(Font)              <12> on input line 35.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 33.
+(Font)              <8> on input line 35.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 33.
+(Font)              <6> on input line 35.
  [1
 
-]
 
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+] [2
 
-[2
 
 ] [3
 
-]
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[4
-
-] [5
-
-]
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[6
 
 ] (main.toc
 Package cleveref Info: loaded `ngerman' language definitions on input line 1.
- [7
+ [4
+
 
 ]
-Package cleveref Info: loaded `ngerman' language definitions on input line 92.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 4
+3.
+
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `lmtt' (encoding: T1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+Package cleveref Info: loaded `ngerman' language definitions on input line 78.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1959,25 +2014,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[8]
-Package cleveref Info: loaded `ngerman' language definitions on input line 151.
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[9{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ma
-thit.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/l
-m/lm-rm.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvip
-s/lm/lm-mathsy.enc}])
+[5])
 \tf@toc=\write6
 \openout6 = `main.toc'.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 55.
+Package cleveref Info: loaded `ngerman' language definitions on input line 57.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1986,74 +2027,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[10] (main.lof
-Package cleveref Info: loaded `ngerman' language definitions on input line 1.
-)
-\tf@lof=\write7
-\openout7 = `main.lof'.
-
- [11
+[6] [7
 
 
-]
-Package cleveref Info: loaded `ngerman' language definitions on input line 60.
+] [8
 
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[12
-
-] (main.lot
-Package cleveref Info: loaded `ngerman' language definitions on input line 1.
-)
-\tf@lot=\write8
-\openout8 = `main.lot'.
-
- [13
-
-]
-Package cleveref Info: loaded `ngerman' language definitions on input line 65.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[14
-
-] [15
-
-]
-Package cleveref Info: loaded `ngerman' language definitions on input line 71.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[16
-
-] [17
-
-]
-Package cleveref Info: loaded `ngerman' language definitions on input line 77.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[18
 
 ] (chapters/01_einleitung.tex
 Kapitel 1.
@@ -2065,8 +2043,88 @@ been already used, duplicate ignored
 l.3 \chapter
             {Grundlagen der Lastflussberechnung} [1
 
+
 ]
-Package cleveref Info: loaded `ngerman' language definitions on input line 3.
+Kapitel 2.
+
+Underfull \hbox (badness 10000) in paragraph at lines 23--24
+
+ []
+
+Package hyperref Info: bookmark level for unknown todo defaults to 0 on input l
+ine 39.
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 39--39
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 39--39
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 40--40
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 40--40
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+[2
+
+{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.e
+nc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-m
+athit.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/
+lm/lm-mathsy.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc
+/dvips/lm/lm-mathex.enc}]
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 58--58
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 58--58
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 72--75
+
+ []
+
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 88.
+
+Overfull \hbox (0.58179pt too wide) in paragraph at lines 82--93
+ [][] 
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 94--94
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
+ []
+
+
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 94--94
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
+ []
+
+
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 101--101
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
+ []
+
+
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 101--101
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 102.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2075,38 +2133,37 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-
-pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has 
-been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.3 \chapter
-            {Grundlagen der Lastflussberechnung} [2
-
-]
-Kapitel 2.
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 3
-7.
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
-File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-[3{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ma
-thex.enc}{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/l
-m/lm-ts1.enc}]
-Underfull \hbox (badness 10000) in paragraph at lines 87--88
-[]|\T1/lmr/m/n/12 (+20) Verbraucher, PV-
+[3]
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 105--105
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 87--88
-\T1/lmr/m/n/12 (+20) Wechselrichter mit $[] \OML/lmm/m/it/12 '$\T1/lmr/m/n/12 (
-+20) -
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 105--105
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
  []
 
 
-Underfull \vbox (badness 1199) has occurred while \output is active []
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 109--109
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
+ []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 92.
+
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 109--109
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
+ []
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 130--130
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 130--130
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 132.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2116,8 +2173,24 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [4]
-Package cleveref Info: loaded `ngerman' language definitions on input line 117.
 
+LaTeX Warning: Marginpar on page 5 moved.
+
+
+Overfull \hbox (1.13593pt too wide) in paragraph at lines 147--147
+[][][]\T1/lmr/m/n/12 (-20) check[]  
+ []
+
+
+Overfull \hbox (1.13593pt too wide) in paragraph at lines 147--147
+[][][]\T1/lmr/m/n/12 (-20) check[]  
+ []
+
+
+LaTeX Warning: Reference `sec:pv_methoden' on page 5 undefined on input line 17
+0.
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 176.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2127,8 +2200,16 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [5]
-Package cleveref Info: loaded `ngerman' language definitions on input line 159.
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 203--203
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
+ []
 
+
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 203--203
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 218.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2138,11 +2219,16 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [6]
-Overfull \hbox (3.80838pt too wide) in paragraph at lines 246--256
- [][] 
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 229--229
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
  []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 256.
+
+Overfull \hbox (16.76764pt too wide) in paragraph at lines 229--229
+[][][]\T1/lmr/m/n/12 (-20) literatur.[]  
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 314.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2152,10 +2238,16 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [7]
+Underfull \hbox (badness 10000) in paragraph at lines 314--321
 
-LaTeX Warning: Reference `eq:H_diag' on page 8 undefined on input line 283.
+ []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 284.
+
+Underfull \hbox (badness 10000) in paragraph at lines 339--341
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 363.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2165,7 +2257,19 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [8]
-Package cleveref Info: loaded `ngerman' language definitions on input line 336.
+
+LaTeX Warning: Reference `eq:qlimits' on page 9 undefined on input line 369.
+
+
+LaTeX Warning: Reference `sec:pv_methoden' on page 9 undefined on input line 36
+9.
+
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 3
+76.
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
+File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+Package cleveref Info: loaded `ngerman' language definitions on input line 379.
 
 
 
@@ -2175,9 +2279,16 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[9]
-Package cleveref Info: loaded `ngerman' language definitions on input line 404.
+[9{C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts
+1.enc}]
+Overfull \hbox (1.44095pt too wide) in paragraph at lines 406--406
+[]\T1/lmr/bx/n/17.28 (-20) Fixpunkt-Iteration und Ba-nach-scher Fix-punkt-
+ []
 
+
+LaTeX Warning: Reference `sec:tpf' on page 10 undefined on input line 409.
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 434.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2187,17 +2298,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [10]
-Overfull \hbox (4.43558pt too wide) in paragraph at lines 541--541
-[]\T1/lmr/bx/n/17.28 (-20) Current In-jec-ti-on Me-thod und PV-Behandlung 
- []
 
+LaTeX Warning: Reference `eq:fpi_ABc' on page 11 undefined on input line 467.
 
-Overfull \hbox (17.85085pt too wide) in paragraph at lines 543--555
-\T1/lmr/m/n/12 (-20) Die kon-ven-tio-nel-le Newton-Raphson-Lastflussberechnung 
-ba-siert auf Leistungs-Mismatch-
- []
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 571.
+Package cleveref Info: loaded `ngerman' language definitions on input line 476.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2207,15 +2311,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [11]
-LaTeX Font Info:    Trying to load font information for T2A+lmr on input line 5
-97.
-LaTeX Font Info:    No file T2Almr.fd. on input line 597.
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
+put line 481.
+Package cleveref Info: loaded `ngerman' language definitions on input line 527.
 
-
-LaTeX Font Warning: Font shape `T2A/lmr/m/n' undefined
-(Font)              using `T2A/cmr/m/n' instead on input line 597.
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 620.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2225,149 +2324,14 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [12]
-Overfull \hbox (51.90152pt too wide) in paragraph at lines 665--669
-[]\T1/lmr/m/n/12 (-20) Die Jacobi-Matrix $\OML/lmm/b/it/12 J[]$ \T1/lmr/m/n/12 
-(-20) be-sitzt die glei-che Blockstruk-tur wie die $\OT1/lmr/m/n/12 (-20) (2\OM
-L/lmm/m/it/12 n \OMS/lmsy/m/n/12 ^^B \OT1/lmr/m/n/12 (-20) 2\OML/lmm/m/it/12 n\
-OT1/lmr/m/n/12 (-20) )$\T1/lmr/m/n/12 (-20) -Knotenadmittanzmatrix,
+Overfull \hbox (29.90527pt too wide) in paragraph at lines 528--528
+[][][]\T1/lmr/m/n/12 (-20) konvergiert 
  []
 
 
-Underfull \vbox (badness 7326) has occurred while \output is active []
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 676.
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[13]
-! Missing delimiter (. inserted).
-<to be read again> 
-                   e
-l.711 \end{align}
-                 
-I was expecting to see something like `(' or `\{' or
-`\}' here. If you typed, e.g., `{' instead of `\{', you
-should probably delete the `{' by typing `1' now, so that
-braces don't get unbalanced. Otherwise just proceed.
-Acceptable delimiters are characters whose \delcode is
-nonnegative, or you can use `\delimiter <delimiter code>'.
-
-! Missing delimiter (. inserted).
-<to be read again> 
-                   e
-l.711 \end{align}
-                 
-I was expecting to see something like `(' or `\{' or
-`\}' here. If you typed, e.g., `{' instead of `\{', you
-should probably delete the `{' by typing `1' now, so that
-braces don't get unbalanced. Otherwise just proceed.
-Acceptable delimiters are characters whose \delcode is
-nonnegative, or you can use `\delimiter <delimiter code>'.
-
-
-Underfull \vbox (badness 1152) has occurred while \output is active []
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 770.
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[14]
-Package cleveref Info: loaded `ngerman' language definitions on input line 821.
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[15]
-
-LaTeX Warning: Reference `fig:jacobi_structure' on page 16 undefined on input l
-ine 874.
-
-
-Underfull \vbox (badness 1609) has occurred while \output is active []
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 887.
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[16]
-
-LaTeX Warning: Reference `eq:cim_mismatch' on page 17 undefined on input line 9
-34.
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 935.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[17]
-Package cleveref Info: loaded `ngerman' language definitions on input line 987.
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[18]
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 1000.
-
-
-LaTeX Warning: Citation 'Davis2006' on page 19 undefined on input line 1026.
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 1030
-.
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[19]
-Package cleveref Info: loaded `ngerman' language definitions on input line 1077
-.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[20]
-
-LaTeX Warning: Reference `subsec:tpf_machbarkeit' on page 1 undefined on input 
-line 1110.
+Overfull \hbox (29.90527pt too wide) in paragraph at lines 528--528
+[][][]\T1/lmr/m/n/12 (-20) konvergiert 
+ []
 
 ) (chapters/03_tensor_powerflow.tex
 Package cleveref Info: loaded `ngerman' language definitions on input line 2.
@@ -2379,7 +2343,77 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[21]
+[13]
+Kapitel 3.
+
+Underfull \hbox (badness 10000) in paragraph at lines 6--7
+
+ []
+
+[14
+
+]
+Overfull \hbox (11.58138pt too wide) in paragraph at lines 46--47
+[]\T1/lmr/m/n/12 (-20) Dabei be-zeich-nen $\OML/lmm/m/it/12 []$\T1/lmr/m/n/12 
+(-20) , $\OML/lmm/m/it/12 []$ \T1/lmr/m/n/12 (-20) und $\OML/lmm/m/it/12 []$ 
+\T1/lmr/m/n/12 (-20) die Ko-ef-fi-zi-en-ten des ZIP-Lastmodells ([][]Ab-schnitt
+ 2.1.3[][]),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 46--47
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 168.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[15]
+Overfull \hbox (12.26518pt too wide) in paragraph at lines 184--185
+[]\T1/lmr/m/n/12 (-20) mit den Tensor-Dimensionen $\OMS/lmsy/m/n/12 F 2 \U/msb/
+m/n/12 C[]$ \T1/lmr/m/n/12 (-20) und $\OMS/lmsy/m/n/12 V[]\OML/lmm/m/it/12 ; \O
+MS/lmsy/m/n/12 V[]\OML/lmm/m/it/12 ; \OMS/lmsy/m/n/12 W 2 \U/msb/m/n/12 C[]$\T1
+/lmr/m/n/12 (-20) . 
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 218.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[16]
+Package cleveref Info: loaded `ngerman' language definitions on input line 254.
+
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[17]
+Package cleveref Info: loaded `ngerman' language definitions on input line 415.
+
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[18]) (chapters/04_methoden.tex
 Package cleveref Info: loaded `ngerman' language definitions on input line 2.
 
 
@@ -2389,17 +2423,61 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[22
+[19]
+Kapitel 4.
+
+LaTeX Warning: Reference `subsec:fpi_limitation' on page 1 undefined on input l
+ine 6.
+
+[20
 
 ]
-Kapitel 3.
+Overfull \hbox (0.90115pt too wide) in paragraph at lines 60--61
+[]\T1/lmr/bx/n/12 (-20) Fall 2: $\OML/lmm/m/it/12 [] \OMS/lmsy/m/n/12 6\OT1/lm
+r/m/n/12 (-20) = 0$ \T1/lmr/m/n/12 (-20) am PV-Knoten. Dann än-dert sich $\OML/
+lmm/b/it/12 B$ \T1/lmr/m/n/12 (-20) mit je-der Q-Aktualisierung,
+ []
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Package cleveref Info: loaded `ngerman' language definitions on input line 98.
 
- [23]
-Underfull \vbox (badness 3302) has occurred while \output is active []
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 27.11652pt, for example:
+(fancyhdr)                \setlength{\headheight}{27.11652pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 159.
+[21]
+
+LaTeX Warning: Reference `eq:convergence_condition' on page 1 undefined on inpu
+t line 125.
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 355.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[22]
+Overfull \hbox (31.04323pt too wide) in paragraph at lines 369--371
+[]\T1/lmr/m/n/12 (-20) Die re-sul-tie-ren-de Span-nungs-än-de-rung am Kno-ten $
+\OML/lmm/m/it/12 k$ \T1/lmr/m/n/12 (-20) folgt aus dem Thévenin-Äquivalent []: 
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 425.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[23]
+Package cleveref Info: loaded `ngerman' language definitions on input line 869.
 
 
 
@@ -2410,14 +2488,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [24]
-Overfull \hbox (12.26518pt too wide) in paragraph at lines 178--179
-[]\T1/lmr/m/n/12 (-20) mit den Tensor-Dimensionen $\OMS/lmsy/m/n/12 F 2 \U/msb/
-m/n/12 C[]$ \T1/lmr/m/n/12 (-20) und $\OMS/lmsy/m/n/12 V[]\OML/lmm/m/it/12 ; \O
-MS/lmsy/m/n/12 V[]\OML/lmm/m/it/12 ; \OMS/lmsy/m/n/12 W 2 \U/msb/m/n/12 C[]$\T1
-/lmr/m/n/12 (-20) . 
- []
+Package cleveref Info: loaded `ngerman' language definitions on input line 941.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 195.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2426,9 +2498,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[25]
-Package cleveref Info: loaded `ngerman' language definitions on input line 249.
-
+[25]) (chapters/05_implementierung.tex
+Package cleveref Info: loaded `ngerman' language definitions on input line 1.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2438,18 +2509,28 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [26]
-Package cleveref Info: loaded `ngerman' language definitions on input line 410.
+Kapitel 5.
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <17.28> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 10.
+
+Overfull \hbox (67.11157pt too wide) in paragraph at lines 28--51
+ [][] 
+ []
 
 
+Overfull \hbox (118.25041pt too wide) in paragraph at lines 68--70
+[]\T1/lmr/m/n/12 (-20) Die Tren-nung von Slack- und Nicht-Slack-Knoten wird be-
+reits im Ad-ap-ter \T1/lmtt/m/n/12 build_network_from_pandapower
+ []
 
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+[27
 
-[27]) (chapters/04_methoden.tex
-Package cleveref Info: loaded `ngerman' language definitions on input line 2.
+]
+Underfull \hbox (badness 10000) in paragraph at lines 79--83
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 102.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2459,71 +2540,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [28]
-Kapitel 4.
-
-LaTeX Warning: Reference `subsec:fpi_limitation' on page 1 undefined on input l
-ine 6.
-
-
-LaTeX Warning: Reference `eq:pv_A' on page 29 undefined on input line 32.
-
-
-LaTeX Warning: Reference `eq:pv_w' on page 29 undefined on input line 32.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [29
-
-]
-Overfull \hbox (73.89227pt too wide) in paragraph at lines 44--57
- [][] 
- []
-
-
-Overfull \hbox (0.90115pt too wide) in paragraph at lines 63--64
-[]\T1/lmr/bx/n/12 (-20) Fall 2: $\OML/lmm/m/it/12 [] \OMS/lmsy/m/n/12 6\OT1/lm
-r/m/n/12 (-20) = 0$ \T1/lmr/m/n/12 (-20) am PV-Knoten. Dann än-dert sich $\OML/
-lmm/b/it/12 B$ \T1/lmr/m/n/12 (-20) mit je-der Q-Aktualisierung,
- []
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 70.
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 27.11652pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11652pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
-
-[30]
-
-LaTeX Warning: Reference `eq:pv_F' on page 31 undefined on input line 77.
-
-
-LaTeX Warning: Reference `eq:pv_w' on page 31 undefined on input line 77.
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 109.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 27.11652pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11652pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
-
-[31]
-Package cleveref Info: loaded `ngerman' language definitions on input line 144.
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 27.11652pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11652pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
-
-[32]
-Package cleveref Info: loaded `ngerman' language definitions on input line 195.
+Package cleveref Info: loaded `ngerman' language definitions on input line 163.
 
 
 
@@ -2533,25 +2550,132 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[33]
+[29]
+Overfull \hbox (3.18016pt too wide) in paragraph at lines 200--207
+\T1/lmr/m/n/12 (-20) Für die ten-so-ri-sier-te Zeitrei-hen-si-mu-la-ti-on er-ze
+ugt das Mo-dul \T1/lmtt/m/n/12 profile_generators.py
+ []
 
-LaTeX Warning: Reference `sec:ergebnisse' on page 1 undefined on input line 230
-.
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 231.
+Package cleveref Info: loaded `ngerman' language definitions on input line 232.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 27.11652pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11652pt}.
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
 (fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[34]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+[30]) (chapters/06_ergebnisse.tex
+Package cleveref Info: loaded `ngerman' language definitions on input line 2.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 288.
 
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[31]
+Kapitel 6.
+
+Underfull \hbox (badness 10000) in paragraph at lines 9--17
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 18--28
+
+ []
+
+[32
+
+] (figures/outer_convergence_error_decoupled.pgf)
+Underfull \hbox (badness 10000) in paragraph at lines 58--63
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 64--72
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 89.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[33] (figures/x_pp_heatmaps.pgf
+<figures/x_pp_heatmaps-img0.png, id=926, interpolate=true, 204.765pt x 204.765p
+t>
+File: figures/x_pp_heatmaps-img0.png Graphic file (type png)
+<use figures/x_pp_heatmaps-img0.png>
+Package pdftex.def Info: figures/x_pp_heatmaps-img0.png  used on input line 77.
+
+(pdftex.def)             Requested size: 98.2892pt x 98.2892pt.
+LaTeX Font Info:    Calculating math sizes for size <11> on input line 289.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <11> on input line 289.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7.69997> on input line 289.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5.5> on input line 289.
+<figures/x_pp_heatmaps-img1.png, id=928, interpolate=true, 205.76875pt x 204.76
+5pt>
+File: figures/x_pp_heatmaps-img1.png Graphic file (type png)
+<use figures/x_pp_heatmaps-img1.png>
+Package pdftex.def Info: figures/x_pp_heatmaps-img1.png  used on input line 313
+.
+(pdftex.def)             Requested size: 98.76787pt x 98.2892pt.
+<figures/x_pp_heatmaps-img2.png, id=929, interpolate=true, 12.045pt x 235.88126
+pt>
+File: figures/x_pp_heatmaps-img2.png Graphic file (type png)
+<use figures/x_pp_heatmaps-img2.png>
+Package pdftex.def Info: figures/x_pp_heatmaps-img2.png  used on input line 547
+.
+(pdftex.def)             Requested size: 5.78171pt x 113.22531pt.
+) (figures/max_pv_convergence.pgf)
+Underfull \hbox (badness 10000) in paragraph at lines 104--105
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 105.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[34 <./figures/x_pp_heatmaps-img0.png> <./figures/x_pp_heatmaps-img1.png> <./fi
+gures/x_pp_heatmaps-img2.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 106--107
+
+ []
+
+(figures/outer_convergence_error_coupled.pgf)
+Underfull \hbox (badness 10000) in paragraph at lines 128--133
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--141
+
+ []
+
+
+LaTeX Warning: Reference `sec:validierung' on page 35 undefined on input line 1
+43.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 142--150
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 150.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2561,19 +2685,40 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [35]
-Package cleveref Info: loaded `ngerman' language definitions on input line 317.
+Underfull \hbox (badness 10000) in paragraph at lines 151--158
 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 159--166
+
+ []
+
+(figures/inner_start_comparison.pgf)
+Underfull \hbox (badness 10000) in paragraph at lines 204--212
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 212.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 27.11652pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11652pt}.
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
 (fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [36]
-Package cleveref Info: loaded `ngerman' language definitions on input line 363.
+Underfull \hbox (badness 10000) in paragraph at lines 213--224
 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 225--233
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 233.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2583,30 +2728,56 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [37]
+Underfull \hbox (badness 10000) in paragraph at lines 234--240
 
-LaTeX Warning: Reference `eq:pv_A' on page 38 undefined on input line 396.
-
-
-LaTeX Warning: Reference `eq:pv_w' on page 38 undefined on input line 396.
+ []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 241--248
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 443.
+ []
 
 
+Overfull \hbox (4.02827pt too wide) in paragraph at lines 322--322
+\T1/lmr/m/n/12 (-20) nächs- 
+ []
 
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 27.11652pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11652pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
 
-[38]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Overfull \hbox (3.38832pt too wide) in paragraph at lines 322--322
+\T1/lmr/m/n/12 (-20) schlei- 
+ []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 443.
 
+Overfull \hbox (19.11108pt too wide) in paragraph at lines 322--322
+\T1/lmr/m/n/12 (-20) sägezahn 
+ []
+
+
+Overfull \hbox (4.02827pt too wide) in paragraph at lines 322--322
+\T1/lmr/m/n/12 (-20) nächs- 
+ []
+
+
+Overfull \hbox (3.38832pt too wide) in paragraph at lines 322--322
+\T1/lmr/m/n/12 (-20) schlei- 
+ []
+
+
+Overfull \hbox (19.11108pt too wide) in paragraph at lines 322--322
+\T1/lmr/m/n/12 (-20) sägezahn 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 328--336
+
+ []
+
+(figures/adaptive_inner_comparison.pgf)
+Underfull \hbox (badness 10000) in paragraph at lines 364--374
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 374.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2615,24 +2786,145 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[39]
-Overfull \vbox (15.20016pt too high) has occurred while \output is active []
+[38]
+Underfull \hbox (badness 10000) in paragraph at lines 375--380
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 443.
+ []
 
+
+Underfull \hbox (badness 10000) in paragraph at lines 383--396
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 397--408
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 408.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 27.11652pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11652pt}.
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
 (fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[39] (figures/salazar_adaptive_speedup.pgf)
+Underfull \hbox (badness 10000) in paragraph at lines 423--428
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 428.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [40]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 475.
-Package cleveref Info: loaded `ngerman' language definitions on input line 492.
+Overfull \hbox (21.6702pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) basierend 
+ []
 
+
+Overfull \hbox (5.89053pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) punkt- 
+ []
+
+
+Overfull \hbox (6.58704pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) schnel- 
+ []
+
+
+Overfull \hbox (8.33998pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) power? 
+ []
+
+
+Overfull \hbox (18.4091pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) variation 
+ []
+
+
+Overfull \hbox (12.01343pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) boxplot 
+ []
+
+
+Overfull \hbox (2.72807pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) durch 
+ []
+
+
+Overfull \hbox (4.01405pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) boxen 
+ []
+
+
+Overfull \hbox (21.6702pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) basierend 
+ []
+
+
+Overfull \hbox (5.89053pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) punkt- 
+ []
+
+
+Overfull \hbox (6.58704pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) schnel- 
+ []
+
+
+Overfull \hbox (8.33998pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) power? 
+ []
+
+
+Overfull \hbox (18.4091pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) variation 
+ []
+
+
+Overfull \hbox (12.01343pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) boxplot 
+ []
+
+
+Overfull \hbox (2.72807pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) durch 
+ []
+
+
+Overfull \hbox (4.01405pt too wide) in paragraph at lines 442--442
+\T1/lmr/m/n/12 (-20) boxen 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 446--454
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 455--464
+
+ []
+
+(figures/timing_vs_size_from_csv.pgf)
+Underfull \hbox (badness 10000) in paragraph at lines 475--482
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 483--491
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 497.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2642,20 +2934,128 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [41]
-Package cleveref Info: loaded `ngerman' language definitions on input line 531.
 
+LaTeX Warning: Citation 'bibid' on page 42 undefined on input line 498.
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 498--498
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 498--498
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+LaTeX Warning: Citation 'bibid' on page 42 undefined on input line 499.
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 499--499
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 499--499
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+LaTeX Warning: Citation 'bibid' on page 42 undefined on input line 503.
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 503--503
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 503--503
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 497--507
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 508--516
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 516.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 27.11652pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11652pt}.
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
 (fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [42]
-Package cleveref Info: loaded `ngerman' language definitions on input line 556.
+
+LaTeX Warning: Reference `sec:Konvergenz der Ã¤uÃŸeren Schleife: Gekoppelte Sen
+sitivitÃ¤t' on page 43 undefined on input line 518.
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 517--523
+
+ []
+
+
+Overfull \hbox (4.02827pt too wide) in paragraph at lines 535--535
+\T1/lmr/m/n/12 (-20) schau- 
+ []
+
+
+Overfull \hbox (4.02827pt too wide) in paragraph at lines 535--535
+\T1/lmr/m/n/12 (-20) schau- 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 536--541
+
+ []
+
+
+LaTeX Warning: Citation 'bibid' on page 43 undefined on input line 544.
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 544--544
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+Overfull \hbox (15.62514pt too wide) in paragraph at lines 544--544
+[][][]\T1/lmr/m/n/12 (-20) literatur[]  
+ []
+
+
+LaTeX Warning: Marginpar on page 43 moved.
+
+
+Overfull \hbox (26.4048pt too wide) in paragraph at lines 553--553
+\T1/lmr/m/n/12 (-20) aufbauend 
+ []
+
+
+Overfull \hbox (26.4048pt too wide) in paragraph at lines 553--553
+\T1/lmr/m/n/12 (-20) aufbauend 
+ []
+
+
+LaTeX Warning: Citation 'stott1974' on page 43 undefined on input line 2007.
+
+
+LaTeX Warning: Citation 'tinney1967' on page 43 undefined on input line 2007.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2001--2010
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 2014
+.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -2664,47 +3064,33 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [43]
-Package cleveref Info: loaded `ngerman' language definitions on input line 596.
+
+LaTeX Warning: Citation 'pandapower' on page 44 undefined on input line 2055.
 
 
+LaTeX Warning: Citation 'pandapower' on page 44 undefined on input line 2055.
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 2079
+.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 27.11652pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11652pt}.
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
 (fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [44]
-Underfull \hbox (badness 10000) in paragraph at lines 628--628
-[]|\T1/lmr/bx/n/12 (+20) Tensor-
+Underfull \hbox (badness 10000) in paragraph at lines 2084--2097
+
  []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 647.
 
+Underfull \hbox (badness 10000) in paragraph at lines 2098--2110
 
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+ []
 
-[45]) (chapters/05_implementierung.tex
-Package cleveref Info: loaded `ngerman' language definitions on input line 2.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 27.11652pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11652pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-15.11652pt}.
-
-[46]
-Kapitel 5.
-) (chapters/06_ergebnisse.tex [47
-
-]
-Package cleveref Info: loaded `ngerman' language definitions on input line 2.
-
+Package cleveref Info: loaded `ngerman' language definitions on input line 2133
+.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -2712,62 +3098,203 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[48
+[45] (figures/rx_inner_invariance.pgf
+LaTeX Font Info:    Trying to load font information for T1+lmss on input line 1
+70.
 
-]
-Kapitel 6.
-) (chapters/07_zusammenfassung.tex [49]
-Package cleveref Info: loaded `ngerman' language definitions on input line 2.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[50
-
-]
-Kapitel 7.
-) (chapters/implementierung_tpf.tex [51]
-Package cleveref Info: loaded `ngerman' language definitions on input line 3.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[52
-
-]
-Kapitel 8.
-[53]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 40.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 40.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 40.
-
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 5
-3.
-(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
-File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+(C:\Users\sgrigorevski\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmss.fd
+File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 Package microtype Info: Loading generic protrusion settings for font family
-(microtype)             `lmtt' (encoding: T1).
+(microtype)             `lmss' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-Package cleveref Info: loaded `ngerman' language definitions on input line 76.
+LaTeX Font Info:    Calculating math sizes for size <6.5> on input line 2391.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6.5> on input line 2391.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <4.54997> on input line 2391.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <3.25> on input line 2391.
+)
+Overfull \hbox (8.75514pt too wide) in paragraph at lines 4988--2147
+ [][] 
+ []
 
+
+LaTeX Warning: Reference `eq:eta-bound' on page 46 undefined on input line 2157
+.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2151--2167
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 2186
+.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[46] (figures/rx_collapse.pgf)
+Overfull \hbox (8.75514pt too wide) in paragraph at lines 2831--2249
+ [][] 
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 2251
+.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[47]
+
+LaTeX Warning: Reference `eq:eta-bound' on page 48 undefined on input line 2265
+.
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 2286
+.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[48]
+Underfull \hbox (badness 10000) in paragraph at lines 2312--2324
+
+ []
+
+
+LaTeX Warning: Reference `sec:methode_a_sensitivitaet' on page 49 undefined on 
+input line 2326.
+
+
+LaTeX Warning: Reference `tab:rx-predictor' on page 49 undefined on input line 
+2375.
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 2383
+.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[49]
+
+LaTeX Warning: Reference `tab:rx-outer-fail' on page 50 undefined on input line
+ 2390.
+
+
+LaTeX Warning: Reference `tab:rx-outer-fail' on page 50 undefined on input line
+ 2390.
+
+(figures/rx_outer_iterations.pgf)
+Overfull \hbox (8.75514pt too wide) in paragraph at lines 5314--2433
+ [][] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2451--2463
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 2463
+.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[50]
+Package cleveref Info: loaded `ngerman' language definitions on input line 2463
+.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[51]
+
+LaTeX Warning: Reference `tab:rx-outer-fail' on page 52 undefined on input line
+ 2478.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2464--2480
+
+ []
+
+
+LaTeX Warning: Reference `tab:rx-predictor' on page 52 undefined on input line 
+2489.
+
+
+LaTeX Warning: Reference `tab:rx-outer-fail' on page 52 undefined on input line
+ 2499.
+
+
+LaTeX Warning: Reference `tab:rx-nr' on page 52 undefined on input line 2516.
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 2520
+.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[52]
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 2522.
+
+
+LaTeX Warning: Reference `sec:methode_a_sensitivitaet' on page 53 undefined on 
+input line 2546.
+
+
+LaTeX Warning: Reference `sec:ausblick' on page 53 undefined on input line 2556
+.
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 2557
+.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[53]
+
+LaTeX Warning: Reference `tab:rx-nr' on page 54 undefined on input line 2564.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2583--2592
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2593--2610
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 2610
+.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -2776,14 +3303,16 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [54]
+Underfull \hbox (badness 10000) in paragraph at lines 2611--2623
 
-LaTeX Warning: Command \textdegree invalid in math mode on input line 92.
+ []
 
 
-LaTeX Warning: Command \textdegree invalid in math mode on input line 92.
+LaTeX Warning: Reference `sec:ausblick' on page 55 undefined on input line 2632
+.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 115.
-
+Package cleveref Info: loaded `ngerman' language definitions on input line 2670
+.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -2792,25 +3321,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [55]
-
-LaTeX Warning: Command \textdegree invalid in math mode on input line 117.
-
-
-LaTeX Warning: Command \textdegree invalid in math mode on input line 117.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 155.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `superscript' on input line 155.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 155.
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 170.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10.95> on input line 2792.
+Package cleveref Info: loaded `ngerman' language definitions on input line 2845
+.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2820,8 +3334,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [56]
-Package cleveref Info: loaded `ngerman' language definitions on input line 222.
-
+Package cleveref Info: loaded `ngerman' language definitions on input line 2900
+.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2831,13 +3345,17 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [57]
-Overfull \hbox (37.71864pt too wide) in paragraph at lines 250--250
-[]\T1/lmr/bx/n/14.4 (-20) Schritt 3.2: Be-rech-nung des kon-ju-gier-ten Stroms 
-(Hadamard-
+Overfull \hbox (8.57881pt too wide) in paragraph at lines 2976--2977
+ [][] 
  []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 271.
 
+Overfull \hbox (8.57881pt too wide) in paragraph at lines 3010--3011
+ [][] 
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 3029
+.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -2846,12 +3364,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [58]
-Overfull \hbox (51.70331pt too wide) in paragraph at lines 288--288
-[]\T1/lmr/bx/n/14.4 (-20) Schritt 3.3: Die Kern-Iteration (Matrix-Matrix-Multip
-likation) 
- []
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 326.
+Package cleveref Info: loaded `ngerman' language definitions on input line 3108
+.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2861,15 +3375,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [59]
-Overfull \hbox (32.40166pt too wide) in paragraph at lines 336--337
-\T1/lmr/m/n/12 (-20) Optimierung in der Pra-xis we-sent-lich schnel-ler als $\O
-ML/lmm/m/it/12 ^^\$ \T1/lmr/m/n/12 (-20) ein-zel-ne Matrix-Vektor-Multiplikatio
-nen. 
- []
-
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 350.
-Package cleveref Info: loaded `ngerman' language definitions on input line 377.
+Package cleveref Info: loaded `ngerman' language definitions on input line 3155
+.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2879,8 +3386,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [60]
-Package cleveref Info: loaded `ngerman' language definitions on input line 419.
-
+Package cleveref Info: loaded `ngerman' language definitions on input line 3211
+.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2890,8 +3397,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [61]
-Package cleveref Info: loaded `ngerman' language definitions on input line 470.
-
+Package cleveref Info: loaded `ngerman' language definitions on input line 3301
+.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2901,8 +3408,14 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [62]
-Package cleveref Info: loaded `ngerman' language definitions on input line 510.
-
+<figures/p1_kout_kin_vs_npv.pdf, id=1193, 457.91287pt x 223.6355pt>
+File: figures/p1_kout_kin_vs_npv.pdf Graphic file (type pdf)
+<use figures/p1_kout_kin_vs_npv.pdf>
+Package pdftex.def Info: figures/p1_kout_kin_vs_npv.pdf  used on input line 335
+6.
+(pdftex.def)             Requested size: 384.10962pt x 187.59319pt.
+Package cleveref Info: loaded `ngerman' language definitions on input line 3362
+.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2912,9 +3425,21 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [63]
-Package cleveref Info: loaded `ngerman' language definitions on input line 547.
+
+LaTeX Warning: Reference `sec:rx-verhaeltnis' on page 64 undefined on input lin
+e 3373.
 
 
+LaTeX Warning: Reference `sec:pv-share-interaktion' on page 64 undefined on inp
+ut line 3383.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3399--3411
+
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 3411
+.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -2922,18 +3447,18 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[64]
-Overfull \hbox (12.0899pt too wide) in paragraph at lines 557--558
-[]\T1/lmr/bx/n/12 (-20) SIMD-Parallelismus: \T1/lmr/m/n/12 (-20) Mo-der-ne CPUs
- kön-nen meh-re-re Gleitkomma-Operationen
+[64 <./figures/p1_kout_kin_vs_npv.pdf>]
+Underfull \hbox (badness 10000) in paragraph at lines 3423--3436
+
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 3462--3470
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 599.
+ []
 
-
+Package cleveref Info: loaded `ngerman' language definitions on input line 3470
+.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -2941,17 +3466,28 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[65]
-Overfull \hbox (18.34993pt too wide) in paragraph at lines 612--634
+[65] (figures/batch_scaling_tau.pgf
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <9> on input line 1166.
+LaTeX Font Info:    Calculating math sizes for size <6.8> on input line 3272.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6.8> on input line 3272.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <4.75998> on input line 3272.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <3.4> on input line 3272.
+)
+Overfull \hbox (28.50984pt too wide) in paragraph at lines 6525--3493
  [][] 
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 3497--3504
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 635.
+ []
 
-
+Package cleveref Info: loaded `ngerman' language definitions on input line 3505
+.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -2960,10 +3496,8 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [66]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 657.
-
+Package cleveref Info: loaded `ngerman' language definitions on input line 3592
+.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2973,8 +3507,30 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [67]
-Package cleveref Info: loaded `ngerman' language definitions on input line 680.
+Underfull \hbox (badness 10000) in paragraph at lines 3615--3626
 
+ []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 3626
+.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[68]
+Underfull \hbox (badness 10000) in paragraph at lines 3627--3636
+
+ []
+
+
+LaTeX Warning: Reference `sec:ausblick' on page 69 undefined on input line 3650
+.
+
+)
+Package cleveref Info: loaded `ngerman' language definitions on input line 99.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2983,7 +3539,34 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[68] (main.aux
+[69] (main.tdo)
+\tf@tdo=\write7
+\openout7 = `main.tdo'.
+
+ [70
+
+]
+Package microtype Info: Character `029' is missing
+(microtype)             in font `T1/lmr/m/sc/12'.
+(microtype)             Ignoring protrusion settings for this character.
+ [71
+
+
+]
+
+Package biblatex Warning: No driver for 'standard'.
+(biblatex)                Using fallback driver on input line 100.
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 108.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[72] (main.aux
 Package cleveref Info: loaded `ngerman' language definitions on input line 9.
 )
  ***********
@@ -2992,83 +3575,67 @@ L3 programming layer <2024-01-04>
  ***********
 
 
-LaTeX Font Warning: Some font shapes were not available, defaults substituted.
-
-
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: There were multiply-defined labels.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 003D86B1301CD52956C6C358B9E42F11;27513.
-
-Package biblatex Warning: Please (re)run Biber on the file:
-(biblatex)                main
-(biblatex)                and rerun LaTeX afterwards.
-
+(rerunfilecheck)             Checksum: 2799C0C19588D7BD0D9DE8C65D1CE194;16111.
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
- ) ) 
+ ) 
 Here is how much of TeX's memory you used:
- 43691 strings out of 474486
- 847446 string characters out of 5740452
- 1950542 words of memory out of 5000000
- 64195 multiletter control sequences out of 15000+600000
- 708050 words of font info for 323 fonts, out of 8000000 for 9000
+ 47873 strings out of 474486
+ 980878 string characters out of 5740452
+ 2005542 words of memory out of 5000000
+ 68454 multiletter control sequences out of 15000+600000
+ 801719 words of font info for 467 fonts, out of 8000000 for 9000
  1143 hyphenation exceptions out of 8191
- 104i,15n,104p,1151b,2768s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 104i,14n,104p,1180b,3044s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-pdfTeX warning (dest): name{cite.0@Garcia2000} has been referenced but does not
- exist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{cite.0@DaCosta1999} has been referenced but does no
-t exist, replaced by a fixed one
+pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist
+, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{cite.0@Grainger1994} has been referenced but does n
-ot exist, replaced by a fixed one
+pdfTeX warning (dest): name{Hfootnote.1} has been referenced but does not exist
+, replaced by a fixed one
 
-
-pdfTeX warning (dest): name{cite.0@Giraldo2022} has been referenced but does no
-t exist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{cite.0@Salazar2024} has been referenced but does no
-t exist, replaced by a fixed one
-
- <C:\Users\sgrigorevski\AppData\Local\MiKTeX\fonts/pk/ljfour/lh/lh-t2a/dpi600\l
-arm1200.pk><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/pub
-lic/lm/lmbx10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/ty
-pe1/public/lm/lmbx12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/f
-onts/type1/public/lm/lmcsc10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/
-MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Users/sgrigorevski/AppData/Local/Pr
-ograms/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/sgrigorevski/AppData/L
-ocal/Programs/MiKTeX/fonts/type1/public/lm/lmmi12.pfb><C:/Users/sgrigorevski/Ap
-pData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi6.pfb><C:/Users/sgrigorev
-ski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi7.pfb><C:/Users/sgr
-igorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Use
-rs/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib10.pfb
-><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr
+<C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx
 10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/
-lm/lmr12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/p
-ublic/lm/lmr6.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/ty
-pe1/public/lm/lmr7.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fon
-ts/type1/public/lm/lmr8.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTe
-X/fonts/type1/public/lm/lmri12.pfb><C:/Users/sgrigorevski/AppData/Local/Program
-s/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/sgrigorevski/AppData/Local/
-Programs/MiKTeX/fonts/type1/public/lm/lmsy6.pfb><C:/Users/sgrigorevski/AppData/
-Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy7.pfb><C:/Users/sgrigorevski/Ap
-pData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:/Users/sgrigorev
-ski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C:/Users/sg
-rigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/ms
-am10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/publi
-c/amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (88 pages, 810337 bytes).
+lm/lmbx12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/
+public/lm/lmbx8.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/
+type1/public/lm/lmcsc10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/lm/lmex10.pfb><C:/Users/sgrigorevski/AppData/Local/Program
+s/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/sgrigorevski/AppData/Local/
+Programs/MiKTeX/fonts/type1/public/lm/lmmi12.pfb><C:/Users/sgrigorevski/AppData
+/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi5.pfb><C:/Users/sgrigorevski/A
+ppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi6.pfb><C:/Users/sgrigore
+vski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi7.pfb><C:/Users/sg
+rigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Us
+ers/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi9.pfb>
+<C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi
+b10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public
+/lm/lmr10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/
+public/lm/lmr12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/
+type1/public/lm/lmr5.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/f
+onts/type1/public/lm/lmr6.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiK
+TeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/sgrigorevski/AppData/Local/Program
+s/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/sgrigorevski/AppData/Local/Pr
+ograms/MiKTeX/fonts/type1/public/lm/lmr9.pfb><C:/Users/sgrigorevski/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/lm/lmri12.pfb><C:/Users/sgrigorevski/AppD
+ata/Local/Programs/MiKTeX/fonts/type1/public/lm/lmss8.pfb><C:/Users/sgrigorevsk
+i/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/sgri
+gorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy5.pfb><C:/User
+s/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy6.pfb><C
+:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy7.
+pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/
+lmsy8.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/type1/publ
+ic/lm/lmtk10.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fonts/typ
+e1/public/lm/lmtt12.pfb><C:/Users/sgrigorevski/AppData/Local/Programs/MiKTeX/fo
+nts/type1/public/amsfonts/symbols/msam10.pfb><C:/Users/sgrigorevski/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on main.pdf (81 pages, 1098135 bytes).
 PDF statistics:
- 1879 PDF objects out of 2073 (max. 8388607)
- 668 named destinations out of 1000 (max. 500000)
- 85405 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 1616 PDF objects out of 1728 (max. 8388607)
+ 416 named destinations out of 1000 (max. 500000)
+ 135265 words of extra memory for PDF output out of 154059 (max. 10000000)
 

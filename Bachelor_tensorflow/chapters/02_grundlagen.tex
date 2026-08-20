@@ -4,19 +4,29 @@
 \label{ch:grundlagen}
 %======================================================================
 
-Die Lastflussberechnung (engl. \textit{Power Flow}, PF) ist eine der fundamentalsten Analysen in der elektrischen Energietechnik. Sie dient der Bestimmung der stationären Spannungen und Ströme an allen Knoten eines Netzes unter gegebenen Erzeugungs- und Verbrauchsbedingungen. Dieses Kapitel führt die mathematischen Grundlagen ein, auf denen die in \cref{ch:tpf,ch:methoden_pv} vorgestellten Methoden aufbauen.
+Zur Berechnung von stationären Spannungen und Strömen in Stromnetzen und der Analyse von Leistungen ist die Lastflussberechnung in der Energietechnik eine der Grundlegenden Verfahren. In diesem Kapitel werden folgend die mathematischen Grundlagen eingeführt, die als Basis für diese Ausarbeitung verwendet werden.
+
+
+%Die Lastflussberechnung (engl. \textit{Power Flow}, PF) ist eine der fundamentalsten Analysen in der elektrischen Energietechnik. Sie dient der Bestimmung der stationären Spannungen und Ströme an allen Knoten eines Netzes unter gegebenen Erzeugungs- und Verbrauchsbedingungen. Dieses Kapitel führt die mathematischen Grundlagen ein, auf denen die in \cref{ch:tpf,ch:methoden_pv} vorgestellten Methoden aufbauen.
 
 \section{Netzmodell und Knotentypen}
 \label{sec:netzmodell}
 
-Dieses Kapitel führt die grundlegende Modellierung eines elektrischen Verteilnetzes für die Lastflussberechnung ein. Alle in den folgenden Kapiteln verwendeten Symbole und Konventionen werden hier definiert. Die Darstellung orientiert sich an der in \cite{Salazar2024} und \cite{Giraldo2022} verwendeten Notation, die als Grundlage für die spätere Tensorformulierung dient.
+Bevor die Berechnung von Lastflüssen eingeführt wird, ist zunächst eine Modellierung von elektrischen Netzen notwendig.
+Diese folgt der Notation in \cite{Salazar2024} und \cite{Giraldo2022}, da sich die Tensorformulierung, als auch Implementierung in Kapitel \cref{ch:tpf,ch:methoden_pv} nach dieser richtet.  
+
+%Dieses Kapitel führt die grundlegende Modellierung eines elektrischen Verteilnetzes für die Lastflussberechnung ein. Alle in den folgenden Kapiteln verwendeten Symbole und Konventionen werden hier definiert. Die Darstellung orientiert sich an der in \cite{Salazar2024} und \cite{Giraldo2022} verwendeten Notation, die als Grundlage für die spätere Tensorformulierung dient.
 
 \subsection{Admittanzformulierung des Netzes}
 \label{subsec:admittanz}
 
-Ein elektrisches Netz wird als gerichteter Graph mit einer Knotenmenge $\Omega_B$ modelliert. Diese wird disjunkt zerlegt in die Menge der Slack-Knoten $\Omega_s$ und die Menge der Lastknoten $\Omega_d$, sodass $\Omega_B = \Omega_s \cup \Omega_d$ und $\Omega_s \cap \Omega_d = \emptyset$ gilt. Sei $b = |\Omega_d|$ die Anzahl der Lastknoten.
+Ein elektrisches Netz kann als Graph mit einer Gesamtknotenmenge $\Omega_\mathrm{B}$ modelliert werden. Diese besteht aus Quellknoten (Slack-Knoten), die eine Energiezufuhr modellieren und in der Menge $\Omega_\mathrm{s}$ enthalten sind. Die restlichen Knoten sind Lastknoten (\emph{drain}) und haben die Menge $\Omega_\mathrm{d}$. Diese Mengen sind disjunkt, sodass $\Omega_B = \Omega_s \cup \Omega_d$ und $\Omega_s \cap \Omega_d = \emptyset$. Zur kompakteren Schreibweise beschreibt $b = |\Omega_\mathrm{d}|$ die Anzahl der Lastknoten.\\
 
-Die Beziehung zwischen den komplexen Knotenspannungen $\mathbf{v} \in \mathbb{C}^{|\Omega_B|}$ und den komplexen Knotenstromeinspeisungen $\mathbf{i} \in \mathbb{C}^{|\Omega_B|}$ wird durch die Knotenadmittanzmatrix $\mathbf{Y} \in \mathbb{C}^{|\Omega_B| \times |\Omega_B|}$ nach dem Kirchhoffschen Knotensatz beschrieben. Durch Umsortierung der Knoten in Slack- und Lastknoten kann die Admittanzmatrix in Blockform dargestellt werden~\cite{Salazar2024}:
+An allen Knoten gelten das Ohm'sche und Kirchoff'sche Gesetz welches erweitert auf ein Multiknotensystem durch das Vektor-Matrix-System
+
+%Ein elektrisches Netz wird als gerichteter Graph mit einer Knotenmenge $\Omega_B$ modelliert. Diese wird disjunkt zerlegt in die Menge der Slack-Knoten $\Omega_s$ und die Menge der Lastknoten $\Omega_d$, sodass $\Omega_B = \Omega_s \cup \Omega_d$ und $\Omega_s \cap \Omega_d = \emptyset$ gilt. Sei $b = |\Omega_d|$ die Anzahl der Lastknoten.
+%
+%Die Beziehung zwischen den komplexen Knotenspannungen $\mathbf{v} \in \mathbb{C}^{|\Omega_B|}$ und den komplexen Knotenstromeinspeisungen $\mathbf{i} \in \mathbb{C}^{|\Omega_B|}$ wird durch die Knotenadmittanzmatrix $\mathbf{Y} \in \mathbb{C}^{|\Omega_B| \times |\Omega_B|}$ nach dem Kirchhoffschen Knotensatz beschrieben. Durch Umsortierung der Knoten in Slack- und Lastknoten kann die Admittanzmatrix in Blockform dargestellt werden~\cite{Salazar2024}:
 \begin{equation}
 	\label{eq:admittance_block}
 	\begin{bmatrix} \mathbf{i}_s \\ -\mathbf{i}_d \end{bmatrix}
@@ -24,80 +34,119 @@ Die Beziehung zwischen den komplexen Knotenspannungen $\mathbf{v} \in \mathbb{C}
 	\begin{bmatrix} \mathbf{Y}_{ss} & \mathbf{Y}_{sd} \\ \mathbf{Y}_{ds} & \mathbf{Y}_{dd} \end{bmatrix}
 	\begin{bmatrix} \mathbf{v}_s \\ \mathbf{v}_d \end{bmatrix}
 \end{equation}
-Dabei bezeichnet $\mathbf{v}_s \in \mathbb{C}^{|\Omega_s|}$ die bekannten Slack-Spannungen und $\mathbf{v}_d \in \mathbb{C}^{b}$ die unbekannten Spannungen an den Lastknoten. Das negative Vorzeichen bei $\mathbf{i}_d$ folgt aus der Konvention, dass Einspeisungen positiv, Bezüge (Lasten) negativ gezählt werden.
 
-Aus dem unteren Block von \eqref{eq:admittance_block} folgt die zentrale Gleichung für die Lastknoten:
+beschrieben wird. 
+Dabei stehen komplexen Knotenspannungen $\mathbf{v} \in \mathbb{C}^{|\Omega_\mathrm{B}|}$ und $\mathbf{i} \in \mathbb{C}^{|\Omega_\mathrm{B}|}$ über die Admittanzmatrix $\mathbf{Y} \in \mathbb{C}^{|\Omega_\mathrm{B}| \times |\Omega_\mathrm{B}|}$ in Beziehung \cite{TinneyHart1967, Stott1974, Bernstein2018, Chen1991}. \todo{literatur} 
+Aufgespalten nach den eingeführten Knotenmengen bezeichnet $\mathbf{v}_\mathrm{s} \in \mathbb{C}^{|\Omega_\mathrm{s}|}$ die bekannten Quellspannungen und $\mathbf{v}_\mathrm{d} \in \mathbb{C}^{b}$ die unbekannten Spannungen an den Lastknoten. Das negative Vorzeichen bei $\mathbf{i}_d$ folgt aus der Konvention, dass Quellen positiv, jedoch Lasten negativ gewertet werden \cite{Kersting2017, Milano2010}. \\ \todo{literatur}
+
+Aus Gleichung \eqref{eq:admittance_block} lässt sich der Ausdruck für den Laststrom 
+
+%Aus dem unteren Block von \eqref{eq:admittance_block} folgt die zentrale Gleichung für die Lastknoten:
 \begin{equation}
 	\label{eq:current_balance}
 	-\mathbf{i}_d = \mathbf{Y}_{ds}\mathbf{v}_s + \mathbf{Y}_{dd}\mathbf{v}_d
 \end{equation}
-Die Beziehung zwischen komplexer Knotenleistung $\mathbf{s}_d$ und Knotenstrom $\mathbf{i}_d$ ist elementweise durch
+
+für die nachfolgende Fixpunktiteration isolieren.
+Die komplexe Knotenleistung $\mathbf{s}_\mathrm{d}$ und Knotenstrom $\mathbf{i}_\mathrm{d}$ ist elementweise durch
 \begin{equation}
 	\label{eq:power_current}
 	\mathbf{s}_d = \mathbf{v}_d \odot \mathbf{i}_d^{*}
 	\quad\Longleftrightarrow\quad
 	\mathbf{i}_d = \left(\mathbf{s}_d \oslash \mathbf{v}_d\right)^{*}
 \end{equation}
-gegeben, wobei $\odot$ das Hadamard-Produkt, $\oslash$ die Hadamard-Division und $(\cdot)^{*}$ die komplexe Konjugation bezeichnet. Die Nichtlinearität des Lastflussproblems entsteht ausschließlich durch das Produkt $\mathbf{v}_d \odot \mathbf{i}_d^{*}$ in \eqref{eq:power_current}. Einsetzen in \eqref{eq:current_balance} liefert die Grundgleichung des Lastflusses:
+charakterisiert\todo{literatur}, wobei $\odot$ das Hadamard-Produkt und $\oslash$ die Hadamard-Division und $(\cdot)^{*}$ die komplexe Konjugation darstellt~\cite{Grainger1994, Milano2010, Bernstein2018}. 
+Die Nichtlinearität des Lastflussproblems entsteht durch das Produkt des Stroms mit der Spannung in \eqref{eq:power_current}. 
+Eingesetzt in \eqref{eq:current_balance} entsteht die Grundgleichung des Lastflusses
+%Einsetzen in \eqref{eq:current_balance} liefert die Grundgleichung des Lastflusses:
 \begin{equation}
 	\label{eq:pf_fundamental}
 	-\operatorname{diag}(\mathbf{v}_d^{*})^{-1}\mathbf{s}_d^{*} = \mathbf{Y}_{ds}\mathbf{v}_s + \mathbf{Y}_{dd}\mathbf{v}_d
 \end{equation}
-Diese Formulierung ist allgemein und gilt sowohl für einphasige und mehrphasige als auch für radiale und vermaschte Netze~\cite{Salazar2024}. Sie bildet den Ausgangspunkt für die in Kapitel~\ref{sec:tpf} vorgestellte Fixpunkt-Formulierung.
+
+welche allgemein ist und gilt sowohl für beliebig-phasige als auch für radiale und vermaschte Netze~\cite{Salazar2024}. Sie bildet den Ausgangspunkt für die in Kapitel~\ref{ch:tpf} vorgestellte Fixpunktiteration.
 
 \subsection{Knotentypen}
 \label{subsec:knotentypen}
 
-In der Lastflussberechnung werden Netzknoten anhand der jeweils vorgegebenen und gesuchten Größen klassifiziert. Jeder Knoten besitzt vier elektrische Größen -- Wirkleistung $P$, Blindleistung $Q$, Spannungsbetrag $|V|$ und Spannungswinkel $\theta$ --, von denen im Lastfluss zwei vorgegeben und zwei unbekannt sind. Daraus ergeben sich drei Standardtypen, dargestellt in Tabelle~\ref{tab:knotentypen}.\\
+Jeder elektrische Knoten verfügt über vier Größen: der Wirkleistung $P$, der Blindleistung $Q$, dem Spannungsbetrag $|V|$ und dem Spannungswinkel $\theta$. 
+Davon sind immer zwei für den Lastfluss bekannt und die Klassifikation von Lastknoten erfolgt über deren gesuchten und gegebenen Größen. 
+Auf dieser Basis folgen die in Tabelle~\ref{tab:knotentypen} vorgestellten drei Knotentypen: PQ-, PV- und Slack-Knoten.\\ 
+
+%In der Lastflussberechnung werden Netzknoten anhand der jeweils vorgegebenen und gesuchten Größen klassifiziert. Jeder Knoten besitzt vier elektrische Größen -- Wirkleistung $P$, Blindleistung $Q$, Spannungsbetrag $|V|$ und Spannungswinkel $\theta$ --, von denen im Lastfluss zwei vorgegeben und zwei unbekannt sind. Daraus ergeben sich drei Standardtypen, dargestellt in Tabelle~\ref{tab:knotentypen}.\\
 
 \begin{table}[h]
 	\centering
-	\caption{Knotentypen im Lastflussproblem}
+	\caption{Knotentypen im Lastflussproblem unter gesuchten und gegebenen Größen mit Anwendungsbeispielen~\cite{TinneyHart1967, Stott1974, Milano2010, Zimmerman2011}}
 	\label{tab:knotentypen}
 	\begin{tabular}{lccp{8.9cm}}
 		\toprule
 		Typ & Bekannt & Unbekannt & Typische Netzelemente \\
+        \hline\hline
+		Slack & $|V|,\theta$ & $P,Q$ &{ \footnotesize Umspannwerk zum überlagerten Netz (Netzverknüpfungspunkt), Referenzgenerator im Übertragungsnetz }\\
 		\midrule
-		Slack & $|V|,\theta$ & $P,Q$ & Umspannwerk zum überlagerten Netz (Netzverknüpfungspunkt), Referenzgenerator im Übertragungsnetz \\
-		PQ    & $P,Q$        & $|V|,\theta$ & Haushalts- und Gewerbelasten, Industrieabnehmer, kleine PV-Anlagen im $\cos\varphi$-Betrieb, ungeregelte Windkraftanlagen, konventionelle Verbraucher \\
-		PV    & $P,|V|$      & $Q,\theta$ & Synchrongeneratoren mit Erregerregelung (Wasser-, Gas-, Dampfkraftwerke), größere PV-Anlagen und Batteriewechselrichter mit Q(U)-Regelung nach VDE-AR-N 4110/4120, STATCOM-Anlagen \\
+		PQ    & $P,Q$        & $|V|,\theta$ & {\footnotesize Haushalts- und Gewerbelasten, Industrieabnehmer, kleine PV-Anlagen im $\cos\phi$-Betrieb, ungeregelte Windkraftanlagen, konventionelle Verbraucher} \\
+		\midrule
+		PV    & $P,|V|$      & $Q,\theta$ & {\footnotesize Synchrongeneratoren mit Erregerregelung (Wasser-, Gas-, Dampfkraftwerke), größere PV-Anlagen und Batteriewechselrichter mit Q(U)-Regelung nach VDE-AR-N 4110/4120, STATCOM-Anlagen} \\
 		\bottomrule
 	\end{tabular}
 \end{table}
 \todo{literatur.}
 
-Der Slack-Knoten dient als Winkel- und Spannungsreferenz des Netzes. Sein Spannungsbetrag und -winkel sind fest vorgegeben (typischerweise $|V|=1{,}0$~p.u. und $\theta = 0$). Er bilanziert die im Netz auftretenden Verluste sowie die Differenz zwischen Erzeugung und Verbrauch, weshalb seine Wirk- und Blindleistungseinspeisungen erst nach Lösung des Lastflusses berechnet werden können. In Verteilnetzen entspricht der Slack-Knoten dem Netzverknüpfungspunkt zum überlagerten Netz.\\
+%Der Slack-Knoten dient als Winkel- und Spannungsreferenz des Netzes. Sein Spannungsbetrag und -winkel sind fest vorgegeben (typischerweise $|V|=1{,}0$~p.u. und $\theta = 0$). Er bilanziert die im Netz auftretenden Verluste sowie die Differenz zwischen Erzeugung und Verbrauch, weshalb seine Wirk- und Blindleistungseinspeisungen erst nach Lösung des Lastflusses berechnet werden können. In Verteilnetzen entspricht der Slack-Knoten dem Netzverknüpfungspunkt zum überlagerten Netz.\\
+Slack-Knoten sind Einspeisungsknoten und fungieren als Spannungs- und Winkelreferenz eines Netzes. 
+Hier sind dementsprechend Spannungswinkel und -betrag konstruktiv vorgegeben und der Slack-Knoten bilanziert die Differenz zwischen Erzeugung und Verbrauch.
+Dadurch ist es weiterhin erst nach der Lastflussberechnung möglich die Einspeisung von Wirk- und Blindleistungen zu bestimmen. 
+In den hier verwendeten Verteilernetzen modelliert der Slack-Knoten die Anbindung zur übergeordneten Netzebene~\cite{Stott1974, Milano2010, Kundur1994}.\\
 \todo{literatur.}
 
-An PQ-Knoten sind Wirk- und Blindleistung vorgegeben, während Spannungsbetrag und -winkel gesucht sind. Sie modellieren typische Lasten sowie Einspeiser ohne Spannungsregelung (z.\,B.\ kleine PV-Anlagen im $\cos\varphi$-Betrieb). Die überwiegende Mehrheit der Knoten in Verteilnetzen ist von diesem Typ.\\
+%An PQ-Knoten sind Wirk- und Blindleistung vorgegeben, während Spannungsbetrag und -winkel gesucht sind. Sie modellieren typische Lasten sowie Einspeiser ohne Spannungsregelung (z.\,B.\ kleine PV-Anlagen im $\cos\varphi$-Betrieb). Die überwiegende Mehrheit der Knoten in Verteilnetzen ist von diesem Typ.\\
+PQ-Knoten modellieren typische Lasten in einem elektrischen Netz, wie z.B. kleine PV-Anlagen im $\cos\phi$-Betrieb, oder Haushaltsgeräte. An solchen Knoten ist die Wirk- und Blindleistung vorgegeben und es wird der Spannungsbetrag und -winkel im Lastfluss berechnet. Dieser Knotentyp ist für gewöhnlich am meißten vertreten~\cite{Kersting2017, Milanovic2013}.\\
 \todo{literatur.}
 
-An PV-Knoten sind Wirkleistung und Spannungsbetrag vorgegeben, während Blindleistung und Spannungswinkel unbekannt sind. Sie modellieren Synchrongeneratoren mit Erregerregelung sowie größere PV-Anlagen und Batteriewechselrichter mit Spannungshaltungsfunktion. Physikalisch stellt der PV-Knoten eine Blindleistungsquelle bzw. -senke dar, die soviel $Q$ einspeist oder aufnimmt, wie zur Einhaltung des Spannungssollwertes $|V_k^{\text{spec}}|$ nötig ist.\\
-
+%An PV-Knoten sind Wirkleistung und Spannungsbetrag vorgegeben, während Blindleistung und Spannungswinkel unbekannt sind. Sie modellieren Synchrongeneratoren mit Erregerregelung sowie größere PV-Anlagen und Batteriewechselrichter mit Spannungshaltungsfunktion. Physikalisch stellt der PV-Knoten eine Blindleistungsquelle bzw. -senke dar, die soviel $Q$ einspeist oder aufnimmt, wie zur Einhaltung des Spannungssollwertes $|V_k^{\text{spec}}|$ nötig ist.\\
+PV-Knoten modellieren Synchrongeneratoren mit Erregerregelung sowie größere PV-Anlagen und Batteriewechselrichter mit Spannungshaltungsfunktion. Dort sind der Spannungsbetrag und Wirkleistung vorgegeben. Dadurch ist ein PV-Knoten eine Blindleistungsquelle/-senke, da sie genau so viel Blindleistung erzeugt oder aufnimmt, um die nötige Spannung $|V_k^{\text{spec}}|$ und Wirkleistung aufrecht zu erhalten~\cite{daCosta1999, Kundur1994, IEEE1547_2018}.\\
 \todo{literatur.}
 
-In der Praxis ist die Blindleistungseinspeisung durch die Kapazität der Regeleinrichtung begrenzt:
-\begin{equation}
-	\label{eq:qlimits}
-	Q_k^{\min} \leq Q_k \leq Q_k^{\max}
-\end{equation}
-Wird eine Grenze erreicht, so wird der Knoten üblicherweise in einen PQ-Knoten mit $Q_k = Q_k^{\min}$ bzw.\ $Q_k = Q_k^{\max}$ umgewandelt und die Spannungsbedingung $|V_k|=|V_k^{\text{spec}}|$ wird dann fallengelassen. Diese Umschaltung wird in Kapitel~\ref{sec:pv_methoden} bei den vorgeschlagenen Methoden berücksichtigt.\\ \todo{literatur.}
+%In der Praxis ist die Blindleistungseinspeisung durch die Kapazität der Regeleinrichtung begrenzt:
+%\begin{equation}
+%	\label{eq:qlimits}
+%	Q_k^{\min} \leq Q_k \leq Q_k^{\max}
+%\end{equation}
+%Wird eine Grenze erreicht, so wird der Knoten üblicherweise in einen PQ-Knoten mit $Q_k = Q_k^{\min}$ bzw.\ $Q_k = Q_k^{\max}$ umgewandelt und die Spannungsbedingung $|V_k|=|V_k^{\text{spec}}|$ wird dann fallengelassen. Diese Umschaltung wird in Kapitel~\ref{sec:pv_methoden} bei den vorgeschlagenen Methoden berücksichtigt.\\ \todo{literatur.}
 
-Die Behandlung der PV-Knoten ist der methodische Kern dieser Arbeit: Während sie sich in das Newton-Raphson-Verfahren (Abschnitt~\ref{sec:nr}) auf natürliche Weise über eine Modifikation der Jacobi-Matrix einfügen lassen~\cite{daCosta1999}, bricht bei ihrer Übertragung auf die Fixpunkt-Iteration die zentrale Voraussetzung einer konstanten Systemmatrix, zusammen. Dies motiviert die in dieser Arbeit entwickelten Methoden A und B.
+%Die Behandlung der PV-Knoten ist der methodische Kern dieser Arbeit: Während sie sich in das Newton-Raphson-Verfahren (Abschnitt~\ref{sec:nr}) auf natürliche Weise über eine Modifikation der Jacobi-Matrix einfügen lassen~\cite{daCosta1999}, bricht bei ihrer Übertragung auf die Fixpunkt-Iteration die zentrale Voraussetzung einer konstanten Systemmatrix, zusammen. Dies motiviert die in dieser Arbeit entwickelten Methode.
+
+Diese Verteilung der gegebenen und gesuchten Größen motiviert den Kern dieser Ausarbeitung. 
+PV-Knoten setzen andere Informationen über das Netz voraus und bedürfen einer eigenen Handhabung in den Lösungsverfahren. 
+In Abschnitt~\ref{sec:nr} wird deren Behandlung im Newton-Raphson (NR) eingeführt.
+Dort wird aufgezeigt wieso die Implementierung im NR über eine simple Modifikation in der Jakobi-Matrix erfolgen kann, wohingegen die Implementierung in der Fixpunktiteration zu dem zentralen Problem dieser Arbeit führt. 
 
 \subsection{Lastmodellierung}
 \label{subsec:lastmodell}
 
-Reale Lasten sind spannungsabhängig. Zur Modellierung dieser Abhängigkeit wird das ZIP-Modell verwendet, das die Last als Superposition eines konstanten Impedanzanteils ($Z$), eines konstanten Stromanteils ($I$) und eines konstanten Leistungsanteils ($P$) beschreibt~\cite{Giraldo2022}:
+%Reale Lasten sind spannungsabhängig. Zur Modellierung dieser Abhängigkeit wird das ZIP-Modell verwendet, das die Last als Superposition eines konstanten Impedanzanteils ($Z$), eines konstanten Stromanteils ($I$) und eines konstanten Leistungsanteils ($P$) beschreibt~\cite{Giraldo2022}:
+Elektrische Lasten sind weiterhin selber spannungsabhängig. 
+Den Industriestandard bildet das ZIP-Modell welches eine Last durch eine Superposition eines konstanten Impedanzanteils ($Z$), eines konstanten Stromanteils ($I$) und eines konstanten Leistungsanteils ($P$) als eine Funktion der Spannung beschreibt~\cite{Giraldo2022}. \todo{literatur} 
+Die Leistung setzt sich dementsprechend durch
+
 \begin{equation}
 	\label{eq:zip}
 	\mathbf{s}_d = \left(\boldsymbol{\alpha}_P + \boldsymbol{\alpha}_I \odot |\mathbf{v}_d| + \boldsymbol{\alpha}_Z \odot |\mathbf{v}_d|^2\right) \odot \mathbf{s}_n
 \end{equation}
-Dabei ist $\mathbf{s}_n$ die Nennleistung des Verbrauchers und $\boldsymbol{\alpha}_P, \boldsymbol{\alpha}_I, \boldsymbol{\alpha}_Z$ sind die knotenweisen ZIP-Koeffizienten mit
+
+zusammen. $\mathbf{s}_n$ ist hier die Nennleistung der Last und $\boldsymbol{\alpha}_P, \boldsymbol{\alpha}_I, \boldsymbol{\alpha}_Z$ sind die vektoriellen knotenweisen ZIP-Koeffizienten. 
+Dabei gilt, dass die Summe der Koeffizienten eines Knotens sich zu eins aufaddieren 
+
 \begin{equation}
 	\alpha_{P,k} + \alpha_{I,k} + \alpha_{Z,k} = 1 \quad \forall k \in \Omega_d
 \end{equation}
-Der Fall $\boldsymbol{\alpha}_P = \mathbf{1}$, $\boldsymbol{\alpha}_I = \boldsymbol{\alpha}_Z = \mathbf{0}$ entspricht dem \emph{konstanten Leistungsmodell}, welches in dieser Arbeit als Standardfall angenommen wird. Diese Annahme ist konsistent mit der Praxis in \texttt{pandapower} und ermöglicht die entscheidende Vereinfachung, dass die Systemmatrix der Fixpunkt-Iteration szenarienunabhängig konstant wird (siehe Abschnitt~\ref{sec:fpi}).
+
+und das Modell damit bloß die Aufteilung der Spannungsabhängigkeit beschreibt.
+Der Fall $\boldsymbol{\alpha}_P = \mathbf{1}$, $\boldsymbol{\alpha}_I = \boldsymbol{\alpha}_Z = \mathbf{0}$ entspricht einem konstanten Leistungsmodell, welches in dieser Arbeit als Standardfall angenommen wird.
+Diese Annahme ist in stationären Netzen und in Optimierungsrechnungen gängig, da konstante Lasten keine Selbstregulierung aufweisen und somit die maximalen Spannungsabfälle und Verluste vorweisen und damit den ungünstigsten Fall darstellen \cite{Kundur1994,Kersting2017,IEEETF1995,VanCutsem1998,Bolognani2016}. \todo{check}
+
+
 
 \subsection{Thévenin-Äquivalent an einem Lastknoten}
 \label{subsec:thevenin}
@@ -437,7 +486,7 @@ schreiben. Diese kompakte Form ist die Grundlage der Tensorformulierung, da $\ma
 		
 		\STATE Initialisiere $k = 0$, $\text{tol} = \infty$
 		\STATE Initialisiere $\mathrm{V}^0_{i,\phi} = [1, a^2, a]$ für alle $i \in \Omega_d$ \COMMENT{Flat Start, $a = e^{\jj 2\pi/3}$}
-		\STATE Berechne $\vect{B}^{-1}$ und $\vect{C}$ gemäß \eqref{eq:giraldo_B}--\eqref{eq:giraldo_C} \COMMENT{Einmalig!}
+		\STATE Berechne $\vect{B}^{-1}$ und $\vect{C}$ gemäß \eqref{eq:giraldo_B}--\eqref{eq:giraldo_C}
 		
 		\WHILE{$\text{tol} \geq \varepsilon$ \textbf{und} $k < K$}
 		\STATE Berechne $\vect{A}^{(k)}$ und $\vect{D}^{(k)}$ gemäß \eqref{eq:giraldo_A}--\eqref{eq:giraldo_D}

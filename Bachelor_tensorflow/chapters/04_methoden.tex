@@ -960,154 +960,172 @@ bleibt, was nachfolgend numerisch berücksichtigt wird.
 %	\label{eq:eta_methode_a}
 %\end{equation}
 
-%======================================================================
-\section{Methode B: Eingebettete Q-Korrektur}
-\label{sec:methode_b}
-%======================================================================
+%%======================================================================
+%\section{Methode B: Eingebettete Q-Korrektur}
+%\label{sec:methode_b}
+%%======================================================================
+%
+%\subsection{Grundidee}
+%\label{subsec:methode_b_idee}
+%
+%Im Gegensatz zu Methode~A, die eine verschachtelte Schleifenstruktur erfordert, integriert Methode~B die PV-Knoten-Behandlung direkt in \textit{jede} FPI-Iteration. Die Grundidee besteht aus drei Schritten, die nach dem regulären FPI-Update ausgeführt werden:
+%\begin{enumerate}
+%	\item \textbf{Spannungsbetrags-Projektion:} Der an einem PV-Knoten berechnete Spannungszeiger wird in seiner Richtung (Winkel) beibehalten, aber im Betrag auf den Sollwert $|V_k^{\spec}|$ skaliert.
+%	\item \textbf{Q-Rückrechnung:} Die Blindleistung wird aus der Netzgleichung (Kirchhoff'sches Knotengesetz) mit dem projizierten Spannungszeiger exakt zurückberechnet.
+%	\item \textbf{Hilfsmatrizen-Update:} Die Matrizen $\vect{A}$, $\vect{B}$ (falls nötig), $\vect{c}$, $\vect{F}$, $\vect{w}$ werden mit dem neuen $Q_k$ aktualisiert.
+%\end{enumerate}
+%
+%Dieser Ansatz erzwingt die Spannungsbedingung $|v_k| = |V_k^{\spec}|$ in jeder Iteration \textit{exakt}. Die Blindleistung ergibt sich direkt aus der Leistungsbilanz, ohne Linearisierung oder Sensitivitätsapproximation.
+%
+%\subsection{Mathematische Formulierung}
+%\label{subsec:methode_b_formulierung}
+%
+%
+%Die reguläre FPI-Iteration \eqref{eq:pv_fpi_basis} wird mit den aktuellen Matrizen $\vect{F}^{(n)}$, $\vect{w}^{(n)}$ durchgeführt:
+%\begin{equation}
+%	\vect{v}_{(n+1)}' = \vect{F}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}^{(n)}
+%	\label{eq:methode_b_fpi}
+%\end{equation}
+%
+%Der Strich in $\vect{v}_{(n+1)}'$ kennzeichnet, dass dies ein Zwischenergebnis ist, das an den PV-Knoten noch korrigiert wird. An PQ-Knoten gilt $v_{k,(n+1)} = v_{k,(n+1)}'$ ohne Korrektur.
+%
+%
+%An jedem PV-Knoten $k \in \Omega_{\text{PV}}$ wird der Spannungszeiger auf den Sollbetrag projiziert:
+%\begin{equation}
+%	v_{k,(n+1)} = |V_k^{\spec}| \cdot \frac{v_{k,(n+1)}'}{|v_{k,(n+1)}'|}
+%	\label{eq:methode_b_projektion}
+%\end{equation}
+%
+%Dies ist eine reine Skalierungsoperation. Der resultierende Spannungszeiger hat den korrekten Betrag $|v_{k,(n+1)}| = |V_k^{\spec}|$ und einen aus der FPI-Iteration stammenden Winkel.
+%
+%
+%Nach der Projektion ist die Spannung am PV-Knoten bekannt. Der zugehörige Strom ergibt sich aus der Admittanzmatrix:
+%\begin{equation}
+%	i_{k,(n+1)} = \sum_{m \in \Omega_d} Y_{dd,km} \cdot v_{m,(n+1)} + (\Yds)_k \cdot \vect{v}_s
+%	\label{eq:methode_b_strom}
+%\end{equation}
+%
+%Die komplexe Leistung am PV-Knoten ergibt sich zu:
+%\begin{equation}
+%	s_{k,(n+1)}^{\text{calc}} = v_{k,(n+1)} \cdot i_{k,(n+1)}^*
+%	\label{eq:methode_b_leistung}
+%\end{equation}
+%
+%Die Blindleistung ist der Imaginärteil:
+%\begin{equation}
+%	Q_k^{(n+1)} = \im\left(v_{k,(n+1)} \cdot i_{k,(n+1)}^*\right)
+%	\label{eq:methode_b_Q}
+%\end{equation}
+%
+%Die so berechnete Blindleistung die Netzgleichung \textit{exakt} erfüllt, im Gegensatz zur linearisierten Sensitivitätsformel \eqref{eq:methode_a_dQ} aus Methode~A.
+%
+%
+%Der Leistungsvektor wird aktualisiert:
+%\begin{equation}
+%	s_k^{(n+1)} = P_k^{\spec} + \jj Q_k^{(n+1)}, \quad \forall k \in \Omega_{\text{PV}}
+%	\label{eq:methode_b_s_update}
+%\end{equation}
+%
+%Anschließend werden die Hilfsmatrizen für die nächste Iteration neu berechnet:
+%\begin{align}
+%	\vect{A}^{(n+1)} &= \diag(\alpha_P \had \vect{s}^{*(n+1)}) \label{eq:methode_b_A_update}\\
+%	\vect{B}^{(n+1)} &= \diag(\alpha_Z \had \vect{s}^{*(n+1)}) + \Ydd \label{eq:methode_b_B_update}\\
+%	\vect{c}^{(n+1)} &= \Yds\vect{v}_s + \alpha_I \had \vect{s}^{*(n+1)} \label{eq:methode_b_c_update}\\
+%	\vect{F}^{(n+1)} &= -(\vect{B}^{(n+1)})^{-1}\vect{A}^{(n+1)} \label{eq:methode_b_F_update}\\
+%	\vect{w}^{(n+1)} &= -(\vect{B}^{(n+1)})^{-1}\vect{c}^{(n+1)} \label{eq:methode_b_w_update}
+%\end{align}
+%
+%
+%In diesem häufigen Spezialfall sind $\vect{B}$, $\vect{B}^{-1}$ und $\vect{c}$ konstant. Es müssen lediglich die Einträge von $\vect{A}$ an den PV-Knoten-Positionen aktualisiert werden, und $\vect{F}$ ergibt sich durch Neuskalierung der entsprechenden Spalten von $\vect{B}^{-1}$. Die Berechnung von $\vect{w}$ entfällt, da $\vect{c}$ und $\vect{B}^{-1}$ unverändert bleiben.
+%
+%\subsection{Algorithmus}
+%\label{subsec:methode_b_algorithmus}
+%
+%\begin{algorithm}[H]
+%	\caption{Methode B: Eingebettete Q-Korrektur (allgemeiner ZIP-Fall)}
+%	\label{alg:methode_b}
+%	\begin{algorithmic}[1]
+%		\REQUIRE $\vect{s}_{\text{PQ}}$, $P_k^{\spec}$ und $|V_k^{\spec}|$ für $k \in \Omega_{\text{PV}}$, $\Ydd$, $\Yds$, $\vect{v}_s$, ZIP-Koeffizienten, Toleranz $\varepsilon$, max.\ Iterationen $K$
+%		\ENSURE $\vect{v}$, $Q_k$ für $k \in \Omega_{\text{PV}}$
+%		
+%		\STATE \textbf{Initialisierung:}
+%		\STATE $Q_k^{(0)} = 0$ für alle $k \in \Omega_{\text{PV}}$
+%		\STATE $\vect{v}^{(0)} = \mathbf{1} + \jj\mathbf{0}$; \quad $n = 0$; \quad $\text{tol} = \infty$
+%		\STATE $\vect{s}^{(0)} = [\vect{s}_{\text{PQ}};\, P_k^{\spec} + \jj Q_k^{(0)}]$
+%		\STATE Berechne $\vect{A}^{(0)}$, $\vect{B}^{(0)}$, $\vect{c}^{(0)}$, $(\vect{B}^{(0)})^{-1}$, $\vect{F}^{(0)}$, $\vect{w}^{(0)}$ gemäß \eqref{eq:pv_A}--\eqref{eq:pv_w}
+%		
+%		\STATE
+%		\STATE \textbf{Hauptschleife:}
+%		\WHILE{$\text{tol} \geq \varepsilon$ \textbf{und} $n < K$}
+%		
+%		\STATE \textit{\% Schritt 1: FPI-Schritt}
+%		\STATE $\vect{v}_{(n+1)}' = \vect{F}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}^{(n)}$
+%		
+%		\STATE
+%		\STATE \textit{\% Schritt 2: Spannungsbetrags-Projektion an PV-Knoten}
+%		\FOR{jeden PV-Knoten $k \in \Omega_{\text{PV}}$}
+%		\STATE $v_{k,(n+1)} = |V_k^{\spec}| \cdot v_{k,(n+1)}' \,/\, |v_{k,(n+1)}'|$
+%		\ENDFOR
+%		\STATE $v_{m,(n+1)} = v_{m,(n+1)}'$ für alle $m \notin \Omega_{\text{PV}}$
+%		
+%		\STATE
+%		\STATE \textit{\% Schritt 3: Q-Rückrechnung aus Netzgleichung}
+%		\FOR{jeden PV-Knoten $k \in \Omega_{\text{PV}}$}
+%		\STATE $i_{k,(n+1)} = \sum_{m} Y_{dd,km} \cdot v_{m,(n+1)} + (\Yds)_k \cdot \vect{v}_s$
+%		\STATE $Q_k^{(n+1)} = \im\left(v_{k,(n+1)} \cdot i_{k,(n+1)}^*\right)$
+%		\STATE $Q_k^{(n+1)} = \max\big(Q_k^{\min},\, \min(Q_k^{\max},\, Q_k^{(n+1)})\big)$ \COMMENT{Q-Limits}
+%		\ENDFOR
+%		
+%		\STATE
+%		\STATE \textit{\% Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren}
+%		\STATE $s_k^{(n+1)} = P_k^{\spec} + \jj Q_k^{(n+1)}$ für alle $k \in \Omega_{\text{PV}}$
+%		\STATE Aktualisiere $\vect{A}^{(n+1)}$ gemäß \eqref{eq:methode_b_A_update}
+%		\IF{$\alpha_{Z,k} \neq 0$ für ein $k \in \Omega_{\text{PV}}$}
+%		\STATE Aktualisiere $\vect{B}^{(n+1)}$ und $(\vect{B}^{(n+1)})^{-1}$ \COMMENT{Rang-1-Update}
+%		\ENDIF
+%		\IF{$\alpha_{I,k} \neq 0$ für ein $k \in \Omega_{\text{PV}}$}
+%		\STATE Aktualisiere $\vect{c}^{(n+1)}$
+%		\ENDIF
+%		\STATE $\vect{F}^{(n+1)} = -(\vect{B}^{(n+1)})^{-1}\vect{A}^{(n+1)}$
+%		\STATE $\vect{w}^{(n+1)} = -(\vect{B}^{(n+1)})^{-1}\vect{c}^{(n+1)}$
+%		
+%		\STATE
+%		\STATE \textit{\% Konvergenz prüfen}
+%		\STATE Berechne Leistungsmismatch an PQ-Knoten
+%		\STATE $\text{tol} = \max\|\vect{s}^{\spec}_{\text{PQ}} - \vect{s}_{\text{PQ,calc}}^{(n+1)}\|$
+%		\STATE $n = n + 1$
+%		
+%		\ENDWHILE
+%		\RETURN $\vect{v}_{(n)}$, $\{Q_k^{(n)}\}_{k \in \Omega_{\text{PV}}}$
+%	\end{algorithmic}
+%\end{algorithm}
+%
+%
+%\paragraph{Vergleich mit Methode A:}
+%\begin{itemize}
+%	\item Methode~B hat nur eine \textit{einzige Schleife}. Dies vereinfacht die Implementierung und vermeidet die vollständige Konvergenz einer inneren Schleife bei jedem äußeren Schritt.
+%	\item Die Spannungsbedingung $|v_k| = |V_k^{\spec}|$ wird in \textit{jeder} Iteration exakt eingehalten.
+%	\item Die Q-Bestimmung \eqref{eq:methode_b_Q} ist \textit{exakt} (keine Linearisierung), während Methode~A die Näherungsformel \eqref{eq:methode_a_dQ} verwendet.
+%	\item Die Hilfsmatrizen müssen in jeder Iteration aktualisiert werden (im allgemeinen ZIP-Fall), während sie bei Methode~A innerhalb der inneren Schleife konstant bleiben.
+%\end{itemize}
 
-\subsection{Grundidee}
-\label{subsec:methode_b_idee}
-
-Im Gegensatz zu Methode~A, die eine verschachtelte Schleifenstruktur erfordert, integriert Methode~B die PV-Knoten-Behandlung direkt in \textit{jede} FPI-Iteration. Die Grundidee besteht aus drei Schritten, die nach dem regulären FPI-Update ausgeführt werden:
-\begin{enumerate}
-	\item \textbf{Spannungsbetrags-Projektion:} Der an einem PV-Knoten berechnete Spannungszeiger wird in seiner Richtung (Winkel) beibehalten, aber im Betrag auf den Sollwert $|V_k^{\spec}|$ skaliert.
-	\item \textbf{Q-Rückrechnung:} Die Blindleistung wird aus der Netzgleichung (Kirchhoff'sches Knotengesetz) mit dem projizierten Spannungszeiger exakt zurückberechnet.
-	\item \textbf{Hilfsmatrizen-Update:} Die Matrizen $\vect{A}$, $\vect{B}$ (falls nötig), $\vect{c}$, $\vect{F}$, $\vect{w}$ werden mit dem neuen $Q_k$ aktualisiert.
-\end{enumerate}
-
-Dieser Ansatz erzwingt die Spannungsbedingung $|v_k| = |V_k^{\spec}|$ in jeder Iteration \textit{exakt}. Die Blindleistung ergibt sich direkt aus der Leistungsbilanz, ohne Linearisierung oder Sensitivitätsapproximation.
-
-\subsection{Mathematische Formulierung}
-\label{subsec:methode_b_formulierung}
 
 
-Die reguläre FPI-Iteration \eqref{eq:pv_fpi_basis} wird mit den aktuellen Matrizen $\vect{F}^{(n)}$, $\vect{w}^{(n)}$ durchgeführt:
-\begin{equation}
-	\vect{v}_{(n+1)}' = \vect{F}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}^{(n)}
-	\label{eq:methode_b_fpi}
-\end{equation}
-
-Der Strich in $\vect{v}_{(n+1)}'$ kennzeichnet, dass dies ein Zwischenergebnis ist, das an den PV-Knoten noch korrigiert wird. An PQ-Knoten gilt $v_{k,(n+1)} = v_{k,(n+1)}'$ ohne Korrektur.
 
 
-An jedem PV-Knoten $k \in \Omega_{\text{PV}}$ wird der Spannungszeiger auf den Sollbetrag projiziert:
-\begin{equation}
-	v_{k,(n+1)} = |V_k^{\spec}| \cdot \frac{v_{k,(n+1)}'}{|v_{k,(n+1)}'|}
-	\label{eq:methode_b_projektion}
-\end{equation}
-
-Dies ist eine reine Skalierungsoperation. Der resultierende Spannungszeiger hat den korrekten Betrag $|v_{k,(n+1)}| = |V_k^{\spec}|$ und einen aus der FPI-Iteration stammenden Winkel.
 
 
-Nach der Projektion ist die Spannung am PV-Knoten bekannt. Der zugehörige Strom ergibt sich aus der Admittanzmatrix:
-\begin{equation}
-	i_{k,(n+1)} = \sum_{m \in \Omega_d} Y_{dd,km} \cdot v_{m,(n+1)} + (\Yds)_k \cdot \vect{v}_s
-	\label{eq:methode_b_strom}
-\end{equation}
-
-Die komplexe Leistung am PV-Knoten ergibt sich zu:
-\begin{equation}
-	s_{k,(n+1)}^{\text{calc}} = v_{k,(n+1)} \cdot i_{k,(n+1)}^*
-	\label{eq:methode_b_leistung}
-\end{equation}
-
-Die Blindleistung ist der Imaginärteil:
-\begin{equation}
-	Q_k^{(n+1)} = \im\left(v_{k,(n+1)} \cdot i_{k,(n+1)}^*\right)
-	\label{eq:methode_b_Q}
-\end{equation}
-
-Die so berechnete Blindleistung die Netzgleichung \textit{exakt} erfüllt, im Gegensatz zur linearisierten Sensitivitätsformel \eqref{eq:methode_a_dQ} aus Methode~A.
 
 
-Der Leistungsvektor wird aktualisiert:
-\begin{equation}
-	s_k^{(n+1)} = P_k^{\spec} + \jj Q_k^{(n+1)}, \quad \forall k \in \Omega_{\text{PV}}
-	\label{eq:methode_b_s_update}
-\end{equation}
-
-Anschließend werden die Hilfsmatrizen für die nächste Iteration neu berechnet:
-\begin{align}
-	\vect{A}^{(n+1)} &= \diag(\alpha_P \had \vect{s}^{*(n+1)}) \label{eq:methode_b_A_update}\\
-	\vect{B}^{(n+1)} &= \diag(\alpha_Z \had \vect{s}^{*(n+1)}) + \Ydd \label{eq:methode_b_B_update}\\
-	\vect{c}^{(n+1)} &= \Yds\vect{v}_s + \alpha_I \had \vect{s}^{*(n+1)} \label{eq:methode_b_c_update}\\
-	\vect{F}^{(n+1)} &= -(\vect{B}^{(n+1)})^{-1}\vect{A}^{(n+1)} \label{eq:methode_b_F_update}\\
-	\vect{w}^{(n+1)} &= -(\vect{B}^{(n+1)})^{-1}\vect{c}^{(n+1)} \label{eq:methode_b_w_update}
-\end{align}
 
 
-In diesem häufigen Spezialfall sind $\vect{B}$, $\vect{B}^{-1}$ und $\vect{c}$ konstant. Es müssen lediglich die Einträge von $\vect{A}$ an den PV-Knoten-Positionen aktualisiert werden, und $\vect{F}$ ergibt sich durch Neuskalierung der entsprechenden Spalten von $\vect{B}^{-1}$. Die Berechnung von $\vect{w}$ entfällt, da $\vect{c}$ und $\vect{B}^{-1}$ unverändert bleiben.
-
-\subsection{Algorithmus}
-\label{subsec:methode_b_algorithmus}
-
-\begin{algorithm}[H]
-	\caption{Methode B: Eingebettete Q-Korrektur (allgemeiner ZIP-Fall)}
-	\label{alg:methode_b}
-	\begin{algorithmic}[1]
-		\REQUIRE $\vect{s}_{\text{PQ}}$, $P_k^{\spec}$ und $|V_k^{\spec}|$ für $k \in \Omega_{\text{PV}}$, $\Ydd$, $\Yds$, $\vect{v}_s$, ZIP-Koeffizienten, Toleranz $\varepsilon$, max.\ Iterationen $K$
-		\ENSURE $\vect{v}$, $Q_k$ für $k \in \Omega_{\text{PV}}$
-		
-		\STATE \textbf{Initialisierung:}
-		\STATE $Q_k^{(0)} = 0$ für alle $k \in \Omega_{\text{PV}}$
-		\STATE $\vect{v}^{(0)} = \mathbf{1} + \jj\mathbf{0}$; \quad $n = 0$; \quad $\text{tol} = \infty$
-		\STATE $\vect{s}^{(0)} = [\vect{s}_{\text{PQ}};\, P_k^{\spec} + \jj Q_k^{(0)}]$
-		\STATE Berechne $\vect{A}^{(0)}$, $\vect{B}^{(0)}$, $\vect{c}^{(0)}$, $(\vect{B}^{(0)})^{-1}$, $\vect{F}^{(0)}$, $\vect{w}^{(0)}$ gemäß \eqref{eq:pv_A}--\eqref{eq:pv_w}
-		
-		\STATE
-		\STATE \textbf{Hauptschleife:}
-		\WHILE{$\text{tol} \geq \varepsilon$ \textbf{und} $n < K$}
-		
-		\STATE \textit{\% Schritt 1: FPI-Schritt}
-		\STATE $\vect{v}_{(n+1)}' = \vect{F}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}^{(n)}$
-		
-		\STATE
-		\STATE \textit{\% Schritt 2: Spannungsbetrags-Projektion an PV-Knoten}
-		\FOR{jeden PV-Knoten $k \in \Omega_{\text{PV}}$}
-		\STATE $v_{k,(n+1)} = |V_k^{\spec}| \cdot v_{k,(n+1)}' \,/\, |v_{k,(n+1)}'|$
-		\ENDFOR
-		\STATE $v_{m,(n+1)} = v_{m,(n+1)}'$ für alle $m \notin \Omega_{\text{PV}}$
-		
-		\STATE
-		\STATE \textit{\% Schritt 3: Q-Rückrechnung aus Netzgleichung}
-		\FOR{jeden PV-Knoten $k \in \Omega_{\text{PV}}$}
-		\STATE $i_{k,(n+1)} = \sum_{m} Y_{dd,km} \cdot v_{m,(n+1)} + (\Yds)_k \cdot \vect{v}_s$
-		\STATE $Q_k^{(n+1)} = \im\left(v_{k,(n+1)} \cdot i_{k,(n+1)}^*\right)$
-		\STATE $Q_k^{(n+1)} = \max\big(Q_k^{\min},\, \min(Q_k^{\max},\, Q_k^{(n+1)})\big)$ \COMMENT{Q-Limits}
-		\ENDFOR
-		
-		\STATE
-		\STATE \textit{\% Schritt 4: Leistungsvektor und Hilfsmatrizen aktualisieren}
-		\STATE $s_k^{(n+1)} = P_k^{\spec} + \jj Q_k^{(n+1)}$ für alle $k \in \Omega_{\text{PV}}$
-		\STATE Aktualisiere $\vect{A}^{(n+1)}$ gemäß \eqref{eq:methode_b_A_update}
-		\IF{$\alpha_{Z,k} \neq 0$ für ein $k \in \Omega_{\text{PV}}$}
-		\STATE Aktualisiere $\vect{B}^{(n+1)}$ und $(\vect{B}^{(n+1)})^{-1}$ \COMMENT{Rang-1-Update}
-		\ENDIF
-		\IF{$\alpha_{I,k} \neq 0$ für ein $k \in \Omega_{\text{PV}}$}
-		\STATE Aktualisiere $\vect{c}^{(n+1)}$
-		\ENDIF
-		\STATE $\vect{F}^{(n+1)} = -(\vect{B}^{(n+1)})^{-1}\vect{A}^{(n+1)}$
-		\STATE $\vect{w}^{(n+1)} = -(\vect{B}^{(n+1)})^{-1}\vect{c}^{(n+1)}$
-		
-		\STATE
-		\STATE \textit{\% Konvergenz prüfen}
-		\STATE Berechne Leistungsmismatch an PQ-Knoten
-		\STATE $\text{tol} = \max\|\vect{s}^{\spec}_{\text{PQ}} - \vect{s}_{\text{PQ,calc}}^{(n+1)}\|$
-		\STATE $n = n + 1$
-		
-		\ENDWHILE
-		\RETURN $\vect{v}_{(n)}$, $\{Q_k^{(n)}\}_{k \in \Omega_{\text{PV}}}$
-	\end{algorithmic}
-\end{algorithm}
 
 
-\paragraph{Vergleich mit Methode A:}
-\begin{itemize}
-	\item Methode~B hat nur eine \textit{einzige Schleife}. Dies vereinfacht die Implementierung und vermeidet die vollständige Konvergenz einer inneren Schleife bei jedem äußeren Schritt.
-	\item Die Spannungsbedingung $|v_k| = |V_k^{\spec}|$ wird in \textit{jeder} Iteration exakt eingehalten.
-	\item Die Q-Bestimmung \eqref{eq:methode_b_Q} ist \textit{exakt} (keine Linearisierung), während Methode~A die Näherungsformel \eqref{eq:methode_a_dQ} verwendet.
-	\item Die Hilfsmatrizen müssen in jeder Iteration aktualisiert werden (im allgemeinen ZIP-Fall), während sie bei Methode~A innerhalb der inneren Schleife konstant bleiben.
-\end{itemize}
+
+
+
+
+
 
 
 %%======================================================================

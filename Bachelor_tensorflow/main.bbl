@@ -53,8 +53,8 @@
       \strng{authorbibnamehash}{240f08141cb334eb4bbecb72e3eb5536}
       \strng{authornamehash}{b8eacb012dd1e63931223887d9e8fdfd}
       \strng{authorfullhash}{240f08141cb334eb4bbecb72e3eb5536}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{arXiv preprint arXiv:2403.04578v1}
@@ -91,8 +91,8 @@
       \strng{authorbibnamehash}{9f1e91778f495c8691fbf670c59b8c6d}
       \strng{authornamehash}{0f121ff9aea812c1de6fcc327a404ab5}
       \strng{authorfullhash}{9f1e91778f495c8691fbf670c59b8c6d}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Electric Power Systems Research}
@@ -103,6 +103,222 @@
       \range{pages}{1}
       \verb{doi}
       \verb 10.1016/j.epsr.2022.108326
+      \endverb
+    \endentry
+    \entry{TinneyHart1967}{article}{}
+      \name{author}{2}{}{%
+        {{hash=876457820448f2bf56ffed8c45a41801}{%
+           family={Tinney},
+           familyi={T\bibinitperiod},
+           given={William\bibnamedelima F.},
+           giveni={W\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=5f3aacec32783c08eea5542a5666aebf}{%
+           family={Hart},
+           familyi={H\bibinitperiod},
+           given={Clifford\bibnamedelima E.},
+           giveni={C\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+      }
+      \strng{namehash}{ca955c280a9ecd5a7ebeb4550adee506}
+      \strng{fullhash}{ca955c280a9ecd5a7ebeb4550adee506}
+      \strng{bibnamehash}{ca955c280a9ecd5a7ebeb4550adee506}
+      \strng{authorbibnamehash}{ca955c280a9ecd5a7ebeb4550adee506}
+      \strng{authornamehash}{ca955c280a9ecd5a7ebeb4550adee506}
+      \strng{authorfullhash}{ca955c280a9ecd5a7ebeb4550adee506}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Power Apparatus and Systems}
+      \field{number}{11}
+      \field{title}{Power Flow Solution by Newton's Method}
+      \field{volume}{PAS-86}
+      \field{year}{1967}
+      \field{pages}{1449\bibrangedash 1460}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1109/TPAS.1967.291823
+      \endverb
+    \endentry
+    \entry{Stott1974}{article}{}
+      \name{author}{1}{}{%
+        {{hash=ea4abf08cea760899580ccfb5c261a31}{%
+           family={Stott},
+           familyi={S\bibinitperiod},
+           given={Brian},
+           giveni={B\bibinitperiod}}}%
+      }
+      \strng{namehash}{ea4abf08cea760899580ccfb5c261a31}
+      \strng{fullhash}{ea4abf08cea760899580ccfb5c261a31}
+      \strng{bibnamehash}{ea4abf08cea760899580ccfb5c261a31}
+      \strng{authorbibnamehash}{ea4abf08cea760899580ccfb5c261a31}
+      \strng{authornamehash}{ea4abf08cea760899580ccfb5c261a31}
+      \strng{authorfullhash}{ea4abf08cea760899580ccfb5c261a31}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Proceedings of the IEEE}
+      \field{number}{7}
+      \field{title}{Review of Load-Flow Calculation Methods}
+      \field{volume}{62}
+      \field{year}{1974}
+      \field{pages}{916\bibrangedash 929}
+      \range{pages}{14}
+      \verb{doi}
+      \verb 10.1109/PROC.1974.9544
+      \endverb
+    \endentry
+    \entry{Bernstein2018}{article}{}
+      \name{author}{5}{}{%
+        {{hash=bfea208d34175ef165d44ee27718651c}{%
+           family={Bernstein},
+           familyi={B\bibinitperiod},
+           given={Andrey},
+           giveni={A\bibinitperiod}}}%
+        {{hash=03ebb954658194d4f7fe4cd6f9a1c295}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Cong},
+           giveni={C\bibinitperiod}}}%
+        {{hash=a4ff4c45be531adfa516baa22675fb3d}{%
+           family={Dall'Anese},
+           familyi={D\bibinitperiod},
+           given={Emiliano},
+           giveni={E\bibinitperiod}}}%
+        {{hash=89ba32485a52406d4df25fcccd63a2a3}{%
+           family={Le\bibnamedelima Boudec},
+           familyi={L\bibinitperiod\bibinitdelim B\bibinitperiod},
+           given={Jean-Yves},
+           giveni={J\bibinithyphendelim Y\bibinitperiod}}}%
+        {{hash=c7fb57439f896086e0ae013b642d39fe}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Changhong},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{f2b5e8e832ad91b3b437c6156a98c191}
+      \strng{fullhash}{ca00d55f2d09ecd5f9f217c87e9b0800}
+      \strng{bibnamehash}{ca00d55f2d09ecd5f9f217c87e9b0800}
+      \strng{authorbibnamehash}{ca00d55f2d09ecd5f9f217c87e9b0800}
+      \strng{authornamehash}{f2b5e8e832ad91b3b437c6156a98c191}
+      \strng{authorfullhash}{ca00d55f2d09ecd5f9f217c87e9b0800}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Power Systems}
+      \field{number}{6}
+      \field{title}{Load Flow in Multiphase Distribution Networks: Existence, Uniqueness, Non-Singularity and Linear Models}
+      \field{volume}{33}
+      \field{year}{2018}
+      \field{pages}{5832\bibrangedash 5843}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1109/TPWRS.2018.2823277
+      \endverb
+    \endentry
+    \entry{Chen1991}{article}{}
+      \name{author}{5}{}{%
+        {{hash=8d0bf6be46f7bd84f975cc0e640592fc}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Tsai-Hsiang},
+           giveni={T\bibinithyphendelim H\bibinitperiod}}}%
+        {{hash=c9ad42a2b71493da8ff10151b0470503}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Mo-Shing},
+           giveni={M\bibinithyphendelim S\bibinitperiod}}}%
+        {{hash=5246d4715faed0d047c2cfa57d4e94b5}{%
+           family={Hwang},
+           familyi={H\bibinitperiod},
+           given={Kab-Ju},
+           giveni={K\bibinithyphendelim J\bibinitperiod}}}%
+        {{hash=96232af5702d0e420ecd7abf9dbf89f6}{%
+           family={Kotas},
+           familyi={K\bibinitperiod},
+           given={Paul},
+           giveni={P\bibinitperiod}}}%
+        {{hash=c1c86ebf9c0d75ca45c21c04332db23f}{%
+           family={Chebli},
+           familyi={C\bibinitperiod},
+           given={Elie\bibnamedelima A.},
+           giveni={E\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \strng{namehash}{d27b4d7a8898f92cf06bcfa4689676a7}
+      \strng{fullhash}{f8d624ac4a15df8b5a1465e4b800f269}
+      \strng{bibnamehash}{f8d624ac4a15df8b5a1465e4b800f269}
+      \strng{authorbibnamehash}{f8d624ac4a15df8b5a1465e4b800f269}
+      \strng{authornamehash}{d27b4d7a8898f92cf06bcfa4689676a7}
+      \strng{authorfullhash}{f8d624ac4a15df8b5a1465e4b800f269}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Power Delivery}
+      \field{number}{3}
+      \field{title}{Distribution System Power Flow Analysis---A Rigid Approach}
+      \field{volume}{6}
+      \field{year}{1991}
+      \field{pages}{1146\bibrangedash 1152}
+      \range{pages}{7}
+      \verb{doi}
+      \verb 10.1109/61.85860
+      \endverb
+    \endentry
+    \entry{Kersting2017}{book}{}
+      \name{author}{1}{}{%
+        {{hash=67f8d2b0ce5c9f9b4a3d252ceb2f404b}{%
+           family={Kersting},
+           familyi={K\bibinitperiod},
+           given={William\bibnamedelima H.},
+           giveni={W\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {CRC Press}%
+      }
+      \strng{namehash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
+      \strng{fullhash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
+      \strng{bibnamehash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
+      \strng{authorbibnamehash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
+      \strng{authornamehash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
+      \strng{authorfullhash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{4}
+      \field{title}{Distribution System Modeling and Analysis}
+      \field{year}{2017}
+    \endentry
+    \entry{Milano2010}{book}{}
+      \name{author}{1}{}{%
+        {{hash=a6a624e10979d64f225ea3eecae2f258}{%
+           family={Milano},
+           familyi={M\bibinitperiod},
+           given={Federico},
+           giveni={F\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {London}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{a6a624e10979d64f225ea3eecae2f258}
+      \strng{fullhash}{a6a624e10979d64f225ea3eecae2f258}
+      \strng{bibnamehash}{a6a624e10979d64f225ea3eecae2f258}
+      \strng{authorbibnamehash}{a6a624e10979d64f225ea3eecae2f258}
+      \strng{authornamehash}{a6a624e10979d64f225ea3eecae2f258}
+      \strng{authorfullhash}{a6a624e10979d64f225ea3eecae2f258}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Power System Modelling and Scripting}
+      \field{year}{2010}
+      \verb{doi}
+      \verb 10.1007/978-3-642-13669-6
       \endverb
     \endentry
     \entry{Grainger1994}{book}{}
@@ -137,12 +353,124 @@
       \field{title}{Power Systems Analysis}
       \field{year}{1994}
     \endentry
-    \entry{DaCosta1999}{article}{}
+    \entry{Zimmerman2011}{article}{}
       \name{author}{3}{}{%
-        {{hash=f2036344c5c0bf7b8b5a346402230880}{%
+        {{hash=2f9d7910c0ab08711b5ccb6b9a196d4f}{%
+           family={Zimmerman},
+           familyi={Z\bibinitperiod},
+           given={Ray\bibnamedelima Daniel},
+           giveni={R\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+        {{hash=24e51313519590d3660f222053522a92}{%
+           family={Murillo-Sánchez},
+           familyi={M\bibinithyphendelim S\bibinitperiod},
+           given={Carlos\bibnamedelima Edmundo},
+           giveni={C\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=406f9b71ebc3cf028ce43d98f90377f6}{%
+           family={Thomas},
+           familyi={T\bibinitperiod},
+           given={Robert\bibnamedelima John},
+           giveni={R\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+      }
+      \strng{namehash}{8defc62e8b9fa57afb474d641d8dce2b}
+      \strng{fullhash}{204ea8e9e524a6da769ac98cb8e8f4cd}
+      \strng{bibnamehash}{204ea8e9e524a6da769ac98cb8e8f4cd}
+      \strng{authorbibnamehash}{204ea8e9e524a6da769ac98cb8e8f4cd}
+      \strng{authornamehash}{8defc62e8b9fa57afb474d641d8dce2b}
+      \strng{authorfullhash}{204ea8e9e524a6da769ac98cb8e8f4cd}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Power Systems}
+      \field{number}{1}
+      \field{title}{{MATPOWER}: Steady-State Operations, Planning, and Analysis Tools for Power Systems Research and Education}
+      \field{volume}{26}
+      \field{year}{2011}
+      \field{pages}{12\bibrangedash 19}
+      \range{pages}{8}
+      \verb{doi}
+      \verb 10.1109/TPWRS.2010.2051168
+      \endverb
+    \endentry
+    \entry{Kundur1994}{book}{}
+      \name{author}{1}{}{%
+        {{hash=39882366f85507fce005c512ac3b2240}{%
+           family={Kundur},
+           familyi={K\bibinitperiod},
+           given={Prabha},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {New York}%
+      }
+      \list{publisher}{1}{%
+        {McGraw-Hill}%
+      }
+      \strng{namehash}{39882366f85507fce005c512ac3b2240}
+      \strng{fullhash}{39882366f85507fce005c512ac3b2240}
+      \strng{bibnamehash}{39882366f85507fce005c512ac3b2240}
+      \strng{authorbibnamehash}{39882366f85507fce005c512ac3b2240}
+      \strng{authornamehash}{39882366f85507fce005c512ac3b2240}
+      \strng{authorfullhash}{39882366f85507fce005c512ac3b2240}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Power System Stability and Control}
+      \field{year}{1994}
+    \endentry
+    \entry{Milanovic2013}{article}{}
+      \name{author}{5}{}{%
+        {{hash=d31123420cbe575240353ecac4a47221}{%
+           family={Milanović},
+           familyi={M\bibinitperiod},
+           given={Jovica\bibnamedelima V.},
+           giveni={J\bibinitperiod\bibinitdelim V\bibinitperiod}}}%
+        {{hash=dc0e9ce6c626b3641d0c12438cbc7bc2}{%
+           family={Yamashita},
+           familyi={Y\bibinitperiod},
+           given={Koji},
+           giveni={K\bibinitperiod}}}%
+        {{hash=e1795acc59c1380aa2b8e1caba334dc7}{%
+           family={Martínez\bibnamedelima Villanueva},
+           familyi={M\bibinitperiod\bibinitdelim V\bibinitperiod},
+           given={Sergio},
+           giveni={S\bibinitperiod}}}%
+        {{hash=0320f3f5be9897a7d0fc82a92bf7b247}{%
+           family={Djokić},
+           familyi={D\bibinitperiod},
+           given={Saša\bibnamedelima Ž.},
+           giveni={S\bibinitperiod\bibinitdelim Ž\bibinitperiod}}}%
+        {{hash=09b63047ad82d2ab0d0f31e60c0322dd}{%
+           family={Korunović},
+           familyi={K\bibinitperiod},
+           given={Lidija\bibnamedelima M.},
+           giveni={L\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+      }
+      \strng{namehash}{268dec52a7e20c6c78391f36223d188f}
+      \strng{fullhash}{30788e9fdfd7227c9ba3236524e7a59b}
+      \strng{bibnamehash}{30788e9fdfd7227c9ba3236524e7a59b}
+      \strng{authorbibnamehash}{30788e9fdfd7227c9ba3236524e7a59b}
+      \strng{authornamehash}{268dec52a7e20c6c78391f36223d188f}
+      \strng{authorfullhash}{30788e9fdfd7227c9ba3236524e7a59b}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Power Systems}
+      \field{number}{3}
+      \field{title}{International Industry Practice on Power System Load Modeling}
+      \field{volume}{28}
+      \field{year}{2013}
+      \field{pages}{3038\bibrangedash 3046}
+      \range{pages}{9}
+    \endentry
+    \entry{daCosta1999}{article}{}
+      \name{author}{3}{}{%
+        {{hash=4946a94ad692f09419f9f6d9152515d4}{%
            family={Costa},
            familyi={C\bibinitperiod},
-           given={Vander\bibnamedelima Menengoy},
+           given={Vander\bibnamedelima M.},
            giveni={V\bibinitperiod\bibinitdelim M\bibinitperiod},
            prefix={da},
            prefixi={d\bibinitperiod}}}%
@@ -151,36 +479,246 @@
            familyi={M\bibinitperiod},
            given={Nelson},
            giveni={N\bibinitperiod}}}%
-        {{hash=c485df95f18fbbc26e7aece33f77bef7}{%
+        {{hash=319b7e2043c96fa2e68f233ab33e5d2b}{%
            family={Pereira},
            familyi={P\bibinitperiod},
-           given={José\bibnamedelimb Luiz\bibnamedelima R.},
+           given={Jose\bibnamedelimb Luiz\bibnamedelima R.},
            giveni={J\bibinitperiod\bibinitdelim L\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
       }
-      \list{publisher}{1}{%
-        {IEEE}%
-      }
-      \strng{namehash}{c7a950a8521d89bf44acfea9ae6801d4}
-      \strng{fullhash}{c22ce9031f3bbd40a7844423566167bd}
-      \strng{bibnamehash}{c22ce9031f3bbd40a7844423566167bd}
-      \strng{authorbibnamehash}{c22ce9031f3bbd40a7844423566167bd}
-      \strng{authornamehash}{c7a950a8521d89bf44acfea9ae6801d4}
-      \strng{authorfullhash}{c22ce9031f3bbd40a7844423566167bd}
+      \strng{namehash}{b48eb968830f63932e63175c0227980e}
+      \strng{fullhash}{bd8a06149cd6bcbcbb0823682f202ba2}
+      \strng{bibnamehash}{bd8a06149cd6bcbcbb0823682f202ba2}
+      \strng{authorbibnamehash}{bd8a06149cd6bcbcbb0823682f202ba2}
+      \strng{authornamehash}{b48eb968830f63932e63175c0227980e}
+      \strng{authorfullhash}{bd8a06149cd6bcbcbb0823682f202ba2}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{IEEE Transactions on Power Systems}
-      \field{month}{11}
       \field{number}{4}
-      \field{title}{Developments in the {Newton Raphson} Power Flow Formulation Based on Current Injections}
+      \field{title}{Developments in the {N}ewton--{R}aphson Power Flow Formulation Based on Current Injections}
       \field{volume}{14}
       \field{year}{1999}
-      \field{pages}{1320\bibrangedash 1326}
+      \field{pages}{1342\bibrangedash 1348}
       \range{pages}{7}
       \verb{doi}
-      \verb 10.1109/59.801890
+      \verb 10.1109/59.801891
       \endverb
+    \endentry
+    \entry{IEEE1547_2018}{standard}{}
+      \list{organization}{1}{%
+        {IEEE}%
+      }
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{number}{IEEE Std 1547-2018}
+      \field{title}{{IEEE} Standard for Interconnection and Interoperability of Distributed Energy Resources with Associated Electric Power Systems Interfaces}
+      \field{year}{2018}
+      \verb{doi}
+      \verb 10.1109/IEEESTD.2018.8332112
+      \endverb
+    \endentry
+    \entry{IEEETF1995}{article}{}
+      \name{author}{1}{}{%
+        {{hash=5bce291ca100188665fefbea207dabeb}{%
+           family={{IEEE Task Force on Load Representation for Dynamic Performance}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{5bce291ca100188665fefbea207dabeb}
+      \strng{fullhash}{5bce291ca100188665fefbea207dabeb}
+      \strng{bibnamehash}{5bce291ca100188665fefbea207dabeb}
+      \strng{authorbibnamehash}{5bce291ca100188665fefbea207dabeb}
+      \strng{authornamehash}{5bce291ca100188665fefbea207dabeb}
+      \strng{authorfullhash}{5bce291ca100188665fefbea207dabeb}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Power Systems}
+      \field{number}{3}
+      \field{title}{Standard Load Models for Power Flow and Dynamic Performance Simulation}
+      \field{volume}{10}
+      \field{year}{1995}
+      \field{pages}{1302\bibrangedash 1313}
+      \range{pages}{12}
+    \endentry
+    \entry{VanCutsem1998}{book}{}
+      \name{author}{2}{}{%
+        {{hash=c0466a9e801411f7e4a3cfa5a6a58231}{%
+           family={Van\bibnamedelima Cutsem},
+           familyi={V\bibinitperiod\bibinitdelim C\bibinitperiod},
+           given={Thierry},
+           giveni={T\bibinitperiod}}}%
+        {{hash=5ce7e3615a1f9a1ba22c76e89152ae2f}{%
+           family={Vournas},
+           familyi={V\bibinitperiod},
+           given={Costas},
+           giveni={C\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{5bade965022b0609aaeff5ff640200eb}
+      \strng{fullhash}{5bade965022b0609aaeff5ff640200eb}
+      \strng{bibnamehash}{5bade965022b0609aaeff5ff640200eb}
+      \strng{authorbibnamehash}{5bade965022b0609aaeff5ff640200eb}
+      \strng{authornamehash}{5bade965022b0609aaeff5ff640200eb}
+      \strng{authorfullhash}{5bade965022b0609aaeff5ff640200eb}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Voltage Stability of Electric Power Systems}
+      \field{year}{1998}
+    \endentry
+    \entry{Bolognani2016}{article}{}
+      \name{author}{2}{}{%
+        {{hash=52268ca42c4adf3bc9131a73fefa04c9}{%
+           family={Bolognani},
+           familyi={B\bibinitperiod},
+           given={Saverio},
+           giveni={S\bibinitperiod}}}%
+        {{hash=825e535e3865ed1b796f22fde655ca91}{%
+           family={Zampieri},
+           familyi={Z\bibinitperiod},
+           given={Sandro},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{fullhash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{bibnamehash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{authorbibnamehash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{authornamehash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{authorfullhash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \field{extraname}{1}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Power Systems}
+      \field{number}{1}
+      \field{title}{On the Existence and Linear Approximation of the Power Flow Solution in Power Distribution Networks}
+      \field{volume}{31}
+      \field{year}{2016}
+      \field{pages}{163\bibrangedash 172}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1109/TPWRS.2015.2395452
+      \endverb
+    \endentry
+    \entry{osipov2022}{article}{}
+      \name{author}{5}{}{%
+        {{hash=b9295f42f0839b9b2bc8fba08d1c932f}{%
+           family={Osipov},
+           familyi={O\bibinitperiod},
+           given={Denis},
+           giveni={D\bibinitperiod}}}%
+        {{hash=1e92214c45d6d7355ca7687f3f6bcc06}{%
+           family={Ferreira},
+           familyi={F\bibinitperiod},
+           given={Alan\bibnamedelimb P.\bibnamedelimi F.},
+           giveni={A\bibinitperiod\bibinitdelim P\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=22e4131d7d9261cd71d4f7115a376486}{%
+           family={Chow},
+           familyi={C\bibinitperiod},
+           given={Joe\bibnamedelima H.},
+           giveni={J\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+        {{hash=4376fa9454adcdb46db545a3680288c6}{%
+           family={Taranto},
+           familyi={T\bibinitperiod},
+           given={Glauco\bibnamedelima N.},
+           giveni={G\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+        {{hash=7bae23f0a9c15f15bfd8baec417ddf20}{%
+           family={Assis},
+           familyi={A\bibinitperiod},
+           given={Tatiana\bibnamedelimb M.\bibnamedelimi L.},
+           giveni={T\bibinitperiod\bibinitdelim M\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+      }
+      \strng{namehash}{3af7072eacf9a52324c724ade7b140e7}
+      \strng{fullhash}{5efb9d9aa72bed93c44ec3f88c816b8e}
+      \strng{bibnamehash}{5efb9d9aa72bed93c44ec3f88c816b8e}
+      \strng{authorbibnamehash}{5efb9d9aa72bed93c44ec3f88c816b8e}
+      \strng{authornamehash}{3af7072eacf9a52324c724ade7b140e7}
+      \strng{authorfullhash}{5efb9d9aa72bed93c44ec3f88c816b8e}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Electric Power Systems Research}
+      \field{title}{Application of {Thévenin} equivalent sensitivity equations for reliable voltage stability assessment}
+      \field{volume}{211}
+      \field{year}{2022}
+      \field{pages}{108424}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/j.epsr.2022.108424
+      \endverb
+    \endentry
+    \entry{bolognani2016}{article}{}
+      \name{author}{2}{}{%
+        {{hash=52268ca42c4adf3bc9131a73fefa04c9}{%
+           family={Bolognani},
+           familyi={B\bibinitperiod},
+           given={Saverio},
+           giveni={S\bibinitperiod}}}%
+        {{hash=825e535e3865ed1b796f22fde655ca91}{%
+           family={Zampieri},
+           familyi={Z\bibinitperiod},
+           given={Sandro},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{fullhash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{bibnamehash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{authorbibnamehash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{authornamehash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{authorfullhash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \field{extraname}{2}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Power Systems}
+      \field{month}{1}
+      \field{number}{1}
+      \field{title}{On the Existence and Linear Approximation of the Power Flow Solution in Power Distribution Networks}
+      \field{volume}{31}
+      \field{year}{2016}
+      \field{pages}{163\bibrangedash 172}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1109/TPWRS.2015.2395452
+      \endverb
+    \endentry
+    \entry{Davis2006}{book}{}
+      \name{author}{1}{}{%
+        {{hash=65d91744b06296f07cba0205480151ba}{%
+           family={Davis},
+           familyi={D\bibinitperiod},
+           given={Timothy\bibnamedelima A.},
+           giveni={T\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Philadelphia}%
+      }
+      \list{publisher}{1}{%
+        {SIAM}%
+      }
+      \strng{namehash}{65d91744b06296f07cba0205480151ba}
+      \strng{fullhash}{65d91744b06296f07cba0205480151ba}
+      \strng{bibnamehash}{65d91744b06296f07cba0205480151ba}
+      \strng{authorbibnamehash}{65d91744b06296f07cba0205480151ba}
+      \strng{authornamehash}{65d91744b06296f07cba0205480151ba}
+      \strng{authorfullhash}{65d91744b06296f07cba0205480151ba}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{series}{Fundamentals of Algorithms}
+      \field{title}{Direct Methods for Sparse Linear Systems}
+      \field{year}{2006}
     \endentry
     \entry{Garcia2000}{article}{}
       \name{author}{5}{}{%
@@ -218,8 +756,8 @@
       \strng{authorbibnamehash}{ea28ed5d23d3defaca1a9bf8ba93af35}
       \strng{authornamehash}{5ff752d929dd2fbfdd80cb32662cc673}
       \strng{authorfullhash}{ea28ed5d23d3defaca1a9bf8ba93af35}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{IEEE Transactions on Power Systems}
@@ -233,7 +771,50 @@
       \verb 10.1109/59.867133
       \endverb
     \endentry
+    \entry{Dembo1982}{article}{}
+      \name{author}{3}{}{%
+        {{hash=c02b37e5398e734786b9b0cef4760787}{%
+           family={dembo},
+           familyi={d\bibinitperiod},
+           given={Ron},
+           giveni={R\bibinitperiod}}}%
+        {{hash=5a142602c542d675183447f695f1aeba}{%
+           family={Eisenstat},
+           familyi={E\bibinitperiod},
+           given={Stanley},
+           giveni={S\bibinitperiod}}}%
+        {{hash=eb016a67ef67897202a483d8e4a6400d}{%
+           family={Steihaug},
+           familyi={S\bibinitperiod},
+           given={Trond},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{ac69d4b1846f8afec1a2ae784a7a859c}
+      \strng{fullhash}{d9983f4a42c18a32caa4a1cce8e0be4e}
+      \strng{bibnamehash}{d9983f4a42c18a32caa4a1cce8e0be4e}
+      \strng{authorbibnamehash}{d9983f4a42c18a32caa4a1cce8e0be4e}
+      \strng{authornamehash}{ac69d4b1846f8afec1a2ae784a7a859c}
+      \strng{authorfullhash}{d9983f4a42c18a32caa4a1cce8e0be4e}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{SIAM J. Numer. Anal.}
+      \field{month}{04}
+      \field{title}{Inexact Newton Methods}
+      \field{volume}{19}
+      \field{year}{1982}
+      \field{pages}{400\bibrangedash 408}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1137/0719025
+      \endverb
+    \endentry
   \enddatalist
+  \missing{bibid}
+  \missing{pandapower}
+  \missing{stott1974}
+  \missing{tinney1967}
 \endrefsection
 \endinput
 
