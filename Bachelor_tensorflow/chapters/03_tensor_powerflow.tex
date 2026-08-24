@@ -3,7 +3,17 @@
 \label{ch:tpf}
 %======================================================================
 
-Aufbauend auf den in \cref{ch:grundlagen} eingeführten Grundlagen der Fixed-Point-Iteration wird in diesem Kapitel der Tensor Power Flow (TPF) nach Salazar Duque et al.\ \cite{Salazar2024} vorgestellt. Der TPF erweitert den eindimensionalen FPI-Algorithmus zu einer mehrdimensionalen Formulierung, die Hunderttausende von Lastflüssen gleichzeitig berechnen kann. Dabei werden zwei Formulierungen präsentiert. Das Kapitel schließt mit einer Analyse der fundamentalen Limitation des TPF, der fehlenden Unterstützung von PV-Knoten, ab.\\
+%Aufbauend auf den in \cref{ch:grundlagen} eingeführten Grundlagen der Fixed-Point-Iteration wird in diesem Kapitel der Tensor Power Flow (TPF) nach Salazar Duque et al.\ \cite{Salazar2024} vorgestellt. Der TPF erweitert den eindimensionalen FPI-Algorithmus zu einer mehrdimensionalen Formulierung, die Hunderttausende von Lastflüssen gleichzeitig berechnen kann. Dabei werden zwei Formulierungen präsentiert. Das Kapitel schließt mit einer Analyse der fundamentalen Limitation des TPF, der fehlenden Unterstützung von PV-Knoten, ab.\\
+
+In \cref{ch:grundlagen} wurden die elektrischen und methodischen Grundlagen des NR-Verfahrens und der Fixpunkt-Iteration eingeführt. 
+Fortlaufend wird auf dieser Basis die Tensorisierung der FPI eingeführt, welches den Tensor Power Flow (TFP) bildet.
+Diese Mehrdimensionale Formulierung orientiert sich nach Salazar Duque et al. \cite{Salazar2024}.
+Dabei wird der strukturelle Vorteil des FPI, einer konstanten Systemmatrix, hier ausgenutzt.
+Daraus resultiert, dass das Verfahren Tausende von Lastflüssen gleichzeitig in jeder Iteration berechnen kann und somit für reine PQ-Netze eine erhebliche Beschleunigung erzielt werden kann.\\
+
+Zunächst wird der Algorithmus (\cref{sec:tpf_algorithmus}) eingeführt, welcher darauf folgend in zwei Formulierungen (Dense und Sparse) vertieft wird. 
+Das Kapitel wird damit abgeschlossen, dass der Zentrale Nachteil dieser Berechnungsvorschrift erklärt wird: Die fehlende Möglichkeit PV-Knoten direkt miteinzubeziehen. 
+Damit wird die in Kapitel 4 vorgestellte Methode zur Berechnung von PV-Knoten mit dem TPF motiviert.
 
 %
 %Die in Abschnitt~\ref{sec:fpi} hergeleitete FPI \eqref{eq:fpi_zbus} berechnet eine einzelne Spannungslösung $\mathbf{v}_d \in \mathbb{C}^{b \phi}$ für einen einzelnen Leistungsvektor $\mathbf{s}_d \in \mathbb{C}^{b\phi}$. In den in dieser Arbeit betrachteten multidimensionalen Anwendungen, wie Zeitreihensimulationen, probabilistischen Lastflüssen und Sensitivitätsstudien, sind jedoch typischerweise $\tau \gg 1$ Szenarien zu berechnen, was zu einer Datenstruktur der Form $\mathcal{S} \in \mathbb{C}^{b\phi \times \tau}$ führt. Die naive Anwendung der FPI besteht darin, für jede der $\tau$ Spalten von $\mathcal{S}$ die Iteration \eqref{eq:fpi_zbus} separat durchzuführen, was einer sequenziellen Schleife über $\tau$ entspricht. Diese Vorgehensweise verschenkt jedoch die zentrale strukturelle Eigenschaft der FPI: die Konstanz von $\mathbf{Z}_B$ über alle Szenarien.
@@ -22,43 +32,68 @@ Aufbauend auf den in \cref{ch:grundlagen} eingeführten Grundlagen der Fixed-Poi
 \label{sec:tpf_algorithmus}
 %======================================================================
 
-Der TPF basiert auf dem in \cref{sec:fpi} eingeführten FPI-Algorithmus nach Giraldo et al.\ \cite{Giraldo2022}. Ausgangspunkt ist das Netzmodell aus \eqref{eq:admittance_block} mit einem Einspeiseknoten, $b = |\Omega_d|$ Lastknoten und $\phi = |\Omega_\phi|$ Phasen. Die Iterationsvorschrift lautet \cite{Salazar2024}:
+Das in \cref{sec:fpi} zugrunde gelegte FPI-Verfahren dient als Ausgangspunkt für den TPF. 
+Es wird weiterhin die Nomenklatur der eingeführten Netzbeschreibung \eqref{eq:admittance_block} übernommen.
+Dabei wird zusätzlich zu den $b$ Lastknoten $\phi$ für die Anzahl der Phase verwendet.
+Das Multiplikat der beiden bildet die Anzahl der Busphasen $b\phi$. 
+Die zusammengefasste Iterationsvorschrift auf Basis von \eqref{eq:fpi_iteration} ist durch
+
+%Der TPF basiert auf dem in \cref{sec:fpi} eingeführten FPI-Algorithmus nach Giraldo et al.\ \cite{Giraldo2022}. Ausgangspunkt ist das Netzmodell aus \eqref{eq:admittance_block} mit einem Einspeiseknoten, $b = |\Omega_d|$ Lastknoten und $\phi = |\Omega_\phi|$ Phasen. Die Iterationsvorschrift lautet \cite{Salazar2024}:
 \begin{equation}
-	\vect{v}_{(n+1)} = \vect{F} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}
+	\mathbf{v}_{(n+1)} = \mathbf{F} \cdot \mathbf{v}_{(n)}^{*\eleminv} + \mathbf{w}
 	\label{eq:tpf_iteration}
 \end{equation}
 
-wobei $\vect{v}_{(n)}^{*\eleminv} \in \C^{b\phi \times 1}$ den element-weisen Kehrwert des konjugierten Spannungsvektors der $n$-ten Iteration bezeichnet. Die Operation $(\cdot)^{*\eleminv}$ ist definiert als:
+gegeben, wobei $\mathbf{v}_{(n)}^{*\eleminv} \in \C^{b\phi \times 1}$ die komponentenweise, inverse, komplex konjugierte Spannung 
+
+%wobei $\vect{v}_{(n)}^{*\eleminv} \in \C^{b\phi \times 1}$ den element-weisen Kehrwert des konjugierten Spannungsvektors der $n$-ten Iteration bezeichnet. Die Operation $(\cdot)^{*\eleminv}$ ist definiert als:
 \begin{equation}
-	\left(\vect{v}^{*\eleminv}\right)_i = \frac{1}{v_i^*} \quad \forall i = 1, \ldots, b\phi
+	\left(\mathbf{v}^{*\eleminv}\right)_i = \frac{1}{v_i^*} \quad  i = 1, \ldots, b\phi
 	\label{eq:eleminv_def}
 \end{equation}
 
-Die konstanten Hilfsmatrizen und -vektoren sind definiert als \cite{Salazar2024}:
+darstellt.
+Dabei ist $n$ die aktuelle Iteration der Spannungsberechnung und die Hilfsmatrizen werden ähnlich wie in \cref{sec:fpi} formuliert mit
+
+
 \begin{align}
-	\vect{A} &= \diag(\alpha_P \had \vect{s}^*) \label{eq:tpf_A}\\
-	\vect{B} &= \diag(\alpha_Z \had \vect{s}^*) + \Ydd \label{eq:tpf_B}\\
-	\vect{c} &= \Yds \vect{v}_s + \alpha_I \had \vect{s}^* \label{eq:tpf_c}\\
-	\vect{F} &= -\vect{B}^{-1}\vect{A} \label{eq:tpf_F}\\
-	\vect{w} &= -\vect{B}^{-1}\vect{c} \label{eq:tpf_w}
+	\mathbf{A} &= \diag(\boldsymbol{\alpha_P} \had \mathbf{s}^*)  &\in \C^{b\phi \times b\phi}\label{eq:tpf_A} \\
+	\mathbf{B} &= \diag(\boldsymbol{\alpha_Z} \had \mathbf{s}^*) + \mathbf{\Ydd} &\in \C^{b\phi \times b\phi} \label{eq:tpf_B}\\
+	\mathbf{c} &= \Yds \mathbf{v}_s + \boldsymbol{\alpha_I} \had \mathbf{s}^* &\in \C^{b\phi \times 1} \label{eq:tpf_c}\\
+	\mathbf{F} &= -\mathbf{B}^{-1}\mathbf{A} &\in \C^{b\phi \times b\phi} \label{eq:tpf_F}\\
+	\mathbf{w} &= -\mathbf{B}^{-1}\mathbf{c} &\in \C^{b\phi \times 1}\label{eq:tpf_w}.
 \end{align}
 
-Dabei bezeichnen $\alpha_P$, $\alpha_I$ und $\alpha_Z$ die Koeffizienten des ZIP-Lastmodells (\cref{subsec:lastmodell}), $\vect{s} \in \C^{b\phi \times 1}$ den Vektor der komplexen Knotenleistungen. Die Matrizen $\vect{A} \in \C^{b\phi \times b\phi}$, $\vect{B} \in \C^{b\phi \times b\phi}$ und der Vektor $\vect{c} \in \C^{b\phi \times 1}$ sind für einen gegebenen Betriebspunkt \textit{konstant} innerhalb des iterativen Prozesses. Folglich können $\vect{F} \in \C^{b\phi \times b\phi}$ und $\vect{w} \in \C^{b\phi \times 1}$ einmal vorausberechnet und in jeder Iteration wiederverwendet werden.\\
+Die Vektoren und Matrizen $\mathbf{A}$, $\mathbf{B}$ und $\mathbf{c}$ sind bei gegebenen Slack-Spannungen und Leistungen Konstant über alle Iterationen. 
+Daraus resultiert, dass die Systemmatrix $\mathbf{F}$ und der Offset $\mathbf{w}$ nur ein einziges mal aufgestellt werden müssen.\\
 
-Für den in Verteilnetzen häufigen Spezialfall rein konstanter Leistung ($\alpha_P = 1$, $\alpha_I = \alpha_Z = 0$) vereinfachen sich die Ausdrücke zu:
+
+%Dabei bezeichnen $\alpha_P$, $\alpha_I$ und $\alpha_Z$ die Koeffizienten des ZIP-Lastmodells (\cref{subsec:lastmodell}), $\vect{s} \in \C^{b\phi \times 1}$ den Vektor der komplexen Knotenleistungen. Die Matrizen $\vect{A} \in \C^{b\phi \times b\phi}$, $\vect{B} \in \C^{b\phi \times b\phi}$ und der Vektor $\vect{c} \in \C^{b\phi \times 1}$ sind für einen gegebenen Betriebspunkt \textit{konstant} innerhalb des iterativen Prozesses. Folglich können $\vect{F} \in \C^{b\phi \times b\phi}$ und $\vect{w} \in \C^{b\phi \times 1}$ einmal vorausberechnet und in jeder Iteration wiederverwendet werden.\\
+
+%Für den in Verteilnetzen häufigen Spezialfall rein konstanter Leistung ($\alpha_P = 1$, $\alpha_I = \alpha_Z = 0$) vereinfachen sich die Ausdrücke zu:
+
+Eine kompaktere Darstellung der Iterationsvorschrift lässt sich in dem gängigen Analysefall der konstanten Last bei $\alpha_P = 1$, $\alpha_I = \alpha_Z = 0$ formulieren~\cite{Kundur1994,Kersting2017,IEEETF1995,VanCutsem1998,Bolognani2016}, wobei die vereinfachten Hilfsgrößen
+
 \begin{align}
-	\vect{B} &= \Ydd \label{eq:tpf_B_konstP}\\
-	\vect{F} &= -\Ydd^{-1} \diag(\vect{s}^*) = -\ZB \diag(\vect{s}^*) \label{eq:tpf_F_konstP}\\
-	\vect{w} &= -\ZB \Yds \vect{v}_s \label{eq:tpf_w_konstP}
+	\mathbf{B} &= {\Ydd} \label{eq:tpf_B_konstP}\\
+	\mathbf{F} &= -{\Ydd}^{-1} \diag(\mathbf{s}^*) = -{\ZB} \diag(\mathbf{s}^*) \label{eq:tpf_F_konstP}\\
+	\mathbf{w} &= -{\ZB} \Yds \mathbf{v}_s \label{eq:tpf_w_konstP}
 \end{align}
 
-wobei $\ZB = \Ydd^{-1}$ die Bus-Impedanzmatrix bezeichnet. Die Iteration \eqref{eq:tpf_iteration} nimmt dann die kompakte Form an:
+
+mit $\mathbf{\ZB} = \mathbf{\Ydd}^{-1}$ als Bus-Impedanzmatrix den vereinfachen.
+Der TPF vereinfacht sich entsprechend zu 
 \begin{equation}
-	\vect{v}_{(n+1)} = \ZB \cdot \left(\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv}\right) + \vect{w}
+	\mathbf{v}_{(n+1)} = \ZB \cdot \left(\vect{s}^* \had \mathbf{v}_{(n)}^{*\eleminv}\right) + \mathbf{w}
 	\label{eq:tpf_konstP}
 \end{equation}
 
-Der Term $\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv} = \vect{s}^* \oslash \vect{v}_{(n)}^*$ entspricht physikalisch dem konjugierten Stromvektor $\vect{i}^* = \vect{s}^*/\vect{v}^*$, wobei die Beziehung $s_k = v_k \cdot i_k^*$ aus \eqref{eq:power_current} genutzt wurde. Die Multiplikation $\ZB \cdot \vect{i}^*$ liefert den Spannungsabfall über die Netzimpedanzen, und $\vect{w}$ korrigiert für den Einfluss der festen Slack-Spannung $\vect{v}_s$.
+wobei die Abhängigkeit zu der Knotenleistung durch den Klammerausdruck leichter nachzuvollziehen ist.
+Genau dieser entspricht den konjugierten Knotenströmen $\mathbf{i}^* = \mathbf{s}^* \oslash \mathbf{v}_{(n)}^*$.
+Zusammen mit der Bus-Impedanzmatrix entspricht der Term $\ZB \cdot \vect{i}^*$ dem Spannungsabfall der Knoten, während $\vect{w}$ den Zusatz der Slack-Spannungen beschreibt.
+Zur besseren Übersichtlichkeit wird fortan diese Darstellung verwendet.
+In der Implementierung wird jedoch weiterhin der allgemeine ZIP-Fall berücksichtigt.
+%Der Term $\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv} = \vect{s}^* \oslash \vect{v}_{(n)}^*$ entspricht physikalisch dem konjugierten Stromvektor $\vect{i}^* = \vect{s}^*/\vect{v}^*$, wobei die Beziehung $s_k = v_k \cdot i_k^*$ aus \eqref{eq:power_current} genutzt wurde. Die Multiplikation $\ZB \cdot \vect{i}^*$ liefert den Spannungsabfall über die Netzimpedanzen, und $\vect{w}$ korrigiert für den Einfluss der festen Slack-Spannung $\vect{v}_s$.
 %
 %\subsection{Umformulierung als iterative Abbildung}
 %\label{subsec:tpf_abbildung}
@@ -158,45 +193,58 @@ Der Term $\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv} = \vect{s}^* \oslash \vect{
 \section{Dense- und Sparse-Formulierung}
 \label{sec:tpf_formulierungen}
 
-In typischen Anwendungen wie Zeitreihensimulationen, probabilistischen Lastflüssen oder maschinellem Lernen liegen die Lastdaten als mehrdimensionaler Tensor vor:
+Zeitreihensimulationen, probabilistischen Lastflüsse, sowie das maschinelle Lernen sind Anwendungen, wo eine Vielzahl an Lastflüssen berechnet werden müssen.
+Dadurch bedingt liegen solche Daten oft in Form von mehrdimensionalen Datenstrukturen vor \cite{Salazar2024, Sandoval.2020, SandovalGuzman.2022, Zhang.2015}.
+Die Lastdimensionen können beispielsweise die Anzahl der Zeitschritte $t$, der Lastszenarien $r$, der zu durchführenden Experimente $p$ und auch die Anzahl der Busphasen $b\phi$ sein. 
+Diese Leistungsdaten können kompakt in der Form eines Tensors 
+
 \begin{equation}
 	\tens{S} \in \C^{\ldots \times p \times r \times t \times b\phi}
 	\label{eq:tensor_S}
 \end{equation}
 
-wobei die Dimensionen beispielsweise Experimente ($p$), Szenarien ($r$) und Zeitschritte ($t$) repräsentieren können. Um die Berechnung effizient zu gestalten, werden alle nicht-physikalischen Dimensionen zu einem einzigen Index $\tau = \ldots \times p \times r \times t$ zusammengefasst (\textit{Reshape}-Operation). Die resultierenden zweidimensionalen Matrizen werden mit der Punkt-Notation gekennzeichnet:
+aufgelistet werden. 
+Die Tensordimension setzt sich aus den verschiedenen Anwendungsarten mit deren Anzahl zu $\ldots \times p \times r \times t \times b\phi$ zusammen.
+bis auf die Busphasen können die nichtphysikalischen Dimensionen zu einer zusammengelegt werden (\emph{reshape}).
+Dadurch wird die Struktur auf $\tau \times b\phi$ vereinfacht werden wobei $\tau = \ldots \cdot p \cdot r \cdot t$ die restlichen Dimensionen zusammenhängt~\cite{Salazar2024}.
+Diese \emph{reshape}-Operation 
+
+%wobei die Dimensionen beispielsweise Experimente ($p$), Szenarien ($r$) und Zeitschritte ($t$) repräsentieren können. Um die Berechnung effizient zu gestalten, werden alle nicht-physikalischen Dimensionen zu einem einzigen Index $\tau = \ldots \times p \times r \times t$ zusammengefasst (\textit{Reshape}-Operation). Die resultierenden zweidimensionalen Matrizen werden mit der Punkt-Notation gekennzeichnet:
 \begin{equation}
-	\tens{S} \in \C^{\ldots \times p \times r \times t \times b\phi} \xrightarrow{\text{reshape}} \dot{S} \in \C^{b\phi \times \tau}
+	\tens{S} \in \C^{\ldots \times p \times r \times t \times b\phi} \xrightarrow{\text{reshape}} \dot{\mathbf{S}} \in \C^{b\phi \times \tau}
 	\label{eq:reshape}
 \end{equation}
 
-Jede Spalte von $\dotS \in \C^{b\phi \times \tau}$ enthält den Leistungsvektor eines einzelnen Lastflusses, und die $\tau$ Spalten repräsentieren alle zu berechnenden Szenarien. Analog werden die Spannungsmatrizen $\dotV_{(n+1)}, \dotV_{(n)}^{*\eleminv} \in \C^{b\phi \times \tau}$ definiert.
+generiert den Leistungstensor $\dot{\mathbf{S}}$, welcher in jeder Spalte $i \in \left[0, \tau \right]$ die Leistung eines Szenarios beinhaltet und die Zeile, wie zuvor den Bus (ggf. die Phase) des Leistungsflusses kennzeichnet.
+Die restlichen Matrizen folgen der selben Konvention
+
+%Jede Spalte von $\dotS \in \C^{b\phi \times \tau}$ enthält den Leistungsvektor eines einzelnen Lastflusses, und die $\tau$ Spalten repräsentieren alle zu berechnenden Szenarien. Analog werden die Spannungsmatrizen $\dotV_{(n+1)}, \dotV_{(n)}^{*\eleminv} \in \C^{b\phi \times \tau}$ definiert.
 
 \subsection{Dense-Formulierung}
 \label{subsec:tpf_dense}
-
-Die tensorisierte FPI in ihrer dense Formulierung lautet \cite{Salazar2024}:
+Wird der FPI aus \eqref{eq:tpf_iteration} tensorisiert dargestellt, folgt zunächst
+%Die tensorisierte FPI in ihrer dense Formulierung lautet \cite{Salazar2024}:
 \begin{equation}
 	\tens{V}_{(n+1)} = \tens{F} \cdot \tens{V}_{(n)}^{*\eleminv} + \tens{W}
 	\label{eq:tensor_fpi}
 \end{equation}
+wobei $\tens{V} \in \C^{\ldots \times p \times r \times b\phi \times t}, \tens{F} \in \C^{\ldots \times p \times r \times t \times b\phi \times b\phi}, \tens{W} \in \C^{\ldots \times p \times r \times b\phi \times t}$ die korrespondierenden Tensorgrößen von $\mathbf{V}, \mathbf{F}$ und $\mathbf{w}$ sind.
+%mit den Tensor-Dimensionen $\tens{F} \in \C^{\ldots \times p \times r \times t \times b\phi \times b\phi}$ und $\tens{V}_{(n+1)}, \tens{V}_{(n)}^{*\eleminv}, \tens{W} \in \C^{\ldots \times p \times r \times b\phi \times t}$.
+Unter Verwendung des konstanten Lastfalls und einer konstanten Netztopologie über alle Szenarien und Iterationen ist der Tensor $\tens{F}$ eine reine Wiederholung der Bus-Impedanzmatrix $\ZB$. 
+Ferner ist auch der Offset-Tensor $\tens{W}$ ein Reihe an Wiederholungen des Slack-Einflusses, welcher für diese Ausarbeitung ebenso über alle Szenarien konstant bleiben soll und somit die Form $\dot{W} = [\mathbf{w}, \mathbf{w}, \ldots, \mathbf{w}] \in \C^{b\phi \times \tau}$ hat.
+%Im Spezialfall konstanter Leistung und fester Netztopologie besteht der Tensor $\tens{F}$ lediglich aus Wiederholungen der identischen Matrix $\ZB$. Ebenso ist $\tens{W}$ eine Wiederholung des konstanten Vektors $\vect{w}$. Durch den Reshape zu zweidimensionalen Matrizen ergibt sich die effiziente Berechnungsvorschrift aus Algorithm~1 in \cite{Salazar2024}:
+Die Iteration erfolgt nach dem \emph{reshape} gemäß
 
-mit den Tensor-Dimensionen $\tens{F} \in \C^{\ldots \times p \times r \times t \times b\phi \times b\phi}$ und $\tens{V}_{(n+1)}, \tens{V}_{(n)}^{*\eleminv}, \tens{W} \in \C^{\ldots \times p \times r \times b\phi \times t}$.
-
-Im Spezialfall konstanter Leistung und fester Netztopologie besteht der Tensor $\tens{F}$ lediglich aus Wiederholungen der identischen Matrix $\ZB$. Ebenso ist $\tens{W}$ eine Wiederholung des konstanten Vektors $\vect{w}$. Durch den Reshape zu zweidimensionalen Matrizen ergibt sich die effiziente Berechnungsvorschrift aus Algorithm~1 in \cite{Salazar2024}:
+%wobei $[:,i]$ die $i$-te Spalte der jeweiligen Matrix bezeichnet. Diese $\tau$ Operationen können als eine einzige Matrix-Matrix-Multiplikation zusammengefasst werden:
 \begin{equation}
-	\dotV_{(n+1)}[:,i] = \ZB \left(\dotS^*[:,i] \had \dotV_{(n)}^{\eleminv}[:,i]\right)^* + \vect{w} \qquad \forall\, i = 1, \ldots, \tau
-	\label{eq:dense_spaltenweise}
-\end{equation}
-
-wobei $[:,i]$ die $i$-te Spalte der jeweiligen Matrix bezeichnet. Diese $\tau$ Operationen können als eine einzige Matrix-Matrix-Multiplikation zusammengefasst werden:
-\begin{equation}
-	\dotV_{(n+1)} = \ZB \cdot \underbrace{\left(\dotS^* \had \dotV_{(n)}^{*\eleminv}\right)}_{\in \C^{b\phi \times \tau}} + \dot{W}
+	\dotV_{(n+1)} = \ZB \cdot \underbrace{\left(\dotS^* \had \dotV_{(n)}^{*\eleminv}\right)}_{\in \C^{b\phi \times \tau}} + \dot{W}.
 	\label{eq:dense_matmul}
 \end{equation}
 
-wobei $\dot{W} = [\vect{w}, \vect{w}, \ldots, \vect{w}] \in \C^{b\phi \times \tau}$ den $\tau$-fach duplizierten Konstantvektor enthält und die Operationen $\had$ und $(\cdot)^{*\eleminv}$ element-weise auf die gesamten Matrizen angewendet werden.
 
+
+%wobei $\dot{W} = [\vect{w}, \vect{w}, \ldots, \vect{w}] \in \C^{b\phi \times \tau}$ den $\tau$-fach duplizierten Konstantvektor enthält und die Operationen $\had$ und $(\cdot)^{*\eleminv}$ element-weise auf die gesamten Matrizen angewendet werden.
+\todo{hier weiter}
 Gleichung \eqref{eq:dense_matmul} stellt eine Multiplikation einer dichten Matrix $\ZB \in \C^{b\phi \times b\phi}$ mit einer Matrix $\in \C^{b\phi \times \tau}$ dar. Alle $\tau$ Lastflüsse werden durch \textit{eine einzige} Matrix-Matrix-Multiplikation gleichzeitig berechnet.
 
 \begin{algorithm}[H]

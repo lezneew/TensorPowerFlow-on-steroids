@@ -151,36 +151,174 @@ Diese Annahme ist in stationären Netzen und in Optimierungsrechnungen gängig, 
 \subsection{Thévenin-Äquivalent an einem Lastknoten}
 \label{subsec:thevenin}
 
-Für die spätere Herleitung der Q-Sensitivität in Methode A wird das Thévenin-Äquivalent an einem Knoten benötigt. Aus der Sicht eines Knotens $k \in \Omega_d$ lässt sich das restliche Netz durch eine ideale Spannungsquelle $E_{\text{Th},k}$ in Reihe mit einer Impedanz $Z_{\text{Th},k}$ ersetzen~\cite{osipov2022}.
+
+\begin{figure}[htbp]
+	\centering
+	% Falls zu breit: \resizebox{\linewidth}{!}{ ... }
+	\resizebox{5.91in}{!}{
+	\begin{tikzpicture}[
+		gen/.style={circle, draw=black, minimum size=5mm, font=\bfseries\small, line width=0.4pt},
+		bus/.style={line width=3.5pt},
+		loadarrow/.style={-{Triangle[length=2.5mm,width=2.5mm]}, line width=1pt},
+		wire/.style={line width=0.9pt},
+		>=Latex
+		]
+		
+		%=========================================================
+		% LEFT PANEL: "The rest of the power system"
+		%=========================================================
+		\begin{scope}
+			\draw[dashed, line width=1pt, rounded corners=2pt]
+			(-0.4,-0.3) rectangle (6.2,5.9);
+			
+			% ---- Bus bars (each a short thick horizontal segment) ----
+			\draw[bus] (0.6,4.3) -- (1.8,4.3);   % Bus A
+			\draw[bus] (3.2,4.6) -- (4.4,4.6);   % Bus B
+			\draw[bus] (1.6,2.9) -- (3.4,2.9);   % Bus C (hub)
+			\draw[bus] (0.3,1.3) -- (1.5,1.3);   % Bus D
+			\draw[bus] (3.3,1.5) -- (4.9,1.5);   % Bus E
+			
+			% ---- Generators (stub up from bus to G) ----
+			\node[gen] (g1) at (1.2,5.1) {G};
+			\draw[wire] (g1) -- (1.2,4.3);
+			\node[gen] (g2) at (3.8,5.4) {G};
+			\draw[wire] (g2) -- (3.8,4.6);
+			\node[gen] (g3) at (2.3,3.7) {G};
+			\draw[wire] (g3) -- (2.3,2.9);
+			\node[gen] (g4) at (4.1,2.3) {G};
+			\draw[wire] (g4) -- (4.1,1.5);
+			
+			% ---- Loads (stub down from bus, arrow) ----
+			\draw[wire, loadarrow] (0.9,1.3) -- (0.9,0.4);
+			\draw[wire, loadarrow] (4.6,1.5) -- (4.6,0.6);
+			
+			% ---- Transmission lines connecting bus bars (mesh) ----
+			\draw[wire] (1.8,4.3) -- (1.6,2.9);   % A -- C
+			\draw[wire] (3.2,4.6) -- (2.8,2.9);   % B -- C
+			\draw[wire] (2.0,2.9) -- (1.5,1.3);   % C -- D
+			\draw[wire] (3.3,1.5) -- (1.5,1.3);   % D -- E  (bottom tie line)
+			
+			% ---- outgoing feeders toward the external "Load node k" bus ----
+			\draw[wire] (3.4,2.9) -- (5.4,2.9);   % C's feeder, exits box at (6.2,*)
+			\draw[wire] (4.9,1.5) -- (5.4,1.5);   % E's feeder, exits box at (6.2,*)
+			\draw[dotted, line width=0.9pt] (5.4,2.9) -- (7.0,3.1);
+			\draw[dotted, line width=0.9pt] (5.4,1.5) -- (7.0,2.3);
+			
+			% ---- caption ----
+			\node[font=\bfseries] at (2.9,-0.7) {Restliches Netz};
+			
+		\end{scope}
+		
+		%=========================================================
+		% "Load node k" bus, sitting between the two panels
+		%=========================================================
+		\draw[bus] (7.0,2.0) -- (7.0,3.3);
+		\draw[wire, loadarrow] (7.0,2.0) -- (7.0,1.3);
+		\node[above] at (7.0,3.75) {\small Last $k$};
+		
+		%=========================================================
+		% GREEN TRANSFORMATION ARROW
+		%=========================================================
+		\draw[-{Triangle[length=4mm,width=5mm]}, line width=3pt]
+		(7.5,2.35) -- (8.9,2.35);
+		
+		%=========================================================
+		% RIGHT PANEL: Thevenin equivalent circuit
+		%=========================================================
+		\begin{scope}[shift={(9.3,0)}]
+			
+			\draw[dashed, line width=1pt, rounded corners=2pt]
+			(-0.3,1.2) rectangle (4.6,3.5);
+			
+			% --- Thevenin voltage source (circle with sine wave) ---
+			\node[circle, draw=black, minimum size=1.5cm, line width=0.8pt] (src) at (0.9,2.35) {};
+			\draw[wire, line width=1pt] plot[smooth, tension=1] coordinates {
+				($(src.center)+(-0.42,0)$)   ($(src.center)+(-0.21,0.28)$)
+				($(src.center)+(0,0)$)       ($(src.center)+(0.21,-0.28)$)
+				($(src.center)+(0.42,0)$) };
+			\node[below=2pt] at (0.9,1.3) {$E_{th,k}$};
+			
+			% wire from source to impedance
+			\draw[wire] (1.65,2.35) -- (2.1,2.35);
+			
+			% --- Thevenin impedance (rectangle) ---
+			\draw[line width=0.8pt] (2.1,2.1) rectangle (3.5,2.6);
+			\node[below=2pt] at (2.8,1.3) {$Z_{th,k}$};
+			
+			% wire from impedance to the boundary of the dashed box
+			\draw[wire] (3.5,2.35) -- (4.6,2.35);
+			
+		\end{scope}
+		% (dashed box right edge is now at global x = 9.3 + 4.6 = 13.9)
+		
+		% wire continuing from the dashed box out to the load bus, with current label
+		\draw[wire] (13.9,2.35) -- (15.4,2.35);
+		\node[above] at (14.3,2.5) {\small $I_{L,k}$};
+		
+		% --- Load node k bus on the far right, with load arrow and voltage label ---
+		\draw[bus] (15.4,2.0) -- (15.4,2.7);
+		\draw[wire, loadarrow] (15.4,2.0) -- (15.4,1.1);
+		\node[above right, xshift=-2pt] at (15,2.75) {\small Last $k$};
+		\node[right] at (15.55,1.55) {\small $U_{L,k}$};
+		
+	\end{tikzpicture}
+	}
+	\caption[Th\'evenin-\"Aquivalent an einem Lastknoten]{Reduktion des Netzes auf
+		das Th\'evenin-\"Aquivalent aus Sicht des Lastknotens $k$. Das gesamte
+		\"ubrige Netz einschlie{\ss}lich Slack-Einspeisung und aller weiteren Lasten
+		wird durch die Leerlaufspannung $E_{\mathrm{Th},k}$ und die Innenimpedanz
+		$Z_{\mathrm{Th},k}=[\mathbf{Z}_B]_{kk}=R_{kk}+\mathrm{j}X_{kk}$
+		ersetzt~\cite{Grainger1994,Anderson1995,Dorfler2013}.}
+	\label{fig:thevenin}
+\end{figure}
+
+Für die spätere Herleitung der Q-Sensitivität für die Äußere Schleife wird das Thévenin-Äquivalent an einem Knoten benötigt. Aus der Sicht eines Knotens $k \in \Omega_d$ lässt sich das restliche Netz gemäß Abbildung \ref{fig:thevenin} durch eine ideale Spannungsquelle $E_{\text{Th},k}$ in Reihe mit einer Impedanz $Z_{\text{Th},k}$ ersetzen~\cite{osipov2022}.
 Die Bus-Impedanzmatrix ist definiert als
 \begin{equation}
 	\label{eq:zbus}
-	\mathbf{Z}_B := \mathbf{Y}_{dd}^{-1}
+	\mathbf{Z}_B := \mathbf{Y}_{dd}^{-1}.
 \end{equation}
-Ihre Diagonalelemente entsprechen den Thévenin-Impedanzen der jeweiligen Knoten:
+Ihre Diagonalelemente entsprechen den Thévenin-Impedanzen der jeweiligen Knoten \cite{Giraldo2022,ALDAOUDEYEH2019105890}
 \begin{equation}
 	\label{eq:z_thev}
 	Z_{\text{Th},k} = R_{kk} + jX_{kk} = [\mathbf{Z}_B]_{kk}
 \end{equation}
-Dieser Zusammenhang liefert die theoretische Grundlage für die in Methode A verwendete Sensitivitätsapproximation
-\begin{equation}
-	\label{eq:q_sensitivity}
-	\frac{\partial |V_k|^2}{\partial Q_k} \approx 2 X_{kk}
-\end{equation}
-welche in Kapitel~\ref{sec:pv_methoden} hergeleitet wird. In Verteilnetzen mit hohem $R/X$-Verhältnis ist zu beachten, dass $R_{kk}$ nicht vernachlässigbar ist, weshalb dort ggf.\ die vollständige komplexe Sensitivität verwendet werden muss.
+Dieser Zusammenhang liefert die theoretische Grundlage für die in Methode A verwendete Sensitivitätsapproximation für einen gegebenen Arbeitspunkt.
+%\begin{equation}
+%	\label{eq:q_sensitivity}
+%	\frac{\partial |V_k|^2}{\partial Q_k} \approx 2 X_{kk}
+%\end{equation}
+%welche in Kapitel~\ref{sec:pv_methoden} hergeleitet wird. In Verteilnetzen mit hohem $R/X$-Verhältnis ist zu beachten, dass $R_{kk}$ nicht vernachlässigbar ist, weshalb dort ggf.\ die vollständige komplexe Sensitivität verwendet werden muss.
 
-\subsection{Existenz einer Lösung}
-\label{subsec:existenz}
+%Aus \eqref{eq:current_balance} folgt mit \eqref{eq:zbus}
+%\begin{equation}
+%	\label{eq:v_zbus}
+%	\mathbf{v}_d = \underbrace{-\mathbf{Z}_B\mathbf{Y}_{ds}\mathbf{v}_s}_{=:\ \mathbf{v}_d^{0}}
+%	\;-\; \mathbf{Z}_B\mathbf{i}_d ,
+%\end{equation}
+%wobei $\mathbf{v}_d^{0}$ die Leerlaufspannungen der Lastknoten bezeichnet. Die
+%$k$-te Zeile von \eqref{eq:v_zbus} lautet
+%\begin{equation}
+%	\label{eq:thev_derivation}
+%	v_k = \underbrace{v_k^{0} - \sum_{j \in \Omega_d \setminus \{k\}} [\mathbf{Z}_B]_{kj}\, i_j}_{=:\ E_{\mathrm{Th},k}}
+%	\;-\; \underbrace{[\mathbf{Z}_B]_{kk}}_{=:\ Z_{\mathrm{Th},k}}\, i_k ,
+%\end{equation}
+%was genau der Klemmengleichung einer Spannungsquelle $E_{\mathrm{Th},k}$ in Reihe
+%mit $Z_{\mathrm{Th},k}$ entspricht~\cite{Grainger1994,Anderson1995,Dorfler2013}.
 
-Nicht jeder Lastzustand führt zu einem konvergenten Lastfluss. Nach den Ergebnissen von Bolognani und Zampieri~\cite{bolognani2016} existiert für ein Zweiknotensystem mit Slack-Spannung $v_0$, Quellimpedanz $z_s$ und Lastleistung $s_l$ genau dann eine praktische (Hochspannungs-)Lösung, wenn
-\begin{equation}
-	\label{eq:feasibility}
-	\|v_0\|^2 \geq 4\,\|s_l\|\,\|z_s\|
-\end{equation}
-gilt. Der Grenzfall entspricht dem Punkt maximaler Leistungsübertragung (\emph{maximum loading point}, MLP), an dem die zwei Impedanzlösungen $z_{l,1}$ und $z_{l,2}$ zusammenfallen. Eine geometrische Interpretation dieser Bedingung sowie ihre Verallgemeinerung auf Mehrknotensysteme findet sich in \cite{Salazar2024}.
+%\subsection{Existenz einer Lösung}
+%\label{subsec:existenz}
+%Die Konvergenz einer Lastflussrechnung ist nicht immer möglich. Die von Bolognani et. al.~\cite{bolognani2016} angeführte Analyse eines Zweiknotennetzes mit Slack-Spannung $v_0$, Quellimpedanz $z_s$ und Lastleistung $s_l$ ergibt, dass es physikalische Lösungen gibt, wenn
+%%Nicht jeder Lastzustand führt zu einem konvergenten Lastfluss. Nach den Ergebnissen von Bolognani und Zampieri~\cite{bolognani2016} existiert für ein Zweiknotensystem mit Slack-Spannung $v_0$, Quellimpedanz $z_s$ und Lastleistung $s_l$ genau dann eine praktische (Hochspannungs-)Lösung, wenn
+%\begin{equation}
+%	\label{eq:feasibility}
+%	\|v_0\|^2 \geq 4\,\|s_l\|\,\|z_s\|
+%\end{equation}
+%gilt. Der Grenzfall entspricht dem Punkt maximaler Leistungsübertragung, an dem die zwei Impedanzlösungen $z_{l,1}$ und $z_{l,2}$ zusammenfallen. Eine geometrische Interpretation dieser Bedingung sowie ihre Verallgemeinerung auf Mehrknotensysteme liegt in \cite{Salazar2024} vor.
 
-Diese Bedingung ist von Bedeutung, weil sie im Grenzfall zusammenfällt mit der Kontraktionsbedingung des Banachschen Fixpunktsatzes (Abschnitt~\ref{sec:fpi}): Nur unterhalb des MLP existiert eine physikalisch sinnvolle Lösung, und nur dort konvergiert die Fixpunkt-Iteration.
-%
+%Diese Bedingung ist von Bedeutung, weil sie im Grenzfall zusammenfällt mit der Kontraktionsbedingung des Banachschen Fixpunktsatzes (Abschnitt~\ref{sec:fpi}): Nur unterhalb des MLP existiert eine physikalisch sinnvolle Lösung, und nur dort konvergiert die Fixpunkt-Iteration.
+
+
 %\bigskip
 %\noindent
 %Zusammenfassend wurden in diesem Abschnitt die Netzmodellierung über die Blockformulierung der Admittanzmatrix, die drei Knotentypen mit ihren jeweiligen bekannten und unbekannten Größen, das ZIP-Lastmodell, das Thévenin-Äquivalent und die grundlegende Existenzbedingung für Lastflusslösungen eingeführt. Auf dieser Basis werden in den folgenden Abschnitten das Newton-Raphson-Verfahren (Abschnitt~\ref{sec:nr}) und die Fixpunkt-Iteration (Abschnitt~\ref{sec:fpi}) als konkrete Lösungsverfahren dargestellt.
@@ -193,22 +331,39 @@ Diese Bedingung ist von Bedeutung, weil sie im Grenzfall zusammenfällt mit der 
 
 
 
-\section{Newton-Raphson-Verfahren mit PV-Knoten}
+\section{Newton-Raphson-Verfahren}
 \label{sec:nr}
-Ausgangspunkt ist die Leistungsbilanz an jedem Lastknoten $k \in \Omega_d$. Im Gegensatz zur in Abschnitt~\ref{subsec:admittanz} verwendeten kartesischen Formulierung ($\mathbf{v} \in \mathbb{C}$) wird für das NR-Verfahren die polare Darstellung der komplexen Knotenspannungen bevorzugt, da sich die Leistungsflussgleichungen dadurch kompakter formulieren lassen. Jede Knotenspannung wird zerlegt in Betrag und Winkel:
+
+Ein weit verbreitetes Verfahren in der Lastflussberechnung bildet das numerische Newton-Raphson-Verfahren (NR-Verfahren)\todo{literatur}.
+Die Basis hierfür bildet eine Leistungsbilanz an jedem einzelnen Lastknoten $k$. 
+Das NR-Verfahren kann generell in kartesischen oder in polaren Koordinaten formuliert werden.
+Zur kompakteren Übersicht wird das Verfahren hier in polaren Koordinaten eingeführt.
+Für die Leistungsbilanz werden die Knotenspannungen dementsprechend durch
+
+%Ausgangspunkt ist die Leistungsbilanz an jedem Lastknoten $k \in \Omega_d$. Im Gegensatz zur in Abschnitt~\ref{subsec:admittanz} verwendeten kartesischen Formulierung ($\mathbf{v} \in \mathbb{C}$) wird für das NR-Verfahren die polare Darstellung der komplexen Knotenspannungen bevorzugt, da sich die Leistungsflussgleichungen dadurch kompakter formulieren lassen. Jede Knotenspannung wird zerlegt in Betrag und Winkel:
 \begin{equation}
 	\label{eq:polar_voltage}
 	V_k = |V_k| \, e^{j\theta_k}, \qquad k \in \Omega_B
 \end{equation}
-wobei $|V_k| \in \mathbb{R}_{>0}$ den Spannungsbetrag und $\theta_k \in (-\pi, \pi]$ den Spannungswinkel am Knoten $k$ bezeichnet.\todo{literatur.}
-Die Vektoren $|\mathbf{V}|$ und $\boldsymbol{\theta}$ fassen die Spannungsbeträge bzw. -winkel aller Knoten zusammen.
-Analog wird die komplexe Knotenadmittanzmatrix $\mathbf{Y}$ aus \eqref{eq:admittance_block} in Real- und Imaginärteil zerlegt:
+
+dargestellt, $|V_k| \in \mathbb{R}_{+}$ den Spannungsbetrag und $\theta_k \in [-\pi, \pi]$ den Spannungswinkel am Knoten $k$ bezeichnet.\todo{literatur.}
+Für Mehrknotensysteme werden die Größen vektoriell zu $|\mathbf{V}|$ und $\boldsymbol{\theta}$ für alle Netzknoten zusammengefasst.
+%Die Vektoren $|\mathbf{V}|$ und $\boldsymbol{\theta}$ fassen die Spannungsbeträge bzw. -winkel aller Knoten zusammen.
+Die komplexe Knotenadmittanzmatrix $\mathbf{Y}$ \eqref{eq:admittance_block} in ihrer Real- und Imaginärzerlegung 
+%Analog wird die komplexe Knotenadmittanzmatrix $\mathbf{Y}$ aus \eqref{eq:admittance_block} in Real- und Imaginärteil zerlegt:
 \begin{equation}
 	\label{eq:y_split}
 	\mathbf{Y} = \mathbf{G} + j\mathbf{B}, \qquad Y_{km} = G_{km} + jB_{km}
 \end{equation}
-mit der Konduktanzmatrix $\mathbf{G} \in \mathbb{R}^{|\Omega_B|\times|\Omega_B|}$ und der Suszeptanzmatrix $\mathbf{B} \in \mathbb{R}^{|\Omega_B|\times|\Omega_B|}$. Das Element $Y_{km}$ beschreibt die Kopplung zwischen den Knoten $k$ und $m$. 
-Für jeden Lastknoten $k \in \Omega_d$ sind die Wirk- und Blindleistungsvorgaben $P_k^{\text{spec}}$ bzw.\ $Q_k^{\text{spec}}$ gegeben (bei PQ-Knoten aus dem Lastprofil, bei PV-Knoten nur $P_k^{\text{spec}}$. Aus \eqref{eq:pf_fundamental} folgen die Leistungsungleichungen 
+
+führt die Konduktanzmatrix $\mathbf{G} \in \mathbb{R}^{|\Omega_B|\times|\Omega_B|}$ und die Suszeptanzmatrix $\mathbf{B} \in \mathbb{R}^{|\Omega_B|\times|\Omega_B|}$ ein.
+%mit der Konduktanzmatrix $\mathbf{G} \in \mathbb{R}^{|\Omega_B|\times|\Omega_B|}$ und der Suszeptanzmatrix $\mathbf{B} \in \mathbb{R}^{|\Omega_B|\times|\Omega_B|}$. 
+Die Diagonalelemente bilden damit die Selbstadmittanz eines Knotens und bestehen aus allen an diesem angeschlossenen Einzeladmittanzen \todo{literatur.}. 
+Folglich bilden Nebendiagonalelemente die elektrischen Kopplungen zwischen den Knoten $k$ und $m$.
+Die Lei,stungsbilanzen selber werden durch die in den PQ-Knoten spezifizierten Wirk- und Blindleistungsvorgaben $P_k^{\text{spec}}$, $Q_k^{\text{spec}}$ und den berechneten Leistungswerten $P_k^{\text{calc}}$ und $Q_k^{\text{calc}}$ gebildet.
+Deren Differenz
+%Das Element $Y_{km}$ beschreibt die Kopplung zwischen den Knoten $k$ und $m$. 
+%Für jeden Lastknoten $k \in \Omega_d$ sind die Wirk- und Blindleistungsvorgaben $P_k^{\text{spec}}$ bzw.\ $Q_k^{\text{spec}}$ gegeben (bei PQ-Knoten aus dem Lastprofil, bei PV-Knoten nur $P_k^{\text{spec}}$. Aus \eqref{eq:pf_fundamental} folgen die Leistungsungleichungen 
 \begin{equation}
 	\label{eq:mismatches}
 	\begin{aligned}
@@ -216,8 +371,11 @@ Für jeden Lastknoten $k \in \Omega_d$ sind die Wirk- und Blindleistungsvorgaben
 		\Delta Q_k &= Q_k^{\text{spec}} - Q_k^{\text{calc}}
 	\end{aligned}
 \end{equation}
-als Differenz zwischen vorgegebenen und aus den aktuellen Zustandsgrößen berechneten Leistungen.
-Die berechneten Leistungen 
+werden als Zustandsgrößen verwendet \todo{literatur.}.
+Die Berechnung der Leistungsgrößen $P_k^{\text{calc}}$ und $Q_k^{\text{calc}}$ geschieht über die Auswertung des Produkts zwischen Spannung und Strom \eqref{eq:power_current}.
+Ausformuliert folgt
+%als Differenz zwischen vorgegebenen und aus den aktuellen Zustandsgrößen berechneten Leistungen.
+%Die berechneten Leistungen 
 \begin{equation}
 	\label{eq:pq_calc}
 	\begin{aligned}
@@ -225,13 +383,14 @@ Die berechneten Leistungen
 		Q_k^{\text{calc}} &= |V_k| \sum_{m \in \Omega_B} |V_m| \left( G_{km}\sin\theta_{km} - B_{km}\cos\theta_{km} \right)
 	\end{aligned}
 \end{equation}
- ergeben sich durch Auswertung des Produkts $\mathbf{v} \odot \mathbf{i}^{*}$ aus \eqref{eq:power_current} in unter Verwendung von \eqref{eq:y_split} und der Winkeldifferenz $\theta_{km} := \theta_k - \theta_m$.
-Die Summation erfolgt über alle Knoten $m \in \Omega_B$, da über die Nichtdiagonalelemente $Y_{km}$ alle direkt mit $k$ verbundenen Knoten Beiträge zur Leistungseinspeisung am Knoten $k$ liefern. \todo{literatur.}
+unter Verwendung von \eqref{eq:y_split} und der Winkeldifferenz $\theta_{km} \equiv \theta_k - \theta_m$.
+Die Summation erfolgt über alle Knoten $m$, da über die Nebendiagonalelemente $Y_{km}$ alle mit $k$ gekoppelten Knoten Beiträge zur Leistungseinspeisung am Knoten $k$ liefern. \todo{literatur.} \\
 
 
 %Das nichtlineare Gleichungssystem $\mathbf{f}(\mathbf{x}) = \mathbf{0}$ mit Zustandsvektor $\mathbf{x} = [\boldsymbol{\theta}^\top, |\mathbf{V}|^\top]^\top$ wird durch Taylor-Entwicklung erster Ordnung um den aktuellen Iterationspunkt linearisiert:
 
-Das NR-Verfahren linearisiert den Mismatch-Vektor 
+%Das NR-Verfahren linearisiert den Mismatch-Vektor 
+Im NR-Verfahren wird die Leistungsdifferenz (engl. \emph{power mismatch}) durch den Vektor 
 
 \begin{equation}
 	\vect{g}(\vect{x}) = 
@@ -243,24 +402,35 @@ Das NR-Verfahren linearisiert den Mismatch-Vektor
 	\label{eq:mismatch_polar}
 \end{equation}
 
- um den aktuellen Arbeitspunkt $\vect{x}^{(k)}= [\boldsymbol{\theta}^\top, |\mathbf{V}|^\top]^\top$ mittels einer Taylor-Entwicklung erster Ordnung
+um den aktuellen Arbeitspunkt
+ \begin{equation}
+   \vect{x}^{(k)}= \begin{bmatrix}
+   	\boldsymbol{\theta} \\
+   	 |\mathbf{V}|
+   \end{bmatrix}
+ 	\label{eq:arbeitspunkt}
+ \end{equation}
+durch eine Taylor-Reihen-Entwicklung erster Ordnung linearisiert.
+Eine kleine Deviation um den Arbeitspunkt kann folglich mit
 \begin{equation}
 	\vect{g}(\vect{x}^{(k)} + \Delta \vect{x}) \approx \vect{g}(\vect{x}^{(k)}) + \vect{J}(\vect{x}^{(k)}) \cdot \Delta \vect{x} = \vect{0}
 	\label{eq:nr_taylor}
 \end{equation}
-
-Daraus ergibt sich der Korrekturvektor
+dargestellt werden. 
+Ergänzend ist anzumerken, dass  $\vect{J}$ die Jacobi-Matrix ist, die folgend näher betrachtet wird.
+Genau hier kann nach der Korrektur
 \begin{equation}
 	\Delta \vect{x}^{(k)} = -\vect{J}(\vect{x}^{(k)})^{-1} \cdot \vect{g}(\vect{x}^{(k)})
 	\label{eq:newton_richtung}
 \end{equation}
-
-woraus die Zustandsgrößen iterativ, mittels
+aufgelöst werden.
+Daraus kann letztlich die Iterationsvorschrift 
 \begin{equation}
 	\vect{x}^{(k+1)} = \vect{x}^{(k)} + \Delta \vect{x}^{(k)}
 	\label{eq:nr_update}
 \end{equation}
-aktualisiert werden können.
+formuliert werden, die den Zustandsvektor bei jeder Iteration aktualisiert \todo{literatur.}.\\ 
+
 %
 %Ausgeschrieben bedeutet dies:
 %\begin{align}
@@ -269,7 +439,19 @@ aktualisiert werden können.
 %\end{align}
 %
 %Der Algorithmus wird initialisiert mit dem \textit{Flat Start}: $|V_k|^{(0)} = 1{,}0 \pu$ und $\theta_k^{(0)} = 0$ für alle Knoten (außer Slack). Die Iteration wird beendet, wenn $\max(|\Delta P_k|, |\Delta Q_k|) < \varepsilon$ mit typischen Toleranzen $\varepsilon = 10^{-6}$ bis $10^{-8}$.
-Die Jacobi-Matrix $\vect{J}$ enthält die partiellen Ableitungen der Mismatch-Funktionen nach den Unbekannten und wird in der polaren Formulierung in vier Blöcke unterteilt \cite{Grainger1994}:
+%Die Jacobi-Matrix $\vect{J}$ enthält die partiellen Ableitungen der Mismatch-Funktionen nach den Unbekannten und wird in der polaren Formulierung in vier Blöcke unterteilt \cite{Grainger1994}:
+
+Die Jacobi-Matrix umfasst die partiellen Differenziationen der Leistungsdifferenzen nach den einzelnen Zustandsgrößen \todo{literatur.}.
+Durch die eingeführte Struktur von zwei Leistungs- und Spannungsgrößen können die Jacobi-Einträge in vier Blöcke 
+\begin{equation}
+	\mathbf{H} = \frac{\partial \mathbf{P}}{\partial \boldsymbol{\theta}}, \quad
+	\mathbf{N} = \frac{\partial \mathbf{P}}{\partial |\mathbf{V}|}, \quad
+	\mathbf{M} = \frac{\partial \mathbf{Q}}{\partial \boldsymbol{\theta}}, \quad
+	\mathbf{L} = \frac{\partial \mathbf{Q}}{\partial |\mathbf{V}|}
+\end{equation}
+gegliedert werden \todo{literatur.}. 
+Zusammengesetzt und eingesetzt in Gleichung \eqref{eq:nr_taylor} ist der Zusammenhang der Ableitungen mit den gesuchten und bekannten Größen durch 
+%Die Blöcke der Jacobi-Matrix $\mathbf{J} \in \mathbb{R}^{2b \times 2b}$ sind definiert als
 
 %\begin{equation}
 %	\begin{bmatrix}
@@ -305,98 +487,165 @@ Die Jacobi-Matrix $\vect{J}$ enthält die partiellen Ableitungen der Mismatch-Fu
 	}_{\mathbf{J}}
 	\begin{bmatrix} \Delta \boldsymbol{\theta} \\ \Delta |\mathbf{V}|\end{bmatrix}
 \end{equation}
-Die Blöcke der Jacobi-Matrix $\mathbf{J} \in \mathbb{R}^{2b \times 2b}$ sind definiert als
-\begin{equation}
-	\mathbf{H} = \frac{\partial \mathbf{P}}{\partial \boldsymbol{\theta}}, \quad
-	\mathbf{N} = \frac{\partial \mathbf{P}}{\partial |\mathbf{V}|}, \quad
-	\mathbf{M} = \frac{\partial \mathbf{Q}}{\partial \boldsymbol{\theta}}, \quad
-	\mathbf{L} = \frac{\partial \mathbf{Q}}{\partial |\mathbf{V}|}
-\end{equation}
+
+hergestellt, wobei die Jacobi dementsprechend die Dimension $\mathbf{J} \in \mathbb{R}^{2b \times 2b}$ hat.
+Damit kann die Iteration durch Aktualisierung der Zustandsgrößen, Jacobi, und Leistungsgrößen durchgeführt werden. 
 %Die Iterationsvorschrift lautet
 %\begin{equation}
 %	\label{eq:nr_update}
 %	\mathbf{x}^{(n+1)} = \mathbf{x}^{(n)} + \mathbf{J}^{-1}(\mathbf{x}^{(n)}) \cdot \Delta \mathbf{f}(\mathbf{x}^{(n)})
 %\end{equation}
-Die Iterationsvorschrift wird abgebrochen, sobald die gewählte Konvergenzgrenze mit $\max(\|\Delta \mathbf{P}\|_\infty, \|\Delta \mathbf{Q}\|_\infty) < \varepsilon$ erfüllt ist.\\
+Diese wird durchgeführt, solange eine gewählte Konvergenzgrenze $\varepsilon$ durch
+\begin{equation}
+	\label{eq:convergence_limit}
+	\max(\|\Delta \mathbf{P}\|, \|\Delta \mathbf{Q}\|) < \varepsilon
+\end{equation}
+nicht erreicht wird.\\
 
-Der wesentliche Vorteil des NR liegt in seiner \textbf{quadratischen Konvergenz} in der Nähe der Lösung. In praktischen Anwendungen konvergiert das Verfahren typischerweise in 3--5 Iterationen~\cite{Salazar2024}. Die Kosten pro Iteration setzen sich zusammen aus dem Aufbau der Jacobi-Matrix, der LU-Faktorisierung des Sparse-Systems \cite{Davis2006}. Der Hauptnachteil ist, dass \emph{beide} Schritte in jeder Iteration wiederholt werden müssen, da die Jacobi-Matrix vom aktuellen Zustand $\mathbf{x}^{(n)}$ abhängt.
+%Der wesentliche Vorteil des NR liegt in seiner \textbf{quadratischen Konvergenz} in der Nähe der Lösung. In praktischen Anwendungen konvergiert das Verfahren typischerweise in 3--5 Iterationen~\cite{Salazar2024}. Die Kosten pro Iteration setzen sich zusammen aus dem Aufbau der Jacobi-Matrix, der LU-Faktorisierung des Sparse-Systems \cite{Davis2006}. Der Hauptnachteil ist, dass \emph{beide} Schritte in jeder Iteration wiederholt werden müssen, da die Jacobi-Matrix vom aktuellen Zustand $\mathbf{x}^{(n)}$ abhängt.
+
 
 \subsection{Behandlung von PV-Knoten}
 \label{subsec:nr_pv}
 
-An PV-Knoten $k \in \Omega_{PV}$ ist der Spannungsbetrag $|V_k| = |V_k^{\text{spec}}|$ fest vorgegeben, während die Blindleistung $Q_k$ eine unbekannte Größe darstellt. Dies erfordert eine Modifikation des Standard-NR.
+Die bisherige Einführung des Verfahrens stützt sich auf Knoten wo Wirk- und Blindleistung bekannt sind, also PQ-Knoten.
+PV-Knoten liefern dahingehend nur die Wirkleistungen $|P_k^{\text{spec}}|$ aus dem Leistungsvektor und die Spannungsbeträge 
+$|V_k^{\text{spec}}|$ aus dem Zustandsvektor, während die Blindleistung $Q_k$ und der Winkel $\theta_k$ gesucht bleiben.
+Daraus folgt eine Modifikation des NR-Verfahrens zur korrekten Behandlung dieser Knoten.\\
 
-Die verbreitete Standardimplementierung (u.\,a.\ in \texttt{pandapower}) reduziert die Systemgröße, indem für jeden PV-Knoten die Q-Gleichung aus dem Gleichungssystem entfernt wird und die zugehörige Spannungsvariable $|V_k|$ als konstant fixiert wird. Das reduzierte System hat die Dimension $(2n_{PQ} + n_{PV})$ statt $2b$:
+%An PV-Knoten $k \in \Omega_{PV}$ ist der Spannungsbetrag $|V_k| = |V_k^{\text{spec}}|$ fest vorgegeben, während die Blindleistung $Q_k$ eine unbekannte Größe darstellt. Dies erfordert eine Modifikation des Standard-NR.
+
+Die verbreitete Implementierung, wie sie auch in der Lastflussberechnungssoftware \texttt{pandapower} vorzufinden ist, erfordert eine Systemreduktion.
+Die Blindleistungsgleichungen für PV-Knoten werden entfernt und der Spannungsbetrag wird als gegebener Wert festgehalten.
+Durch das Weglassen der Zeilen und Spalten wird die Dimension auf des Systems auf $(2n_{PQ} + n_{PV})$ verkleinert.
+Die Lastflussgleichung mit ihren Jacobi-Blöcken ist nach Reduktion durch
+%reduziert die Systemgröße, indem für jeden PV-Knoten die Q-Gleichung aus dem Gleichungssystem entfernt wird und die zugehörige Spannungsvariable $|V_k|$ als konstant fixiert wird. Das reduzierte System hat die Dimension $(2n_{PQ} + n_{PV})$ statt $2b$:
 \begin{equation}
 	\label{eq:nr_reduziert}
-	\begin{bmatrix} \Delta \mathbf{P} \\ \Delta \mathbf{Q}_{PQ} \end{bmatrix}
+	\begin{bmatrix} \Delta \mathbf{P} \\ \Delta \mathbf{Q}_{\mathrm{PQ}} \end{bmatrix}
 	=
 	\begin{bmatrix}
-		\mathbf{H} & \mathbf{N}_{PQ} \\
-		\mathbf{M}_{PQ} & \mathbf{L}_{PQ,PQ}
+		\mathbf{H} & \mathbf{N}_{\mathrm{PQ}} \\
+		\mathbf{M}_{\mathrm{PQ}} & \mathbf{L}_{\mathrm{PQ,PQ}}
 	\end{bmatrix}
-	\begin{bmatrix} \Delta \boldsymbol{\theta} \\ \Delta |\mathbf{V}_{PQ}|\end{bmatrix}
+	\begin{bmatrix} \Delta \boldsymbol{\theta} \\ \Delta |\mathbf{V}_{\mathrm{PQ}}|\end{bmatrix}
 \end{equation}
-Nach Konvergenz wird die Blindleistung an den PV-Knoten aus \eqref{eq:pq_calc} nachträglich berechnet.\\
 
-Ein alternativer Ansatz formuliert das NR-Verfahren nicht in Polar-, sondern in \emph{kartesischen Koordinaten} auf Basis von \emph{Stromeinspeisungs-Ungleichungen} (\emph{current injection mismatches}) $\Delta I_{r,k}$ und $\Delta I_{m,k}$ (Real- und Imaginärteil). Für PQ-Knoten sind die Nichtdiagonalblöcke der resultierenden $(2n \times 2n)$-Jacobi-Matrix identisch mit den entsprechenden $(2 \times 2)$-Blöcken der Knotenadmittanzmatrix und bleiben über alle Iterationen konstant; nur die Diagonalblöcke müssen aktualisiert werden.
-
-An einem PV-Knoten $k$ wird die Blindleistung $\Delta Q_k$ als zusätzliche abhängige Variable eingeführt und die zusätzliche Gleichung $\Delta |V_k| = 0$ hinzugefügt, sodass zunächst ein erweitertes System der Dimension $(2n + n_{PV})$ entsteht:
 \begin{equation}
-	\label{eq:nr_erweitert}
-	\begin{bmatrix}
-		\Delta I_{m,k} \\
-		\Delta I_{r,k} \\
-		\Delta |V_k|
-	\end{bmatrix}
-	=
-	\begin{bmatrix}
-		B'_{kk} & G'_{kk} & \partial I_{m,k}/\partial Q_k \\
-		G'_{kk} & -B'_{kk} & \partial I_{r,k}/\partial Q_k \\
-		\partial |V_k|/\partial V_{r,k} & \partial |V_k|/\partial V_{m,k} & 0
-	\end{bmatrix}
-	\begin{bmatrix}
-		\Delta V_{r,k} \\
-		\Delta V_{m,k} \\
-		\Delta Q_k
-	\end{bmatrix}
+	\mathbf{H} = \frac{\partial \mathbf{P}}{\partial \boldsymbol{\theta}}, \quad
+	\mathbf{N}_{PQ} = \frac{\partial \mathbf{P}}{\partial |\mathbf{V}_{\mathrm{PQ}}|}, \quad
+	\mathbf{M}_\mathrm{PQ} = \frac{\partial \mathbf{Q}_{\mathrm{PQ}}}{\partial \boldsymbol{\theta}}, \quad
+	\mathbf{L}_{\mathrm{PQ,PQ}} = \frac{\partial \mathbf{Q}_{\mathrm{PQ}}}{\partial |\mathbf{V}_{\mathrm{PQ}}|}
 \end{equation}
-Die letzte Zeile von \eqref{eq:nr_erweitert} liefert die lineare Beziehung $\Delta V_{m,k} = -(V_{r,k}/V_{m,k})\,\Delta V_{r,k}$, die in die ersten beiden Zeilen eingesetzt wird. Dadurch wird eine der Spannungsvariablen eliminiert und durch $\Delta Q_k$ ersetzt, sodass das System auf die ursprüngliche Dimension $(2n \times 2n)$ \emph{reduziert} wird. Der wesentliche Vorteil liegt darin, dass die Jacobi-Matrix unabhängig von der Anzahl der PV-Knoten die Struktur der Knotenadmittanzmatrix beibehält: Die Nichtdiagonalblöcke bleiben konstant, und nur wenige Diagonalblöcke müssen pro Iteration aktualisiert werden.
 
-Empirische Ergebnisse an praktischen Netzen zeigen, dass dieser Ansatz die Gesamtrechenzeit gegenüber der klassischen NR-Formulierung in Polarkoordinaten um ca.\ 20\,\% reduziert, bei identischem Konvergenzverhalten~\cite{daCosta1999}. In dieser Arbeit wird dennoch die polare Standardformulierung als NR-Referenz verwendet, da diese der Implementierung in \texttt{pandapower} entspricht, welches als Referenz dient.
+gegeben.
+Nach vollständiger Konvergenz werden die Blindleistungen der PV-Knoten aus \eqref{eq:pq_calc} nachträglich berechnet.\\
 
-\paragraph{Behandlung von Q-Grenzen.}
-In der Praxis sind die an einem PV-Knoten einspeisbaren Blindleistungen durch $Q_k^{\min} \leq Q_k \leq Q_k^{\max}$ begrenzt (vgl.\ \eqref{eq:qlimits}). Nach jeder NR-Iteration wird die berechnete Blindleistung mit den Grenzen verglichen. Wird eine Grenze verletzt, so wird der Knoten in einen PQ-Knoten mit $Q_k = Q_k^{\min}$ bzw.\ $Q_k = Q_k^{\max}$ umgewandelt und die Spannungsbedingung fallengelassen. Umgekehrt wird ein zuvor umgeschalteter Knoten wieder in einen PV-Knoten überführt, sobald die Spannungsbedingung wieder erfüllbar wird. Dieser \emph{Q-Limit-Enforcement}-Mechanismus wird auch in den vorgeschlagenen Tensor-Methoden (Kap.~\ref{sec:pv_methoden}) übernommen.
+
+Dabei ist der Nachteil des Verfahrens die Neuberechnung und Aufbau der Jacobi-Matrix in jedem Iterationsschritt, da die Ableitungen direkt von dem aktuellen Zustand abhängen~\cite{Davis2006}. 
+Den Vorteil hingegen bildet die quadratische Konvergenzeigenschaft der Verfahrens. Dadurch findet das Verfahren im Normalfall zwischen 3--5 Iterationen eine Lösung~\cite{Salazar2024}.
+
+%Ein alternativer Ansatz formuliert das NR-Verfahren nicht in Polar-, sondern in \emph{kartesischen Koordinaten} auf Basis von \emph{Stromeinspeisungs-Ungleichungen} (\emph{current injection mismatches}) $\Delta I_{r,k}$ und $\Delta I_{m,k}$ (Real- und Imaginärteil). Für PQ-Knoten sind die Nichtdiagonalblöcke der resultierenden $(2n \times 2n)$-Jacobi-Matrix identisch mit den entsprechenden $(2 \times 2)$-Blöcken der Knotenadmittanzmatrix und bleiben über alle Iterationen konstant; nur die Diagonalblöcke müssen aktualisiert werden.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%strominjektion
+
+
+
+%In einer alternativen Formulierung können PV-Knoten anderweitig im NR-Verfahren eingefügt werden. 
+%Nach Costa et al. \cite{daCosta1999} kann das Verfahren in kartesischen Koordinaten basierend auf realen und imaginären Stromeinspeisungen $\Delta I_{r,k}$ und $\Delta I_{m,k}$ formuliert werden.
+%Anzumerken ist, dass die Nebendiagonalblöcke der PQ-Knoten der Jacobimatrix mit den Knotenadmittanzmatrizen übereinstimmen und deswegen über alle Iterationen konstant bleiben.
+%
+%\todo{hier weitermachen}
+%An einem PV-Knoten $k$ wird die Blindleistung $\Delta Q_k$ als zusätzliche abhängige Variable eingeführt und die zusätzliche Gleichung $\Delta |V_k| = 0$ hinzugefügt, sodass zunächst ein erweitertes System der Dimension $(2n + n_{PV})$ entsteht:
+%\begin{equation}
+%	\label{eq:nr_erweitert}
+%	\begin{bmatrix}
+%		\Delta I_{m,k} \\
+%		\Delta I_{r,k} \\
+%		\Delta |V_k|
+%	\end{bmatrix}
+%	=
+%	\begin{bmatrix}
+%		B_{kk} & G_{kk} & \partial I_{m,k}/\partial Q_k \\
+%		G_{kk} & -B_{kk} & \partial I_{r,k}/\partial Q_k \\
+%		\partial |V_k|/\partial V_{r,k} & \partial |V_k|/\partial V_{m,k} & 0
+%	\end{bmatrix}
+%	\begin{bmatrix}
+%		\Delta V_{r,k} \\
+%		\Delta V_{m,k} \\
+%		\Delta Q_k
+%	\end{bmatrix}
+%\end{equation}
+%Die letzte Zeile von \eqref{eq:nr_erweitert} liefert die lineare Beziehung $\Delta V_{m,k} = -(V_{r,k}/V_{m,k})\,\Delta V_{r,k}$, die in die ersten beiden Zeilen eingesetzt wird. Dadurch wird eine der Spannungsvariablen eliminiert und durch $\Delta Q_k$ ersetzt, sodass das System auf die ursprüngliche Dimension $(2n \times 2n)$ \emph{reduziert} wird. Der wesentliche Vorteil liegt darin, dass die Jacobi-Matrix unabhängig von der Anzahl der PV-Knoten die Struktur der Knotenadmittanzmatrix beibehält: Die Nichtdiagonalblöcke bleiben konstant, und nur wenige Diagonalblöcke müssen pro Iteration aktualisiert werden.\\
+%Empirische Ergebnisse an praktischen Netzen zeigen, dass dieser Ansatz die Gesamtrechenzeit gegenüber der klassischen NR-Formulierung in Polarkoordinaten um ca.\ 20\,\% reduziert, bei identischem Konvergenzverhalten~\cite{daCosta1999}. In dieser Arbeit wird dennoch die polare Standardformulierung als NR-Referenz verwendet, da diese der Implementierung in \texttt{pandapower} entspricht, welches als Referenz dient.
+
+%\paragraph{Behandlung von Q-Grenzen.}
+%In der Praxis sind die an einem PV-Knoten einspeisbaren Blindleistungen durch $Q_k^{\min} \leq Q_k \leq Q_k^{\max}$ begrenzt (vgl.\ \eqref{eq:qlimits}). Nach jeder NR-Iteration wird die berechnete Blindleistung mit den Grenzen verglichen. Wird eine Grenze verletzt, so wird der Knoten in einen PQ-Knoten mit $Q_k = Q_k^{\min}$ bzw.\ $Q_k = Q_k^{\max}$ umgewandelt und die Spannungsbedingung fallengelassen. Umgekehrt wird ein zuvor umgeschalteter Knoten wieder in einen PV-Knoten überführt, sobald die Spannungsbedingung wieder erfüllbar wird. Dieser \emph{Q-Limit-Enforcement}-Mechanismus wird auch in den vorgeschlagenen Tensor-Methoden (Kap.~\ref{sec:pv_methoden}) übernommen.
 
 \subsection{Bewertung für multidimensionale Lastflussanalysen}
 \label{subsec:nr_massen}
 
-Für einzelne Lastflüsse ist das NR-Verfahren aufgrund seiner quadratischen Konvergenz und der ausgereiften Sparse-Implementierungen sehr effizient. Für die in dieser Arbeit betrachteten (\emph{multidimensionalen}) Anwendungen, probabilistische Lastflüsse und Sensitivitätsstudien mit $\tau \gg 1$ Szenarien, ergibt sich jedoch ein struktureller Nachteil:
-\begin{itemize}
-	\item Die Jacobi-Matrix $\mathbf{J}(\mathbf{x}^{(n)}, \mathbf{s})$ hängt sowohl vom Iterationszustand als auch von den szenarienspezifischen Leistungsvorgaben ab. Sie muss daher in jeder Iteration \emph{jedes} Szenarios neu aufgebaut und faktorisiert werden.
-	\item Der Gesamtaufwand skaliert linear mit $\tau$: $t_{\text{gesamt}} \approx \tau \cdot t_{\text{NR}}$.
+Genau dieser Vor- und Nachteil soll im Bezug auf multidimensionale Berechnungen näher betrachtet werden.
+Bei mehreren Lastflussszenarien $\tau$, wie sie in der Zeitreihenberechnung, Monte-Carlo-Simulationen und probabilistischen Lastflüssen vorkommen, folgt ein struktureller Nachteil: Die Jacobi-Matrix $\mathbf{J}(\mathbf{x}^{(n)}, \mathbf{s})$ muss aufgrund Ihrer Abhängigkeit von der Leistung und Zustand nicht nur in jeder Iteration bestimmt werden, sondern auch in jedem Szenario.\\
+%Die 
+%
+%
+%Für einzelne Lastflüsse ist das NR-Verfahren aufgrund seiner quadratischen Konvergenz und der ausgereiften Sparse-Implementierungen sehr effizient. Für die in dieser Arbeit betrachteten (\emph{multidimensionalen}) Anwendungen, probabilistische Lastflüsse und Sensitivitätsstudien mit $\tau \gg 1$ Szenarien, ergibt sich jedoch ein struktureller Nachteil:
+%\begin{itemize}
+%	\item Die Jacobi-Matrix $\mathbf{J}(\mathbf{x}^{(n)}, \mathbf{s})$ hängt sowohl vom Iterationszustand als auch von den szenarienspezifischen Leistungsvorgaben ab. Sie muss daher in jeder Iteration \emph{jedes} Szenarios neu aufgebaut und faktorisiert werden.
+%	\item Der Gesamtaufwand skaliert linear mit $\tau$: $t_{\text{gesamt}} \approx \tau \cdot t_{\text{NR}}$.
 %	\item Eine Parallelisierung über Szenarien ist zwar prinzipiell möglich, aber ineffizient, da jede Instanz eine eigene Sparse-Faktorisierung durchführen muss. Standard-BLAS-Bibliotheken (\texttt{OpenBLAS}, \texttt{MKL}) können nicht effektiv genutzt werden.
-\end{itemize}
+%\end{itemize}
 
-Empirisch wird anhand einer Jahressimulation im Minutenraster ($\tau = 525\,600$ Lastflüsse) für ein 100-Bus-Netz folgende Rechenzeiten belegt~\cite{Salazar2024}:
+%Empirisch wird anhand einer Jahressimulation im Minutenraster ($\tau = 525\,600$ Lastflüsse) für ein 100-Bus-Netz folgende Rechenzeiten belegt~\cite{Salazar2024}:
 
+In Tabelle \ref{tab:nr_vergleich} ist exemplarisch ein Ergebnis für ein 100-Knoten-Netz einer Jahressimulation abgebildet~\cite{Salazar2024}, welches diesen Nachteil belegt. 
 \begin{table}[H]
 	\centering
-	\caption{Rechenzeit für 525.600 Lastflüsse eines 100-Bus-Netzes~\cite{Salazar2024}}
+	\caption{Rechenzeit in Minuten für verschiedene Anzahl an Lastflüsse (PF) eines 100-Knoten-Netzes~\cite{Salazar2024}}
 	\label{tab:nr_vergleich}
-	\begin{tabular}{lrr}
-		\toprule
-		Verfahren & Zeit [min] & Speedup vs.\ NR \\
-		\midrule
+\begin{tabular}{llrrrr}
+	\toprule
+	Algorithmus & Netzgröße &
+	\SI{8760}{PF} &
+	\SI{17520}{PF} &
+	\SI{35040}{PF} &
+	\SI{525600}{PF} \\
+	\midrule
+	NR
+	& 100
+	& 1.03
+	& 2.06
+	& 4.12
+	& 61.85 \\
+	
+	Tensor
+	& 100
+	& 0.01
+	& 0.01
+	& 0.02
+	& 0.37 \\
 
-		NR (Sparse) & 61{,}9 & 1{,}00 \\
-		Tensor (Sparse) & 10{,}1 & 6{,}1 \\
-		Tensor (Dense) & 0{,}37 & 164{,}0 \\
-		\bottomrule
-	\end{tabular}
+	\bottomrule
+\end{tabular}
 \end{table}
 
-Der Faktor 164 zwischen NR (Sparse) und Tensor (Dense) verdeutlicht den Kern der Motivation dieser Arbeit. Bei fester Netztopologie und konstantem Leistungsmodell bleibt die zentrale Systemmatrix der Fixpunkt-Iteration ($\mathbf{Z}_B$) über alle Szenarien und Iterationen \emph{konstant}. Die dadurch mögliche Vorab-Berechnung und -Faktorisierung sowie die anschließende Batched-Matrix-Multiplikation eliminieren den Hauptaufwand pro Szenario. Diese strukturelle Eigenschaft, die dem NR fundamental fehlt, ist der Ausgangspunkt für die im nächsten Abschnitt vorgestellte Fixpunkt-Iteration.
+Dieses Ergebnis begründet den nahezu linearen Anstieg der Rechenzeit bei ansteigender Szenarienanzahl $t_{\text{gesamt}} \approx \tau \cdot t_{\text{NR}}$.
+Dabei konnte bereits für den reinen PQ-Knoten-Fall gezeigt werden dass eine tensorisierte Fixpunktberechnung um den Faktor 164 schneller sein kann als das NR-Verfahren~\cite{Salazar2024}. Dies liegt, wie folgend erklärt an der Konstanz der Systemmatrix in derm Fixpunktverfahren gegenüber der sich verändernden Jacobimatrix.
+%Der Faktor 164 zwischen NR (Sparse) und Tensor (Dense) verdeutlicht den Kern der Motivation dieser Arbeit. Bei fester Netztopologie und konstantem Leistungsmodell bleibt die zentrale Systemmatrix der Fixpunkt-Iteration ($\mathbf{Z}_B$) über alle Szenarien und Iterationen \emph{konstant}. Die dadurch mögliche Vorab-Berechnung und -Faktorisierung sowie die anschließende Batched-Matrix-Multiplikation eliminieren den Hauptaufwand pro Szenario. Diese strukturelle Eigenschaft, die dem NR fundamental fehlt, ist der Ausgangspunkt für die im nächsten Abschnitt vorgestellte Fixpunkt-Iteration.
 
 \bigskip
 \noindent
@@ -406,7 +655,14 @@ Der Faktor 164 zwischen NR (Sparse) und Tensor (Dense) verdeutlicht den Kern der
 \section{Fixpunkt-Iteration und Banachscher Fixpunktsatz}
 \label{sec:fpi}
 
-Dieses Kapitel führt die Fixpunkt-Iteration (FPI) als alternatives Lösungsverfahren für das Lastflussproblem ein und stellt damit das mathematische Fundament des in Kapitel~\ref{sec:tpf} entwickelten Tensor Power Flow bereit. Im Gegensatz zum Newton-Raphson-Verfahren verzichtet die FPI auf eine Linearisierung und arbeitet stattdessen mit einer expliziten Iterationsvorschrift, deren zentrale Systemmatrix über alle Iterationen \emph{konstant} bleibt. Diese Eigenschaft ist der Ausgangspunkt für die spätere Massenparallelisierung.
+%Dieses Kapitel führt die Fixpunkt-Iteration (FPI) als alternatives Lösungsverfahren für das Lastflussproblem ein und stellt damit das mathematische Fundament des in Kapitel~\ref{sec:tpf} entwickelten Tensor Power Flow bereit. Im Gegensatz zum Newton-Raphson-Verfahren verzichtet die FPI auf eine Linearisierung und arbeitet stattdessen mit einer expliziten Iterationsvorschrift, deren zentrale Systemmatrix über alle Iterationen \emph{konstant} bleibt. Diese Eigenschaft ist der Ausgangspunkt für die spätere Massenparallelisierung.
+
+
+Die Fixpunkt-Iteration (FPI) wird in diesem Abschnitt eingeführt. 
+Das Verfahren dient als tensorisierbare Alternative zu dem Newton-Raphson-Verfahren.
+Dabei wird gezeigt, dass für Netze ohne PV-Knoten die Systemmatrix über alle Iterationen konstant bleibt, nicht wie die Jacobimatrix in dem NR-Verfahren.
+Dieses Kapitel dient weiterhin als Basis für die Parallelisierung, welche im \cref{ch:tpf} des \emph{Tensor Power Flow} durchgeführt wird.
+
 
 %Die Darstellung folgt der Herleitung von Giraldo et al.~\cite{Giraldo2022} über die Laurent-Reihen-Entwicklung und der äquivalenten Formulierung in Salazar Duque et al.~\cite{salazar2024}. Abschnitt~\ref{subsec:fpi_herleitung} leitet die Iterationsvorschrift her, Abschnitt~\ref{subsec:banach} beweist die Konvergenz über den Banachschen Fixpunktsatz, Abschnitt~\ref{subsec:fpi_interpretation} liefert die physikalische Interpretation und Abschnitt~\ref{subsec:fpi_eigenschaften} fasst die für die Tensorformulierung relevanten Eigenschaften zusammen.
 
@@ -415,13 +671,31 @@ Dieses Kapitel führt die Fixpunkt-Iteration (FPI) als alternatives Lösungsverf
 \subsection{Laurent-Reihen-Approximation}
 \label{subsec:laurent}
 
-Die Nichtlinearität der Lastflussgleichungen resultiert aus dem Term $(V_k)^{-1}$, der im spezifizierten Strom \eqref{eq:power_current} auftritt. Giraldo et al.\ \cite{Giraldo2022} schlagen eine Linearisierung mittels Laurent-Reihenentwicklung vor.
-	Die Nichtlinearität $f(V_i) = (V_i)^{-1}$ an einem Knoten $i \in \Omega_d$ wird um einen Arbeitspunkt $\mathrm{V}^0 \in \C$ mittels Laurent-Reihe approximiert als:
-	\begin{equation}
-		f(V_i) \approx \frac{2}{\mathrm{V}^0} - \frac{V_i}{(\mathrm{V}^0)^2}
-		\label{eq:laurent_approx}
-	\end{equation}
-	unter der Annahme $V_i = \mathrm{V}^0 - \Delta V$ mit $\|\Delta V\| / \|\mathrm{V}^0\| < 1$.
+
+In der Leistungsgleichung \eqref{eq:power_current} ist ersichtlich dass durch die elementweise Division der Spannung $V^{-1}$ eine Nichtlinearität vorliegt.
+Diese pflanzt sich in die Darstellung des leistungsabhängigen Knotenstromes fort~\cite{Giraldo2022}.
+Um diese zu linearisieren, wird eine Laurent-Reihenapproximation durchgeführt.
+Dabei wird die spannungsabhängige Funktion $f(V) = V^{-1}$ an einem Arbeitspunkt $\mathrm{V}^{(0)}$ als eine Laurent-Reihe erster Ordnung
+
+\begin{equation}
+	f(V_i) \approx \frac{2}{\mathrm{V}^0} - \frac{V_i}{(\mathrm{V}^0)^2}
+	\label{eq:laurent_approx}
+\end{equation}
+
+dargestellt werden, wobei
+ 
+\begin{equation}
+	V_i = \mathrm{V}^0 - \Delta V \quad \text{mit} \quad \|\Delta V\| / \|\mathrm{V}^0\| < 1
+	\label{eq:annahme}
+\end{equation}
+ angenommen wird.
+%Die Nichtlinearität der Lastflussgleichungen resultiert aus dem Term $(V_k)^{-1}$, der im spezifizierten Strom \eqref{eq:power_current} auftritt. Giraldo et al.\ \cite{Giraldo2022} schlagen eine Linearisierung mittels Laurent-Reihenentwicklung vor.
+%	Die Nichtlinearität $f(V_i) = (V_i)^{-1}$ an einem Knoten $i \in \Omega_d$ wird um einen Arbeitspunkt $\mathrm{V}^0 \in \C$ mittels Laurent-Reihe approximiert als:
+%	\begin{equation}
+%		f(V_i) \approx \frac{2}{\mathrm{V}^0} - \frac{V_i}{(\mathrm{V}^0)^2}
+%		\label{eq:laurent_approx}
+%	\end{equation}
+%	unter der Annahme $V_i = \mathrm{V}^0 - \Delta V$ mit $\|\Delta V\| / \|\mathrm{V}^0\| < 1$.
 %\begin{proof}
 %	Die Funktion $f(\Delta V) = 1/(\mathrm{V}^0 - \Delta V)$ kann für $\|\Delta V\| < \|\mathrm{V}^0\|$ als konvergente Potenzreihe dargestellt werden \cite{Giraldo2022}:
 %	\begin{equation}
@@ -430,115 +704,140 @@ Die Nichtlinearität der Lastflussgleichungen resultiert aus dem Term $(V_k)^{-1
 	%	\end{equation}
 %	Durch Abbruch nach dem zweiten Glied ($n \leq 2$) und Rücksubstitution $\Delta V = \mathrm{V}^0 - V_i$ ergibt sich die Approximation \eqref{eq:laurent_approx}.
 %\end{proof}
-Die Annahme $\|\Delta V\| / \|\mathrm{V}^0\| < 1$ ist physikalisch gerechtfertigt, da Knotenspannungen in Verteilnetzen im Normalbetrieb innerhalb eines engen Bandes um den Nennwert liegen (typisch $0{,}9$ bis $1{,}1$~p.u.) \cite{Giraldo2022}. Im iterativen Algorithmus wird der Arbeitspunkt $\mathrm{V}^0$ nach jeder Iteration auf den aktuellen Spannungswert aktualisiert, sodass die Approximation mit jeder Iteration genauer wird.
-
-
-
-
-
+Diese Annahme wird dadurch begründet, dass die Spannungen in Verteilernetzen innerhalb eines engen Bandes um den Nennwert liegen. 
+Das Band erstreckt sich hierbei typischerweise von 0,9 bis $1,1\,\mathrm{p.u.}$~\cite{Giraldo2022}.
+%Im iterativen Algorithmus wird der Arbeitspunkt $\mathrm{V}^0$ nach jeder Iteration auf den aktuellen Spannungswert aktualisiert, sodass die Approximation mit jeder Iteration genauer wird.
 
 \subsection{Herleitung der Fixpunkt-Iteration}
 \label{subsec:fpi_herleitung}
-Ausgangspunkt ist die Grundgleichung des Lastflusses \eqref{eq:pf_fundamental}. Unter Einbeziehung des ZIP-Lastmodells \eqref{eq:zip} lässt sich die Nichtlinearität in eine explizite Iterationsvorschrift überführen. Nach Giraldo et al.~\cite{Giraldo2022} ergibt sich die Stromgleichung an den Lastknoten zu
+
+Das ZIP-Modell \eqref{eq:zip} kann durch die Knotenspannung $V_\mathrm{d}$ dividiert werden um die Knotenströme 
+
 \begin{equation}
 	\label{eq:current_zip}
+	%		-\operatorname{diag}(\mathbf{v}_d^{*})^{-1}\mathbf{s}_d^{*} &= \mathbf{Y}_{ds}\mathbf{v}_s + \mathbf{Y}_{dd}\mathbf{v}_d\\
+	%	&\Updownarrow\\
 	\mathbf{i}_d = \left(\boldsymbol{\alpha}_P \odot \operatorname{diag}(\mathbf{v}_d^{*})^{-1} + \operatorname{diag}(\boldsymbol{\alpha}_I) + \boldsymbol{\alpha}_Z \odot \operatorname{diag}(\mathbf{v}_d)\right)\mathbf{s}_n^{*}
 \end{equation}
-Einsetzen in die Knotenstrombilanz \eqref{eq:current_balance} und Umordnen führt auf das lineare System
+
+als Funktion der ZIP-aufgeteilten Spannung und Nennleistung darzustellen.
+An dieser Stelle ist die Nichtlinearität $\operatorname{diag}(\mathbf{v}_d^{*})^{-1}$ sichtbar. 
+Für diesen Ausdruck wird die bereits eingeführte Laurent-Reihe verwendet. 
+Der Ausdruck für den Knotenstrom wird weiterhin in die Knotenbilanz \eqref{eq:current_balance} eingesetzt und führt zu
+
+
+
+%Ausgangspunkt ist die Grundgleichung des Lastflusses \eqref{eq:pf_fundamental}. Unter Einbeziehung des ZIP-Lastmodells \eqref{eq:zip} lässt sich die Nichtlinearität in eine explizite Iterationsvorschrift überführen. Nach Giraldo et al.~\cite{Giraldo2022} ergibt sich die Stromgleichung an den Lastknoten zu
+
+%Einsetzen in die Knotenstrombilanz \eqref{eq:current_balance} und Umordnen führt auf das lineare System
 \begin{equation}
 	\vect{A}\vect{V}_d^* - \vect{B}\vect{V}_d = \vect{C} + \vect{D}
 	\label{eq:lineares_system}
 \end{equation}
 mit den Matrizen
 \begin{align}
-	\vect{A} &= \diag\left(\alpha_P \had \mathrm{V}^{0*-2} \had \vect{S}_n^*\right) \label{eq:giraldo_A}\\
-	\vect{B} &= \diag(\alpha_Z \had \vect{S}_n^*) + \Ydd \label{eq:giraldo_B}\\
-	\vect{C} &= \Yds \vect{V}_s + \alpha_I \had \vect{S}_n^* \label{eq:giraldo_C}\\
-	\vect{D} &= 2\alpha_P \had \mathrm{V}^{0*-1} \had \vect{S}_n^* \label{eq:giraldo_D}
+	\vect{A} &= \diag\left(\boldsymbol{\alpha_P} \had \mathrm{V}^{0*-2} \had \mathbf{S}_n^*\right) \label{eq:giraldo_A}\\
+	\vect{B} &= \diag(\boldsymbol{\alpha_Z} \had \mathbf{S}_n^*) + \mathbf{\Ydd} \label{eq:giraldo_B}\\
+	\vect{C} &= \mathbf{\Yds} \mathbf{V}_s + \boldsymbol{\alpha_I} \had \mathbf{S}_n^* \label{eq:giraldo_C}\\
+	\vect{D} &= 2\boldsymbol{\alpha_P} \had \mathrm{V}^{0*-1} \had \mathbf{S}_n^* \label{eq:giraldo_D}.
 \end{align}
-Auflösen von \eqref{eq:lineares_system} nach $\mathbf{V}_d$ liefert die Fixpunkt-Iterationsvorschrift
+Auflösen von \eqref{eq:lineares_system} nach der Spannung $\mathbf{V}_d$ liefert schließlich die Iterationsvorschrift des Fixpunkts
 \begin{equation}
 	\label{eq:fpi_iteration}
 	\boxed{\;	\vect{V}_d^{(k+1)} = \vect{B}^{-1}\left(\vect{A}^{(k)} \vect{V}_d^{*(k)} - \vect{C} - \vect{D}^{(k)}\right) =: T\!\left(\mathbf{v}_d^{(n)}\right)\;}
 \end{equation}
-Die Iteration wird typischerweise mit einem Flat-Start $\mathbf{v}_d^{(0)} = \mathbf{1}$ initialisiert und abgebrochen, sobald $\|\mathbf{v}_d^{(n+1)} - \mathbf{v}_d^{(n)}\|_\infty < \varepsilon$.
+nach Giraldo et al.~\cite{Giraldo2022}.
+Ähnlich zu dem NR-Verfahren wird diese Rechnung bis zum erreichen der Konvergenzgrenze $\|\mathbf{v}_d^{(n+1)} - \mathbf{v}_d^{(n)}\| < \varepsilon$ wiederholt.
+%Die Iteration wird typischerweise mit einem Flat-Start $\mathbf{v}_d^{(0)} = \mathbf{1}$ initialisiert und abgebrochen, sobald $\|\mathbf{v}_d^{(n+1)} - \mathbf{v}_d^{(n)}\| < \varepsilon$.
+Diese Darstellung ist für jegliche ZIP-Lastkonfiguration gültig. 
 
-\paragraph{Reiner Fall konstanter Leistung.}
-Für das in dieser Arbeit als Standardfall angenommene konstante Leistungsmodell ($\boldsymbol{\alpha}_P = \mathbf{1}$, $\boldsymbol{\alpha}_I = \boldsymbol{\alpha}_Z = \mathbf{0}$) vereinfachen sich \eqref{eq:fpi_ABc} zu
-\begin{equation}
-	\label{eq:fpi_konstant}
-	\mathbf{A} = \operatorname{diag}(\mathbf{s}_d^{*}), \quad \mathbf{B} = \mathbf{Y}_{dd}, \quad \mathbf{c} = \mathbf{Y}_{ds}\mathbf{v}_s
-\end{equation}
-Mit der Bus-Impedanzmatrix $\mathbf{Z}_B = \mathbf{Y}_{dd}^{-1}$ aus \eqref{eq:zbus} lässt sich die Iteration als
-\begin{equation}
-	\label{eq:fpi_zbus}
-	\mathbf{v}_d^{(n+1)} = \mathbf{Z}_B\left(\mathbf{s}_d^{*} \oslash \mathbf{v}_d^{*\,(n)}\right) - \mathbf{Z}_B\mathbf{Y}_{ds}\mathbf{v}_s
-\end{equation}
-schreiben. Diese kompakte Form ist die Grundlage der Tensorformulierung, da $\mathbf{Z}_B$ und $\mathbf{Z}_B\mathbf{Y}_{ds}\mathbf{v}_s$ szenarienunabhängig konstant sind und einmalig vorab berechnet werden können.
+%Um die Abhängigkeit der Leistung in dem nachfolgenden Kapitel besser Aufzeigen zu können
+%%Für das in dieser Arbeit als Standardfall angenommene konstante Leistungsmodell ($\boldsymbol{\alpha}_P = \mathbf{1}$, $\boldsymbol{\alpha}_I = \boldsymbol{\alpha}_Z = \mathbf{0}$) vereinfachen sich \eqref{eq:fpi_ABc} zu
+%\begin{equation}
+%	\label{eq:fpi_konstant}
+%	\mathbf{A} = \operatorname{diag}(\mathbf{s}_d^{*}), \quad \mathbf{B} = \mathbf{Y}_{dd}, \quad \mathbf{c} = \mathbf{Y}_{ds}\mathbf{v}_s
+%\end{equation}
+%Mit der Bus-Impedanzmatrix $\mathbf{Z}_B = \mathbf{Y}_{dd}^{-1}$ aus \eqref{eq:zbus} lässt sich die Iteration als
+%\begin{equation}
+%	\label{eq:fpi_zbus}
+%	\mathbf{v}_d^{(n+1)} = \mathbf{Z}_B\left(\mathbf{s}_d^{*} \oslash \mathbf{v}_d^{*\,(n)}\right) - \mathbf{Z}_B\mathbf{Y}_{ds}\mathbf{v}_s
+%\end{equation}
+%schreiben. Diese kompakte Form ist die Grundlage der Tensorformulierung, da $\mathbf{Z}_B$ und $\mathbf{Z}_B\mathbf{Y}_{ds}\mathbf{v}_s$ szenarienunabhängig konstant sind und einmalig vorab berechnet werden können.
+%
+%
+%\begin{algorithm}[H]
+%	\caption{Successive Approximation Method (SAM) nach \cite{Giraldo2022}}
+%	\label{alg:sam}
+%	\begin{algorithmic}[1]
+%		\REQUIRE $\vect{S}_n$, $\Ydd$, $\Yds$, $\vect{V}_s$, Toleranz $\varepsilon$, max.\ Iterationen $K$
+%		\ENSURE $\vect{V}_d$
+%		
+%		\STATE Initialisiere $k = 0$, $\text{tol} = \infty$
+%		\STATE Initialisiere $\mathrm{V}^0_{i,\phi} = [1, a^2, a]$ für alle $i \in \Omega_d$ \COMMENT{Flat Start, $a = e^{\jj 2\pi/3}$}
+%		\STATE Berechne $\vect{B}^{-1}$ und $\vect{C}$ gemäß \eqref{eq:giraldo_B}--\eqref{eq:giraldo_C}
+%		
+%		\WHILE{$\text{tol} \geq \varepsilon$ \textbf{und} $k < K$}
+%		\STATE Berechne $\vect{A}^{(k)}$ und $\vect{D}^{(k)}$ gemäß \eqref{eq:giraldo_A}--\eqref{eq:giraldo_D}
+%		\STATE $\vect{V}_d^{(k+1)} = \vect{B}^{-1}\left(\vect{A}^{(k)} \vect{V}_d^{*(k)} - \vect{C} - \vect{D}^{(k)}\right)$
+%		\STATE Berechne Leistungsmismatch: $\vect{S}_d^{*(k+1)} = \diag(\vect{V}_d^{*(k+1)})(\Yds\vect{V}_s + \Ydd\vect{V}_d^{(k+1)})$
+%		\STATE $\text{tol} \leftarrow \max\|\vect{S}_d^* - \vect{S}_d^{*(k+1)}\|$
+%		\STATE $\mathrm{V}^0_d \leftarrow \vect{V}_d^{(k+1)}$ \COMMENT{Arbeitspunkt aktualisieren}
+%		\STATE $k \leftarrow k + 1$
+%		\ENDWHILE
+%		
+%		\STATE Berechne $\vect{S}_s^* = \diag(\vect{V}_s^*)(\vect{Y}_{ss}\vect{V}_s + \vect{Y}_{sd}\vect{V}_d^{(k)})$
+%		\RETURN $\vect{V}_d^{(k)}$, $\vect{S}_s$
+%	\end{algorithmic}
+%\end{algorithm}
 
 
-\begin{algorithm}[H]
-	\caption{Successive Approximation Method (SAM) nach \cite{Giraldo2022}}
-	\label{alg:sam}
-	\begin{algorithmic}[1]
-		\REQUIRE $\vect{S}_n$, $\Ydd$, $\Yds$, $\vect{V}_s$, Toleranz $\varepsilon$, max.\ Iterationen $K$
-		\ENSURE $\vect{V}_d$
-		
-		\STATE Initialisiere $k = 0$, $\text{tol} = \infty$
-		\STATE Initialisiere $\mathrm{V}^0_{i,\phi} = [1, a^2, a]$ für alle $i \in \Omega_d$ \COMMENT{Flat Start, $a = e^{\jj 2\pi/3}$}
-		\STATE Berechne $\vect{B}^{-1}$ und $\vect{C}$ gemäß \eqref{eq:giraldo_B}--\eqref{eq:giraldo_C}
-		
-		\WHILE{$\text{tol} \geq \varepsilon$ \textbf{und} $k < K$}
-		\STATE Berechne $\vect{A}^{(k)}$ und $\vect{D}^{(k)}$ gemäß \eqref{eq:giraldo_A}--\eqref{eq:giraldo_D}
-		\STATE $\vect{V}_d^{(k+1)} = \vect{B}^{-1}\left(\vect{A}^{(k)} \vect{V}_d^{*(k)} - \vect{C} - \vect{D}^{(k)}\right)$
-		\STATE Berechne Leistungsmismatch: $\vect{S}_d^{*(k+1)} = \diag(\vect{V}_d^{*(k+1)})(\Yds\vect{V}_s + \Ydd\vect{V}_d^{(k+1)})$
-		\STATE $\text{tol} \leftarrow \max\|\vect{S}_d^* - \vect{S}_d^{*(k+1)}\|$
-		\STATE $\mathrm{V}^0_d \leftarrow \vect{V}_d^{(k+1)}$ \COMMENT{Arbeitspunkt aktualisieren}
-		\STATE $k \leftarrow k + 1$
-		\ENDWHILE
-		
-		\STATE Berechne $\vect{S}_s^* = \diag(\vect{V}_s^*)(\vect{Y}_{ss}\vect{V}_s + \vect{Y}_{sd}\vect{V}_d^{(k)})$
-		\RETURN $\vect{V}_d^{(k)}$, $\vect{S}_s$
-	\end{algorithmic}
-\end{algorithm}
-
-
-\subsection{Konvergenzbeweis über den Banachschen Fixpunktsatz}
+\subsection{Konvergenz über den Banachschen Fixpunktsatz}
 \label{subsec:banach}
 
-Die Konvergenz der Iteration \eqref{eq:fpi_iteration} lässt sich über den Banachschen Fixpunktsatz beweisen. Dieser besagt, dass eine kontrahierende Abbildung $T: X \to X$ auf einem vollständigen metrischen Raum $(X,d)$ genau einen Fixpunkt $\mathbf{u} = T(\mathbf{u})$ besitzt, zu dem die Folge $\mathbf{v}^{(n+1)} = T(\mathbf{v}^{(n)})$ für jeden Startwert $\mathbf{v}^{(0)} \in X$ konvergiert. Die Abbildung heißt \emph{kontrahierend} mit Kontraktionskonstante $\eta$, wenn
-\begin{equation}
-	\label{eq:contraction}
-	d\!\left(T(\mathbf{v}),\, T(\mathbf{w})\right) \leq \eta\, d(\mathbf{v}, \mathbf{w}) \quad \forall \mathbf{v},\mathbf{w} \in X, \quad 0 \leq \eta < 1
-\end{equation}
+%Die Konvergenz der Iteration \eqref{eq:fpi_iteration} lässt sich über den Banachschen Fixpunktsatz beweisen. Dieser besagt, dass eine kontrahierende Abbildung $T: X \to X$ auf einem vollständigen metrischen Raum $(X,d)$ genau einen Fixpunkt $\mathbf{u} = T(\mathbf{u})$ besitzt, zu dem die Folge $\mathbf{v}^{(n+1)} = T(\mathbf{v}^{(n)})$ für jeden Startwert $\mathbf{v}^{(0)} \in X$ konvergiert. Die Abbildung heißt \emph{kontrahierend} mit Kontraktionskonstante $\eta$, wenn
+%\begin{equation}
+%	\label{eq:contraction}
+%	d\!\left(T(\mathbf{v}),\, T(\mathbf{w})\right) \leq \eta\, d(\mathbf{v}, \mathbf{w}) \quad \forall \mathbf{v},\mathbf{w} \in X, \quad 0 \leq \eta < 1
+%\end{equation}
 
-\paragraph{Kontraktionsbedingung für den TPF.}
-Sei $\mathbf{u}_d$ die exakte Lösung des Lastflusses und $v_{\min} = \min_{k \in \Omega_d} |u_k|$ der minimale Spannungsbetrag im Netz. Nach Giraldo et al.~\cite{Giraldo2022} lässt sich für die Iteration \eqref{eq:fpi_iteration} die Ungleichung
+Die Konvergenz des Verfahrens ist über den Banachschen Fixpunktsatz charakterisiert \cite{Banach.1922}. Dieser besagt eine kontrahierende Abbildung $T: X \to X$ einen Fixpunkt $u$ besitzt, zudem jeder Startpunkt konvergiert.
+Übertragen auf das Lastflussproblem ist $\mathbf{u}$ die exakte Lösung des Lastflusses. Giraldo et al.~\cite{Giraldo2022} wendet der Fixpunktsatz auf den FPI an leitet die Ungleichung
 \begin{equation}
 	\label{eq:contraction_tpf}
 	\left\|\mathbf{v}_d^{(n+1)} - \mathbf{u}_d\right\|
 	\leq \frac{\left\|\mathbf{B}^{-1}\operatorname{diag}(\boldsymbol{\alpha}_P \odot \mathbf{s}_n^{*})\right\|}{v_{\min}^2}
 	\left\|\mathbf{v}_d^{(n)} - \mathbf{u}_d\right\|
 \end{equation}
-herleiten. Die Kontraktionskonstante lautet somit
+
+her, wobei $v_{\min}$  der minimale Spannungsbetrag im Netz ist. Nach Banach ist der Vorfaktor 
+
 \begin{equation}
 	\label{eq:eta}
 	\boxed{\;\eta = \max_{k \in \Omega_d}\left\{\frac{\left\|\mathbf{B}^{-1}\operatorname{diag}(\boldsymbol{\alpha}_P \odot \mathbf{s}_n^{*})\right\|}{v_{\min}^2}\right\}\;}
 \end{equation}
-Die FPI konvergiert genau dann für einen beliebigen Startwert zur eindeutigen Lösung, wenn $\eta < 1$ gilt. \todo{konvergiert auch für eta größer 1. klären: literatur.}
 
-Als Interpretation 
-für den Fall konstanter Leistung ($\boldsymbol{\alpha}_P = \mathbf{1}$) und unter Verwendung der Identität $\mathbf{s}_n^{*} \oslash v_{\min}^2 = \mathbf{1} \oslash \mathbf{z}_{L}$, wobei $\mathbf{z}_{L,k} = v_{\min}^2 / |s_{n,k}^{*}|$ die \emph{Lastimpedanz} am Knoten $k$ bezeichnet, vereinfacht sich \eqref{eq:eta} zu~\cite{Salazar2024,Giraldo2022}
+die Kontraktionskonstante des Systems.
+Die FPI konvergiert genau dann für einen beliebigen Startwert zur eindeutigen Lösung, wenn $\eta < 1$ gilt. 
+Ferner ist zu beachten, dass dies nur eine hinreichende Bedingung ist und für  $\eta > 1$ die Iteration trotzdem konvergieren kann, diese jedoch nicht mehr garantiert ist.\\
+
+Zur besseren Interpretation der Konstante wird der konstante Lastfall $\boldsymbol{\alpha}_\mathrm{P} = \mathbf{1}$ verwendet. 
+Dabei kann unter der Verwendung von $\mathbf{z}_{L,k} = v_{\min}^2 / |s_{n,k}^{*}|$ als Lastimpedanz an Knoten $k$ die Kontraktionskonstante auf 
+%Als Interpretation für den Fall konstanter Leistung ($\boldsymbol{\alpha}_P = \mathbf{1}$) und unter Verwendung der Identität $\mathbf{s}_n^{*} \oslash v_{\min}^2 = \mathbf{1} \oslash \mathbf{z}_{L}$, wobei $\mathbf{z}_{L,k} = v_{\min}^2 / |s_{n,k}^{*}|$ die \emph{Lastimpedanz} am Knoten $k$ bezeichnet, vereinfacht sich \eqref{eq:eta} zu~\cite{Salazar2024,Giraldo2022}
 \begin{equation}
 	\label{eq:eta_physical}
 	\eta = \left\|\mathbf{Z}_B\operatorname{diag}(\mathbf{1} \oslash \mathbf{z}_L)\right\|_1 \approx \max_{k \in \Omega_d}\frac{|Z_{\text{Th},k}|}{|z_{L,k}|}
 \end{equation}
-mit der Thévenin-Impedanz $Z_{\text{Th},k} = [\mathbf{Z}_B]_{kk}$ aus \eqref{eq:z_thev}. Die Kontraktionsbedingung $\eta < 1$ ist daher äquivalent zu
+mit der Thévenin-Impedanz $Z_{\text{Th},k} = [\mathbf{Z}_B]_{kk}$ aus \eqref{eq:z_thev} reduziert werden.
+Wenn die Hinreichende Bedingung erfüllt wird, gilt 
 \begin{equation}
 	\label{eq:physical_condition}
-	|Z_{\text{Th},k}| < |z_{L,k}| \quad \forall k \in \Omega_d
+	|Z_{\text{Th},k}| < |z_{L,k}|
 \end{equation}
-Die FPI konvergiert genau dann, wenn an jedem Lastknoten die Thévenin-Impedanz kleiner als die Lastimpedanz ist. Dies ist der praktische, hochspannungsseitige Betriebspunkt. 
+für alle Lastknoten in Netz.
+Physikalisch bedeutet dies, dass Lastwiderstand größer sein muss, als die Thévenin-Impedanz (Innenwiderstand). 
+Diese Charakteristik ist genau im hochspannungsseitigen Betriebspunkt des elektrischen Netzes erfüllt \cite{Giraldo2022}.
+
+%Die FPI konvergiert genau dann, wenn an jedem Lastknoten die Thévenin-Impedanz kleiner als die Lastimpedanz ist. Dies ist der praktische, hochspannungsseitige Betriebspunkt. 
 
 %\paragraph{Zusammenhang mit der Existenzbedingung.}
 %Die Kontraktionsbedingung \eqref{eq:physical_condition} fällt im Grenzfall zusammen mit der in Abschnitt~\ref{subsec:existenz} eingeführten Existenzbedingung \eqref{eq:feasibility} von Bolognani und Zampieri~\cite{bolognani2016}: Existiert eine praktische Lastflusslösung, so ist die FPI eine Kontraktion und konvergiert; existiert keine Lösung, so kann auch keine Kontraktion vorliegen. Damit ist die FPI in doppelter Hinsicht robust: Sie konvergiert genau dann, wenn eine physikalische Lösung existiert, und sie konvergiert stets zum \emph{richtigen} (hochspannungsseitigen) Betriebspunkt. \todo{macht gerade keinen sinn wenn es auch für große Eta konvergiert :'/}
