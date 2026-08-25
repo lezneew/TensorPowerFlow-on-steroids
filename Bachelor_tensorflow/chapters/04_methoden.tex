@@ -1,42 +1,50 @@
 %======================================================================
-\chapter{Methoden zur PV-Knoten-Integration im Tensor Power Flow}
+\chapter{PV-Knoten-Integration im Tensor Power Flow}
 \label{ch:methoden_pv}
 %======================================================================
 
-In den vorherigen Kapiteln wurde gezeigt, dass der Tensor Power Flow durch die Konstantheit der Systemmatrix $\vect{F}$  einen erheblichen Geschwindigkeitsvorteil gegenüber konventionellen Verfahren bietet. Die zentrale Limitation liegt in der Annahme, dass der Leistungsvektor $\vect{s}$ über alle Iterationen vollständig bekannt und konstant ist (\cref{subsec:fpi_limitation,sec:tpf_limitation}). PV-Knoten verletzen diese Annahme, da ihre Blindleistung $Q_k$ unbekannt ist und iterativ bestimmt werden muss.
 
-Dieses Kapitel entwickelt zwei Methoden, die PV-Knoten in die FPI-Struktur des TPF integrieren, ohne die Parallelisierbarkeit wesentlich einzuschränken. Beide Methoden operieren auf der allgemeinen FPI-Formulierung aus \cref{sec:tpf_algorithmus}.
-\begin{equation}
-	\vect{v}_{(n+1)} = \vect{F}^{(n)} \cdot \vect{v}_{(n)}^{*\eleminv} + \vect{w}^{(n)}
-	\label{eq:pv_fpi_basis}
-\end{equation}
-mit den in \eqref{eq:tpf_A}--\eqref{eq:tpf_w} definierten Hilfsgrößen.
-%\begin{align}
-%	\vect{A}^{(n)} &= \diag(\alpha_P \had \vect{s}^{*(n)}) \label{eq:pv_A}\\
-%	\vect{B}^{(n)} &= \diag(\alpha_Z \had \vect{s}^{*(n)}) + \Ydd \label{eq:pv_B}\\
-%	\vect{c}^{(n)} &= \Yds\vect{v}_s + \alpha_I \had \vect{s}^{*(n)} \label{eq:pv_c}\\
-%	\vect{F}^{(n)} &= -(\vect{B}^{(n)})^{-1}\vect{A}^{(n)} \label{eq:pv_F}\\
-%	\vect{w}^{(n)} &= -(\vect{B}^{(n)})^{-1}\vect{c}^{(n)} \label{eq:pv_w}
-%\end{align}
-%
-Der Index $(n)$ kennzeichnet, dass diese Größen im allgemeinen Fall von der aktuellen Schätzung des Leistungsvektors $\vect{s}^{(n)}$ abhängen, welcher sich bei PV-Knoten zwischen den Iterationen ändert, da dort $s_k^{(n)} = P_k^{\spec} + \jj Q_k^{(n)}$ mit iterativ bestimmtem $Q_k^{(n)}$ gilt.
+Die zentrale Problemstellung verbunden mit der fehlenden Möglichkeit, PV-Knoten in dem Tensor Power Flow zu berücksichtigen wurde nun in \cref{ch:tpf} aufgezeigt. 
+Dabei ist aufgewiesen, dass der TPF durch seine Tensorisierung der Leistungsgrößen einen erheblichen Vorteil gegenüber dem NR-Verfahren bezüglich der Rechenzeit haben kann.
+Dieser wird darunter auch durch die sich nicht verändernde Systemmatrix $\tens{F}$ begründet.
+Aufgrund dieser Eigenschaft muss dieser Tensor nur einmal zu Beginn der Vorschrift berechnet werden, vorausgesetzt das elektrische Netz besteht nur aus Slack- und PQ-Knoten.
+Verfügt das Netz jedoch auch über PV-Knoten, beinhaltet die Iterationsvorschrift \eqref{eq:tpf_konstP} unbekannte Blindleistungen, welche das Verfahren nicht liefern kann.\\
+
+In diesem Kapitel soll nun für diese unbekannte Größe eine weitere Iterationsvorschrift entwickelt werden, welche in Form einer äußeren Schleife mehrere TPF Durchgänge startet und die Blindleistung jedes mal neu schätzt.
+Ziel dieser Methode soll es sein, den Effizienzvorteil des TPFs möglichst wenig zu verringern und die Tensorisierung des FPIs aufrecht zu erhalten.
+Zunächst wird konkret analysiert, welche Auswirkungen die Inklusion von PV-Knoten auf die Iterationsgrößen haben.
+Daraufhin wird unter diesen Informationen eine äußere Schleife konstruiert, welche auf Basis einer Thévenin-Näherung funktioniert.
+Das Kapitel schließt mit einer Tensorformulierung der äußeren Schleife ab.
 
 %======================================================================
 \section{Analyse der Auswirkung von PV-Knoten auf die FPI-Struktur}
 \label{sec:pv_auswirkung}
 %======================================================================
 
-Um die nachfolgenden Methoden zu motivieren, wird zunächst systematisch analysiert, welche Bestandteile der FPI-Formulierung von einer Änderung der Blindleistung $Q_k$ an einem PV-Knoten $k$ betroffen sind. Der Leistungsvektor ändert sich am PV-Knoten gemäß:
+
+Eine möglichst effiziente Implementierung der äußeren Schleife benötigt zunächst eine Analyse über die Auswirkung eines nicht-konstanten Leistungsvektors.
+Dabei ist der Leistungsvektor
+
 \begin{equation}
 	s_k^{(n)} = P_k^{\spec} + \jj Q_k^{(n)}  
 	\label{eq:s_pv_change}
 \end{equation}
 
-Die Auswirkungen auf die einzelnen Matrizen sind in \cref{tab:pv_abhaengigkeit_allgemein} zusammengefasst.
+über die unbekannte Blindleistung $Q_\mathrm{k}^{(n)}$ der Iteration $n$ direkt betroffen. 
+Deswegen müssen alle Größen der Iterationsvoschrift auf Ihre Abhängigkeit von der Blindleistung untersucht werden. 
+Hierzu werden die Matrizen und Vektoren \eqref{eq:tpf_A}--\eqref{eq:tpf_w} in Tabelle \ref{tab:pv_abhaengigkeit_allgemein} mit ihrer Abhängigkeit von der Leistung aufgelistet.\\
+
+
+
+
+%Um die nachfolgenden Methoden zu motivieren, wird zunächst systematisch analysiert, welche Bestandteile der FPI-Formulierung von einer Änderung der Blindleistung $Q_k$ an einem PV-Knoten $k$ betroffen sind. Der Leistungsvektor ändert sich am PV-Knoten gemäß:
+%
+%
+%Die Auswirkungen auf die einzelnen Matrizen sind in \cref{tab:pv_abhaengigkeit_allgemein} zusammengefasst.
 
 \begin{table}[H]
 	\centering
-	\caption{Abhängigkeit der FPI-Bestandteile von der Blindleistung $Q_k$ eines PV-Knotens für den allgemeinen ZIP-Fall.}
+	\caption{Abhängigkeit der FPI-Matrizen von der Blindleistung $Q_k$ eines PV-Knotens für den allgemeinen ZIP-Fall.}
 	\label{tab:pv_abhaengigkeit_allgemein}
 	\begin{tabular}{@{}lcc@{}}
 		\toprule
@@ -53,54 +61,83 @@ Die Auswirkungen auf die einzelnen Matrizen sind in \cref{tab:pv_abhaengigkeit_a
 	\end{tabular}
 \end{table}
 
-%\paragraph{Interpretation.}
-Die Auswirkungen einer Q-Änderung am PV-Knoten hängen fundamental vom Lastmodell an diesem Knoten ab:
-\begin{itemize}
-	\item \textbf{Fall 1:} $\alpha_{Z,k} = 0$ am PV-Knoten. Dann bleibt $\vect{B}$ (und damit $\vect{B}^{-1}$) über alle Iterationen \textit{konstant}. Lediglich $\vect{A}$ und ggf.\ $\vect{c}$ ändern sich. Dies ist der rechentechnisch günstigste Fall, da die Inversion von $\vect{B}$ nur einmal durchgeführt werden muss.
-	\item \textbf{Fall 2:} $\alpha_{Z,k} \neq 0$ am PV-Knoten. Dann ändert sich $\vect{B}$ mit jeder Q-Aktualisierung, und $\vect{B}^{-1}$ muss grundsätzlich neu berechnet werden. %Jedoch ändert sich nur ein \textit{Diagonalelement} von $\vect{B}$, was effiziente Rang-1-Updates (Sherman-Morrison-Formel) ermöglicht.
-\end{itemize}
+Dabei ist zu erkennen, dass der ZIP-Fall der tragende Faktor für die Konstanz der Matrizen ist.
+Ist ein Vollständiger ZIP-Fall gegeben ist weder $\mathbf{F}$ noch $\mathbf{w}$ konstant über alle Iterationen.
+Da das Interesse bei der Systemmatrix liegt, lassen sich hier zwei Fälle bestimmen.\\
 
-In der Praxis werden Generatoren an PV-Knoten fast ausschließlich als leistungskonstante Einspeiser modelliert ($\alpha_{P,k} = 1$, $\alpha_{Z,k} = \alpha_{I,k} = 0$), da ihr Verhalten durch die Leistungselektronik oder Turbinenregelung bestimmt wird, nicht durch die Netzspannung \cite{Garcia2000, Giraldo2022}. Für diesen häufigen Spezialfall gilt:
-\begin{equation}
-	\alpha_{Z,k} = \alpha_{I,k} = 0 \quad \Rightarrow \quad \vect{B}^{-1} \text{ und } \vect{w} \text{ bleiben konstant.}
-	\label{eq:pv_spezialfall}
-\end{equation}
+Wenn $\alpha_{Z,k} = 0$ ist, bleiben die für $\mathbf{F}$ relevante Matrix $\mathbf{B}$ konstant und der einzige Leistungseinfluss bleibt mit $\alpha_{P,k}$, dem konstanten Lastanteil. Dieser Fall hat als Vorteil, dass die $\mathbf{B}$-Matrix nur einmal invertiert werden muss.
+Ist $\alpha_{Z,k} \neq 0$ ist die Konstanz nicht mehr gegeben und der Rechenaufwand erhöht sich durch die sich wiederholende Inversion von $\mathbf{B}$.
+Im konstanten Stromfall $\alpha_{I,k} \neq 0$ bleibt der Rechenvorteil der einmaligen Inversion erhalten. Ferner verschwindet in diesem Fall die Systemmatrix $\mathbf{F}$ und die einzige Veränderliche ist der Slack-Einfluss $\mathbf{w}$.\\
 
-Die nachfolgende Entwicklung wird zunächst für den \textit{allgemeinen ZIP-Fall} formuliert und die Vereinfachungen für den Spezialfall \eqref{eq:pv_spezialfall} jeweils explizit angegeben.
+Generatoren werden häufig, wie in \cref{ch:grundlagen} beschrieben als konstante Leistungsspeiser implementiert, was den konstanten Lastfall zum Fokus und Standardfall dieser Arbeit macht. 
+Weiterhin folgt dieser Analyse, dass die äußere Blindleistungskorrektur zunächst ausschließlich PV-Zeilen umfassen muss.
+Dies ist eine direkte Konsequenz der $\operatorname{diag}$-Operation in der Systemmatrix, welche die Leistung knotenweise in die Rechnung einbringt.
+Da die einzige Kopplung aus der der Bus-Impedanzmatrix folgt, kann eine Thévenin-Näherung verwendet werden, da alle relevanten Größen hierfür bereits bekannt sind und sich nur mit der Netztopologie Ändern würden. 
+Damit lässt sich die Alternative einer arbeitspunktabhängigen Korrektur vermeiden, welche die Nachteile einer NR-Iteration mit sich bringen würde (siehe \cref{sec:nr}).
+Abschließend soll die Korrektur selber tensorisierbar über alle Lastflüsse $\tau$ sein, um der in dem TPF zugrunde gelegte Parallelisierung auszunutzen.\\
 
 
-\subsection{Konsequenzen für den Konvergenzbeweis}
-\label{subsec:pv_konvergenz_konsequenz}
-
-Der Konvergenzbeweis nach Banach basiert auf der Konstantheit von $\vect{s}$ und damit aller Hilfsmatrizen. Wenn $\vect{s}$ sich zwischen den Iterationen ändert, ist der Kontraktionsfaktor $\eta$ aus \eqref{eq:eta} nicht mehr über die gesamte Iteration konstant.
 %
-%	\item Der formale Konvergenzbeweis (\cref{prop:sam_kontraktion}) ist in seiner vorliegenden Form \textit{nicht direkt anwendbar}, da die Abbildung $T^{(n)}(\cdot)$ iterationsabhängig wird.
-%	\item Die physikalische Konvergenzbedingung $\|Z_{ii}\| < \|Z_{L,i}\|$ (\cref{subsec:konvergenz_physik}) bleibt als heuristische Richtlinie anwendbar, sofern die Q-Änderungen die äquivalente Lastimpedanz nicht fundamental verändern.
-In der Praxis konvergieren die nachfolgend vorgestellten Methoden für typische Verteilnetz-Betriebspunkte zuverlässig, wie in \cref{ch:ergebnisse} numerisch validiert wird.
+%
+%
+%%\paragraph{Interpretation.}
+%Die Auswirkungen einer Q-Änderung am PV-Knoten hängen fundamental vom Lastmodell an diesem Knoten ab:
+%\begin{itemize}
+%	\item \textbf{Fall 1:} $\alpha_{Z,k} = 0$ am PV-Knoten. Dann bleibt $\vect{B}$ (und damit $\vect{B}^{-1}$) über alle Iterationen \textit{konstant}. Lediglich $\vect{A}$ und ggf.\ $\vect{c}$ ändern sich. Dies ist der rechentechnisch günstigste Fall, da die Inversion von $\vect{B}$ nur einmal durchgeführt werden muss.
+%	\item \textbf{Fall 2:} $\alpha_{Z,k} \neq 0$ am PV-Knoten. Dann ändert sich $\vect{B}$ mit jeder Q-Aktualisierung, und $\vect{B}^{-1}$ muss grundsätzlich neu berechnet werden. %Jedoch ändert sich nur ein \textit{Diagonalelement} von $\vect{B}$, was effiziente Rang-1-Updates (Sherman-Morrison-Formel) ermöglicht.
+%\end{itemize}
+%
+%In der Praxis werden Generatoren an PV-Knoten fast ausschließlich als leistungskonstante Einspeiser modelliert ($\alpha_{P,k} = 1$, $\alpha_{Z,k} = \alpha_{I,k} = 0$), da ihr Verhalten durch die Leistungselektronik oder Turbinenregelung bestimmt wird, nicht durch die Netzspannung \cite{Garcia2000, Giraldo2022}. Für diesen häufigen Spezialfall gilt:
+%\begin{equation}
+%	\alpha_{Z,k} = \alpha_{I,k} = 0 \quad \Rightarrow \quad \vect{B}^{-1} \text{ und } \vect{w} \text{ bleiben konstant.}
+%	\label{eq:pv_spezialfall}
+%\end{equation}
+%
+%Die nachfolgende Entwicklung wird zunächst für den \textit{allgemeinen ZIP-Fall} formuliert und die Vereinfachungen für den Spezialfall \eqref{eq:pv_spezialfall} jeweils explizit angegeben.
+
+
+%\subsection{Konsequenzen für den Konvergenzbeweis}
+%\label{subsec:pv_konvergenz_konsequenz}
+
+%Der Konvergenzbeweis nach Banach basiert auf der Konstantheit von $\vect{s}$ und damit aller Hilfsmatrizen. Wenn $\vect{s}$ sich zwischen den Iterationen ändert, ist der Kontraktionsfaktor $\eta$ aus \eqref{eq:eta} nicht mehr über die gesamte Iteration konstant.
+%%
+%%	\item Der formale Konvergenzbeweis (\cref{prop:sam_kontraktion}) ist in seiner vorliegenden Form \textit{nicht direkt anwendbar}, da die Abbildung $T^{(n)}(\cdot)$ iterationsabhängig wird.
+%%	\item Die physikalische Konvergenzbedingung $\|Z_{ii}\| < \|Z_{L,i}\|$ (\cref{subsec:konvergenz_physik}) bleibt als heuristische Richtlinie anwendbar, sofern die Q-Änderungen die äquivalente Lastimpedanz nicht fundamental verändern.
+%In der Praxis konvergieren die nachfolgend vorgestellten Methoden für typische Verteilnetz-Betriebspunkte zuverlässig, wie in \cref{ch:ergebnisse} numerisch validiert wird.
 
 
 %======================================================================
-\section{Methode A: Äußere Q-Schleife}
+\section{Methode der Äußeren Q-Schleife}
 \label{sec:methode_a}
 %======================================================================
 
 %\subsection{Grundidee}
 %\label{subsec:methode_a_idee}
 
-Methode~A realisiert die PV-Knoten-Behandlung durch eine verschachtelte
-Schleifenstruktur. Der Standard-TPF wird als \textit{innere Schleife} mit
-festem Leistungsvektor $\vect{s}^{(\ell)}$ (und damit festen Matrizen
-$\vect{F}^{(\ell)}$, $\vect{w}^{(\ell)}$) ausgeführt, bis er konvergiert.
-Anschließend wird in einer \textit{äußeren Schleife} der Blindleistungs\-
-vektor $\vect{q}\in\mathbb{R}^{n_{pv}}$ an \emph{allen} PV-Knoten simultan
-korrigiert, der Leistungsvektor $\vect{s}^{(\ell+1)}$ aktualisiert und die
-Hilfsmatrizen neu berechnet.
 
-Der konzeptionelle Ablauf ist:
+
+Nachdem die strukturellen Anforderungen an die Methode spezifiziert wurden, gilt es den Aufbau der Schleife zu konkretisieren.
+Das Grundkonzept ist hierbei eine Verschachtelung des TPFs mit der Q-Korrektur.
+Der TPF wird ab hier als \emph{innere} Schleife bezeichnet und durchgeführt, während die Q-Korrektur als \emph{äußere} Schleife  den TPF ummantelt.
+Während einer äußeren Iteration $l$ wird mit einem konstanten Leistungsvektor $\mathbf{s}^{(l)}$ gerechnet, bis das Verfahren wie in \cref{ch:tpf} spezifiziert konvergiert.
+Nachfolgend wird anhand dieses Ergebnisses wird ein Blindleistungsvektor $\mathbf{q}$ für ausschließlich PV-Knoten korrigiert.
+Das Ergebnis wird abschließend für den Leistungsvektor $\mathbf{s}{(\ell+1)}$ eingesetzt\\
+
+
+%Methode~A realisiert die PV-Knoten-Behandlung durch eine verschachtelte
+%Schleifenstruktur. Der Standard-TPF wird als \textit{innere Schleife} mit
+%festem Leistungsvektor $\vect{s}^{(\ell)}$ (und damit festen Matrizen
+%$\vect{F}^{(\ell)}$, $\vect{w}^{(\ell)}$) ausgeführt, bis er konvergiert.
+%Anschließend wird in einer \textit{äußeren Schleife} der Blindleistungs\-
+%vektor $\vect{q}\in\mathbb{R}^{n_{pv}}$ an \emph{allen} PV-Knoten simultan
+%korrigiert, der Leistungsvektor $\vect{s}^{(\ell+1)}$ aktualisiert und die
+%Hilfsmatrizen neu berechnet.
+
+Der Ablauf soll nach dem folgenden Schema
 \begin{enumerate}
 	\item Setze $\vect{q}^{(0)} = \vect{0}$ als initialen Schätzwert
 	(äußere Iteration $\ell = 0$).
-	\item Berechne $\vect{s}^{(\ell)}$, daraus $\vect{A}^{(\ell)}$,
+	\item Berechne $\vect{s}^{(\ell)}$, $\vect{A}^{(\ell)}$,
 	$\vect{B}^{(\ell)}$, $\vect{c}^{(\ell)}$, $\vect{F}^{(\ell)}$,
 	$\vect{w}^{(\ell)}$.
 	\item Führe den vollständigen TPF (innere Schleife) mit festem
@@ -109,21 +146,27 @@ Der konzeptionelle Ablauf ist:
 	\item Berechne den Vektor der Spannungsabweichungen
 	\[
 	\Delta|\vect{V}_{pv}|^2
-	\;=\; |\vect{V}^{\spec}|^2 - |\vect{v}^{(\ell)}_{pv}|^2
-	\;\in\; \mathbb{R}^{n_{pv}} .
+	\;=\; |\vect{V}^{\spec}|^2 - |\vect{v}^{(\ell)}_{pv}|^2.
 	\]
 	\item Korrigiere $\vect{q}^{(\ell+1)} = \vect{q}^{(\ell)} + \Delta\vect{q}^{(\ell)}$
-	\emph{gekoppelt} über alle PV-Knoten
-	(\S~\ref{subsec:methode_a_herleitung}).
+	{gekoppelt} über alle PV-Knoten
+	(\cref{subsec:methode_a_herleitung}).
 	%\item Falls $\bigl\lVert\Delta|\vect{V}_{pv}|^2\bigr\rVert_\infty < \varepsilon_Q$:
 	%fertig. Sonst: zurück zu Schritt~2.
 \end{enumerate}
 
-Ein wesentlicher Vorteil dieser Struktur ist, dass die innere Schleife ein
-\textit{unmodifizierter} Standard-TPF ist. Da $\vect{s}^{(\ell)}$ dort
-konstant gehalten wird, sind alle Hilfsmatrizen über die inneren Iterationen
-fixiert. Der Konvergenzbeweis (\cref{eq:convergence_condition}) ist daher für
-die innere Schleife vollständig gültig.
+ablaufen.
+Bei diesem Ablauf ist der Vorteil, dass die innere Schleife einen unveränderten TPF beinhaltet. Die Matrizen und Vektoren im TPF bleiben über die innere Schleife konstant. Somit bleibt die robuste Konvergenz nach Banach, wie in \cref{subsec:banach} eingeführt, bestehen.
+Damit werden alle weitere Effekte auf die äußere Schleife isoliert.
+Nachfolgend soll die Sensitivität für die Blindleistungskorrektur formuliert werden, wobei das Hauptziel eine möglichst aufwandsarme Berechnung ist.
+
+
+
+%Ein wesentlicher Vorteil dieser Struktur ist, dass die innere Schleife ein
+%\textit{unmodifizierter} Standard-TPF ist. Da $\vect{s}^{(\ell)}$ dort
+%konstant gehalten wird, sind alle Hilfsmatrizen über die inneren Iterationen
+%fixiert. Der Konvergenzbeweis (\cref{eq:convergence_condition}) ist daher für
+%die innere Schleife vollständig gültig.
 
 %\subsection{Herleitung der gekoppelten Q-Korrekturformel}
 %\label{subsec:methode_a_herleitung}
@@ -324,45 +367,73 @@ die innere Schleife vollständig gültig.
 \subsection{Herleitung der Q-Korrekturformel}
 \label{subsec:methode_a_herleitung}
 
-Für die Q-Korrektur in Schritt~5 wird eine Beziehung zwischen $\Delta Q_k$ und
-dem Spannungsmismatch $\Delta|V_k|^2$ benötigt. Diese wird über das
-Thévenin-Ersatzschaltbild am PV-Knoten~$k$ hergeleitet.
+
+In Schritt~5 wird eine Spannungsdifferenz zwischen dem durch PV-Knoten gegebenen Spannungsbetrag und dem tatsächlich ausgerechneten Spannungsabfall berechnet.
+Diese Differenz soll als Residuum zur Blindleistungskorrektur dienen, da sich bei Angleichung der PV-Spannungen die nötige Blindleistung einstellt um die PV-Vorgabe zu halten.
+Da das Residuum über das Kontraktionsverhalten zudem auch über die Konvergenzbedingung verfügt, wird nur noch ein Zusammenhang benötigt, welcher die Korrekturrichtung vorgibt, in welche die Q-Korrektur erfolgen soll.\\
+
+
+Die Thévenin-Impedanz ist eine einfache Möglichkeit Spannung und Strom am Arbeitspunkt eines PV-Knoten in Beziehung zu setzen.
+Diese kann folglich dafür verwendet werden, die Reaktion der Leistung auf auf eine Spannungsänderung zu approximieren.\\
+
+%Für die Q-Korrektur in Schritt~5 wird eine Beziehung zwischen $\Delta Q_k$ und
+%dem Spannungsmismatch $\Delta|V_k|^2$ benötigt. Diese wird über das
+%Thévenin-Ersatzschaltbild am PV-Knoten~$k$ hergeleitet.
 
 %----------------------------------------------------------------------
 %\paragraph{Thévenin-Äquivalent am Knoten $k$.}
-Aus Sicht eines PV-Knotens~$k$ lässt sich das restliche Netz durch sein
-Thévenin-Äquivalent beschreiben. Die Spannung am Knoten~$k$ ergibt sich als
+Gemäß \cref{subsec:thevenin} ist die das Thévenin-Äquivalent an einem PV-Knoten $k$ durch
 \begin{equation}
 	V_k \;=\; E_{th,k} \;-\; Z^{(\ell)}_{B,kk}\cdot I_k,
 	\label{eq:thevenin_skalar}
 \end{equation}
-wobei $E_{th,k}$ die Thévenin-Leerlaufspannung (bestimmt durch das restliche Netz
-und die Slack-Spannung) und $Z^{(\ell)}_{B,kk}$ das $k$-te Diagonalelement der
-Bus-Impedanzmatrix ist:
+gegeben. Dabei ist $E_{th,k}$ die Leerlaufspannung des äquivalenten Schaltbildes und $Z^{(\ell)}_{B,kk}$ die Thévenin-Impedanz, wie es auch in Abbildung \ref{{fig:thevenin} gezeigt wird. 
+Die Impedanz ist darüber hinaus das jeweilige Diagonalelement der Impedanzmatrix 
+
+
+%wobei $E_{th,k}$ die Thévenin-Leerlaufspannung (bestimmt durch das restliche Netz
+%und die Slack-Spannung) und $Z^{(\ell)}_{B,kk}$ das $k$-te Diagonalelement der
+%Bus-Impedanzmatrix ist:
 \begin{equation}
 	Z^{(\ell)}_{B,kk} \;=\; \bigl[(\vect{B}^{(\ell)})^{-1}\bigr]_{kk}
 	\;=\; R^{(\ell)}_{kk} + \jj\,X^{(\ell)}_{kk}.
 	\label{eq:diagonalelement}
 \end{equation}
 
+Für eine konstante Netztopologie, wie sie für die Arbeit angenommen wird, sind die Impedanzen über alle äußeren Iterationen $\ell$ gleich.
+
+%----------------------------------------------------------------------
+%\paragraph{Linearisierung: Stromänderung bei Q-Variation.}
+%Bei festgehaltenem $P_k$ und unter der Annahme, dass sich $V_k$ bei einer kleinen
+%Änderung $\Delta Q_k$ nur geringfügig ändert (Linearisierung um den aktuellen
+%Arbeitspunkt $v^{(\ell)}_k$), ergibt sich die Stromänderung:
+Von Interesse ist an der Stelle nicht der absolute Wert von der Spannung, sondern dessen Differenz.
+Wird diese aus \eqref{eq:thevenin_skalar} gebildet, folgt der Ausdruck
+\begin{equation}
+	\Delta V_k \;=\; -Z^{(\ell)}_{B,kk}\cdot\Delta I_k
+	\label{eq:spannung_skalar}
+\end{equation}
+
+mit noch einem unbekannten Ausdruck für die Stromdifferenz.
+Der Knotenstrom
+
 %----------------------------------------------------------------------
 %\paragraph{Strominjektion als Funktion von $Q_k$.}
-Die komplexe Leistungsinjektion am Knoten~$k$ in Erzeugerkonvention lautet
+%Die komplexe Leistungsinjektion am Knoten~$k$ in Erzeugerkonvention lautet
 $S_k = P_k + \jj Q_k = V_k\cdot I_k^*$. Daraus folgt für den Strom:
 \begin{equation}
 	I_k \;=\; \frac{S_k^*}{V_k^*} \;=\; \frac{P_k - \jj Q_k}{V_k^*}.
 	\label{eq:strom_skalar}
 \end{equation}
+kann als Funktion der Knotenleistung $S_\mathbf{k}$ dargestellt werden. Der  Ausduck folgt direkt aus der Leistungsdefinition \eqref{eq:power_current}.
+Bei Bildung von der Stromänderung wird beachtet, dass die Wirkleistung $P_\mathrm{k}$ gegeben ist und sich folglich eliminiert. In der Nähe des Arbeitspunktes $v_\mathrm{k}$ folgt die Stromänderung aufgrund einer Blindleistungsinjektion
 
-%----------------------------------------------------------------------
-%\paragraph{Linearisierung: Stromänderung bei Q-Variation.}
-Bei festgehaltenem $P_k$ und unter der Annahme, dass sich $V_k$ bei einer kleinen
-Änderung $\Delta Q_k$ nur geringfügig ändert (Linearisierung um den aktuellen
-Arbeitspunkt $v^{(\ell)}_k$), ergibt sich die Stromänderung:
 \begin{equation}
 	\Delta I_k \;\approx\; \left.\frac{-\jj\,\Delta Q_k}{V_k^*}\right|_{V_k = v^{(\ell)}_k}.
 	\label{eq:strom_linear}
 \end{equation}
+
+Das
 
 %----------------------------------------------------------------------
 %\paragraph{Spannungsänderung über Thévenin-Impedanz.}
@@ -1298,3 +1369,81 @@ bleibt, was nachfolgend numerisch berücksichtigt wird.
 %Wenn $\alpha_{Z,k} \neq 0$ am PV-Knoten gilt, geht der Tensor-Vorteil in der dense-Formulierung teilweise verloren, da $\vect{B}^{-1}$ szenarioabhängig wird. In diesem Fall bietet die sparse-Formulierung (\cref{subsec:tpf_sparse}) mit szenarioabhängigen Diagonalblöcken in $\dotM$ eine Alternative, wobei die Block-Diagonalstruktur eine parallele Lösung ermöglicht.
 %
 %Die quantitative Bewertung des resultierenden Gesamtspeedups gegenüber konventionellen Verfahren ist Gegenstand von \cref{ch:ergebnisse}.
+
+
+
+
+
+\subsection{Herleitung der Q-Korrekturformel}
+\label{subsec:methode_a_herleitung}
+
+Für die Q-Korrektur in Schritt~5 wird eine Beziehung zwischen $\Delta Q_k$ und dem
+Spannungsmismatch $\Delta|V_k|^2$ benötigt. Sie folgt unmittelbar aus der bereits
+aufgestellten Netzgleichung, ohne dass ein zusätzliches Ersatzschaltbild postuliert
+werden muss.
+
+%----------------------------------------------------------------------
+Ausgangspunkt ist die Fixpunktform \eqref{eq:fpi_dense}, die sich mit der
+Bus-Impedanzmatrix $\vect{Z}^{(\ell)}_B = (\vect{B}^{(\ell)})^{-1}$ als
+\begin{equation}
+	\vect{v} \;=\; \vect{Z}^{(\ell)}_B\,\vect{i} \;+\; \vect{w},
+	\qquad
+	i_k \;=\; \frac{s_k^*}{v_k^*},
+	\label{eq:netzgleichung_zb}
+\end{equation}
+schreiben lässt. Diese Beziehung ist in den Strominjektionen $\vect{i}$ exakt und
+linear; die gesamte Nichtlinearität des Lastflussproblems steckt allein in der
+Abhängigkeit $i_k(v_k)$. Spaltet man Zeile~$k$ in den Eigen- und den Fremdanteil auf,
+\begin{equation}
+	v_k \;=\; \underbrace{w_k + \sum_{j\neq k} Z^{(\ell)}_{B,kj}\,i_j}_{E_{th,k}}
+	\;+\; \underbrace{Z^{(\ell)}_{B,kk}}_{Z_{th,k}}\;i_k,
+	\label{eq:thevenin_identifikation}
+\end{equation}
+so ist das Thévenin-Äquivalent am Knoten~$k$ unmittelbar identifiziert: Die
+Leerlaufspannung $E_{th,k}$ ist die Überlagerung von Slack-Einspeisung und allen
+übrigen Knotenströmen, die Thévenin-Impedanz ist das Diagonalelement
+\begin{equation}
+	Z^{(\ell)}_{B,kk} \;=\; \bigl[(\vect{B}^{(\ell)})^{-1}\bigr]_{kk}
+	\;=\; R^{(\ell)}_{kk} + \jj\,X^{(\ell)}_{kk}.
+	\label{eq:diagonalelement}
+\end{equation}
+Ein Ersatzschaltbild muss somit nicht als Modellannahme eingeführt werden; es ist
+eine Umschreibung von~\eqref{eq:netzgleichung_zb}. Insbesondere braucht $E_{th,k}$
+nie explizit berechnet zu werden, da es in der folgenden Differenzenbildung entfällt.
+
+%----------------------------------------------------------------------
+Da $\vect{Z}^{(\ell)}_B$ und $\vect{w}$ im konstanten Lastfall nach
+\cref{subsec:konsequenz_analyse} unabhängig von $\vect{Q}$ sind, folgt aus
+\eqref{eq:netzgleichung_zb} für eine Störung der Strominjektionen exakt
+\begin{equation}
+	\Delta\vect{v} \;=\; \vect{Z}^{(\ell)}_B\,\Delta\vect{i}.
+	\label{eq:delta_v_exakt}
+\end{equation}
+Zwei Näherungen führen von hier zur Korrekturformel. Erstens wird die
+Strominjektion am PV-Knoten um den aktuellen Arbeitspunkt $v^{(\ell)}_k$
+linearisiert; mit $s_k = P_k + \jj Q_k$ in Erzeugerkonvention und festgehaltenem
+$P_k$ gilt
+\begin{equation}
+	\Delta i_k \;\approx\; \frac{-\jj\,\Delta Q_k}{(v^{(\ell)}_k)^*}.
+	\label{eq:strom_linear}
+\end{equation}
+Zweitens wird die Rückwirkung auf die übrigen Knoten vernachlässigt
+($\Delta i_j = 0$ für $j \neq k$), obwohl sich bei konstanter Leistung auch die
+Lastströme mit den Spannungen ändern. Beide Näherungen betreffen ausschließlich die
+Schrittweite der äußeren Korrektur, nicht deren Fixpunkt: Das Abbruchkriterium
+bewertet die Spannungsbeträge der exakten TPF-Lösung, sodass ein Fehler in der
+Sensitivität lediglich die Konvergenzgeschwindigkeit beeinflusst.
+
+Einsetzen von~\eqref{eq:strom_linear} in~\eqref{eq:delta_v_exakt} liefert
+\begin{equation}
+	\Delta v_k \;=\; -\jj\,Z^{(\ell)}_{B,kk}\,\frac{\Delta Q_k}{(v^{(\ell)}_k)^*}.
+	\label{eq:spannung_skalar}
+\end{equation}
+Mit $-\jj\,(R^{(\ell)}_{kk} + \jj X^{(\ell)}_{kk}) = X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}$
+und $(v^{(\ell)}_k)^{*-1} = e^{\jj\theta_k}/|v^{(\ell)}_k|$ ergibt die
+Ausmultiplikation
+\begin{equation}
+	\Delta v_k \;=\; \frac{\Delta Q_k}{|v^{(\ell)}_k|}
+	\bigl(X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}\bigr)\,e^{\jj\theta_k}.
+	\label{eq:spannung_ausmult}
+\end{equation}

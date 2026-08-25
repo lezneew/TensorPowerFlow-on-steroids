@@ -340,7 +340,7 @@ Das NR-Verfahren kann generell in kartesischen oder in polaren Koordinaten formu
 Zur kompakteren Übersicht wird das Verfahren hier in polaren Koordinaten eingeführt.
 Für die Leistungsbilanz werden die Knotenspannungen dementsprechend durch
 
-%Ausgangspunkt ist die Leistungsbilanz an jedem Lastknoten $k \in \Omega_d$. Im Gegensatz zur in Abschnitt~\ref{subsec:admittanz} verwendeten kartesischen Formulierung ($\mathbf{v} \in \mathbb{C}$) wird für das NR-Verfahren die polare Darstellung der komplexen Knotenspannungen bevorzugt, da sich die Leistungsflussgleichungen dadurch kompakter formulieren lassen. Jede Knotenspannung wird zerlegt in Betrag und Winkel:
+
 \begin{equation}
 	\label{eq:polar_voltage}
 	V_k = |V_k| \, e^{j\theta_k}, \qquad k \in \Omega_B
@@ -348,22 +348,19 @@ Für die Leistungsbilanz werden die Knotenspannungen dementsprechend durch
 
 dargestellt, $|V_k| \in \mathbb{R}_{+}$ den Spannungsbetrag und $\theta_k \in [-\pi, \pi]$ den Spannungswinkel am Knoten $k$ bezeichnet.\todo{literatur.}
 Für Mehrknotensysteme werden die Größen vektoriell zu $|\mathbf{V}|$ und $\boldsymbol{\theta}$ für alle Netzknoten zusammengefasst.
-%Die Vektoren $|\mathbf{V}|$ und $\boldsymbol{\theta}$ fassen die Spannungsbeträge bzw. -winkel aller Knoten zusammen.
 Die komplexe Knotenadmittanzmatrix $\mathbf{Y}$ \eqref{eq:admittance_block} in ihrer Real- und Imaginärzerlegung 
-%Analog wird die komplexe Knotenadmittanzmatrix $\mathbf{Y}$ aus \eqref{eq:admittance_block} in Real- und Imaginärteil zerlegt:
+
 \begin{equation}
 	\label{eq:y_split}
 	\mathbf{Y} = \mathbf{G} + j\mathbf{B}, \qquad Y_{km} = G_{km} + jB_{km}
 \end{equation}
 
 führt die Konduktanzmatrix $\mathbf{G} \in \mathbb{R}^{|\Omega_B|\times|\Omega_B|}$ und die Suszeptanzmatrix $\mathbf{B} \in \mathbb{R}^{|\Omega_B|\times|\Omega_B|}$ ein.
-%mit der Konduktanzmatrix $\mathbf{G} \in \mathbb{R}^{|\Omega_B|\times|\Omega_B|}$ und der Suszeptanzmatrix $\mathbf{B} \in \mathbb{R}^{|\Omega_B|\times|\Omega_B|}$. 
 Die Diagonalelemente bilden damit die Selbstadmittanz eines Knotens und bestehen aus allen an diesem angeschlossenen Einzeladmittanzen \todo{literatur.}. 
 Folglich bilden Nebendiagonalelemente die elektrischen Kopplungen zwischen den Knoten $k$ und $m$.
 Die Lei,stungsbilanzen selber werden durch die in den PQ-Knoten spezifizierten Wirk- und Blindleistungsvorgaben $P_k^{\text{spec}}$, $Q_k^{\text{spec}}$ und den berechneten Leistungswerten $P_k^{\text{calc}}$ und $Q_k^{\text{calc}}$ gebildet.
 Deren Differenz
-%Das Element $Y_{km}$ beschreibt die Kopplung zwischen den Knoten $k$ und $m$. 
-%Für jeden Lastknoten $k \in \Omega_d$ sind die Wirk- und Blindleistungsvorgaben $P_k^{\text{spec}}$ bzw.\ $Q_k^{\text{spec}}$ gegeben (bei PQ-Knoten aus dem Lastprofil, bei PV-Knoten nur $P_k^{\text{spec}}$. Aus \eqref{eq:pf_fundamental} folgen die Leistungsungleichungen 
+
 \begin{equation}
 	\label{eq:mismatches}
 	\begin{aligned}
@@ -374,8 +371,8 @@ Deren Differenz
 werden als Zustandsgrößen verwendet \todo{literatur.}.
 Die Berechnung der Leistungsgrößen $P_k^{\text{calc}}$ und $Q_k^{\text{calc}}$ geschieht über die Auswertung des Produkts zwischen Spannung und Strom \eqref{eq:power_current}.
 Ausformuliert folgt
-%als Differenz zwischen vorgegebenen und aus den aktuellen Zustandsgrößen berechneten Leistungen.
-%Die berechneten Leistungen 
+
+
 \begin{equation}
 	\label{eq:pq_calc}
 	\begin{aligned}
@@ -387,9 +384,9 @@ unter Verwendung von \eqref{eq:y_split} und der Winkeldifferenz $\theta_{km} \eq
 Die Summation erfolgt über alle Knoten $m$, da über die Nebendiagonalelemente $Y_{km}$ alle mit $k$ gekoppelten Knoten Beiträge zur Leistungseinspeisung am Knoten $k$ liefern. \todo{literatur.} \\
 
 
-%Das nichtlineare Gleichungssystem $\mathbf{f}(\mathbf{x}) = \mathbf{0}$ mit Zustandsvektor $\mathbf{x} = [\boldsymbol{\theta}^\top, |\mathbf{V}|^\top]^\top$ wird durch Taylor-Entwicklung erster Ordnung um den aktuellen Iterationspunkt linearisiert:
 
-%Das NR-Verfahren linearisiert den Mismatch-Vektor 
+
+
 Im NR-Verfahren wird die Leistungsdifferenz (engl. \emph{power mismatch}) durch den Vektor 
 
 \begin{equation}
@@ -800,7 +797,7 @@ Diese Darstellung ist für jegliche ZIP-Lastkonfiguration gültig.
 %	d\!\left(T(\mathbf{v}),\, T(\mathbf{w})\right) \leq \eta\, d(\mathbf{v}, \mathbf{w}) \quad \forall \mathbf{v},\mathbf{w} \in X, \quad 0 \leq \eta < 1
 %\end{equation}
 
-Die Konvergenz des Verfahrens ist über den Banachschen Fixpunktsatz charakterisiert \cite{Banach.1922}. Dieser besagt eine kontrahierende Abbildung $T: X \to X$ einen Fixpunkt $u$ besitzt, zudem jeder Startpunkt konvergiert.
+Die Konvergenz des Verfahrens ist über den Banachschen Fixpunktsatz charakterisiert~\cite{Banach.1922}. Dieser besagt eine kontrahierende Abbildung $T: X \to X$ einen Fixpunkt $u$ besitzt, zudem jeder Startpunkt konvergiert.
 Übertragen auf das Lastflussproblem ist $\mathbf{u}$ die exakte Lösung des Lastflusses. Giraldo et al.~\cite{Giraldo2022} wendet der Fixpunktsatz auf den FPI an leitet die Ungleichung
 \begin{equation}
 	\label{eq:contraction_tpf}

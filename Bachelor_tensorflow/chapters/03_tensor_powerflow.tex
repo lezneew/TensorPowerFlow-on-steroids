@@ -3,29 +3,17 @@
 \label{ch:tpf}
 %======================================================================
 
-%Aufbauend auf den in \cref{ch:grundlagen} eingeführten Grundlagen der Fixed-Point-Iteration wird in diesem Kapitel der Tensor Power Flow (TPF) nach Salazar Duque et al.\ \cite{Salazar2024} vorgestellt. Der TPF erweitert den eindimensionalen FPI-Algorithmus zu einer mehrdimensionalen Formulierung, die Hunderttausende von Lastflüssen gleichzeitig berechnen kann. Dabei werden zwei Formulierungen präsentiert. Das Kapitel schließt mit einer Analyse der fundamentalen Limitation des TPF, der fehlenden Unterstützung von PV-Knoten, ab.\\
-
 In \cref{ch:grundlagen} wurden die elektrischen und methodischen Grundlagen des NR-Verfahrens und der Fixpunkt-Iteration eingeführt. 
 Fortlaufend wird auf dieser Basis die Tensorisierung der FPI eingeführt, welches den Tensor Power Flow (TFP) bildet.
 Diese Mehrdimensionale Formulierung orientiert sich nach Salazar Duque et al. \cite{Salazar2024}.
 Dabei wird der strukturelle Vorteil des FPI, einer konstanten Systemmatrix, hier ausgenutzt.
 Daraus resultiert, dass das Verfahren Tausende von Lastflüssen gleichzeitig in jeder Iteration berechnen kann und somit für reine PQ-Netze eine erhebliche Beschleunigung erzielt werden kann.\\
 
-Zunächst wird der Algorithmus (\cref{sec:tpf_algorithmus}) eingeführt, welcher darauf folgend in zwei Formulierungen (Dense und Sparse) vertieft wird. 
+Zunächst wird der Algorithmus (\cref{sec:tpf_algorithmus}) eingeführt, welcher darauf folgend in seiner Dense-Formulierungen vertieft wird. 
+Die Sparse-Formulierung wird für diese Ausarbeitung nicht verwendet, da sie erst ab Netzgrößen von über 1000 Knoten effizienter sein kann.
+Der Fokus bleibt auf der Analyse der einer äußeren Schleife.
 Das Kapitel wird damit abgeschlossen, dass der Zentrale Nachteil dieser Berechnungsvorschrift erklärt wird: Die fehlende Möglichkeit PV-Knoten direkt miteinzubeziehen. 
 Damit wird die in Kapitel 4 vorgestellte Methode zur Berechnung von PV-Knoten mit dem TPF motiviert.
-
-%
-%Die in Abschnitt~\ref{sec:fpi} hergeleitete FPI \eqref{eq:fpi_zbus} berechnet eine einzelne Spannungslösung $\mathbf{v}_d \in \mathbb{C}^{b \phi}$ für einen einzelnen Leistungsvektor $\mathbf{s}_d \in \mathbb{C}^{b\phi}$. In den in dieser Arbeit betrachteten multidimensionalen Anwendungen, wie Zeitreihensimulationen, probabilistischen Lastflüssen und Sensitivitätsstudien, sind jedoch typischerweise $\tau \gg 1$ Szenarien zu berechnen, was zu einer Datenstruktur der Form $\mathcal{S} \in \mathbb{C}^{b\phi \times \tau}$ führt. Die naive Anwendung der FPI besteht darin, für jede der $\tau$ Spalten von $\mathcal{S}$ die Iteration \eqref{eq:fpi_zbus} separat durchzuführen, was einer sequenziellen Schleife über $\tau$ entspricht. Diese Vorgehensweise verschenkt jedoch die zentrale strukturelle Eigenschaft der FPI: die Konstanz von $\mathbf{Z}_B$ über alle Szenarien.
-%
-%Das Konzept der Tensorisierung besteht darin, die $\tau$ einzelnen Matrix-Vektor-Multiplikationen $\mathbf{Z}_B \mathbf{x}_i$ mit $\mathbf{x}_i \in \mathbb{C}^{b\phi}$ ($i = 1,\ldots,\tau$) durch \emph{eine} Matrix-Matrix-Multiplikation $\mathbf{Z}_B \mathbf{X}$ mit $\mathbf{X} \in \mathbb{C}^{b\phi \times \tau}$ zu ersetzen. Der entscheidende Vorteil liegt darin, dass Matrix-Matrix-Multiplikationen im Vergleich zu Matrix-Vektor-Multiplikationen drastisch bessere Cache-Lokalität aufweist und somit die Rechenzeit reduziert~\cite{Salazar2024}.
-%
-%Für allgemeinere Studiendesigns mit mehreren unabhängigen Dimensionen (z.\,B.\ $p$ Experimente, $r$ Szenarien pro Experiment, $t$ Zeitschritte) lässt sich die Leistungsdatenstruktur als Tensor
-%\begin{equation}
-%	\label{eq:power_tensor}
-%	\mathcal{S} \in \mathbb{C}^{\ldots \times p \times r \times t \times b\phi}
-%\end{equation}
-%darstellen. Alle unabhängigen Dimensionen können jedoch für die Berechnung zu einer einzigen effektiven Dimension $\tau = \ldots \cdot p \cdot r \cdot t$ zusammengefasst werden, ohne dass die Konvergenzeigenschaften der FPI berührt werden~\cite{Salazar2024}. Diese Reshape-Operation ist in modernen numerischen Bibliotheken (NumPy) speichereffizient möglich und wird im Folgenden als Ausgangspunkt für die Dense- und Sparse-Formulierung verwendet.
 
 %======================================================================
 \section{Grundalgorithmus}
@@ -38,7 +26,7 @@ Dabei wird zusätzlich zu den $b$ Lastknoten $\phi$ für die Anzahl der Phase ve
 Das Multiplikat der beiden bildet die Anzahl der Busphasen $b\phi$. 
 Die zusammengefasste Iterationsvorschrift auf Basis von \eqref{eq:fpi_iteration} ist durch
 
-%Der TPF basiert auf dem in \cref{sec:fpi} eingeführten FPI-Algorithmus nach Giraldo et al.\ \cite{Giraldo2022}. Ausgangspunkt ist das Netzmodell aus \eqref{eq:admittance_block} mit einem Einspeiseknoten, $b = |\Omega_d|$ Lastknoten und $\phi = |\Omega_\phi|$ Phasen. Die Iterationsvorschrift lautet \cite{Salazar2024}:
+
 \begin{equation}
 	\mathbf{v}_{(n+1)} = \mathbf{F} \cdot \mathbf{v}_{(n)}^{*\eleminv} + \mathbf{w}
 	\label{eq:tpf_iteration}
@@ -46,7 +34,7 @@ Die zusammengefasste Iterationsvorschrift auf Basis von \eqref{eq:fpi_iteration}
 
 gegeben, wobei $\mathbf{v}_{(n)}^{*\eleminv} \in \C^{b\phi \times 1}$ die komponentenweise, inverse, komplex konjugierte Spannung 
 
-%wobei $\vect{v}_{(n)}^{*\eleminv} \in \C^{b\phi \times 1}$ den element-weisen Kehrwert des konjugierten Spannungsvektors der $n$-ten Iteration bezeichnet. Die Operation $(\cdot)^{*\eleminv}$ ist definiert als:
+
 \begin{equation}
 	\left(\mathbf{v}^{*\eleminv}\right)_i = \frac{1}{v_i^*} \quad  i = 1, \ldots, b\phi
 	\label{eq:eleminv_def}
@@ -67,10 +55,6 @@ Dabei ist $n$ die aktuelle Iteration der Spannungsberechnung und die Hilfsmatriz
 Die Vektoren und Matrizen $\mathbf{A}$, $\mathbf{B}$ und $\mathbf{c}$ sind bei gegebenen Slack-Spannungen und Leistungen Konstant über alle Iterationen. 
 Daraus resultiert, dass die Systemmatrix $\mathbf{F}$ und der Offset $\mathbf{w}$ nur ein einziges mal aufgestellt werden müssen.\\
 
-
-%Dabei bezeichnen $\alpha_P$, $\alpha_I$ und $\alpha_Z$ die Koeffizienten des ZIP-Lastmodells (\cref{subsec:lastmodell}), $\vect{s} \in \C^{b\phi \times 1}$ den Vektor der komplexen Knotenleistungen. Die Matrizen $\vect{A} \in \C^{b\phi \times b\phi}$, $\vect{B} \in \C^{b\phi \times b\phi}$ und der Vektor $\vect{c} \in \C^{b\phi \times 1}$ sind für einen gegebenen Betriebspunkt \textit{konstant} innerhalb des iterativen Prozesses. Folglich können $\vect{F} \in \C^{b\phi \times b\phi}$ und $\vect{w} \in \C^{b\phi \times 1}$ einmal vorausberechnet und in jeder Iteration wiederverwendet werden.\\
-
-%Für den in Verteilnetzen häufigen Spezialfall rein konstanter Leistung ($\alpha_P = 1$, $\alpha_I = \alpha_Z = 0$) vereinfachen sich die Ausdrücke zu:
 
 Eine kompaktere Darstellung der Iterationsvorschrift lässt sich in dem gängigen Analysefall der konstanten Last bei $\alpha_P = 1$, $\alpha_I = \alpha_Z = 0$ formulieren~\cite{Kundur1994,Kersting2017,IEEETF1995,VanCutsem1998,Bolognani2016}, wobei die vereinfachten Hilfsgrößen
 
@@ -93,104 +77,10 @@ Genau dieser entspricht den konjugierten Knotenströmen $\mathbf{i}^* = \mathbf{
 Zusammen mit der Bus-Impedanzmatrix entspricht der Term $\ZB \cdot \vect{i}^*$ dem Spannungsabfall der Knoten, während $\vect{w}$ den Zusatz der Slack-Spannungen beschreibt.
 Zur besseren Übersichtlichkeit wird fortan diese Darstellung verwendet.
 In der Implementierung wird jedoch weiterhin der allgemeine ZIP-Fall berücksichtigt.
-%Der Term $\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv} = \vect{s}^* \oslash \vect{v}_{(n)}^*$ entspricht physikalisch dem konjugierten Stromvektor $\vect{i}^* = \vect{s}^*/\vect{v}^*$, wobei die Beziehung $s_k = v_k \cdot i_k^*$ aus \eqref{eq:power_current} genutzt wurde. Die Multiplikation $\ZB \cdot \vect{i}^*$ liefert den Spannungsabfall über die Netzimpedanzen, und $\vect{w}$ korrigiert für den Einfluss der festen Slack-Spannung $\vect{v}_s$.
-%
-%\subsection{Umformulierung als iterative Abbildung}
-%\label{subsec:tpf_abbildung}
-%
-%Für den Konvergenzbeweis wird die Iteration \eqref{eq:tpf_iteration} als Abbildung $T: \C^{b\phi} \to \C^{b\phi}$ umgeschrieben. Unter Nutzung der Identität $\vect{v}^{*\eleminv} = \vect{v} \oslash \|\vect{v}\|^2_\circ$ (wobei $\|\vect{v}\|^2_\circ$ den Vektor der element-weisen Betragsquadrate $|v_i|^2$ bezeichnet) ergibt sich \cite{Salazar2024}:
-%\begin{equation}
-%	\vect{v}_{(n+1)} = -\vect{B}^{-1} \diag\left(\alpha_P \had \vect{s}^* \oslash \|\vect{v}_{(n)}\|^2_\circ\right) \vect{v}_{(n)} + \vect{w} = T(\vect{v}_{(n)})
-%	\label{eq:tpf_mapping}
-%\end{equation}
-%
-%Diese Darstellung macht die Abhängigkeit der Abbildung vom aktuellen Spannungsvektor $\vect{v}_{(n)}$ explizit und ermöglicht die Anwendung des Banach'schen Fixpunktsatzes (\cref{thm:banach}).
 
-%\subsection{Konvergenzbeweis}
-%\label{subsec:tpf_konvergenz}
-%
-%Der Konvergenzbeweis folgt der Argumentation in \cite{Salazar2024} und zeigt, dass die Abbildung $T(\cdot)$ in \eqref{eq:tpf_mapping} eine Kontraktion ist. Die Differenz zweier aufeinanderfolgender Iterationen wird abgeschätzt als:
-%\begin{equation}
-%	\|\vect{v}_{(n+1)} - \vect{v}_{(n)}\|_1 = \left\|\vect{B}^{-1} \diag\left(\alpha_P \had \vect{s}^* \oslash \|\vect{v}_{(n+1)}\|^2_\circ\right) \vect{v}_{(n+1)} - \vect{B}^{-1} \diag\left(\alpha_P \had \vect{s}^* \oslash \|\vect{v}_{(n)}\|^2_\circ\right) \vect{v}_{(n)}\right\|_1
-%	\label{eq:tpf_konv1}
-%\end{equation}
-%
-%Dabei wird die 1-Norm verwendet: für Vektoren $\|\vect{x}\|_1 = \sum_i |x_i|$ und für Matrizen $\|\vect{A}\|_1 = \max_j \sum_i |a_{ij}|$ (maximale Spaltensumme der Beträge).
-%
-%Die konjugierte Knotenleistung wird durch ihre äquivalente Lastimpedanz $z_{l,i}$ ausgedrückt:
-%\begin{equation}
-%	s_i^* \oslash \|v_{(n),i}\|^2 = 1 / z_{l,i}
-%	\label{eq:load_impedance}
-%\end{equation}
-%
-%Unter der Annahme, dass die Last machbar ist (d.\,h.\ eine Lösung existiert, vgl.\ \cref{subsec:tpf_machbarkeit}) und die Iteration konvergiert ($\vect{v}_{(n+1)} \to \vect{v}_{(n)}$), kann die Hölder-Ungleichung angewendet werden, um \eqref{eq:tpf_konv1} abzuschätzen \cite{Salazar2024}:
-%\begin{equation}
-%	\|\vect{v}_{(n+1)} - \vect{v}_{(n)}\|_1 \leq \underbrace{\|\vect{B}^{-1} \diag(\alpha_P \oslash \vect{z}_l)\|_1}_{= k} \cdot \|\vect{v}_{(n+1)} - \vect{v}_{(n)}\|_1
-%	\label{eq:tpf_konv2}
-%\end{equation}
-%
-%Für den Fall rein konstanter Leistung ($\alpha_P = 1$) und unter Beachtung, dass $\vect{B}^{-1} = \ZB$ die Bus-Impedanzmatrix ist, ergibt sich der Kontraktionsfaktor zu:
-%\begin{equation}
-%	k = \|\ZB \diag(\vect{1} \oslash \vect{z}_l)\|_1 = \frac{|\hat{z}_{jj}|}{|\hat{z}_{l,j}|}
-%	\label{eq:tpf_kontraktionsfaktor}
-%\end{equation}
-%
-%wobei die Notation $\hat{\cdot}$ das Wertepaar $(j, z_{l,j})$ kennzeichnet, für das das Verhältnis der Impedanzen maximal wird. Die Diagonalelemente $|z_{jj}|$ der Bus-Impedanzmatrix $\ZB$ entsprechen den Thévenin-Impedanzen am jeweiligen Knoten $j$ \cite{Grainger1994}.
-%
-%\subsection{Physikalische Interpretation der Konvergenzbedingung}
-%\label{subsec:tpf_physik}
-%
-%Die Bedingung $k < 1$ für die Kontraktionseigenschaft ist genau dann erfüllt, wenn:
-%\begin{equation}
-%	|z_{jj}| < |z_{l,j}| \quad \forall j \in \Omega_d
-%	\label{eq:tpf_konv_bedingung}
-%\end{equation}
-%
-%Diese Ungleichung hat eine klare physikalische Bedeutung: Die Thévenin-Impedanz an jedem Knoten $j$ muss betragsmäßig kleiner sein als die äquivalente Lastimpedanz an diesem Knoten. Nach dem Theorem der maximalen Leistungsübertragung tritt der Grenzfall $|z_{jj}| = |z_{l,j}|$ genau am Punkt maximaler Leistungsübertragung auf \cite{Salazar2024, Giraldo2022}. Daraus folgen zwei zentrale Aussagen:
-%
-%\begin{enumerate}
-%	\item Die Bedingung \eqref{eq:tpf_konv_bedingung} ist für den \textit{normalen Betriebspunkt} eines Netzes stets erfüllt, da dort $|z_{l,j}| \gg |z_{jj}|$ gilt (hohe Spannung, niedriger Strom).
-%	\item Der FPI-Algorithmus konvergiert stets zum \textit{operationellen} Fixpunkt (High-Voltage-Lösung), unabhängig vom Startwert. Dies steht im Gegensatz zum NR-Verfahren, das abhängig von der Initialisierung auch zur nicht-operationellen Lösung (Low-Voltage) konvergieren kann (vgl.\ \cref{subsec:nr_grenzen}).
-%\end{enumerate}
-%
-%Der Kontraktionsfaktor $k$ bestimmt zudem die Konvergenzgeschwindigkeit: Je kleiner $k$, desto schneller konvergiert der Algorithmus. Für typische Verteilnetze unter normalen Lastbedingungen liegt $k$ im Bereich $0{,}05$ bis $0{,}15$ \cite{Giraldo2022}, was 5--10 Iterationen bis zur Konvergenz bei einer Toleranz von $10^{-6}$ erfordert. Bei steigender Last nähert sich $k \to 1$, was die Konvergenz verlangsamt.
-%
-%\subsection{Geometrische Interpretation und Machbarkeitsbedingung}
-%\label{subsec:tpf_machbarkeit}
-%
-%Salazar Duque et al.\ \cite{Salazar2024} leiten eine geometrische Interpretation der Existenz einer Lastflusslösung her. Für ein äquivalentes Zwei-Bus-System (Quellenknoten 0 mit Spannung $v_0$ und Lastknoten 1 mit Last $s_l = p_l + \jj q_l$) ergeben sich die Lastflussgleichungen in der Impedanzebene ($r_l$, $x_l$) als zwei Kreisgleichungen:
-%\begin{align}
-%	(r_l - c_{1,p})^2 + (x_l - c_{2,p})^2 &= r_p^2 \label{eq:kreis_p}\\
-%	(r_l - c_{1,q})^2 + (x_l - c_{2,q})^2 &= r_q^2 \label{eq:kreis_q}
-%\end{align}
-%
-%mit den Parametern \cite{Salazar2024}:
-%\begin{equation}
-%	\begin{aligned}
-%		c_{1,p} &= \frac{\|v_0\|^2}{2p_l} - r_s, & c_{2,p} &= -x_s, & r_p &= \frac{\|v_0\|}{2p_l}\sqrt{\|v_0\|^2 - 4r_s p_l} \\
-%		c_{1,q} &= -r_s, & c_{2,q} &= \frac{\|v_0\|^2}{2q_l} - x_s, & r_q &= \frac{\|v_0\|}{2q_l}\sqrt{\|v_0\|^2 - 4x_s q_l}
-%	\end{aligned}
-%	\label{eq:kreis_parameter}
-%\end{equation}
-%
-%wobei $z_s = r_s + \jj x_s$ die Quellenimpedanz (Leitungsimpedanz) ist. Die Schnittpunkte beider Kreise liefern die möglichen Lastimpedanzen $z_{l,1}$ und $z_{l,2}$. Salazar Duque et al.\ \cite{Salazar2024} zeigen, dass alle kritischen Punkte (genau ein Berührpunkt, d.\,h.\ maximale Leistungsübertragung) auf einem Kreis mit Radius $\|z_s\|$ in der Impedanzebene liegen:
-%\begin{equation}
-%	h^2 = c_{1,p}^2 + c_{2,p}^2 - r_p^2 = r_s^2 + x_s^2 = \|z_s\|^2
-%	\label{eq:kritischer_kreis}
-%\end{equation}
-%
-%Die Lösung $z_{l,1}$ mit $\|z_{l,1}\| < \|z_s\|$ liegt innerhalb dieses Kreises (niedrige Impedanz, hoher Strom -- nicht-operationeller Punkt), während $z_{l,2}$ mit $\|z_{l,2}\| > \|z_s\|$ außerhalb liegt (hohe Impedanz, niedriger Strom -- operationeller Punkt). Der FPI konvergiert gemäß \eqref{eq:tpf_konv_bedingung} stets zur Lösung $z_{l,2}$.
-%
-%Aus der Analyse der kritischen Punkte leiten die Autoren eine konservative Machbarkeitsbedingung für die Existenz einer Lastflusslösung ab \cite{Salazar2024}:
-%\begin{equation}
-%	\|v_0\|^2 \geq 4 \|s_l\| \cdot \|z_s\|
-%	\label{eq:machbarkeit}
-%\end{equation}
-%
-%Diese Bedingung in Norm-Form besagt, dass das Quadrat der Quellenspannung mindestens das Vierfache des Produkts aus Lastleistung und Quellenimpedanz betragen muss. Sie ist konsistent mit den in der Literatur bekannten Existenzbedingungen \cite{Bolognani2016, Bazrafshan2018} und liefert hier eine geometrische Herleitung und Interpretation.
 
 %======================================================================
-\section{Dense- und Sparse-Formulierung}
+\section{Dense-Formulierung}
 \label{sec:tpf_formulierungen}
 
 Zeitreihensimulationen, probabilistischen Lastflüsse, sowie das maschinelle Lernen sind Anwendungen, wo eine Vielzahl an Lastflüssen berechnet werden müssen.
@@ -209,46 +99,43 @@ bis auf die Busphasen können die nichtphysikalischen Dimensionen zu einer zusam
 Dadurch wird die Struktur auf $\tau \times b\phi$ vereinfacht werden wobei $\tau = \ldots \cdot p \cdot r \cdot t$ die restlichen Dimensionen zusammenhängt~\cite{Salazar2024}.
 Diese \emph{reshape}-Operation 
 
-%wobei die Dimensionen beispielsweise Experimente ($p$), Szenarien ($r$) und Zeitschritte ($t$) repräsentieren können. Um die Berechnung effizient zu gestalten, werden alle nicht-physikalischen Dimensionen zu einem einzigen Index $\tau = \ldots \times p \times r \times t$ zusammengefasst (\textit{Reshape}-Operation). Die resultierenden zweidimensionalen Matrizen werden mit der Punkt-Notation gekennzeichnet:
 \begin{equation}
-	\tens{S} \in \C^{\ldots \times p \times r \times t \times b\phi} \xrightarrow{\text{reshape}} \dot{\mathbf{S}} \in \C^{b\phi \times \tau}
+	\dot{\mathbf{S}} \in \C^{b\phi \times \tau}
 	\label{eq:reshape}
 \end{equation}
 
 generiert den Leistungstensor $\dot{\mathbf{S}}$, welcher in jeder Spalte $i \in \left[0, \tau \right]$ die Leistung eines Szenarios beinhaltet und die Zeile, wie zuvor den Bus (ggf. die Phase) des Leistungsflusses kennzeichnet.
-Die restlichen Matrizen folgen der selben Konvention
-
-%Jede Spalte von $\dotS \in \C^{b\phi \times \tau}$ enthält den Leistungsvektor eines einzelnen Lastflusses, und die $\tau$ Spalten repräsentieren alle zu berechnenden Szenarien. Analog werden die Spannungsmatrizen $\dotV_{(n+1)}, \dotV_{(n)}^{*\eleminv} \in \C^{b\phi \times \tau}$ definiert.
-
-\subsection{Dense-Formulierung}
-\label{subsec:tpf_dense}
+Die restlichen Matrizen folgen der selben Konvention.
 Wird der FPI aus \eqref{eq:tpf_iteration} tensorisiert dargestellt, folgt zunächst
-%Die tensorisierte FPI in ihrer dense Formulierung lautet \cite{Salazar2024}:
+
 \begin{equation}
 	\tens{V}_{(n+1)} = \tens{F} \cdot \tens{V}_{(n)}^{*\eleminv} + \tens{W}
 	\label{eq:tensor_fpi}
 \end{equation}
 wobei $\tens{V} \in \C^{\ldots \times p \times r \times b\phi \times t}, \tens{F} \in \C^{\ldots \times p \times r \times t \times b\phi \times b\phi}, \tens{W} \in \C^{\ldots \times p \times r \times b\phi \times t}$ die korrespondierenden Tensorgrößen von $\mathbf{V}, \mathbf{F}$ und $\mathbf{w}$ sind.
-%mit den Tensor-Dimensionen $\tens{F} \in \C^{\ldots \times p \times r \times t \times b\phi \times b\phi}$ und $\tens{V}_{(n+1)}, \tens{V}_{(n)}^{*\eleminv}, \tens{W} \in \C^{\ldots \times p \times r \times b\phi \times t}$.
 Unter Verwendung des konstanten Lastfalls und einer konstanten Netztopologie über alle Szenarien und Iterationen ist der Tensor $\tens{F}$ eine reine Wiederholung der Bus-Impedanzmatrix $\ZB$. 
 Ferner ist auch der Offset-Tensor $\tens{W}$ ein Reihe an Wiederholungen des Slack-Einflusses, welcher für diese Ausarbeitung ebenso über alle Szenarien konstant bleiben soll und somit die Form $\dot{W} = [\mathbf{w}, \mathbf{w}, \ldots, \mathbf{w}] \in \C^{b\phi \times \tau}$ hat.
-%Im Spezialfall konstanter Leistung und fester Netztopologie besteht der Tensor $\tens{F}$ lediglich aus Wiederholungen der identischen Matrix $\ZB$. Ebenso ist $\tens{W}$ eine Wiederholung des konstanten Vektors $\vect{w}$. Durch den Reshape zu zweidimensionalen Matrizen ergibt sich die effiziente Berechnungsvorschrift aus Algorithm~1 in \cite{Salazar2024}:
-Die Iteration erfolgt nach dem \emph{reshape} gemäß
+Die Iteration erfolgt nach dem \emph{reshape} dem Ausdruck
 
-%wobei $[:,i]$ die $i$-te Spalte der jeweiligen Matrix bezeichnet. Diese $\tau$ Operationen können als eine einzige Matrix-Matrix-Multiplikation zusammengefasst werden:
+
 \begin{equation}
-	\dotV_{(n+1)} = \ZB \cdot \underbrace{\left(\dotS^* \had \dotV_{(n)}^{*\eleminv}\right)}_{\in \C^{b\phi \times \tau}} + \dot{W}.
+	\dotV_{(n+1)} = \ZB \cdot \underbrace{\left(\dotS^* \had \dotV_{(n)}^{*\eleminv}\right)}_{\in \C^{b\phi \times \tau}} + \dot{W},
 	\label{eq:dense_matmul}
 \end{equation}
 
-
-
-%wobei $\dot{W} = [\vect{w}, \vect{w}, \ldots, \vect{w}] \in \C^{b\phi \times \tau}$ den $\tau$-fach duplizierten Konstantvektor enthält und die Operationen $\had$ und $(\cdot)^{*\eleminv}$ element-weise auf die gesamten Matrizen angewendet werden.
+welcher die selbe Struktur hat wie \eqref{eq:tpf_konstP} \cite{Salazar2024}.
+Dabei kann in diesem Fall die selbe Bus-Impedanzmatrix verwendet werden.
+Vor der Tensorformlierung liegt eine Vektor-Matrix Multiplikation zwischen der Impedanzmatrix $\ZB$ und dem Stromvektor $\vect{s}^* \had \mathbf{v}_{(n)}^{*\eleminv}$ vor. 
+Nach der Tensorisierung und dem \emph{reshape} wird diese Operation zu einem Matrix-Matrix-Produkt zwischen $\ZB$ und $\dotS^* \had \dotV_{(n)}^{*\eleminv}$.
+Hierbei werden alle Leistungsvektoren der Lastflüsse berücksichtigt.
+Der nachfolgende Algorithmus zeigt Dense-Formulierung nach Salazar Duque \cite{Salazar2024}.
 \todo{hier weiter}
-Gleichung \eqref{eq:dense_matmul} stellt eine Multiplikation einer dichten Matrix $\ZB \in \C^{b\phi \times b\phi}$ mit einer Matrix $\in \C^{b\phi \times \tau}$ dar. Alle $\tau$ Lastflüsse werden durch \textit{eine einzige} Matrix-Matrix-Multiplikation gleichzeitig berechnet.
+
+
+
 
 \begin{algorithm}[H]
-	\caption{Tensor Power Flow -- Dense-Formulierung nach \cite{Salazar2024}}
+	\caption{Tensor Power Flow. Dense-Formulierung nach \cite{Salazar2024}}
 	\label{alg:tpf_dense}
 	\begin{algorithmic}[1]
 		\REQUIRE $\dotS \in \C^{b\phi \times \tau}$, $\ZB \in \C^{b\phi \times b\phi}$, $\vect{w} \in \C^{b\phi \times 1}$, Toleranz $\varepsilon$, max.\ Iterationen $K$
@@ -256,7 +143,7 @@ Gleichung \eqref{eq:dense_matmul} stellt eine Multiplikation einer dichten Matri
 		\STATE $\dotV_0 = \mathbf{1} + \jj\mathbf{0} \in \C^{b\phi \times \tau}$; \quad $n = 0$; \quad $\text{tol} = \infty$
 		\WHILE{$\text{tol} \geq \varepsilon$ \textbf{und} $n < K$}
 		\FOR{$i = 1$ \textbf{bis} $\tau$}
-		\STATE $\dotV_{(n+1)}[:,i] = \ZB \left(\dotS[:,i] \had \dotV_{(n)}^{\eleminv}[:,i]\right)^* + \vect{w}$
+		\STATE $\dotV_{(n+1)}[i] = \ZB \left(\dotS[i] \had \dotV_{(n)}^{\eleminv}[i]\right)^* + \vect{w}$
 		\ENDFOR
 		\STATE $\text{tol} = \max\left(\|s_{(n+1)} - s_{(n)}\|_2\right)$; \quad $n = n + 1$
 		\ENDWHILE
@@ -264,61 +151,61 @@ Gleichung \eqref{eq:dense_matmul} stellt eine Multiplikation einer dichten Matri
 	\end{algorithmic}
 \end{algorithm}
 
-Es ist anzumerken, dass der Reshape von \eqref{eq:tensor_fpi} zu \eqref{eq:dense_matmul} die Konvergenz des FPI-Algorithmus nicht beeinflusst, da die Aktualisierung der Spannungswerte identisch zu \eqref{eq:tpf_iteration} bleibt \cite{Salazar2024}.
 
-\subsection{Sparse-Formulierung}
-\label{subsec:tpf_sparse}
 
-Ein Nachteil der dense Formulierung ist, dass die Matrix $\ZB = \Ydd^{-1}$ vollbesetzt (dense) ist, obwohl die Admittanzmatrix $\Ydd$ dünnbesetzt (sparse) ist. Für große Netze ($b\phi > 1000$) kann die Speicherung von $\ZB$ problematisch werden. Salazar Duque et al.\ \cite{Salazar2024} schlagen daher eine sparse Formulierung vor, die die Inversion von $\Ydd$ vermeidet.
-Die Iteration \eqref{eq:tpf_iteration} wird umformuliert zu:
-\begin{equation}
-	\tens{M} \cdot \tens{V}_{(n+1)} = \tens{V}_{(n)}^{*\eleminv} + \tens{H}
-	\label{eq:sparse_tensor}
-\end{equation}
+%\subsection{Sparse-Formulierung}
+%\label{subsec:tpf_sparse}
+%
+%Ein Nachteil der dense Formulierung ist, dass die Matrix $\ZB = \Ydd^{-1}$ vollbesetzt (dense) ist, obwohl die Admittanzmatrix $\Ydd$ dünnbesetzt (sparse) ist. Für große Netze ($b\phi > 1000$) kann die Speicherung von $\ZB$ problematisch werden. Salazar Duque et al.\ \cite{Salazar2024} schlagen daher eine sparse Formulierung vor, die die Inversion von $\Ydd$ vermeidet.
+%Die Iteration \eqref{eq:tpf_iteration} wird umformuliert zu:
+%\begin{equation}
+%	\tens{M} \cdot \tens{V}_{(n+1)} = \tens{V}_{(n)}^{*\eleminv} + \tens{H}
+%	\label{eq:sparse_tensor}
+%\end{equation}
+%
+%wobei:
+%\begin{align}
+%	\tens{M} &= -\vect{A}^{\eleminv} \vect{B} \label{eq:sparse_M}\\
+%	\tens{H} &= \vect{A}^{\eleminv} \vect{C} \label{eq:sparse_H}
+%\end{align}
+%
+%mit $\vect{A}$, $\vect{B}$ und $\vect{C}$ gemäß \eqref{eq:tpf_A}--\eqref{eq:tpf_c}. Da $\vect{A}$ eine Diagonalmatrix ist, überträgt sich die Dünnbesetztheit von $\Ydd$ auf $\tens{M}$.
+%
+%Die Reshaped-Form von \eqref{eq:sparse_tensor} ergibt ein lineares Gleichungssystem der Struktur $\vect{A}\vect{x} = \vect{b}$:
+%\begin{equation}
+%	\underbrace{\dotM}_{\vect{A}} \cdot \underbrace{\dotV_{(n+1)}}_{\vect{x}} = \underbrace{\dotV_{(n)}^{*\eleminv} + \dot{H}}_{\vect{b}}
+%	\label{eq:sparse_system}
+%\end{equation}
+%
+%Die Matrix $\dotM \in \C^{(\tau \cdot b\phi) \times (\tau \cdot b\phi)}$ ist die Block-Diagonalverkettung der Submatrizen:
+%\begin{equation}
+%	\dotM = \begin{bmatrix}
+%		\vect{M}_1 & 0 & \cdots & 0 \\
+%		0 & \vect{M}_2 & \cdots & 0 \\
+%		\vdots & & \ddots & \vdots \\
+%		0 & 0 & \cdots & \vect{M}_\tau
+%	\end{bmatrix}
+%	\label{eq:block_diagonal}
+%\end{equation}
+%
+%Die Vektoren $\dotV_{(n+1)}$, $\dotV_{(n)}^{*\eleminv}$ und $\dot{H}$ werden vertikal angeordnet. Das System \eqref{eq:sparse_system} wird iterativ mittels eines sparse Direktlösers berechnet.
 
-wobei:
-\begin{align}
-	\tens{M} &= -\vect{A}^{\eleminv} \vect{B} \label{eq:sparse_M}\\
-	\tens{H} &= \vect{A}^{\eleminv} \vect{C} \label{eq:sparse_H}
-\end{align}
-
-mit $\vect{A}$, $\vect{B}$ und $\vect{C}$ gemäß \eqref{eq:tpf_A}--\eqref{eq:tpf_c}. Da $\vect{A}$ eine Diagonalmatrix ist, überträgt sich die Dünnbesetztheit von $\Ydd$ auf $\tens{M}$.
-
-Die Reshaped-Form von \eqref{eq:sparse_tensor} ergibt ein lineares Gleichungssystem der Struktur $\vect{A}\vect{x} = \vect{b}$:
-\begin{equation}
-	\underbrace{\dotM}_{\vect{A}} \cdot \underbrace{\dotV_{(n+1)}}_{\vect{x}} = \underbrace{\dotV_{(n)}^{*\eleminv} + \dot{H}}_{\vect{b}}
-	\label{eq:sparse_system}
-\end{equation}
-
-Die Matrix $\dotM \in \C^{(\tau \cdot b\phi) \times (\tau \cdot b\phi)}$ ist die Block-Diagonalverkettung der Submatrizen:
-\begin{equation}
-	\dotM = \begin{bmatrix}
-		\vect{M}_1 & 0 & \cdots & 0 \\
-		0 & \vect{M}_2 & \cdots & 0 \\
-		\vdots & & \ddots & \vdots \\
-		0 & 0 & \cdots & \vect{M}_\tau
-	\end{bmatrix}
-	\label{eq:block_diagonal}
-\end{equation}
-
-Die Vektoren $\dotV_{(n+1)}$, $\dotV_{(n)}^{*\eleminv}$ und $\dot{H}$ werden vertikal angeordnet. Das System \eqref{eq:sparse_system} wird iterativ mittels eines sparse Direktlösers berechnet.
-
-\begin{algorithm}[H]
-	\caption{Tensor Power Flow -- Sparse-Formulierung nach \cite{Salazar2024}}
-	\label{alg:tpf_sparse}
-	\begin{algorithmic}[1]
-		\REQUIRE $\dotS \in \C^{b\phi \times \tau}$, $\Ydd \in \C^{b\phi \times b\phi}$ (sparse), $\Yds \in \C^{b\phi \times \phi}$ (sparse), Toleranz $\varepsilon$, max.\ Iterationen $K$
-		\ENSURE $\dotV_n \in \C^{b\phi \times \tau}$, Iterationszahl $n$
-		\STATE Berechne $\dotM$ und $\dot{H}$ (Block-Diagonal-Aufbau gemäß \eqref{eq:block_diagonal})
-		\STATE $\dotV_0 = \mathbf{1} + \jj\mathbf{0} \in \C^{(\tau \cdot b\phi) \times 1}$; \quad $n = 0$; \quad $\text{tol} = \infty$
-		\WHILE{$\text{tol} \geq \varepsilon$ \textbf{und} $n < K$}
-		\STATE $\dotV_{(n+1)} = \text{solve}\left(\dotM, \; \dotV_{(n)}^{*\eleminv} + \dot{H}\right)$ \COMMENT{Sparse-Löser}
-		\STATE $\text{tol} = \max\left(\|s_{(n+1)} - s_{(n)}\|_2\right)$; \quad $n = n + 1$
-		\ENDWHILE
-		\STATE $\vect{V}_n = \text{reshape}(\dotV_n, \; b\phi \times \tau)$
-		\RETURN $\vect{V}_n$, $n$
-	\end{algorithmic}
-\end{algorithm}
+%\begin{algorithm}[H]
+%	\caption{Tensor Power Flow -- Sparse-Formulierung nach \cite{Salazar2024}}
+%	\label{alg:tpf_sparse}
+%	\begin{algorithmic}[1]
+%		\REQUIRE $\dotS \in \C^{b\phi \times \tau}$, $\Ydd \in \C^{b\phi \times b\phi}$ (sparse), $\Yds \in \C^{b\phi \times \phi}$ (sparse), Toleranz $\varepsilon$, max.\ Iterationen $K$
+%		\ENSURE $\dotV_n \in \C^{b\phi \times \tau}$, Iterationszahl $n$
+%		\STATE Berechne $\dotM$ und $\dot{H}$ (Block-Diagonal-Aufbau gemäß \eqref{eq:block_diagonal})
+%		\STATE $\dotV_0 = \mathbf{1} + \jj\mathbf{0} \in \C^{(\tau \cdot b\phi) \times 1}$; \quad $n = 0$; \quad $\text{tol} = \infty$
+%		\WHILE{$\text{tol} \geq \varepsilon$ \textbf{und} $n < K$}
+%		\STATE $\dotV_{(n+1)} = \text{solve}\left(\dotM, \; \dotV_{(n)}^{*\eleminv} + \dot{H}\right)$ \COMMENT{Sparse-Löser}
+%		\STATE $\text{tol} = \max\left(\|s_{(n+1)} - s_{(n)}\|_2\right)$; \quad $n = n + 1$
+%		\ENDWHILE
+%		\STATE $\vect{V}_n = \text{reshape}(\dotV_n, \; b\phi \times \tau)$
+%		\RETURN $\vect{V}_n$, $n$
+%	\end{algorithmic}
+%\end{algorithm}
 
 %\subsection{Entscheidender Vorteil der Sparse-Formulierung}
 %\label{subsec:sparse_vorteil}
@@ -442,34 +329,58 @@ Die Vektoren $\dotV_{(n+1)}$, $\dotV_{(n)}^{*\eleminv}$ und $\dot{H}$ werden ver
 %======================================================================
 \label{subsec:tpf_annahme}
 
-Die Effizienz des Tensor Power Flow basiert auf einer fundamentalen Annahme: \textit{Der Leistungsvektor $\vect{s}$ ist für alle $\tau$ Lastflüsse vollständig bekannt und bleibt während der gesamten Iteration konstant.}
 
-Diese Annahme ermöglicht:
-\begin{enumerate}
-	\item Die \textbf{Vorausberechnung} der Systemmatrix $\ZB$ (bzw.\ $\dotM$) und des Konstantvektors $\vect{w}$.
-	\item Die \textbf{Wiederverwendung} dieser Größen über alle Iterationen und alle $\tau$ Lastflüsse.
-	\item Die \textbf{Zusammenfassung} aller $\tau$ Lastflüsse in eine einzige Matrix-Matrix-Multiplikation.
-\end{enumerate}
 
-Ohne diese Konstantheit wäre der Tensor-Reshape \eqref{eq:reshape} nicht durchführbar, da jeder Lastfluss seine eigene, sich ändernde Systemmatrix benötigen würde.
 
-%\subsection{Warum PV-Knoten diese Annahme verletzen}
-%\label{subsec:tpf_pv_problem}
+Wie bereits eingeführt wurde, setzt der TPF voraus, dass der Leistungstensor $\dot{\mathbf{S}}$ über alle Iterationen und Lastflüsse konstant und bekannt bleibt.
+Ist dies nicht gegeben, muss im allgemeinen Fall der Tensor $\tens{F}$ neu berechnet werden.
+Wenn Komponenten des Leistungsvektors unbekannt sind, befinden sich gesuchte Größen in der Berechnungsvorschrift und die FPI kann nicht durchgeführt werden.\\
 
-Bei PV-Knoten ist die Blindleistung $Q_k$ unbekannt (\cref{subsec:knotentypen}). Der Leistungsvektor am PV-Knoten $k$ lautet:
-\begin{equation}
-	s_k = P_k^{\spec} + \jj \underbrace{Q_k}_{\text{unbekannt}}
-	\label{eq:s_pv_unbekannt}
-\end{equation}
+Werden nun PV-Knoten betrachtet, ist genau Situation vorhanden.
+Bei einem solchen Knoten ist die Leistung nur in der Wirkleistungskomponente $P$ bekannt, während die Blindleistung $Q$ eine zu berechnende Größe darstellt.
+Dadurch kann die Systemmatrix nicht mehr einmalig im voraus berechnet werden und wiederverwendet werden.\\
 
-Da $Q_k$ iterativ bestimmt werden muss, um die Spannungsbedingung $|V_k| = |V_k^{\spec}|$ zu erfüllen, ändert sich $s_k$ zwischen den Iterationen. Dies hat folgende Konsequenzen für die TPF-Formulierung:
+In der Nachfolgende Methode wird die Blindleistung $Q$ iterativ bestimmt, wodurch die Konstanz der Matrix $\mathbf{A} = \diag(\alpha_P \had \mathbf{s}^*)$ verloren geht. 
+Wenn ein konstanter Lastfall mit $\alpha_P = 1$ angenommen wird, ändert sich die Systemmatrix $\ZB$ zwar nicht mehr über die Iterationen, jedoch ist die Formulierung für den Strom $\dotS^* \had \dotV_{(n)}^{*\eleminv}$ weiterhin von der Leistung abhängig und benötigt ebenfalls eine eigenständige Handhabung der unbekannten PV-Blindleistungen.\\
 
-\begin{enumerate}
-	\item Die Matrix $\vect{A} = \diag(\alpha_P \had \vect{s}^*)$ aus \eqref{eq:tpf_A} ist \textbf{nicht mehr konstant}, da $\vect{s}$ sich ändert.
-	\item Damit sind auch $\vect{F} = -\vect{B}^{-1}\vect{A}$ und $\vect{w} = -\vect{B}^{-1}\vect{c}$ nicht mehr über die Iterationen konstant.
-	\item Im Fall rein konstanter Leistung ($\alpha_P = 1$): Die Iteration $\vect{v}_{(n+1)} = \ZB(\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv}) + \vect{w}$ ändert sich nicht in der Systemmatrix $\ZB$ selbst, aber der Leistungsvektor $\dotS$ im Produkt $\dotS^* \had \dotV_{(n)}^{*\eleminv}$ ist für PV-Knoten iterationsabhängig.
-	\item Im Tensor-Setting: Verschiedene Szenarien $i$ und $j$ haben im Allgemeinen unterschiedliche $Q$-Werte am selben PV-Knoten. Die Matrix $\dotS$ ändert sich daher sowohl über die Iterationen szenarioabhängig als auch nach jeder Q-Korrektur.
-\end{enumerate}
+Bislang wurde diese Einschränkung des TPF nicht auf PV-Knoten erweitert. 
+Der reine PQ-Knoten-Fall reicht in vielen Fällen aus.
+Kleine PV-Anlagen, Windkraftanlagen, Gewerbelasten, Batterien und  Wechselrichter können alle als PQ Knoten dargestellt werden, wobei PV-Knoten bislang zu PQ-Knoten umgewandelt werden, um diese Beschränkung der Methode zu vermeiden~\cite{Salazar2024}.
+Im Gegensatz wird mit zunehmender Anzahl von dezentralen Erzeugeranlagen, wie Synchrongeneratoren und PV-Anlagen, eine Option zur Inklusion von PV-Knoten im TPF relevanter~\cite{Ghiani2015,Wang2019}. 
+
+
+
+
+
+
+%Die Effizienz des Tensor Power Flow basiert auf einer fundamentalen Annahme: \textit{Der Leistungsvektor $\vect{s}$ ist für alle $\tau$ Lastflüsse vollständig bekannt und bleibt während der gesamten Iteration konstant.}
+%
+%Diese Annahme ermöglicht:
+%\begin{enumerate}
+%	\item Die \textbf{Vorausberechnung} der Systemmatrix $\ZB$ (bzw.\ $\dotM$) und des Konstantvektors $\vect{w}$.
+%	\item Die \textbf{Wiederverwendung} dieser Größen über alle Iterationen und alle $\tau$ Lastflüsse.
+%	\item Die \textbf{Zusammenfassung} aller $\tau$ Lastflüsse in eine einzige Matrix-Matrix-Multiplikation.
+%\end{enumerate}
+%
+%Ohne diese Konstantheit wäre der Tensor-Reshape \eqref{eq:reshape} nicht durchführbar, da jeder Lastfluss seine eigene, sich ändernde Systemmatrix benötigen würde.
+%
+%%\subsection{Warum PV-Knoten diese Annahme verletzen}
+%%\label{subsec:tpf_pv_problem}
+%
+%Bei PV-Knoten ist die Blindleistung $Q_k$ unbekannt (\cref{subsec:knotentypen}). Der Leistungsvektor am PV-Knoten $k$ lautet:
+%\begin{equation}
+%	s_k = P_k^{\spec} + \jj \underbrace{Q_k}_{\text{unbekannt}}
+%	\label{eq:s_pv_unbekannt}
+%\end{equation}
+%
+%Da $Q_k$ iterativ bestimmt werden muss, um die Spannungsbedingung $|V_k| = |V_k^{\spec}|$ zu erfüllen, ändert sich $s_k$ zwischen den Iterationen. Dies hat folgende Konsequenzen für die TPF-Formulierung:
+%
+%\begin{enumerate}
+%	\item Die Matrix $\vect{A} = \diag(\alpha_P \had \vect{s}^*)$ aus \eqref{eq:tpf_A} ist \textbf{nicht mehr konstant}, da $\vect{s}$ sich ändert.
+%	\item Damit sind auch $\vect{F} = -\vect{B}^{-1}\vect{A}$ und $\vect{w} = -\vect{B}^{-1}\vect{c}$ nicht mehr über die Iterationen konstant.
+%	\item Im Fall rein konstanter Leistung ($\alpha_P = 1$): Die Iteration $\vect{v}_{(n+1)} = \ZB(\vect{s}^* \had \vect{v}_{(n)}^{*\eleminv}) + \vect{w}$ ändert sich nicht in der Systemmatrix $\ZB$ selbst, aber der Leistungsvektor $\dotS$ im Produkt $\dotS^* \had \dotV_{(n)}^{*\eleminv}$ ist für PV-Knoten iterationsabhängig.
+%	\item Im Tensor-Setting: Verschiedene Szenarien $i$ und $j$ haben im Allgemeinen unterschiedliche $Q$-Werte am selben PV-Knoten. Die Matrix $\dotS$ ändert sich daher sowohl über die Iterationen szenarioabhängig als auch nach jeder Q-Korrektur.
+%\end{enumerate}
 
 %\subsection{Mathematische Darstellung des Problems}
 %\label{subsec:tpf_pv_math}
@@ -511,7 +422,7 @@ Da $Q_k$ iterativ bestimmt werden muss, um die Spannungsbedingung $|V_k| = |V_k^
 %	\end{tabular}
 %\end{table}
 
-Die Limitation des TPF auf PQ-Knoten ist in der Praxis für Verteilnetze oft akzeptabel, da dort die Mehrzahl der Einspeiser (PV-Anlagen mit Wechselrichter, Batteriespeicher) als PQ-Knoten mit festem Leistungsfaktor modelliert wird \cite{Salazar2024}. Mit zunehmender Integration von Synchrongeneratoren und spannungsregelnden Einheiten in Verteilnetzen gewinnt die korrekte Abbildung von PV-Knoten jedoch an Bedeutung. %Die Entwicklung geeigneter Erweiterungen des TPF zur Berücksichtigung von PV-Knoten ist Gegenstand von \cref{ch:methoden_pv}.
+%Die Limitation des TPF auf PQ-Knoten ist in der Praxis für Verteilnetze oft akzeptabel, da dort die Mehrzahl der Einspeiser (PV-Anlagen mit Wechselrichter, Batteriespeicher) als PQ-Knoten mit festem Leistungsfaktor modelliert wird \cite{Salazar2024}. Mit zunehmender Integration von Synchrongeneratoren und spannungsregelnden Einheiten in Verteilnetzen gewinnt die korrekte Abbildung von PV-Knoten jedoch an Bedeutung. %Die Entwicklung geeigneter Erweiterungen des TPF zur Berücksichtigung von PV-Knoten ist Gegenstand von \cref{ch:methoden_pv}.
 
 
 
