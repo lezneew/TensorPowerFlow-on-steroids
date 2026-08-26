@@ -387,7 +387,7 @@ Gemäß \cref{subsec:thevenin} ist die das Thévenin-Äquivalent an einem PV-Kno
 	V_k \;=\; E_{th,k} \;-\; Z^{(\ell)}_{B,kk}\cdot I_k,
 	\label{eq:thevenin_skalar}
 \end{equation}
-gegeben. Dabei ist $E_{th,k}$ die Leerlaufspannung des äquivalenten Schaltbildes und $Z^{(\ell)}_{B,kk}$ die Thévenin-Impedanz, wie es auch in Abbildung \ref{{fig:thevenin} gezeigt wird. 
+gegeben. Dabei ist $E_{th,k}$ die Leerlaufspannung des äquivalenten Schaltbildes und $Z^{(\ell)}_{B,kk}$ die Thévenin-Impedanz, wie es auch in Abbildung \ref{fig:thevenin} gezeigt wird. 
 Die Impedanz ist darüber hinaus das jeweilige Diagonalelement der Impedanzmatrix 
 
 
@@ -395,13 +395,12 @@ Die Impedanz ist darüber hinaus das jeweilige Diagonalelement der Impedanzmatri
 %und die Slack-Spannung) und $Z^{(\ell)}_{B,kk}$ das $k$-te Diagonalelement der
 %Bus-Impedanzmatrix ist:
 \begin{equation}
-	Z^{(\ell)}_{B,kk} \;=\; \bigl[(\vect{B}^{(\ell)})^{-1}\bigr]_{kk}
+	Z^{(\ell)}_{B,kk} \;=\; \bigl[\ZB^{(\ell)}\bigr]_{kk}
 	\;=\; R^{(\ell)}_{kk} + \jj\,X^{(\ell)}_{kk}.
 	\label{eq:diagonalelement}
 \end{equation}
 
 Für eine konstante Netztopologie, wie sie für die Arbeit angenommen wird, sind die Impedanzen über alle äußeren Iterationen $\ell$ gleich.
-
 %----------------------------------------------------------------------
 %\paragraph{Linearisierung: Stromänderung bei Q-Variation.}
 %Bei festgehaltenem $P_k$ und unter der Annahme, dass sich $V_k$ bei einer kleinen
@@ -415,135 +414,429 @@ Wird diese aus \eqref{eq:thevenin_skalar} gebildet, folgt der Ausdruck
 \end{equation}
 
 mit noch einem unbekannten Ausdruck für die Stromdifferenz.
-Der Knotenstrom
+Der Knotenstrom 
 
 %----------------------------------------------------------------------
 %\paragraph{Strominjektion als Funktion von $Q_k$.}
 %Die komplexe Leistungsinjektion am Knoten~$k$ in Erzeugerkonvention lautet
-$S_k = P_k + \jj Q_k = V_k\cdot I_k^*$. Daraus folgt für den Strom:
+
 \begin{equation}
 	I_k \;=\; \frac{S_k^*}{V_k^*} \;=\; \frac{P_k - \jj Q_k}{V_k^*}.
 	\label{eq:strom_skalar}
 \end{equation}
-kann als Funktion der Knotenleistung $S_\mathbf{k}$ dargestellt werden. Der  Ausduck folgt direkt aus der Leistungsdefinition \eqref{eq:power_current}.
-Bei Bildung von der Stromänderung wird beachtet, dass die Wirkleistung $P_\mathrm{k}$ gegeben ist und sich folglich eliminiert. In der Nähe des Arbeitspunktes $v_\mathrm{k}$ folgt die Stromänderung aufgrund einer Blindleistungsinjektion
+kann als Funktion der Knotenleistung $S_{k}$ dargestellt werden. Der  Ausduck folgt direkt aus der Leistungsdefinition \eqref{eq:power_current}.
+Bei Bildung von der Stromänderung wird beachtet, dass die Wirkleistung $P_{k}$ gegeben ist und sich folglich eliminiert. In der Nähe des Arbeitspunktes $v_{k}$ folgt die Stromänderung aufgrund einer Blindleistungsinjektion
 
 \begin{equation}
 	\Delta I_k \;\approx\; \left.\frac{-\jj\,\Delta Q_k}{V_k^*}\right|_{V_k = v^{(\ell)}_k}.
 	\label{eq:strom_linear}
 \end{equation}
 
-Das
+Dieser linearisierte Term kann weiterhin in Gleichung \eqref{eq:spannung_skalar} eingesetzt und sortiert werden. 
+Die Spannungsänderung 
 
 %----------------------------------------------------------------------
 %\paragraph{Spannungsänderung über Thévenin-Impedanz.}
-Die resultierende Spannungsänderung am Knoten~$k$ folgt aus dem
-Thévenin-Äquivalent~\eqref{eq:thevenin_skalar}:
+%Die resultierende Spannungsänderung am Knoten~$k$ folgt aus dem
+%Thévenin-Äquivalent~\eqref{eq:thevenin_skalar}:
 \begin{equation}
-	\Delta V_k \;=\; -Z^{(\ell)}_{B,kk}\cdot\Delta I_k
-	\;=\; Z^{(\ell)}_{B,kk}\cdot\frac{\jj\,\Delta Q_k}{(v^{(\ell)}_k)^*}.
+	V_k^* \cdot \Delta V_k \;=\; Z^{(\ell)}_{B,kk}\cdot\jj\,\Delta Q_k
 	\label{eq:spannung_skalar}
 \end{equation}
-Mit $Z^{(\ell)}_{B,kk} = R^{(\ell)}_{kk} + \jj X^{(\ell)}_{kk}$ und
-$(v^{(\ell)}_k)^* = |v^{(\ell)}_k|\,e^{-\jj\theta_k}$ ergibt die Ausmultiplikation:
+
+ist nach einsetzten somit eine Funktion des Arbeitspunkt und der Blindleistungsänderung.
+Damit liegt bereits ein Ausdruck vor, mit welcher eine Blindleistungskorrektur ausgehend von einer Spannungsdifferenz in Beziehung stehen.
+Der Nachteil dieser Formulierung ist jedoch dass die Spannungsdifferenz selber noch eine komplex Größe ist. 
+Dies setzt folglich für eine Differenz zwischen aktueller und vorgegebener PV-Spannung voraus, dass die Winkeldifferenz bekannt ist.
+Da aber eine Winkelvorgabe bei PV-Knoten fehlt, muss die Formulierung auf Spannungsbeträge erweitert werden, um die Winkelabhängigkeit zu verlieren.
+Um das zu erzielen, kann das Produkt 	$V_k^* V_k = |V_k|^2$ gebildet werden.
+Wendet man die Differenz auf das Betragsquadrat an an, kann der Ausdruck 
+
 \begin{equation}
-	\Delta V_k \;=\; \frac{\Delta Q_k}{|v^{(\ell)}_k|}
-	\bigl(X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}\bigr)\,e^{\jj\theta_k}.
-	\label{eq:spannung_ausmult}
+    \Delta(|V_k|^2) = |V_k + \Delta V_k|^2 - |V_k|^2
+	= V_k^*\Delta V_k + V_k(\Delta V_k)^* + |\Delta V_k|^2
+	\label{eq:V2}
 \end{equation}
 
-%----------------------------------------------------------------------
-%\paragraph{Änderung des Spannungsbetragsquadrats.}
-Die Änderung von $|V_k|^2$ lässt sich über die Identität\footnote{Diese folgt
-	direkt aus $|V_k|^2 = V_k V_k^*$: Setzt man den geänderten Wert
-	$V_k + \Delta V_k$ ein und multipliziert aus, erhält man $\Delta(|V_k|^2)
-	= V_k^*\Delta V_k + V_k(\Delta V_k)^* + |\Delta V_k|^2$. Der quadratische Term
-	$|\Delta V_k|^2$ wird im Sinne der Linearisierung vernachlässigt; mit
-	$z + z^* = 2\,\re(z)$ verbleibt $\Delta(|V_k|^2) = 2\,\re(V_k^*\Delta V_k)$.}
+formuliert werden.
+Da ohnehin die Linearisierung um $V_k$ betrachtet wird, kann $|\Delta V_k|^2$ vernachlässigt werden. Durch die Identität $z + z^* = 2\,\re(z)$ reduziert sich der Ausdruck \eqref{eq:V2} zu
+
 \begin{equation}
 	\Delta(|V_k|^2) \;=\; 2\,\re\bigl(V_k^*\cdot\Delta V_k\bigr)
 	\label{eq:betragsquadrat_identitaet}
 \end{equation}
-berechnen. Einsetzen von~\eqref{eq:spannung_ausmult} mit
-$V_k^* = |v^{(\ell)}_k|\,e^{-\jj\theta_k}$ liefert:
-\begin{align}
-	V_k^*\cdot\Delta V_k
-	&= |v^{(\ell)}_k|\,e^{-\jj\theta_k}\cdot\frac{\Delta Q_k}{|v^{(\ell)}_k|}
-	\bigl(X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}\bigr)\,e^{\jj\theta_k} \notag\\
-	&= \Delta Q_k\cdot\bigl(X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}\bigr).
-	\label{eq:VstarDeltaV_skalar}
-\end{align}
-Der Realteil ergibt:
+
+Das Argument der Realteils entspricht genau der rechten Seite von Gleichung \eqref{eq:spannung_skalar}.
+Dementsprechend kann dessen Realteil
+
 \begin{equation}
 	\re\bigl(V_k^*\cdot\Delta V_k\bigr) \;=\; X^{(\ell)}_{kk}\cdot\Delta Q_k.
 	\label{eq:realteil_skalar}
 \end{equation}
-Bemerkenswert ist, dass der Widerstandsanteil $R^{(\ell)}_{kk}$ ausschließlich zum
-Imaginärteil beiträgt und sich somit vollständig herauskürzt. Einsetzen
-in~\eqref{eq:betragsquadrat_identitaet} liefert die zentrale
-Sensitivitätsbeziehung:
+
+ausgewertet werden. 
+Dabei ist die Reaktanz $X^{(\ell)}$ der Imaginärteil der Impedanzmatrix $Z^{(\ell)}_{B,kk}$ und trägt als einziger zum Realteil des Ausdrucks $Z^{(\ell)}_{B,kk}\cdot \jj$.
+Zusammen mit \eqref{eq:betragsquadrat_identitaet} kann die Sensitivitätsbeziehung 
+
 \begin{equation}
 	\Delta(|V_k|^2) \;=\; 2\,X^{(\ell)}_{kk}\cdot\Delta Q_k.
 	\label{eq:sensitivity_skalar}
 \end{equation}
 
+formuliert werden.
+Dabei ist die Spannungsdifferenz gegeben durch den aktuell berechneten Spannungsbetrag $|V_k|$ und dem vorgegebenen PV-Wert $|V^{\spec}_k|$.
+Eingesetzt in \eqref{eq:sensitivity_skalar} ist die Berechnungsvorschrift für die Blindleistungskorrektur durch
+
+%Hierzu werden die Spannungsgrößen auf eine Seite 	$V_k^* V_k = $
+%
+%\begin{equation}
+%	V_k^* \Delta V_k \;=\; Z^{(\ell)}_{B,kk}\cdot \jj\,\Delta Q_k
+%	\label{eq:spannung_skalar}
+%\end{equation}
+%
+%gebracht.
+%
+%
+%
+%Mit $Z^{(\ell)}_{B,kk} = R^{(\ell)}_{kk} + \jj X^{(\ell)}_{kk}$ und
+%$(v^{(\ell)}_k)^* = |v^{(\ell)}_k|\,e^{-\jj\theta_k}$ ergibt die Ausmultiplikation:
+%\begin{equation}
+%	\Delta V_k \;=\; \frac{\Delta Q_k}{|v^{(\ell)}_k|}
+%	\bigl(X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}\bigr)\,e^{\jj\theta_k}.
+%	\label{eq:spannung_ausmult}
+%\end{equation}
+%
+%%----------------------------------------------------------------------
+%%\paragraph{Änderung des Spannungsbetragsquadrats.}
+%Die Änderung von $|V_k|^2$ lässt sich über die Identität\footnote{Diese folgt
+%	direkt aus $|V_k|^2 = V_k V_k^*$: Setzt man den geänderten Wert
+%	$V_k + \Delta V_k$ ein und multipliziert aus, erhält man $\Delta(|V_k|^2)
+%	= V_k^*\Delta V_k + V_k(\Delta V_k)^* + |\Delta V_k|^2$. Der quadratische Term
+%	$|\Delta V_k|^2$ wird im Sinne der Linearisierung vernachlässigt; mit
+%	$z + z^* = 2\,\re(z)$ verbleibt $\Delta(|V_k|^2) = 2\,\re(V_k^*\Delta V_k)$.}
+%\begin{equation}
+%	\Delta(|V_k|^2) \;=\; 2\,\re\bigl(V_k^*\cdot\Delta V_k\bigr)
+%	\label{eq:betragsquadrat_identitaet}
+%\end{equation}
+%berechnen. Einsetzen von~\eqref{eq:spannung_ausmult} mit
+%$V_k^* = |v^{(\ell)}_k|\,e^{-\jj\theta_k}$ liefert:
+%\begin{align}
+%	V_k^*\cdot\Delta V_k
+%	&= |v^{(\ell)}_k|\,e^{-\jj\theta_k}\cdot\frac{\Delta Q_k}{|v^{(\ell)}_k|}
+%	\bigl(X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}\bigr)\,e^{\jj\theta_k} \notag\\
+%	&= \Delta Q_k\cdot\bigl(X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}\bigr).
+%	\label{eq:VstarDeltaV_skalar}
+%\end{align}
+%Der Realteil ergibt:
+%\begin{equation}
+%	\re\bigl(V_k^*\cdot\Delta V_k\bigr) \;=\; X^{(\ell)}_{kk}\cdot\Delta Q_k.
+%	\label{eq:realteil_skalar}
+%\end{equation}
+%Bemerkenswert ist, dass der Widerstandsanteil $R^{(\ell)}_{kk}$ ausschließlich zum
+%Imaginärteil beiträgt und sich somit vollständig herauskürzt. Einsetzen
+%in~\eqref{eq:betragsquadrat_identitaet} liefert die zentrale
+%Sensitivitätsbeziehung:
+%\begin{equation}
+%	\Delta(|V_k|^2) \;=\; 2\,X^{(\ell)}_{kk}\cdot\Delta Q_k.
+%	\label{eq:sensitivity_skalar}
+%\end{equation}
+
 %----------------------------------------------------------------------
 %\paragraph{Ergebnis: Q-Korrekturformel.}
-Um die Spannung vom berechneten Wert $|v^{(\ell)}_k|$ auf den Sollwert
-$|V^{\spec}_k|$ zu korrigieren, wird $\Delta(|V_k|^2) = |V^{\spec}_k|^2 -
-|v^{(\ell)}_k|^2$ gefordert. Auflösen von~\eqref{eq:sensitivity_skalar} nach
-$\Delta Q_k$ ergibt:
+%Um die Spannung vom berechneten Wert $|v^{(\ell)}_k|$ auf den Sollwert
+%$|V^{\spec}_k|$ zu korrigieren, wird $\Delta(|V_k|^2) = |V^{\spec}_k|^2 -
+%|v^{(\ell)}_k|^2$ gefordert. Auflösen von~\eqref{eq:sensitivity_skalar} nach
+%$\Delta Q_k$ ergibt:
 \begin{equation}
-	\boxed{\;\Delta Q^{(\ell)}_k \;=\; \frac{|V^{\spec}_k|^2 - |v^{(\ell)}_k|^2}{2\cdot X^{(\ell)}_{kk}}, \;}
+	\boxed{\;\Delta Q^{(\ell)}_k \;=\; \frac{|V^{\spec}_k|^2 - |V^{(\ell)}_k|^2}{2\cdot X^{(\ell)}_{kk}}, \;}
 	\label{eq:methode_a_dQ_scalar}
 \end{equation}
-wobei $X^{(\ell)}_{kk} = \im\bigl(\bigl[(\vect{B}^{(\ell)})^{-1}\bigr]_{kk}\bigr)$
-die Thévenin-Reaktanz am Knoten~$k$ ist. 
+%wobei $X^{(\ell)}_{kk} = \im\bigl(\bigl[(\vect{B}^{(\ell)})^{-1}\bigr]_{kk}\bigr)$
+%die Thévenin-Reaktanz am Knoten~$k$ ist. 
+
+hergeleitet.
+Dieser kann folglich als Korrekturformel verwendet werden, nach dem im inneren TPF ein Spannungsvektor berechnet wird.
+
 
 %======================================================================
-\paragraph{Berücksichtigung der Kopplung zwischen den PV-Knoten: }
-Die Herleitung~\eqref{eq:thevenin_skalar}--\eqref{eq:methode_a_dQ_scalar}
-behandelt jeden PV-Knoten für sich und verwendet dabei nur das
-Diagonalelement~$Z^{(\ell)}_{B,kk}$. Damit wird angenommen, dass
-eine Q-Änderung am Knoten~$k$ ausschließlich die Spannung an genau diesem Knoten
-beeinflusst. Tatsächlich teilen sich die PV-Knoten in einem realen Netz jedoch
-gemeinsame Leitungen, sodass eine Blindleistungsänderung am Knoten~$j$ auch die
-Spannung am Knoten~$k$ verschiebt. Diese Kopplung lässt sich erfassen, indem man
-die skalare Rechnung konsequent in Matrixnotation überführt. An die Stelle der
-Skalare treten Vektoren über alle PV-Knoten ($\Delta\vect{Q}$,
-$\Delta\vect{V}_{pv}$), und das Diagonalelement~$Z^{(\ell)}_{B,kk}$ wird durch den
-gesamten PV--PV-Block~$\vect{Z}^{(\ell)}_{pp}$ der Bus-Impedanzmatrix ersetzt.
-Dessen Off-Diagonalelemente~$(k\neq j)$ tragen gerade die zuvor vernachlässigte
-Kopplung.
+\subsection{Berücksichtigung der PV-PV-Kopplung}
 
-Die einzelnen Schritte bleiben unverändert, werden aber vektoriell gelesen. Aus
-der knotenweisen Stromänderung~\eqref{eq:strom_linear} wird
-$\Delta\vect{I}_{pv} = -\jj\,\vect{D}_V^{-1}\,\Delta\vect{Q}$ mit der
-Diagonalmatrix $\vect{D}_V = \diag((v^{(\ell)}_k)^*)$, und aus dem
-Thévenin-Schritt~\eqref{eq:spannung_skalar} wird
-$\Delta\vect{V}_{pv} = \vect{Z}^{(\ell)}_{pp}\,\Delta\vect{I}_{pv}$. Wertet man
-$\Delta(|V_k|^2) = 2\,\re(V_k^*\Delta V_k)$ komponentenweise aus und nutzt für
-Verteilnetze die Näherungen ähnlicher Spannungsbeträge $(|v^{(\ell)}_k| \approx
-|v^{(\ell)}_j|)$ und kleiner Winkeldifferenzen $(\theta_j - \theta_k \approx 0)$,
-so kürzen sich die Widerstandsanteile wie im skalaren Fall heraus. Es verbleibt die
-matrixwertige Sensitivitätsbeziehung
+Jedoch wird in \cref{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität} der Ergebnisse gezeigt, dass diese reine Thévenin-Formulierung der Sensitivität einen großen Nachteil hat.
+Die zuvor vorgeschlagene Herleitung~\eqref{eq:thevenin_skalar}--\eqref{eq:methode_a_dQ_scalar} behandelt jeden PV-Knoten einzeln.
+Dies hat zur Folge, dass bei der ausschließlichen Verwendung von den Diagonalelementen von~$Z^{(\ell)}_{B,kk}$ die Kopplung von zwei verschiedenen PV-Knoten unterschlagen wird.
+Jedoch kann diese Annahme nur gelten, wenn mehrere PV-Knoten keinen Einfluss aufeinander haben.
+Liegen mehrerer solcher Knoten im Netz vor, können sie sich Leitungen teile. 
+Folglich kann eine Blindleistungsänderung an einem Knoten die Spannung eines anderen PV-Knotens beeinflussen.
+Dieses Verhalten lässt sich bei Erhöhung von PV-Knoten eines radialen Netzes in \cref{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität} unter Konvergenzverlust beobachten.\\
+
+Deswegen wird hier alternative modifizierte Sensitivität für die Blindleistungskorrektur vorgeschlagen, welche die elektrische Kopplung mehrerer PV-Knoten berücksichtigt. 
+Da die Kopplungen zwischen Knoten werden im Netzmodell (\cref{subsec:admittanz}) durch die Nebendiagonalelemente der Impedanzmatrix modelliert. 
+Dies motiviert eine konsequente Erweiterung der skalaren Formulierung der Sensitivität \eqref{eq:methode_a_dQ_scalar} in eine Matrixform, um die gesamte Impedanzmatrix verwenden zu können.
+Die Skalare $\Delta Q_k$ und $\Delta V_{k}$ werden durch die korrespondierenden Vektorgrößern $\Delta\mathbf{Q}$,
+$\Delta\mathbf{V}_{\mathrm{pv}}$ erweitert, wobei der $k$-te PV-Knoten in der $k$-ten Zeile der Vektoren steht.
+Für die Impedanz wird aus der Geamtmatrix $\ZB$ gebaut, indem alle PV-PV-Einträge zu einem Block $\Delta\mathbf{V}_\mathrm{pv}$ zusammengetragen werden.
+Die Nebendiagonalelemente dieser Matrix beschreiben genau den Einfluss der PV-Knoten auf einander.\\
+
+Die einzelnen Rechenschritte der Herleitung bleiben die selben.
+aus der skalaren entkoppelten Gleichung 
+
 \begin{equation}
-	\Delta\bigl(|\vect{V}_{pv}|^2\bigr) \;=\; 2\,\vect{X}^{(\ell)}_{pp}\,\Delta\vect{Q},
-	\label{eq:sensitivity_matrix}
-\end{equation}
-die direkte Verallgemeinerung von~\eqref{eq:sensitivity_skalar}: Aus dem Skalar
-$2X^{(\ell)}_{kk}$ ist die Matrix $2\vect{X}^{(\ell)}_{pp}$ geworden, deren
-Diagonale genau die skalaren Sensitivitäten enthält. Auflösen
-nach~$\Delta\vect{Q}$ ergibt die
-gekoppelte Q-Korrekturformel
+	\;\Delta Q^{(\ell)}_k \;=\; \frac{|V^{\spec}_k|^2 - |V^{(\ell)}_k|^2}{2\cdot X^{(\ell)}_{kk}}
+	\label{eq:skale}
+\end{equation} 
+
+wird folglich 
+
 \begin{equation}
 	\boxed{\;\Delta\vect{Q}^{(\ell)} \;=\; \tfrac{1}{2}\,\bigl(\vect{X}^{(\ell)}_{pp}\bigr)^{-1} \bigl(|\vect{V}^{\spec}_{pv}|^2 - |\vect{v}^{(\ell)}_{pv}|^2\bigr) \;}
 	\label{eq:methode_a_dQ_coupled}
 \end{equation}
-Vernachlässigt man die Off-Diagonalen von $\vect{X}^{(\ell)}_{pp}$, zerfällt
-\eqref{eq:methode_a_dQ_coupled} knotenweise wieder in die skalare Formel
-\eqref{eq:methode_a_dQ_scalar}. Beide Varianten sind gleichermaßen
-tensorisierbar, da $\vect{X}^{(\ell)}_{pp}$ über alle Iterationen und Szenarien
+
+als gekoppelte Blindleistungskorrektur aufgefasst.
+Werden in dieser bloß die Hauptdiagonalelemente betrachtet, entsprechen die Ausdrücke der entkoppelten Formulierung in \eqref{eq:skale}.
+Es wird ebenfalls in \cref{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität} empirisch gezeigt, dass diese Formulierung deutlich robuster zu einer Konvergenz der Berechnung führt, als die entkoppelte Variante.
+
+
+\subsection{Tensorformulierung der äußeren Blindleistungskorrektur}
+
+Die hergelittenen Formulierungen für die Blindleistungskorrektur beziehen sich zunächst auf einen einzigen Lastfluss.
+In diesem Abschnitt sollen die beiden Varianten der $Q$-Korrektur nun in eine Tensorformulierung überführt werden, um der Anforderung in  \cref{sec:pv_auswirkung} gerecht zu werden.
+Dabei soll es möglich sein diese Korrektur auch für $\tau$-Lastflüsse gleichzeitig ausführen zu können.
+Bei mehreren Lastszenarien liegen die berechneten Größen als mehrdimensionale Tensoren vor, wie in der Dense-Formulierung bereits eingeführt wurde.
+Die Spannungen 
+\begin{equation}
+	|\dot{{V}}_{\mathrm{pv}}^{\spec}|^2,
+	\qquad
+	|\dot{{v}}_{\mathrm{pv}}^{(\ell)}|^2
+	\qquad \in
+	\mathbb{R}^{n_{\mathrm{pv}}\times\tau}
+	\label{eq:dense_pv_voltage}
+\end{equation}
+liegen dabei bereits in tensorisierter Form durch die Berechnung vor und dienen als Ausgangspunkt für die folgenden Formulierungen.
+Die Blindleistung
+
+\begin{equation}
+	\Delta\dot{{Q}}^{(\ell)}
+	\in
+	\mathbb{R}^{n_{\mathrm{pv}}\times\tau}
+	\label{eq:dense_dQ}
+\end{equation}
+
+soll ebenfalls mehrdimensional vorliegen um diese einfach in den TPF übernehmen zu können.
+Die Spalten beherbergen dabei die einzelnen Lastflüsse und die Zeilen wie zuvor die PV-Busse.
+Für das Spannungsresiduum folgt eine einfache spaltenweise Subtraktion der Elemente
+
+\begin{equation}
+	\dot{{R}}^{(\ell)}
+	=
+	|\dot{{V}}_{\mathrm{pv}}^{\spec}|^2
+	-
+	|\dot{{v}}_{\mathrm{pv}}^{(\ell)}|^2
+	=
+	\begin{bmatrix}
+		r_{1,1}^{(\ell)} & r_{1,2}^{(\ell)} & \cdots & r_{1,\tau}^{(\ell)}\\
+		r_{2,1}^{(\ell)} & r_{2,2}^{(\ell)} & \cdots & r_{2,\tau}^{(\ell)}\\
+		\vdots & \vdots & \ddots & \vdots\\
+		r_{n_{\mathrm{pv}},1}^{(\ell)}
+		&
+		r_{n_{\mathrm{pv}},2}^{(\ell)}
+		&
+		\cdots
+		&
+		r_{n_{\mathrm{pv}},\tau}^{(\ell)}
+	\end{bmatrix}
+	\in
+	\mathbb{R}^{n_{\mathrm{pv}}\times\tau},
+	\label{eq:dense_pv_residual}
+\end{equation}
+wobei ebenfalls eine zweidimensionale Matrix folgt.
+Da für die betrachtete Formulierung eine konstante Netztopologie
+angenommen wird, ist die PV-PV-Sensitivitätsmatrix $\vect{X}_{pp}$
+für alle Szenarien identisch. Die Sensitivität muss daher nicht für jedes
+einzelne Szenario wiederholt werden. Stattdessen kann dieselbe Matrix durch
+eine Matrixmultiplikation auf sämtliche Spalten des Spannungsresiduums
+angewendet werden.\\
+
+
+Für die entkoppelte Formulierung werden die
+Hauptdiagonalelemente der PV-PV-Reaktanzmatrix berücksichtigt. Die
+entsprechende Diagonalmatrix ist durch
+\begin{equation}
+	\vect{X}_{pp}^{\mathrm{diag}}
+	=
+	\operatorname{diag}
+	\left(
+	\vect{X}_{pp}
+	\right)
+	\in
+	\mathbb{R}^{n_{\mathrm{pv}}\times n_{\mathrm{pv}}}
+	\label{eq:dense_Xpp_diag}
+\end{equation}
+gegeben.
+Die skalare Blindleistungskorrektur
+\begin{equation}
+	\Delta Q_k^{(\ell)}
+	=
+	\frac{
+		|V_k^{\spec}|^2
+		-
+		|v_k^{(\ell)}|^2
+	}{
+		2X_{kk}
+	}
+	\label{eq:dense_scalar_decoupled}
+\end{equation}
+kann damit für sämtliche PV-Knoten und Szenarien gleichzeitig als
+Matrixoperation 
+\begin{equation}
+	\boxed{
+		\Delta\dot{\vect{Q}}_{\mathrm{dec}}^{(\ell)}
+		=
+		\frac{1}{2}
+		\left(
+		\vect{X}_{pp}^{\mathrm{diag}}
+		\right)^{-1}
+		\cdot
+		\left(
+		|\dot{\vect{V}}_{\mathrm{pv}}^{\spec}|^2
+		-
+		|\dot{\vect{v}}_{\mathrm{pv}}^{(\ell)}|^2
+		\right)
+	}
+	\label{eq:dense_decoupled_Q}
+\end{equation}
+
+formuliert werden.
+Die Elemente können dabei Element-weise mit einander verrechnet werden.\\
+
+Unter Berücksichtigung der PV-Kopplungen 
+werden zusätzlich die Nebendiagonalelemente der
+PV-PV-Reaktanzmatrix~$\vect{X}_{pp}$ verwendet.
+Da die restlichen Bedingungen die selben sind wie in der entkoppelten Variante, folgt für das Residuum
+\begin{align}
+	\dot{{R}}^{(\ell)}
+	&=
+	2\vect{X}_{pp}
+	\cdot
+	\Delta\dot{{Q}}^{(\ell)}\\
+	&=
+	2
+	\begin{bmatrix}
+		X_{11} & X_{12} & \cdots & X_{1n_{\mathrm{pv}}}\\
+		X_{21} & X_{22} & \cdots & X_{2n_{\mathrm{pv}}}\\
+		\vdots & \vdots & \ddots & \vdots\\
+		X_{n_{\mathrm{pv}}1}
+		&
+		X_{n_{\mathrm{pv}}2}
+		&
+		\cdots
+		&
+		X_{n_{\mathrm{pv}}n_{\mathrm{pv}}}
+	\end{bmatrix}
+	\begin{bmatrix}
+		\Delta Q_{1,1}^{(\ell)}
+		&
+		\Delta Q_{1,2}^{(\ell)}
+		&
+		\cdots
+		&
+		\Delta Q_{1,\tau}^{(\ell)}
+		\\
+		\Delta Q_{2,1}^{(\ell)}
+		&
+		\Delta Q_{2,2}^{(\ell)}
+		&
+		\cdots
+		&
+		\Delta Q_{2,\tau}^{(\ell)}
+		\\
+		\vdots
+		&
+		\vdots
+		&
+		\ddots
+		&
+		\vdots
+		\\
+		\Delta Q_{n_{\mathrm{pv}},1}^{(\ell)}
+		&
+		\Delta Q_{n_{\mathrm{pv}},2}^{(\ell)}
+		&
+		\cdots
+		&
+		\Delta Q_{n_{\mathrm{pv}},\tau}^{(\ell)}
+	\end{bmatrix}
+	\label{eq:dense_coupled_sensitivity}
+\end{align}
+
+Die gekoppelte Blindleistungskorrektur in Tensorform ist folglich durch
+\begin{equation}
+	\boxed{
+		\Delta\dot{{Q}}^{(\ell)}
+		=
+		\frac{1}{2}
+		\vect{X}_{pp}^{-1}
+		\cdot
+		\left(
+		|\dot{\vect{V}}_{\mathrm{pv}}^{\spec}|^2
+		-
+		|\dot{\vect{v}}_{\mathrm{pv}}^{(\ell)}|^2
+		\right)
+	}.
+	\label{eq:dense_coupled_Q}
+\end{equation}
+gegeben
+
+
+
+%
+%Die Herleitung~\eqref{eq:thevenin_skalar}--\eqref{eq:methode_a_dQ_scalar}
+%behandelt jeden PV-Knoten für sich und verwendet dabei nur das
+%Diagonalelement~$Z^{(\ell)}_{B,kk}$. Damit wird angenommen, dass
+%eine Q-Änderung am Knoten~$k$ ausschließlich die Spannung an genau diesem Knoten
+%beeinflusst. Tatsächlich teilen sich die PV-Knoten in einem realen Netz jedoch
+%gemeinsame Leitungen, sodass eine Blindleistungsänderung am Knoten~$j$ auch die
+%Spannung am Knoten~$k$ verschiebt. Diese Kopplung lässt sich erfassen, indem man
+%die skalare Rechnung konsequent in Matrixnotation überführt. An die Stelle der
+%Skalare treten Vektoren über alle PV-Knoten ($\Delta\vect{Q}$,
+%$\Delta\vect{V}_{pv}$), und das Diagonalelement~$Z^{(\ell)}_{B,kk}$ wird durch den
+%gesamten PV--PV-Block~$\vect{Z}^{(\ell)}_{pp}$ der Bus-Impedanzmatrix ersetzt.
+%Dessen Off-Diagonalelemente~$(k\neq j)$ tragen gerade die zuvor vernachlässigte
+%Kopplung.
+%
+%Die einzelnen Schritte bleiben unverändert, werden aber vektoriell gelesen. Aus
+%der knotenweisen Stromänderung~\eqref{eq:strom_linear} wird
+%$\Delta\vect{I}_{pv} = -\jj\,\vect{D}_V^{-1}\,\Delta\vect{Q}$ mit der
+%Diagonalmatrix $\vect{D}_V = \diag((v^{(\ell)}_k)^*)$, und aus dem
+%Thévenin-Schritt~\eqref{eq:spannung_skalar} wird
+%$\Delta\vect{V}_{pv} = \vect{Z}^{(\ell)}_{pp}\,\Delta\vect{I}_{pv}$. Wertet man
+%$\Delta(|V_k|^2) = 2\,\re(V_k^*\Delta V_k)$ komponentenweise aus und nutzt für
+%Verteilnetze die Näherungen ähnlicher Spannungsbeträge $(|v^{(\ell)}_k| \approx
+%|v^{(\ell)}_j|)$ und kleiner Winkeldifferenzen $(\theta_j - \theta_k \approx 0)$,
+%so kürzen sich die Widerstandsanteile wie im skalaren Fall heraus. Es verbleibt die
+%matrixwertige Sensitivitätsbeziehung
+%\begin{equation}
+%	\Delta\bigl(|\vect{V}_{pv}|^2\bigr) \;=\; 2\,\vect{X}^{(\ell)}_{pp}\,\Delta\vect{Q},
+%	\label{eq:sensitivity_matrix}
+%\end{equation}
+%die direkte Verallgemeinerung von~\eqref{eq:sensitivity_skalar}: Aus dem Skalar
+%$2X^{(\ell)}_{kk}$ ist die Matrix $2\vect{X}^{(\ell)}_{pp}$ geworden, deren
+%Diagonale genau die skalaren Sensitivitäten enthält. Auflösen
+%nach~$\Delta\vect{Q}$ ergibt die
+%gekoppelte Q-Korrekturformel
+%\begin{equation}
+%	\boxed{\;\Delta\vect{Q}^{(\ell)} \;=\; \tfrac{1}{2}\,\bigl(\vect{X}^{(\ell)}_{pp}\bigr)^{-1} \bigl(|\vect{V}^{\spec}_{pv}|^2 - |\vect{v}^{(\ell)}_{pv}|^2\bigr) \;}
+%	\label{eq:methode_a_dQ_coupled}
+%\end{equation}
+%Vernachlässigt man die Off-Diagonalen von $\vect{X}^{(\ell)}_{pp}$, zerfällt
+%\eqref{eq:methode_a_dQ_coupled} knotenweise wieder in die skalare Formel
+%\eqref{eq:methode_a_dQ_scalar}. Beide Varianten sind gleichermaßen
+%tensorisierbar, da $\vect{X}^{(\ell)}_{pp}$ über alle Iterationen und Szenarien
+
+
+
+
+
 %konstant ist, lässt sich $(\vect{X}^{(\ell)}_{pp})^{-1}$ einmalig vorab berechnen,
 %und das Q-Update über alle $\tau$ Szenarien reduziert sich auf ein
 %Matrix-Matrix-Produkt -- denselben Operationstyp, der auch den TPF-Kern
@@ -928,15 +1221,15 @@ tensorisierbar, da $\vect{X}^{(\ell)}_{pp}$ über alle Iterationen und Szenarien
 %	(vgl.\ \S~\ref{subsec:methode_a_konvergenz}).
 %\end{enumerate}
 
-\paragraph{Konvergenz der äußeren Schleife:}
-Die äußere Q-Schleife ist selbst eine Fixpunktiteration: Ausgehend vom Residuum
-$|V^{\spec}_k|^2 - |v^{(\ell)}_k|^2$ wird $\vect{Q}$ so lange korrigiert, bis die
-Spannungsbeträge ihre Sollwerte erreichen. Da der innere TPF pro äußerer
-Iteration exakt gelöst wird, bestimmt allein dieses Residuum die Konvergenz, 
-die Sensitivität $\vect{X}^{(\ell)}_{pp}$ (bzw. ihre Diagonale) liefert nur die
-Suchrichtung, nicht die Genauigkeit des Fixpunkts. Formal konvergiert die
-Schleife, wenn der Spektralradius der äußeren Iterationsabbildung $\rho < 1$
-bleibt, was nachfolgend numerisch berücksichtigt wird.
+%\paragraph{Konvergenz der äußeren Schleife:}
+%Die äußere Q-Schleife ist selbst eine Fixpunktiteration: Ausgehend vom Residuum
+%$|V^{\spec}_k|^2 - |v^{(\ell)}_k|^2$ wird $\vect{Q}$ so lange korrigiert, bis die
+%Spannungsbeträge ihre Sollwerte erreichen. Da der innere TPF pro äußerer
+%Iteration exakt gelöst wird, bestimmt allein dieses Residuum die Konvergenz, 
+%die Sensitivität $\vect{X}^{(\ell)}_{pp}$ (bzw. ihre Diagonale) liefert nur die
+%Suchrichtung, nicht die Genauigkeit des Fixpunkts. Formal konvergiert die
+%Schleife, wenn der Spektralradius der äußeren Iterationsabbildung $\rho < 1$
+%bleibt, was nachfolgend numerisch berücksichtigt wird.
 
 
 %\paragraph{Zusammenfassung der Konvergenzbedingungen: }
@@ -1373,77 +1666,77 @@ bleibt, was nachfolgend numerisch berücksichtigt wird.
 
 
 
-
-\subsection{Herleitung der Q-Korrekturformel}
-\label{subsec:methode_a_herleitung}
-
-Für die Q-Korrektur in Schritt~5 wird eine Beziehung zwischen $\Delta Q_k$ und dem
-Spannungsmismatch $\Delta|V_k|^2$ benötigt. Sie folgt unmittelbar aus der bereits
-aufgestellten Netzgleichung, ohne dass ein zusätzliches Ersatzschaltbild postuliert
-werden muss.
-
-%----------------------------------------------------------------------
-Ausgangspunkt ist die Fixpunktform \eqref{eq:fpi_dense}, die sich mit der
-Bus-Impedanzmatrix $\vect{Z}^{(\ell)}_B = (\vect{B}^{(\ell)})^{-1}$ als
-\begin{equation}
-	\vect{v} \;=\; \vect{Z}^{(\ell)}_B\,\vect{i} \;+\; \vect{w},
-	\qquad
-	i_k \;=\; \frac{s_k^*}{v_k^*},
-	\label{eq:netzgleichung_zb}
-\end{equation}
-schreiben lässt. Diese Beziehung ist in den Strominjektionen $\vect{i}$ exakt und
-linear; die gesamte Nichtlinearität des Lastflussproblems steckt allein in der
-Abhängigkeit $i_k(v_k)$. Spaltet man Zeile~$k$ in den Eigen- und den Fremdanteil auf,
-\begin{equation}
-	v_k \;=\; \underbrace{w_k + \sum_{j\neq k} Z^{(\ell)}_{B,kj}\,i_j}_{E_{th,k}}
-	\;+\; \underbrace{Z^{(\ell)}_{B,kk}}_{Z_{th,k}}\;i_k,
-	\label{eq:thevenin_identifikation}
-\end{equation}
-so ist das Thévenin-Äquivalent am Knoten~$k$ unmittelbar identifiziert: Die
-Leerlaufspannung $E_{th,k}$ ist die Überlagerung von Slack-Einspeisung und allen
-übrigen Knotenströmen, die Thévenin-Impedanz ist das Diagonalelement
-\begin{equation}
-	Z^{(\ell)}_{B,kk} \;=\; \bigl[(\vect{B}^{(\ell)})^{-1}\bigr]_{kk}
-	\;=\; R^{(\ell)}_{kk} + \jj\,X^{(\ell)}_{kk}.
-	\label{eq:diagonalelement}
-\end{equation}
-Ein Ersatzschaltbild muss somit nicht als Modellannahme eingeführt werden; es ist
-eine Umschreibung von~\eqref{eq:netzgleichung_zb}. Insbesondere braucht $E_{th,k}$
-nie explizit berechnet zu werden, da es in der folgenden Differenzenbildung entfällt.
-
-%----------------------------------------------------------------------
-Da $\vect{Z}^{(\ell)}_B$ und $\vect{w}$ im konstanten Lastfall nach
-\cref{subsec:konsequenz_analyse} unabhängig von $\vect{Q}$ sind, folgt aus
-\eqref{eq:netzgleichung_zb} für eine Störung der Strominjektionen exakt
-\begin{equation}
-	\Delta\vect{v} \;=\; \vect{Z}^{(\ell)}_B\,\Delta\vect{i}.
-	\label{eq:delta_v_exakt}
-\end{equation}
-Zwei Näherungen führen von hier zur Korrekturformel. Erstens wird die
-Strominjektion am PV-Knoten um den aktuellen Arbeitspunkt $v^{(\ell)}_k$
-linearisiert; mit $s_k = P_k + \jj Q_k$ in Erzeugerkonvention und festgehaltenem
-$P_k$ gilt
-\begin{equation}
-	\Delta i_k \;\approx\; \frac{-\jj\,\Delta Q_k}{(v^{(\ell)}_k)^*}.
-	\label{eq:strom_linear}
-\end{equation}
-Zweitens wird die Rückwirkung auf die übrigen Knoten vernachlässigt
-($\Delta i_j = 0$ für $j \neq k$), obwohl sich bei konstanter Leistung auch die
-Lastströme mit den Spannungen ändern. Beide Näherungen betreffen ausschließlich die
-Schrittweite der äußeren Korrektur, nicht deren Fixpunkt: Das Abbruchkriterium
-bewertet die Spannungsbeträge der exakten TPF-Lösung, sodass ein Fehler in der
-Sensitivität lediglich die Konvergenzgeschwindigkeit beeinflusst.
-
-Einsetzen von~\eqref{eq:strom_linear} in~\eqref{eq:delta_v_exakt} liefert
-\begin{equation}
-	\Delta v_k \;=\; -\jj\,Z^{(\ell)}_{B,kk}\,\frac{\Delta Q_k}{(v^{(\ell)}_k)^*}.
-	\label{eq:spannung_skalar}
-\end{equation}
-Mit $-\jj\,(R^{(\ell)}_{kk} + \jj X^{(\ell)}_{kk}) = X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}$
-und $(v^{(\ell)}_k)^{*-1} = e^{\jj\theta_k}/|v^{(\ell)}_k|$ ergibt die
-Ausmultiplikation
-\begin{equation}
-	\Delta v_k \;=\; \frac{\Delta Q_k}{|v^{(\ell)}_k|}
-	\bigl(X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}\bigr)\,e^{\jj\theta_k}.
-	\label{eq:spannung_ausmult}
-\end{equation}
+%
+%\subsection{Herleitung der Q-Korrekturformel}
+%\label{subsec:methode_a_herleitung}
+%
+%Für die Q-Korrektur in Schritt~5 wird eine Beziehung zwischen $\Delta Q_k$ und dem
+%Spannungsmismatch $\Delta|V_k|^2$ benötigt. Sie folgt unmittelbar aus der bereits
+%aufgestellten Netzgleichung, ohne dass ein zusätzliches Ersatzschaltbild postuliert
+%werden muss.
+%
+%%----------------------------------------------------------------------
+%Ausgangspunkt ist die Fixpunktform \eqref{eq:fpi_dense}, die sich mit der
+%Bus-Impedanzmatrix $\vect{Z}^{(\ell)}_B = (\vect{B}^{(\ell)})^{-1}$ als
+%\begin{equation}
+%	\vect{v} \;=\; \vect{Z}^{(\ell)}_B\,\vect{i} \;+\; \vect{w},
+%	\qquad
+%	i_k \;=\; \frac{s_k^*}{v_k^*},
+%	\label{eq:netzgleichung_zb}
+%\end{equation}
+%schreiben lässt. Diese Beziehung ist in den Strominjektionen $\vect{i}$ exakt und
+%linear; die gesamte Nichtlinearität des Lastflussproblems steckt allein in der
+%Abhängigkeit $i_k(v_k)$. Spaltet man Zeile~$k$ in den Eigen- und den Fremdanteil auf,
+%\begin{equation}
+%	v_k \;=\; \underbrace{w_k + \sum_{j\neq k} Z^{(\ell)}_{B,kj}\,i_j}_{E_{th,k}}
+%	\;+\; \underbrace{Z^{(\ell)}_{B,kk}}_{Z_{th,k}}\;i_k,
+%	\label{eq:thevenin_identifikation}
+%\end{equation}
+%so ist das Thévenin-Äquivalent am Knoten~$k$ unmittelbar identifiziert: Die
+%Leerlaufspannung $E_{th,k}$ ist die Überlagerung von Slack-Einspeisung und allen
+%übrigen Knotenströmen, die Thévenin-Impedanz ist das Diagonalelement
+%\begin{equation}
+%	Z^{(\ell)}_{B,kk} \;=\; \bigl[(\vect{B}^{(\ell)})^{-1}\bigr]_{kk}
+%	\;=\; R^{(\ell)}_{kk} + \jj\,X^{(\ell)}_{kk}.
+%	\label{eq:diagonalelement}
+%\end{equation}
+%Ein Ersatzschaltbild muss somit nicht als Modellannahme eingeführt werden; es ist
+%eine Umschreibung von~\eqref{eq:netzgleichung_zb}. Insbesondere braucht $E_{th,k}$
+%nie explizit berechnet zu werden, da es in der folgenden Differenzenbildung entfällt.
+%
+%%----------------------------------------------------------------------
+%Da $\vect{Z}^{(\ell)}_B$ und $\vect{w}$ im konstanten Lastfall nach
+%\cref{subsec:konsequenz_analyse} unabhängig von $\vect{Q}$ sind, folgt aus
+%\eqref{eq:netzgleichung_zb} für eine Störung der Strominjektionen exakt
+%\begin{equation}
+%	\Delta\vect{v} \;=\; \vect{Z}^{(\ell)}_B\,\Delta\vect{i}.
+%	\label{eq:delta_v_exakt}
+%\end{equation}
+%Zwei Näherungen führen von hier zur Korrekturformel. Erstens wird die
+%Strominjektion am PV-Knoten um den aktuellen Arbeitspunkt $v^{(\ell)}_k$
+%linearisiert; mit $s_k = P_k + \jj Q_k$ in Erzeugerkonvention und festgehaltenem
+%$P_k$ gilt
+%\begin{equation}
+%	\Delta i_k \;\approx\; \frac{-\jj\,\Delta Q_k}{(v^{(\ell)}_k)^*}.
+%	\label{eq:strom_linear}
+%\end{equation}
+%Zweitens wird die Rückwirkung auf die übrigen Knoten vernachlässigt
+%($\Delta i_j = 0$ für $j \neq k$), obwohl sich bei konstanter Leistung auch die
+%Lastströme mit den Spannungen ändern. Beide Näherungen betreffen ausschließlich die
+%Schrittweite der äußeren Korrektur, nicht deren Fixpunkt: Das Abbruchkriterium
+%bewertet die Spannungsbeträge der exakten TPF-Lösung, sodass ein Fehler in der
+%Sensitivität lediglich die Konvergenzgeschwindigkeit beeinflusst.
+%
+%Einsetzen von~\eqref{eq:strom_linear} in~\eqref{eq:delta_v_exakt} liefert
+%\begin{equation}
+%	\Delta v_k \;=\; -\jj\,Z^{(\ell)}_{B,kk}\,\frac{\Delta Q_k}{(v^{(\ell)}_k)^*}.
+%	\label{eq:spannung_skalar}
+%\end{equation}
+%Mit $-\jj\,(R^{(\ell)}_{kk} + \jj X^{(\ell)}_{kk}) = X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}$
+%und $(v^{(\ell)}_k)^{*-1} = e^{\jj\theta_k}/|v^{(\ell)}_k|$ ergibt die
+%Ausmultiplikation
+%\begin{equation}
+%	\Delta v_k \;=\; \frac{\Delta Q_k}{|v^{(\ell)}_k|}
+%	\bigl(X^{(\ell)}_{kk} - \jj R^{(\ell)}_{kk}\bigr)\,e^{\jj\theta_k}.
+%	\label{eq:spannung_ausmult}
+%\end{equation}

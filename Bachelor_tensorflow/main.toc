@@ -29,10 +29,9 @@
 \contentsline {section}{\numberline {4.1}Analyse der Auswirkung von PV-Knoten auf die FPI-Struktur}{19}{section.4.1}%
 \contentsline {section}{\numberline {4.2}Methode der Äußeren Q-Schleife}{20}{section.4.2}%
 \contentsline {subsection}{\numberline {4.2.1}Herleitung der Q-Korrekturformel}{21}{subsection.4.2.1}%
-\contentsline {paragraph}{Berücksichtigung der Kopplung zwischen den PV-Knoten: }{22}{section*.29}%
-\contentsline {paragraph}{Konvergenz der äußeren Schleife:}{23}{section*.30}%
-\contentsline {subsection}{\numberline {4.2.2}Algorithmus}{24}{subsection.4.2.2}%
-\contentsline {subsection}{\numberline {4.2.3}Herleitung der Q-Korrekturformel}{24}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.2}Berücksichtigung der PV-PV-Kopplung}{23}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Tensorformulierung der äußeren Blindleistungskorrektur}{24}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Algorithmus}{26}{subsection.4.2.4}%
 \contentsline {chapter}{\numberline {5}Implementierung}{27}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Softwarearchitektur der \texttt {tpf}-Bibliothek}{27}{section.5.1}%
 \contentsline {subsection}{\numberline {5.1.1}Modulübersicht}{27}{subsection.5.1.1}%
@@ -54,14 +53,14 @@
 \contentsline {subsection}{\numberline {6.3.1}Versuchsaufbau: Trennung von Impedanzbetrag und Impedanzwinkel}{44}{subsection.6.3.1}%
 \contentsline {subsection}{\numberline {6.3.2}Innere Fixpunktiteration}{46}{subsection.6.3.2}%
 \contentsline {subsection}{\numberline {6.3.3}Äußere Blindleistungskorrektur}{49}{subsection.6.3.3}%
-\contentsline {paragraph}{Der Faktor $\sqrt {1+\rho ^{2}}$ ist keine Eigenschaft des Sweep-Modus.}{49}{section*.55}%
-\contentsline {paragraph}{Die Struktur des PV--PV-Blocks bleibt unverändert.}{49}{section*.56}%
-\contentsline {paragraph}{Beobachtung: Plateau, Anstieg, Abbruch.}{50}{section*.58}%
-\contentsline {paragraph}{Ursache: Verlust der Linearisierung.}{50}{section*.61}%
-\contentsline {paragraph}{Zwei Versagensmechanismen.}{52}{section*.62}%
-\contentsline {paragraph}{Gegenprobe im Modus \texttt {const\_x}.}{53}{section*.63}%
-\contentsline {paragraph}{Aufwand pro Iteration und Vergleich mit der entkoppelten Näherung.}{53}{section*.64}%
-\contentsline {paragraph}{Abgrenzung von Verfahrens- und Lösbarkeitsgrenze.}{54}{section*.65}%
+\contentsline {paragraph}{Der Faktor $\sqrt {1+\rho ^{2}}$ ist keine Eigenschaft des Sweep-Modus.}{49}{section*.53}%
+\contentsline {paragraph}{Die Struktur des PV--PV-Blocks bleibt unverändert.}{49}{section*.54}%
+\contentsline {paragraph}{Beobachtung: Plateau, Anstieg, Abbruch.}{50}{section*.56}%
+\contentsline {paragraph}{Ursache: Verlust der Linearisierung.}{50}{section*.59}%
+\contentsline {paragraph}{Zwei Versagensmechanismen.}{52}{section*.60}%
+\contentsline {paragraph}{Gegenprobe im Modus \texttt {const\_x}.}{53}{section*.61}%
+\contentsline {paragraph}{Aufwand pro Iteration und Vergleich mit der entkoppelten Näherung.}{53}{section*.62}%
+\contentsline {paragraph}{Abgrenzung von Verfahrens- und Lösbarkeitsgrenze.}{54}{section*.63}%
 \contentsline {subsection}{\numberline {6.3.4}Zwischenfazit und Einordnung}{54}{subsection.6.3.4}%
 \contentsline {section}{\numberline {6.4}Einfluss des Lastfaktors}{55}{section.6.4}%
 \contentsline {subsection}{\numberline {6.4.1}Versuchsaufbau und Normierung}{56}{subsection.6.4.1}%
@@ -75,7 +74,7 @@
 \contentsline {section}{\numberline {6.6}Mehrere Lastflüsse}{64}{section.6.6}%
 \contentsline {subsection}{\numberline {6.6.1}Versuchsaufbau und Datenbasis}{65}{subsection.6.6.1}%
 \contentsline {subsection}{\numberline {6.6.2}Amortisation der Vorberechnung und Break-even}{65}{subsection.6.6.2}%
-\contentsline {paragraph}{Rolle des PV-Anteils.}{67}{section*.78}%
+\contentsline {paragraph}{Rolle des PV-Anteils.}{67}{section*.76}%
 \contentsline {subsection}{\numberline {6.6.3}Genauigkeit und Robustheit}{68}{subsection.6.6.3}%
 \contentsline {subsection}{\numberline {6.6.4}Zwischenfazit}{68}{subsection.6.6.4}%
-\contentsline {chapter}{Literaturverzeichnis}{72}{chapter*.81}%
+\contentsline {chapter}{Literaturverzeichnis}{72}{chapter*.79}%
