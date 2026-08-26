@@ -16,11 +16,12 @@
 \contentsline {todo}{literatur.}{7}{section*.24}%
 \contentsline {todo}{literatur.}{8}{section*.25}%
 \contentsline {todo}{hier weiter}{16}{section*.27}%
-\contentsline {todo}{-inner loop komplett konvergieren lassen vs adaptiv anzahl an inneren iteration bis zu nächsten äußeren schleife begrenzen -sägezahn charakter kann reduziert werden ein}{38}{section*.38}%
-\contentsline {todo}{-basierend auf den zuvor getroffenen optimierungen -frag: bei welchen größen ist das fixpunktverfahren schneller als pandapower? -variation von netzgröße und pv anteil -boxplot rechenzeit vs. netzgröße eine box hat mehrere netze gelicher größe aber mit verschiedenen pv anteilen. begründet durch die zuvor ermittelte pv unabhängigkeit. -im plot: linearer anstieg der tfp rechenzeit, nr const auf ca 20 ms -boxen im tpf breiter als bei nr -}{41}{section*.41}%
-\contentsline {todo}{literatur}{42}{section*.43}%
+\contentsline {todo}{rew till here}{33}{section*.33}%
+\contentsline {todo}{-inner loop komplett konvergieren lassen vs adaptiv anzahl an inneren iteration bis zu nächsten äußeren schleife begrenzen -sägezahn charakter kann reduziert werden ein}{38}{section*.39}%
+\contentsline {todo}{-basierend auf den zuvor getroffenen optimierungen -frag: bei welchen größen ist das fixpunktverfahren schneller als pandapower? -variation von netzgröße und pv anteil -boxplot rechenzeit vs. netzgröße eine box hat mehrere netze gelicher größe aber mit verschiedenen pv anteilen. begründet durch die zuvor ermittelte pv unabhängigkeit. -im plot: linearer anstieg der tfp rechenzeit, nr const auf ca 20 ms -boxen im tpf breiter als bei nr -}{41}{section*.42}%
 \contentsline {todo}{literatur}{42}{section*.44}%
 \contentsline {todo}{literatur}{42}{section*.45}%
-\contentsline {todo}{fail cases mal anschauen ob sie sinnvoll}{43}{section*.46}%
-\contentsline {todo}{literatur}{43}{section*.47}%
-\contentsline {todo}{-aufbauend auf dem vorherigen kapitel bei netzen die bei NR nicht konvergieren -}{43}{section*.48}%
+\contentsline {todo}{literatur}{42}{section*.46}%
+\contentsline {todo}{fail cases mal anschauen ob sie sinnvoll}{43}{section*.47}%
+\contentsline {todo}{literatur}{43}{section*.48}%
+\contentsline {todo}{-aufbauend auf dem vorherigen kapitel bei netzen die bei NR nicht konvergieren -}{43}{section*.49}%

@@ -6,39 +6,44 @@
 \label{sec:Optimierung der Methode A}
 
 
-Die in Abschnitt~\ref{subsec:methode_a_herleitung} hergeleitete Methode~A besteht
-aus zwei verschachtelten Schleifen: einer inneren Fixpunktiteration, die den
-Lastfluss bei gegebener Blindleistungseinspeisung löst, und einer äußeren
-Schleife, die diese Einspeisung so korrigiert, dass die Spannungsvorgaben der
-PV-Knoten eingehalten werden. Diese Struktur eröffnet drei voneinander
-unabhängige Ansatzpunkte zur Optimierung: die Genauigkeit der
-Sensitivitätsbeziehung, mit der die äußere Korrektur bestimmt wird, die
-Initialisierung der inneren Schleife und deren Abbruchkriterium.\\
+In \cref{subsec:methode_a_herleitung} wurde eine Methode entwickelt, welche PV-Knoten eines Stromnetzes in einer Fixpunkt-Iteration unterstützt.
+Dabei ist die Besonderheit, dass der FPI und somit der TPF keine native möglichkeit haben, solche Knoten zu berücksichtigen.
+Die vorgestellte Methode besteht dabei aus einer äußeren Schleife, welche mittels des Spannungsbetragsresiduums eine Blindleistungskorrektur generiert.
+Während der Implementierung und Erprobung dieser Methode konnten bereits mehrere grundlegende Optimierungen des Algorithmus identifiziert werden.
+Die drei Ansätze umfassen demnach eine Verbesserung der Sensitivitätsgleichung, eine sauberere Verarbeitung gewonnener Daten zu einer optimierten Inititialisierung und einer dynamischen Abbruchbedingung.\\
 
-Zunächst wird in
-Abschnitt~\ref{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität}
-gezeigt, dass die entkoppelte Theveninnäherung nur begrenzt zu Konvergenz führt und durch die vollständige Berücksichtigung der
-PV-PV-Kopplung ersetzt werden muss. Diese Maßnahme betrifft die Robustheit des
-Verfahrens und ist Voraussetzung für alle weiteren Untersuchungen. Anschließend
-werden in den Abschnitten~\ref{subsec:ergebnisse_warmstart}
-und~\ref{subsec:ergebnisse_adaptiv} zwei rein rechenzeitbezogene Maßnahmen
-betrachtet: die Übernahme des Spannungszustands zwischen den äußeren Iterationen
-(Warm Start) und die Kopplung der inneren Abbruchtoleranz an das äußere
-Residuum.\\
+Was bereits in \cref{ch:methoden_pv} eingeführt wurde, ist eine gekoppelte Formulierung der Korrekturformel \eqref{eq:sensitivity_skalar}. 
+Um diese soll es in \cref{subsec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität} handeln. 
+Dabei hat die Implementierung gezeigt, dass die entkoppelte Thévenin-Näherung nicht ausreicht um effektiv die PV-Busse zu beachten, ohne einen Konvergenzverlust zu erleiden. 
+Die Ursache wird in diesem Abschnitt untersucht und das Verhalten der entkoppelten Sensitivität charakterisiert.\\
 
-Als Bewertungsmaßstab dienen die Anzahl der äußeren Iterationen, die
-Gesamtzahl der inneren Fixpunktschritte. Die Untersuchungen erfolgen exemplarisch zur Visualisierung an einem radialen
-40-Knoten-Netz und werden anschließend über den in
-Abschnitt~\ref{sec:testnetze} eingeführten Skalierungsdatensatz auf Netzgrößen
-bis $1000$ Knoten und PV-Anteile bis $60\,\%$ übertragen, um die
-Verallgemeinerbarkeit der Ergebnisse zu prüfen. Die als vorteilhaft
-identifizierten Einstellungen werden jeweils für die folgenden Untersuchungen
-übernommen.
+Die zwei weiteren Optimierungen haben ihren Fokus auf der Reduktion der Iterationenanzahl.
+Dafür werden in Abschnitten~\ref{subsec:ergebnisse_warmstart} und~\ref{subsec:ergebnisse_adaptiv} die Initialisierung der inneren Schleife, durch Übernahme vergangener Konvergenzwerte, untersucht und die Konvergenzgrenze dynamisch festgelegt.\\
 
 
+
+%Die in Abschnitt~\ref{subsec:methode_a_herleitung} hergeleitete Methode~A besteht
+%aus zwei verschachtelten Schleifen: einer inneren Fixpunktiteration, die den
+%Lastfluss bei gegebener Blindleistungseinspeisung löst, und einer äußeren
+%Schleife, die diese Einspeisung so korrigiert, dass die Spannungsvorgaben der
+%PV-Knoten eingehalten werden. Diese Struktur eröffnet drei voneinander
+%unabhängige Ansatzpunkte zur Optimierung: die Genauigkeit der
+%Sensitivitätsbeziehung, mit der die äußere Korrektur bestimmt wird, die
+%Initialisierung der inneren Schleife und deren Abbruchkriterium.\\
+
+%Zunächst wird in Abschnitt~\ref{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität}gezeigt, dass die entkoppelte Theveninnäherung nur begrenzt zu Konvergenz führt und durch die vollständige Berücksichtigung der
+%PV-PV-Kopplung ersetzt werden muss. 
+%Diese Maßnahme betrifft die Robustheit des Verfahrens und ist Voraussetzung für alle weiteren Untersuchungen. 
+%Anschließend werden in den Abschnitten~\ref{subsec:ergebnisse_warmstart} und~\ref{subsec:ergebnisse_adaptiv} zwei rein rechenzeitbezogene Maßnahmen betrachtet: die Übernahme des Spannungszustands zwischen den äußeren Iterationen
+%(Warm Start) und die Kopplung der inneren Abbruchtoleranz an das äußere Residuum.\\
+
+Als Bewertungsmaßstab dienen die Anzahl der äußeren und die Gesamtzahl an inneren Iterationen. 
+Die Simulationen erfolgen zur Visualisierung an einem radialen 40-Knoten-Netz und werden anschließend über den in Abschnitt~\ref{sec:testnetze} eingeführten Netzgrößenbereich auf bis $1000$ Knoten erweitert.
+
+\todo{rew till here}
 
 \subsection{Entkoppelte vs. gekoppelte Sensitivität}
-\label{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität}
+\label{subsec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität}
 
 Die in Abschnitt~\ref{subsec:methode_a_herleitung} eingeführte Q-Korrektur von
 Methode~A wurde zunächst als entkoppelte Theveninnäherung eingeführt und verwendet bloß die Diagonalelemente $2X^{(\ell)}_{kk}$ Gl.~\eqref{eq:methode_a_dQ_scalar} der Reaktanz.
