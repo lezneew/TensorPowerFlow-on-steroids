@@ -34,6 +34,8 @@ from convergence_analysis import (
     compute_empirical_contraction,
 )
 from validate_pv_method_a_comprehensive import run_validation_suite
+from plot_network_topology import generate_radial_coordinates
+from matplotlib.lines import Line2D
 
 
 def plot_baseline_tpf_vs_nr(save_name="baseline_tpf_vs_nr.pgf"):
@@ -246,7 +248,7 @@ def plot_outer_convergence_error_decoupled(
 
     # ax.axhline(y=1e-6, color="gray", linestyle="--", linewidth=1.0, alpha=0.7, label=r"$10^{-6}$ tolerance")
     ax.set_xlabel("Äußere Iteration", fontsize=12)
-    ax.set_ylabel(r"$\max(|V_{PV}| - V^{spec})$ [p.u.]", fontsize=12)
+    ax.set_ylabel(r"$\max(|V_{\mathrm{PV}}| - V^{\mathrm{spec}})$ [p.u.]", fontsize=12)
     # ax.set_title("Outer Convergence: Decoupled Q-Update\n" + r"$\Delta Q_k = \frac{|V^{spec}_k|^2 - |v_k|^2}{2 \cdot X_{kk}}$", fontsize=13)
     ax.legend(fontsize=10, loc="center right")
     ax.grid(True, which="both", alpha=0.3)
@@ -255,6 +257,109 @@ def plot_outer_convergence_error_decoupled(
 
 
     plt.tight_layout()
+
+    save_path = SAVE_DIR / save_name
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    print(f"\n  Plot saved: {save_path}")
+
+    if not USE_PGF:
+        plt.show()
+    plt.close(fig)
+
+
+def plot_radial_networks_for_convergence(
+    network_names: list = None,
+    save_name: str = "radial_networks_convergence.pgf"
+):
+    """
+    Plot radial network topologies for the networks used in outer_convergence_decoupled.
+    Shows both networks side-by-side with bus types highlighted.
+
+    Parameters
+    ----------
+    network_names : list
+        List of network names to test. Default: ["sz_40_r010", "sz_40_r020"]
+    save_name : str
+        Output filename
+    """
+    if network_names is None:
+        network_names = ["sz_40_r010", "sz_40_r020"]
+
+    networks = get_salazar_scaling_networks()
+    fig, axes = plt.subplots(1, 2, figsize=(5.91, 2.5))
+
+    for idx, name in enumerate(network_names):
+        print(f"  Processing topology: {name}...")
+        info = networks[name]
+        net = info["constructor"]()
+
+        ax = axes[idx]
+        n_bus = len(net.bus)
+
+        if 'x' in net.bus.columns and 'y' in net.bus.columns:
+            x = net.bus['x'].values
+            y = net.bus['y'].values
+        else:
+            x, y = generate_radial_coordinates(net)
+
+        y_min, y_max = y.min(), y.max()
+        y_center = (y_min + y_max) / 2
+        y = y - y_center
+
+        ppc = net._ppc
+        bus_types = ppc["bus"][:, 1].astype(int)
+        pv_indices = set(np.where(bus_types == 2)[0])
+        slack_indices = set(np.where(bus_types == 3)[0])
+
+        for line_idx in net.line.index:
+            from_bus = int(net.line.at[line_idx, 'from_bus'])
+            to_bus = int(net.line.at[line_idx, 'to_bus'])
+            ax.plot([x[from_bus], x[to_bus]], [y[from_bus], y[to_bus]],
+                   'gray', linewidth=.5, alpha=0.7, zorder=1)
+
+        plotted_labels = {'slack': False, 'pv': False, 'pq': False}
+        for i in range(n_bus):
+            if i in slack_indices:
+                marker = 's'
+                color = 'green'
+                size = 12
+                label = 'Slack' if not plotted_labels['slack'] else None
+                plotted_labels['slack'] = True
+            elif i in pv_indices:
+                marker = 'v'
+                color = 'darkred'
+                size = 20
+                label = 'PV' if not plotted_labels['pv'] else None
+                plotted_labels['pv'] = True
+            else:
+                marker = 'o'
+                color = 'black'
+                size = 8
+                label = 'PQ' if not plotted_labels['pq'] else None
+                plotted_labels['pq'] = True
+
+            ax.scatter(x[i], y[i], c=color, s=size, marker=marker, linewidths=1.5,
+                      zorder=5, label=label)
+
+        n_pv = len(pv_indices)
+        ax.set_title(f"$n_{{\\mathrm{{PV}}}}={n_pv}$", fontsize=12)
+        # ax.set_aspect('equal')
+        ax.axis('off')
+
+    handles = [
+        Line2D([0], [0], marker='s', color='w', markerfacecolor='green',
+              markersize=12, label='Slack'),
+        Line2D([0], [0], marker='v', color='w', markerfacecolor='darkred',
+              markersize=10, label='PV'),
+        Line2D([0], [0], marker='o', color='w', markerfacecolor='black',
+              markersize=8, label='PQ'),
+    ]
+    fig.legend(handles=handles, loc='lower center', ncol=3, fontsize=10,
+              bbox_to_anchor=(0.5, -0.02))
+
+    plt.tight_layout()
+    fig.subplots_adjust(bottom=0.18)
 
     save_path = SAVE_DIR / save_name
     SAVE_DIR.mkdir(parents=True, exist_ok=True)
@@ -377,51 +482,64 @@ def print_salazar_scaling_table():
     print(r"\end{table}")
 
 
-def plot_max_pv_convergence(save_name="max_pv_convergence.pgf"):
-    """Plot max PV nodes that converge vs network size."""
+def plot_max_pv_convergence(save_name="max_pv_convergence_1.pgf"):
+    """Plot max PV nodes that converge vs network size with error bars over 10 random networks per size."""
     from tpf.generators.network_generator_salazar import create_salazar_network
 
     network_sizes = [20, 40, 75, 120, 200, 350, 500, 750, 1000]
     max_pv_limit = 50
-    seed = 42
+    base_seed = 42
+    n_variants = 10
 
     sizes_plot = []
-    max_pv_converged = []
+    mean_pv_converged = []
+    std_pv_converged = []
 
     for n_bus in network_sizes:
         print(f"  Testing n_bus={n_bus}...")
-        max_conv = 0
+        converged_counts = []
 
-        for n_pv in range(1, max_pv_limit + 1):
-            try:
-                net_pp = create_salazar_network(nodes=n_bus, n_pv=n_pv, seed=seed)
-                network = build_network_from_pandapower(net_pp, include_pv=True)
+        for variant in range(n_variants):
+            seed = base_seed + variant
+            max_conv = 0
 
-                solver = TPFDensePVMethodA(
-                    tol=1e-8, max_iter_inner=100, max_iter_outer=100,
-                    tol_pv=1e-6, omega=1.0, use_decoupled=True
-                )
-                result = solver.solve(network)
+            for n_pv in range(1, max_pv_limit + 1):
+                try:
+                    net_pp = create_salazar_network(nodes=n_bus, n_pv=n_pv, seed=seed, pv_placement="random")
+                    network = build_network_from_pandapower(net_pp, include_pv=True)
 
-                if result.converged:
-                    max_conv = n_pv
-                else:
+                    solver = TPFDensePVMethodA(
+                        tol=1e-8, max_iter_inner=100, max_iter_outer=100,
+                        tol_pv=1e-6, omega=1.0, use_decoupled=True
+                    )
+                    result = solver.solve(network)
+
+                    if result.converged:
+                        max_conv = n_pv
+                    else:
+                        break
+                except Exception as e:
                     break
-            except Exception as e:
-                print(f"    Warning at n_pv={n_pv}: {e}")
-                break
+
+            converged_counts.append(max_conv)
 
         sizes_plot.append(n_bus)
-        max_pv_converged.append(max_conv)
-        print(f"    max converged: {max_conv}")
+        mean_pv = np.mean(converged_counts)
+        std_pv = np.std(converged_counts)
+        mean_pv_converged.append(mean_pv)
+        std_pv_converged.append(std_pv)
+        print(f"    mean: {mean_pv:.1f} ± {std_pv:.1f}")
 
     fig, ax = plt.subplots(figsize=(5.91, 3))
-    ax.loglog(sizes_plot, max_pv_converged, "o-", color="darkblue", linewidth=2, markersize=8)
-    ax.set_xlabel("$n_{{\mathrm{{bus}}}}$", fontsize=12)
-    ax.set_ylabel("Max $n_{{\mathrm{{PV}}}}$ konvergiert", fontsize=12)
+    ax.errorbar(sizes_plot, mean_pv_converged, yerr=std_pv_converged,
+                fmt="o-", color="darkblue", linewidth=1, markersize=4,
+                capsize=4, capthick=1.5, alpha=0.8)
+    ax.set_xlabel("$n_{\mathrm{bus}}$", fontsize=12)
+    ax.set_ylabel("Max $n_{\mathrm{PV}}$ konvergiert", fontsize=12)
     ax.grid(True, which="both", alpha=0.3)
-    # ax.set_xscale("log")
     ax.set_ylim(1, 1000)
+    ax.set_xscale('log')
+    ax.set_yscale('log')
     plt.tight_layout()
     save_path = SAVE_DIR / save_name
     SAVE_DIR.mkdir(parents=True, exist_ok=True)
@@ -1625,7 +1743,7 @@ def plot_subplot_c_from_csv(save_name="timing_vs_size_from_csv.pgf"):
 
 if __name__ == "__main__":
     # print_salazar_scaling_table()
-    # plot_max_pv_convergence()
+    plot_max_pv_convergence()
     # print_x_pp_matrices()
     # plot_outer_convergence_error_coupled()
     # plot_inner_start_comparison()
@@ -1635,5 +1753,7 @@ if __name__ == "__main__":
     # plot_pq_scaling_time()
     # plot_baseline_tpf_vs_nr()
     # plot_timing_vs_size()
-    plot_subplot_c_from_csv()
+    # plot_subplot_c_from_csv()
     # plot_timing_vs_pv_ratio()
+    # plot_radial_networks_for_convergence()
+    # plot_outer_convergence_error_decoupled()

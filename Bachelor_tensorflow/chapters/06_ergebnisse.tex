@@ -3,7 +3,7 @@
 \label{ch:ergebnisse}
 %======================================================================
 \section{Optimierung der Methode A}
-\label{sec:Optimierung der Methode A}
+\label{sec:Optimierung der Methode}
 
 
 In \cref{subsec:methode_a_herleitung} wurde eine Methode entwickelt, welche PV-Knoten eines Stromnetzes in einer Fixpunkt-Iteration unterstützt.
@@ -40,17 +40,40 @@ Dafür werden in Abschnitten~\ref{subsec:ergebnisse_warmstart} und~\ref{subsec:e
 Als Bewertungsmaßstab dienen die Anzahl der äußeren und die Gesamtzahl an inneren Iterationen. 
 Die Simulationen erfolgen zur Visualisierung an einem radialen 40-Knoten-Netz und werden anschließend über den in Abschnitt~\ref{sec:testnetze} eingeführten Netzgrößenbereich auf bis $1000$ Knoten erweitert.
 
-\todo{rew till here}
 
 \subsection{Entkoppelte vs. gekoppelte Sensitivität}
 \label{subsec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität}
 
-Die in Abschnitt~\ref{subsec:methode_a_herleitung} eingeführte Q-Korrektur von
-Methode~A wurde zunächst als entkoppelte Theveninnäherung eingeführt und verwendet bloß die Diagonalelemente $2X^{(\ell)}_{kk}$ Gl.~\eqref{eq:methode_a_dQ_scalar} der Reaktanz.
-Diese Vereinfachung vernachlässigt
-jedoch die Kopplung zwischen den PV-Knoten, die in den Nebendiagonalelementen
-$X^{(\ell)}_{pp,kj}$ ($k\neq j$) kodiert ist. In diesem Abschnitt wird
-untersucht, wie sich diese fehlende Kopplung auf das Konvergenzverhalten auswirkt.
+Zunächst wird die entkoppelte und gekoppelte Thévenin-Näherung, welche in \cref{subsec:methode_a_herleitung}, näher betrachtet. 
+Dort wurde gezeigt dass die Korrekturformel, nur anhand der Diagonalelemente der Reaktanzmatrix als Sensitivität, die Schrittweite bestimmt.
+Die Kopplungen der verschiedenen PV-Knoten untereinander wurde dahingehend vernachlässigt.
+Diese Beziehungen sind in den Nebendiagonalelementen der Matrix kodiert. \\
+
+Exemplarisch wird die Analyse an einem kleineren, radialen 40-Knoten-Netz zur Verdeutlichung des Effekts durchgeführt.
+Dabei werden zwei Konfigurationen simuliert: einmal hat das Netz 4 PV-Knoten, danach 8 PV-Knoten, bei sonst identischer Netztopologie und Parametrierung.
+Die Struktur der Konfigurationen sind in Abbildung \ref{fig:radial_networks_convergence} skizziert.
+
+\begin{figure}[htbp]
+	\centering
+	\input{figures/radial_networks_convergence.pgf}
+	\caption{Zwei Konfigurationen eines 40 Knoten Netzes mit $n_\mathrm{pv}=4$ und $n_\mathrm{pv}=8$ PV Knoten. Gezeigt wird die Netztopologie}
+	\label{fig:radial_networks_convergence}
+\end{figure}
+
+Diese Netze werden mittels des erweiterten TPFs mit entkoppelten äußeren Schleife gelöst und gegen die Referenzlösung der NR-Methode verifiziert.
+Relevant für die äußere Blindleistungskorrektur ist das Konvergenzverhalten der PV-Knoten, da die innere TPF-Schleife unverändert rechnet. \\
+
+Als erstes Ergebnis wird in Abbildung~\ref{fig:outer_convergence_decoupled} deswegen der maximale Spannungsbetragsfehler der PV-Knoten über die Anzahl der äußeren Iterationen gezeigt. 
+Dort ist zu erkennen, dass für das Netz mit $n_\mathrm{pv}=4$ PV-Knoten der Spannungsfehler monoton über 15 Schritte unter $10^{-6}\,\mathrm{p.u.}$ fällt.
+Hingegen stagniert der Verlauf des Netzes mit $n_\mathrm{pv}=8$ PV-Knoten sehr früh und erreicht auch nach 100 äußeren Iterationen nicht die selbe Konvergenzgrenze von $10^{-6}\,\mathrm{p.u.}$.\\
+
+
+%Die in Abschnitt~\ref{subsec:methode_a_herleitung} eingeführte Q-Korrektur von
+%Methode~A wurde zunächst als entkoppelte Theveninnäherung eingeführt und verwendet bloß die Diagonalelemente $2X^{(\ell)}_{kk}$ Gl.~\eqref{eq:methode_a_dQ_scalar} der Reaktanz.
+%Diese Vereinfachung vernachlässigt
+%jedoch die Kopplung zwischen den PV-Knoten, die in den Nebendiagonalelementen
+%$X^{(\ell)}_{pp,kj}$ ($k\neq j$) kodiert ist. In diesem Abschnitt wird
+%untersucht, wie sich diese fehlende Kopplung auf das Konvergenzverhalten auswirkt.
 
 
 \begin{figure}[htbp]
@@ -60,37 +83,66 @@ untersucht, wie sich diese fehlende Kopplung auf das Konvergenzverhalten auswirk
 	\label{fig:outer_convergence_decoupled}
 \end{figure}
 
-Abbildung~\ref{fig:outer_convergence_decoupled} zeigt den maximalen
-Spannungsfehler über die Iterationen
-der äußeren Q-Korrektur exemplarisch für ein radiales 40-Knoten-Netz. Verglichen werden zwei
-Varianten mit $n_\mathrm{pv}=4$ bzw.\ $n_\mathrm{pv}=8$ PV-Knoten bei sonst
-identischer Netztopologie und Parametrierung.\\
+%Abbildung~\ref{fig:outer_convergence_decoupled} zeigt den maximalen
+%Spannungsfehler über die Iterationen
+%der äußeren Q-Korrektur exemplarisch für ein radiales 40-Knoten-Netz. Verglichen werden zwei
+%Varianten mit $n_\mathrm{pv}=4$ bzw.\ $n_\mathrm{pv}=8$ PV-Knoten bei sonst
+%identischer Netztopologie und Parametrierung.\\
+%
+% Der Spannungsfehler fällt für das $n_\mathrm{pv}=4$ monoton und
+%	nähert sich zunehmend einem linear-konvergenten Verlauf an. Die
+%	Konvergenzschwelle von $\epsilon_V < 10^{-6}\,\text{p.u.}$ wird nach
+%	$15$ äußeren Iterationen erreicht.
+%Für das $n_\mathrm{pv}=8$ Netz stagniert der Fehler bereits nach wenigen
+%	Iterationen und verbessert
+%	sich über die gesamten $100$ dargestellten Iterationen praktisch nicht mehr.
+%	Die äußere Schleife konvergiert nicht.\\
+%	
 
- Der Spannungsfehler fällt für das $n_\mathrm{pv}=4$ monoton und
-	nähert sich zunehmend einem linear-konvergenten Verlauf an. Die
-	Konvergenzschwelle von $\epsilon_V < 10^{-6}\,\text{p.u.}$ wird nach
-	$15$ äußeren Iterationen erreicht.
-Für das $n_\mathrm{pv}=8$ Netz stagniert der Fehler bereits nach wenigen
-	Iterationen und verbessert
-	sich über die gesamten $100$ dargestellten Iterationen praktisch nicht mehr.
-	Die äußere Schleife konvergiert nicht.\\
-	
-	
-Der Übergang von Konvergenz zu Stagnation bei bloßer Verdopplung der
-PV-Knotenzahl lässt sich unmittelbar auf die diagonale Approximation
-zurückführen. Die gekoppelte Sensitivitätsbeziehung lautet nach
-Gl.~\eqref{eq:sensitivity_matrix}
-$\Delta\bigl(|\vect{V}_{pv}|^2\bigr) = 2\,\vect{X}^{(\ell)}_{pp}\,\Delta\vect{Q}$,
-während die diagonale Näherung effektiv $\vect{X}^{(\ell)}_{pp} \approx
-\diag(X^{(\ell)}_{kk})$ setzt. Diese Näherung ist nur dann gerechtfertigt, wenn
-$\vect{X}^{(\ell)}_{pp}$ diagonaldominant ist.
-Je mehr PV-Knoten sich einen
-gemeinsamen Pfad zum Slack teilen, desto größer werden diese Kopplungsterme in
-Summe. Bei $n_\mathrm{pv}=8$ liegen die PV-Knoten so dicht, dass die
-Näherung verletzt wird, wie in Abbildung \ref{fig:x_pp_heatmaps} erkennbar ist, da bei $n_\mathrm{PV}=8$ hohe Werte in den in den Nebendiagonalen vorkommen. Physikalisch
-bedeutet dies, dass eine Q-Anpassung am Knoten $k$ die Spannung an einem
-benachbarten PV-Knoten $j$ mit verändert, was die diagonale Korrektur nicht
-berücksichtigt.
+
+Dies entspricht einem Konvergenzverlust bei einer $10\,\%$-igen Erhöhung des PV-Anteils des Netzes.
+Dieses Verhalten lässt sich auf den vernachlässigten Einfluss der elektrischen Kopplungen durch die diagonale Approximation der Reaktanz zurückführen.
+Bei näherer Betrachtung der Struktur des PV-PV-Blocks der Reaktanzmatrix und der tensorisierten Sensitivität der entkoppelten Korrektur nach Gleichung \eqref{eq:dense_decoupled_Q} wird eine relevante Näherung getroffen: Die Nebendiagonalelemente der Reaktanzmatrix werden bei der Thévenin-Näherung vernachlässigt und es wird angenommen, dass 
+
+\begin{equation}
+	\mathbf{X}^{(\ell)}_{pp} \approx
+	\diag(X^{(\ell)}_{kk})
+\end{equation}
+
+gilt. Diese Annahme gilt jedoch nur wenn die Reaktanzmatrix $\mathbf{X}^{(\ell)}_{pp}$ selber diagonaldominant ist und dessen Deviationsterme im Verhältnis zu den Hauptdiagonaltermen vernachlässigbar klein sind.
+Wenn wie in Abbildung \ref{fig:radial_networks_convergence} aber mehrere PV-Knoten sich ein und den selben Pfad zum Slack teilen, nehmen die PV-Knoten Einfluss aufeinander (\cref{subsec:PV-PV-Kopplung}).
+Je mehr solcher Knoten auf einem gemeinsamen Pfad liegen desto größer werden deren Kopplungseffekte.\todo{literatur.}
+In diesem Netz liegen die 8 PV-Knoten dicht genug beieinander, sodass die Diagonalitätsnäherung nicht mehr getroffen werden kann.\\
+
+Dies ist direkt anhand der Matrizen der PV-Blöcke sichtbar.
+Abbildung \ref{fig:x_pp_heatmaps} zeigt den Aufbau der Reaktanzmatrizen den beiden Konfigurationen in einer Farbkodierung.
+Dort besitzt die linke Matrix mit 4 PV-Knoten nur in der Hauptdiagonale hohe Werte von $\sim4\times10^{-4}\,\mathrm{p.u.}$ wohingegen die Deviationsterme unter $\sim1\times10^{-4}\,\mathrm{p.u.}$ bleiben. 
+Es lässt sich die demnach die Näherung dr Diagonalität treffen und das Verfahren konvergiert.\\
+
+
+Die PV-PV-Reaktanz des 8 PV-Knoten Netzes hat ähnlich große Werte in den Hauptdiagonalelementen. 
+Konträr zum kleineren PV-Knotenfall liegen hier jeweils auf zwei Pfaden zwei PV-Knoten direkt aneinander (erkennbar in Abbildung \ref{fig:radial_networks_convergence}). 
+Das ist ebenfalls anhand der dessen Matrix erkennbar.
+Dort sind genau die vier Kopplungsterme mit höheren Werten von $\sim3\times10^{-4}\,\mathrm{p.u.}$ in den Nebendiagonalen erkennbar. 
+Die sind relativ zu den Hauptdiagonaltermen groß und verletzen dadurch die Diagonalitätsannahme der entkoppelten Q-Korrektur und führt zu dem stagnierenden Konvergenzverhalten führt.
+Physikalisch korrigiert das Verfahren die Blindleistung der Knoten unabhängig von einander. 
+Durch die fehlende Kopplung arbeiten die berechneten Werte gegeneinander, wodurch die spezifizierte PV-Spannung nicht eingestellt werden kann.\\
+
+%Der Übergang von Konvergenz zu Stagnation bei bloßer Verdopplung der
+%PV-Knotenzahl lässt sich unmittelbar auf die diagonale Approximation
+%zurückführen. Die gekoppelte Sensitivitätsbeziehung lautet nach
+%Gl.~\eqref{eq:sensitivity_matrix}
+%$\Delta\bigl(|\vect{V}_{pv}|^2\bigr) = 2\,\vect{X}^{(\ell)}_{pp}\,\Delta\vect{Q}$,
+%während die diagonale Näherung effektiv $\vect{X}^{(\ell)}_{pp} \approx
+%\diag(X^{(\ell)}_{kk})$ setzt. Diese Näherung ist nur dann gerechtfertigt, wenn
+%$\vect{X}^{(\ell)}_{pp}$ diagonaldominant ist.
+%Je mehr PV-Knoten sich einen
+%gemeinsamen Pfad zum Slack teilen, desto größer werden diese Kopplungsterme in
+%Summe. Bei $n_\mathrm{pv}=8$ liegen die PV-Knoten so dicht, dass die
+%Näherung verletzt wird, wie in Abbildung \ref{fig:x_pp_heatmaps} erkennbar ist, da bei $n_\mathrm{PV}=8$ hohe Werte in den in den Nebendiagonalen vorkommen. Physikalisch
+%bedeutet dies, dass eine Q-Anpassung am Knoten $k$ die Spannung an einem
+%benachbarten PV-Knoten $j$ mit verändert, was die diagonale Korrektur nicht
+%berücksichtigt.
 
 \begin{figure}[htbp]
 	\centering
@@ -99,26 +151,31 @@ berücksichtigt.
 	\label{fig:x_pp_heatmaps}
 \end{figure}
 
+Bei einer zufälligen Besetzung der PV-Knoten in der Netztopologie, wie sie bei der Netzerstellung in dieser Ausarbeitung durchgeführt wird, lässt sich ein weiterer Trend in Abbildung \ref{fig:max_pv_convergence} erkennen.
+Dort wird ein verallgemeinertes Experiment durchgeführt um die PV-Limitierung für andere Netzgrößen zu charakterisieren.
+Hier werden für Netzgrößen von 20 bis 1000 Knoten die Anzahl der PV-Knoten sequenziell erhöht und es wird ausgewertet, ob das Verfahren konvergiert.
+Für jede Netzgröße werden 10 verschiedene zufällige PV-Bus-Verteilungen getestet.
+Die maximale Anzahl an PV-Knoten, bei der Konvergenz vorliegt, wird gegen die Netzgröße aufgetragen.\\
+Der Verlauf dieser Kurve ist nahezu konstant um $\sim6$ PV-Knoten. 
+Damit ist für das entkoppelte Verfahren keine Abhängigkeit von der Netzgröße erkennbar.
+
+
+
+
+
+%Weiterhin ist beobachtbar, dass die maximale Anzahl der PV-Knoten nicht von der Größe des Netzes abhängt wie in Abbildung \ref{fig:max_pv_convergence} experimentell festgestellt wird. Hier wurde die Anzahl der PV-Knoten wurde für jede Netzgröße erhöht bis keine Konvergenz mehr eintritt. Somit ist bei der Verwendung der entkoppelten Näherung zu beachten dass ab einem Anteil von $\sim10$ PV-Knoten mit Divergenz zu rechnen ist.\\
 \begin{figure}[htbp]
 	\centering
-	\input{figures/max_pv_convergence.pgf}
-	\caption{Korrelation zwischen der maximalen Anzahl an PV-Bussen unter Konvergenz gegenüber der Netzgröße $n$.}
+	\input{figures/max_pv_convergence_1.pgf}
+	\caption{Korrelation zwischen der maximalen Anzahl an PV-Bussen unter Konvergenz gegenüber der Netzgröße $n$. Jeder Datenpunkt umfasst 10 verschiedene PV-Verteilungen in der Netztopologie.}
 	\label{fig:max_pv_convergence}
 \end{figure}
 
-Weiterhin ist beobachtbar, dass die maximale Anzahl der PV-Knoten nicht von der Größe des Netzes abhängt wie in Abbildung \ref{fig:max_pv_convergence} experimentell festgestellt wird. Hier wurde die Anzahl der PV-Knoten wurde für jede Netzgröße erhöht bis keine Konvergenz mehr eintritt. Somit ist bei der Verwendung der entkoppelten Näherung zu beachten dass ab einem Anteil von $\sim10$ PV-Knoten mit Divergenz zu rechnen ist.\\
-
+Damit ist die Methode durch diese Annahme nicht für die Berechnung von Lastflüssen geeignet da beispielsweise ein 1000-Knoten-Netz nicht mehr als 9 PV-Knoten haben darf ohne, dass es versagt.
 Aus der Eigenschaft, dass nur begrenzt viele PV Knoten vorkommen dürfen, wird die Berücksichtigung der PV-PV-Kopplung motiviert.\\
 
-Die gekoppelte Variante ersetzt die elementweise Division durch $2X^{(\ell)}_{kk}$
-durch die Lösung des vollen linearen Systems nach
-Gl.~\eqref{eq:methode_a_dQ_coupled},
-\begin{equation}
-	\Delta\vect{Q} = \tfrac{1}{2}\,\bigl(\vect{X}^{(\ell)}_{pp}\bigr)^{-1}
-	\bigl(|\vect{V}^{\spec}_{pv}|^2 - |\vect{v}^{(\ell)}_{pv}|^2\bigr),
-\end{equation}
-und berücksichtigt damit die Nebendiagonalelemente von
-$\vect{X}^{(\ell)}_{pp}$ explizit.
+
+Die gekoppelte Variante ersetzt die elementweise Division durch den Diagonalterm durch die Lösung des vollen linearen Systems nach Gleichung~\eqref{eq:methode_a_dQ_coupled} und berücksichtigt damit die Nebendiagonalelemente der Reaktanzmatrix.
 
 \begin{figure}[htbp]
 	\centering
@@ -130,52 +187,75 @@ $\vect{X}^{(\ell)}_{pp}$ explizit.
 	\label{fig:outer_convergence_error_coupled}
 \end{figure}
 
-Abbildung~\ref{fig:outer_convergence_error_coupled} zeigt das
-Konvergenzverhalten für dasselbe 40-Knoten-Netz bei einer PV-Bestückung von
-$n_\mathrm{pv}=5$ bis $n_\mathrm{pv}=40$. Der Fall $n_\mathrm{pv}=40$
-entspricht dabei dem Grenzfall, in dem sämtliche Nicht-Slack-Knoten als
-PV-Knoten modelliert sind und die Kopplungsterme somit maximal wirksam werden.\\
-
-Alle betrachteten Konfigurationen erreichen die Konvergenzschwelle
-$\epsilon_V < 10^{-6}\,\text{p.u.}$ innerhalb von $8$ bis $9$ äußeren
-Iterationen. Die Iterationszahl ist damit nahezu unabhängig von der Anzahl der
-PV-Knoten.
-Die im entkoppelten Fall beobachtete Divergenzgrenze von etwa
-$n_\mathrm{pv}\approx 10$ (Abbildung~\ref{fig:max_pv_convergence}) entfällt
-vollständig.\\
-
-Dieses Ergebnis bestätigt die in
-Abschnitt~\ref{sec:validierung} formulierte Erklärung: Die Stagnation der
-entkoppelten Variante ist keine Eigenschaft der äußeren Schleife selbst, sondern
-allein eine Folge der vernachlässigten PV-PV-Kopplung. Sobald
-$\vect{X}^{(\ell)}_{pp}$ vollständig einbezogen wird, entspricht die Korrektur
-einem konsistenten Newton-Schritt auf dem Residuum
-$|\vect{V}^{\spec}_{pv}|^2 - |\vect{v}_{pv}|^2$, und die einzelnen PV-Knoten
-korrigieren sich nicht mehr gegenseitig weg.\\
-
-Auffällig ist ferner die Form der Fehlerverläufe: Nach einer flacheren
-Anfangsphase fällt der Fehler über mehrere Dekaden zunehmend steiler ab. Dieses
-beschleunigende Verhalten ist darauf zurückzuführen, dass
-$\vect{X}^{(\ell)}_{pp}$ eine \emph{linearisierte} Sensitivität darstellt: Mit
-schrumpfendem Residuum verliert der bei der Linearisierung vernachlässigte
-Term höherer Ordnung (vgl.\ Abschnitt~\ref{subsec:methode_a_herleitung}) an
-Gewicht, sodass der Korrekturschritt zunehmend exakt wird.\\
-
-Der Preis für die verbesserte Robustheit ist der Verlust der reinen
-elementweisen Operation: Statt einer Division tritt pro äußerer Iteration eine
-Lösung der Dimension $n_\mathrm{pv}\times n_\mathrm{pv}$ auf. Dieser Aufwand
-fällt jedoch kaum ins Gewicht.
-$\vect{X}^{(\ell)}_{pp}$ ist bei fester Netztopologie über alle Iterationen und
-Lastszenarien hinweg konstant, sodass eine einmalige Faktorisierung genügt und
-pro Iteration lediglich ein Vor-/Rückwärtseinsetzen verbleibt.\\
+Es wird das selbe Experiment durchgeführt wie für den entkoppelten Fall.
+In Abbildung~\ref{fig:outer_convergence_error_coupled} werden wieder Konvergenzverläufe eines 40-Knoten-Netzes bei verschiedener Anzahl von PV-Knoten aufgenommen, jedoch mit der gekoppelten Korrekturformel~\eqref{eq:methode_a_dQ_coupled}. 
+Dieses mal aber für eine Anzahl von 5 -- 40 PV-Bussen, also einem Anteil von bis zu $100\,\%$.
+Das bildet den Grenzfall, dass die Kopplungen maximal wirksam werden.\\
 
 
-Die gekoppelte Q-Korrektur ist der entkoppelten Variante klar vorzuziehen: Sie
-konvergiert für alle untersuchten PV-Anteile in $8$ bis $9$ Iterationen, ist
-robust gegenüber der PV-Knotenzahl. Die entkoppelte Variante bleibt lediglich für Netze
-mit sehr wenigen, elektrisch weit auseinanderliegenden PV-Knoten eine
-Alternative. Alle folgenden Untersuchungen zu Methode~A verwenden daher die
-gekoppelte Formulierung.
+%Abbildung~\ref{fig:outer_convergence_error_coupled} zeigt das
+%Konvergenzverhalten für dasselbe 40-Knoten-Netz bei einer PV-Bestückung von
+%$n_\mathrm{pv}=5$ bis $n_\mathrm{pv}=40$. Der Fall $n_\mathrm{pv}=40$
+%entspricht dabei dem Grenzfall, in dem sämtliche Nicht-Slack-Knoten als
+%PV-Knoten modelliert sind und die Kopplungsterme somit maximal wirksam werden.\\
+
+Das Ergebnis dieser Simulation ist dass bei Berücksichtigung der Deviationsterme alle Netzkonfigurationen konvergieren und Fehler unter $10^{-6}\,\mathrm{p.u.}$ aufweisen.
+Im Bezug auf die Anzahl äußerer Iterationen ist zunächst keine Abhängigkeit erkennbar, da alle Konfigurationen entweder 8 oder 9 Iterationen bis zur Konvergenzgrenze benötigen.
+Eine Erfolgsgrenze wie unter Verwendung der entkoppelten Sesnitivität ist hier nicht erkennbar.\\
+
+%Alle betrachteten Konfigurationen erreichen die Konvergenzschwelle
+%$\epsilon_V < 10^{-6}\,\text{p.u.}$ innerhalb von $8$ bis $9$ äußeren
+%Iterationen. Die Iterationszahl ist damit nahezu unabhängig von der Anzahl der
+%PV-Knoten.
+%Die im entkoppelten Fall beobachtete Divergenzgrenze von etwa
+%$n_\mathrm{pv}\approx 10$ (Abbildung~\ref{fig:max_pv_convergence}) entfällt
+%vollständig.\\
+
+Die vorangegangene Erklärung wird durch dieses Ergebnis bestätigt.
+Das stagnierende Verhalten ist kein Effekt der Schleife selber, sondern bildet sich nur aufgrund der vernachlässigten Diagonalterme.
+Unter Berücksichtigung dieser, liegt zwar keine reine Thévenin-Näherung mehr vor, es wird aber ein deutlich robusteres Konvergenzverhalten erzielt.\todo{literatur}
+Die gekoppelte Formulierung entspricht eher einem Netwon-Schritt über das Residuum $|\mathbf{V}^{\spec}_{pv}|^2 - |\mathbf{V}_{pv}|^2$, welcher auf einen Arbeitspunkt konkret ausgewertet wird und über alle Iterationen unverändert bleibt.\\
+
+
+%Dieses Ergebnis bestätigt die in
+%Abschnitt~\ref{sec:validierung} formulierte Erklärung: Die Stagnation der
+%entkoppelten Variante ist keine Eigenschaft der äußeren Schleife selbst, sondern
+%allein eine Folge der vernachlässigten PV-PV-Kopplung. Sobald
+%$\vect{X}^{(\ell)}_{pp}$ vollständig einbezogen wird, entspricht die Korrektur
+%einem konsistenten Newton-Schritt auf dem Residuum
+%$|\vect{V}^{\spec}_{pv}|^2 - |\vect{v}_{pv}|^2$, und die einzelnen PV-Knoten
+%korrigieren sich nicht mehr gegenseitig weg.\\
+
+%Auffällig ist ferner die Form der Fehlerverläufe: Nach einer flacheren
+%Anfangsphase fällt der Fehler über mehrere Dekaden zunehmend steiler ab. Dieses
+%beschleunigende Verhalten ist darauf zurückzuführen, dass
+%$\vect{X}^{(\ell)}_{pp}$ eine \emph{linearisierte} Sensitivität darstellt: Mit
+%schrumpfendem Residuum verliert der bei der Linearisierung vernachlässigte
+%Term höherer Ordnung (vgl.\ Abschnitt~\ref{subsec:methode_a_herleitung}) an
+%Gewicht, sodass der Korrekturschritt zunehmend exakt wird.\\
+%
+%Der Preis für die verbesserte Robustheit ist der Verlust der reinen
+%elementweisen Operation: Statt einer Division tritt pro äußerer Iteration eine
+%Lösung der Dimension $n_\mathrm{pv}\times n_\mathrm{pv}$ auf. Dieser Aufwand
+%fällt jedoch kaum ins Gewicht.
+%$\vect{X}^{(\ell)}_{pp}$ ist bei fester Netztopologie über alle Iterationen und
+%Lastszenarien hinweg konstant, sodass eine einmalige Faktorisierung genügt und
+%pro Iteration lediglich ein Vor-/Rückwärtseinsetzen verbleibt.\\
+
+
+
+Die gekoppelte Q-Korrektur ist der entkoppelten Rechnungsvorschrift aufgrund der Robustheit vorzuziehen.
+Sie konvergiert für alle untersuchten PV-Anteile in $8$ bis $9$ Iterationen, und verhält sich zunächst invariant gegenüber der PV-Knotenzahl.
+Die genaue Abhängigkeit von der Anzahl wird zu späterem Punkt in \cref{sec:pv-share-invarianz} wieder aufgegriffen, um den Einfluss konkret von anderen Einflussfaktoren, wie dem veränderten Lastprofil, zu isolieren. 
+Anhand der Ergebnisse dieses Kapitels wird die Verwendung der gekoppelten Formulierung der äußeren Blindleistungskorrekturschleife für alle nachfolgenden Simulationen begründet.
+Diese bildet nun den Standard dieser Methode.
+
+
+
+%Die entkoppelte Variante bleibt lediglich für Netze
+%mit sehr wenigen, elektrisch weit auseinanderliegenden PV-Knoten eine
+%Alternative. Alle folgenden Untersuchungen zu Methode~A verwenden daher die
+%gekoppelte Formulierung.
 
 \subsection{Warm-Start der inneren Schleife}
 \label{subsec:ergebnisse_warmstart}
@@ -439,6 +519,101 @@ Untersuchungen gemeinsam mit dem Warm Start als Standardeinstellung verwendet.
 
 
 
+
+\section{PV-Anteil}
+\label{sec:pv-share-invarianz}
+
+Um den Einfluss des PV-Anteils isoliert zu erfassen, wird die Zahl der PV-Knoten
+$n_\mathrm{pv}$ bei fester Netzgröße von einem Knoten bis zur vollständigen
+Besetzung ($n_\mathrm{pv}=n_\mathrm{bus}-1$) variiert. Die PV-Knoten werden mit
+$P_\mathrm{gen}=0$ betrieben, sodass die Wirkleistungsbilanz und damit der
+Arbeitspunkt unabhängig von $n_\mathrm{pv}$ bleiben; die Sollwerte werden
+relativ zur Ausgangslösung mit $\delta=\num{0.005}\,\mathrm{p.u.}$ gesetzt.
+Alle Läufe verwenden die gekoppelte Q-Korrektur mit Warm Start und adaptiver
+innerer Toleranz bei $\rho=R/X=\num{7.73}$ und $v_\mathrm{min}=\num{0.97}\,\mathrm{p.u.}$
+
+Tabelle~\ref{tab:pv-share-invarianz} zeigt das Ergebnis. Über den gesamten
+Bereich bleiben die äußeren Iterationen $k_\mathrm{out}$ auf $8\ldots10$ und die
+gesamten inneren Iterationen $k_\mathrm{in}$ auf $15\ldots18$ beschränkt,
+während die Kondition der PV-PV-Matrix $\operatorname{cond}(\vect X_{pp})$ um
+mehr als vier Dekaden und der Jacobi-Spektralradius $\rho_\mathrm{J}$ um den
+Faktor $84$ anwachsen. Der leichte Anstieg von $8$ auf $10$ vollzieht sich
+zwischen $n_\mathrm{pv}=1$ und $n_\mathrm{pv}\approx 8$ und sättigt danach
+vollständig. Alle 48 Läufe konvergieren, die Abweichung zur
+Newton-Raphson-Referenz bleibt bei $\max|\Delta V|<\num{1e-6}\,\mathrm{p.u.}$
+
+\begin{table}[htbp]
+	\centering
+	\caption{Gekoppelte Q-Korrektur, einzelner Lastfluss ($\tau=1$): Iterationen
+		und Rechenzeit über den PV-Anteil. Median über Seeds.}
+	\label{tab:pv-share-invarianz}
+	\begin{tabular}{rrrrrrrr}
+		\toprule
+		$n_\mathrm{bus}$ & $n_\mathrm{pv}$ & Anteil &
+		$\operatorname{cond}(\vect X_{pp})$ & $\rho_\mathrm{J}$ &
+		$k_\mathrm{out}$ & $k_\mathrm{in}$ & $t$ / ms \\
+		\midrule
+		40  & 1   & 0.026 & 1.0                & 0.00  & 8  & 16 & 1.07 \\
+		40  & 4   & 0.103 & 10.4               & 0.82  & 9  & 16 & 0.63 \\
+		40  & 10  & 0.256 & 39.8               & 2.20  & 10 & 16 & 1.22 \\
+		40  & 20  & 0.513 & 81.3               & 3.18  & 10 & 16 & 0.77 \\
+		40  & 39  & 1.000 & 199.7              & 6.26  & 10 & 16 & 0.93 \\
+		\midrule
+		200 & 1   & 0.005 & 1.0                & 0.00  & 8  & 16 & 5.09 \\
+		200 & 10  & 0.050 & 76.6               & 1.80  & 10 & 16 & 5.22 \\
+		200 & 50  & 0.251 & 912.7              & 10.03 & 10 & 16 & 4.31 \\
+		200 & 100 & 0.503 & $\num{1.93e3}$     & 17.96 & 10 & 16 & 5.75 \\
+		200 & 199 & 1.000 & $\num{4.74e3}$     & 33.67 & 10 & 16 & 5.62 \\
+		\midrule
+		500 & 1   & 0.002 & 1.0                & 0.00  & 8  & 16 & 7.24 \\
+		500 & 10  & 0.020 & 136.5              & 1.53  & 10 & 16 & 7.96 \\
+		500 & 50  & 0.100 & $\num{1.45e3}$     & 9.59  & 9  & 15 & 6.89 \\
+		500 & 250 & 0.501 & $\num{1.28e4}$     & 44.67 & 9  & 15 & 7.56 \\
+		500 & 499 & 1.000 & $\num{3.43e4}$     & 84.08 & 10 & 16 & 9.14 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Die Rechenzeit folgt diesem Bild: Innerhalb einer Netzgröße streut sie um
+höchstens den Faktor $2.5$ ($n_\mathrm{bus}=40$: $\num{0.55}\ldots\num{1.37}\,\mathrm{ms}$)
+bzw. $1.5$ ($n_\mathrm{bus}=500$: $\num{6.07}\ldots\num{9.18}\,\mathrm{ms}$),
+ohne monotonen Trend über $n_\mathrm{pv}$. Der Grund ist, dass das einmalige
+Faktorisieren von $\vect X_{pp}$ in die Vorberechnung fällt und pro äußerer
+Iteration nur ein Vor-/Rückwärtseinsetzen der Größe $n_\mathrm{pv}$ anfällt,
+das gegenüber der inneren GEMM mit $O(n_\mathrm{bus}^2)$ nicht ins Gewicht
+fällt. Die Laufzeit wird damit von $n_\mathrm{bus}$ bestimmt, nicht vom
+PV-Anteil.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.9\textwidth]{figures/p1_kout_kin_vs_npv.pdf}
+	\caption{Äußere und gesamte innere Iterationen über der Zahl der PV-Knoten
+		für $n_\mathrm{bus}\in\{40,200,500\}$. Die gekoppelte Korrektur bildet ein
+		Plateau; zum Vergleich ist die Abbruchkante der entkoppelten Variante
+		eingezeichnet.}
+	\label{fig:p1-kout-kin-vs-npv}
+\end{figure}
+
+Die Ursache der Invarianz liegt darin, dass keiner der beiden Konvergenztreiber
+der Methode auf $n_\mathrm{pv}$ reagiert. Die gemessene innere
+Kontraktionszahl $\eta$ ist je Netz exakt konstant
+($\num{0.0257}$, $\num{0.0254}$, $\num{0.0253}$ für $n_\mathrm{bus}=40$, $200$,
+$500$) und stimmt bis auf \SI{5}{\percent} mit dem Modell aus
+Gl.~\eqref{eq:lam-etamodell} überein; der Linearisierungsfehler der äußeren
+Schleife $\varepsilon_\mathrm{lin}$ bleibt mit $\num{0.177}\ldots\num{0.222}$
+innerhalb von $\pm\SI{10}{\percent}$ ohne erkennbaren Trend. Der PV-Anteil hat
+im Nennbetrieb somit keinen Wirkkanal auf die Konvergenz, und die
+Fehlerquellen aus dem $R/X$-Verhältnis (Abschnitt~\ref{sec:rx-verhaeltnis})
+und aus der PV-Besetzung sind orthogonal.
+
+Das Niveau des Plateaus wird stattdessen von der Härte der Sollwertvorgabe und
+vom $R/X$-Verhältnis gesetzt: Eine Halbierung von $\delta$ auf
+$\num{0.002}\,\mathrm{p.u.}$ senkt $k_\mathrm{out}$ von $10$ auf $5$ und
+$k_\mathrm{in}$ von $16$ auf $8$ bei unverändertem PV-Anteil. Die Invarianz ist
+außerdem konditional: Sie gilt bis $\lambda\lesssim 2$ und $\rho\lesssim
+\num{4.6}$; bei $\lambda=5$ steigt $k_\mathrm{out}$ zwischen \SI{2}{\percent}
+und \SI{99}{\percent} PV-Anteil um den Faktor $\num{2.6}$
+(vgl.~Abschnitt~\ref{sec:pv-share-interaktion}).
 
 
 
@@ -3291,101 +3466,6 @@ läuft; eine $\lambda$-aufgelöste Auswertung dieses Vergleichs steht aus.
 
 
 
-
-\section{PV-Anteil}
-\label{sec:pv-share-invarianz}
-
-Um den Einfluss des PV-Anteils isoliert zu erfassen, wird die Zahl der PV-Knoten
-$n_\mathrm{pv}$ bei fester Netzgröße von einem Knoten bis zur vollständigen
-Besetzung ($n_\mathrm{pv}=n_\mathrm{bus}-1$) variiert. Die PV-Knoten werden mit
-$P_\mathrm{gen}=0$ betrieben, sodass die Wirkleistungsbilanz und damit der
-Arbeitspunkt unabhängig von $n_\mathrm{pv}$ bleiben; die Sollwerte werden
-relativ zur Ausgangslösung mit $\delta=\num{0.005}\,\mathrm{p.u.}$ gesetzt.
-Alle Läufe verwenden die gekoppelte Q-Korrektur mit Warm Start und adaptiver
-innerer Toleranz bei $\rho=R/X=\num{7.73}$ und $v_\mathrm{min}=\num{0.97}\,\mathrm{p.u.}$
-
-Tabelle~\ref{tab:pv-share-invarianz} zeigt das Ergebnis. Über den gesamten
-Bereich bleiben die äußeren Iterationen $k_\mathrm{out}$ auf $8\ldots10$ und die
-gesamten inneren Iterationen $k_\mathrm{in}$ auf $15\ldots18$ beschränkt,
-während die Kondition der PV-PV-Matrix $\operatorname{cond}(\vect X_{pp})$ um
-mehr als vier Dekaden und der Jacobi-Spektralradius $\rho_\mathrm{J}$ um den
-Faktor $84$ anwachsen. Der leichte Anstieg von $8$ auf $10$ vollzieht sich
-zwischen $n_\mathrm{pv}=1$ und $n_\mathrm{pv}\approx 8$ und sättigt danach
-vollständig. Alle 48 Läufe konvergieren, die Abweichung zur
-Newton-Raphson-Referenz bleibt bei $\max|\Delta V|<\num{1e-6}\,\mathrm{p.u.}$
-
-\begin{table}[htbp]
-	\centering
-	\caption{Gekoppelte Q-Korrektur, einzelner Lastfluss ($\tau=1$): Iterationen
-		und Rechenzeit über den PV-Anteil. Median über Seeds.}
-	\label{tab:pv-share-invarianz}
-	\begin{tabular}{rrrrrrrr}
-		\toprule
-		$n_\mathrm{bus}$ & $n_\mathrm{pv}$ & Anteil &
-		$\operatorname{cond}(\vect X_{pp})$ & $\rho_\mathrm{J}$ &
-		$k_\mathrm{out}$ & $k_\mathrm{in}$ & $t$ / ms \\
-		\midrule
-		40  & 1   & 0.026 & 1.0                & 0.00  & 8  & 16 & 1.07 \\
-		40  & 4   & 0.103 & 10.4               & 0.82  & 9  & 16 & 0.63 \\
-		40  & 10  & 0.256 & 39.8               & 2.20  & 10 & 16 & 1.22 \\
-		40  & 20  & 0.513 & 81.3               & 3.18  & 10 & 16 & 0.77 \\
-		40  & 39  & 1.000 & 199.7              & 6.26  & 10 & 16 & 0.93 \\
-		\midrule
-		200 & 1   & 0.005 & 1.0                & 0.00  & 8  & 16 & 5.09 \\
-		200 & 10  & 0.050 & 76.6               & 1.80  & 10 & 16 & 5.22 \\
-		200 & 50  & 0.251 & 912.7              & 10.03 & 10 & 16 & 4.31 \\
-		200 & 100 & 0.503 & $\num{1.93e3}$     & 17.96 & 10 & 16 & 5.75 \\
-		200 & 199 & 1.000 & $\num{4.74e3}$     & 33.67 & 10 & 16 & 5.62 \\
-		\midrule
-		500 & 1   & 0.002 & 1.0                & 0.00  & 8  & 16 & 7.24 \\
-		500 & 10  & 0.020 & 136.5              & 1.53  & 10 & 16 & 7.96 \\
-		500 & 50  & 0.100 & $\num{1.45e3}$     & 9.59  & 9  & 15 & 6.89 \\
-		500 & 250 & 0.501 & $\num{1.28e4}$     & 44.67 & 9  & 15 & 7.56 \\
-		500 & 499 & 1.000 & $\num{3.43e4}$     & 84.08 & 10 & 16 & 9.14 \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-
-Die Rechenzeit folgt diesem Bild: Innerhalb einer Netzgröße streut sie um
-höchstens den Faktor $2.5$ ($n_\mathrm{bus}=40$: $\num{0.55}\ldots\num{1.37}\,\mathrm{ms}$)
-bzw. $1.5$ ($n_\mathrm{bus}=500$: $\num{6.07}\ldots\num{9.18}\,\mathrm{ms}$),
-ohne monotonen Trend über $n_\mathrm{pv}$. Der Grund ist, dass das einmalige
-Faktorisieren von $\vect X_{pp}$ in die Vorberechnung fällt und pro äußerer
-Iteration nur ein Vor-/Rückwärtseinsetzen der Größe $n_\mathrm{pv}$ anfällt,
-das gegenüber der inneren GEMM mit $O(n_\mathrm{bus}^2)$ nicht ins Gewicht
-fällt. Die Laufzeit wird damit von $n_\mathrm{bus}$ bestimmt, nicht vom
-PV-Anteil.
-
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.9\textwidth]{figures/p1_kout_kin_vs_npv.pdf}
-	\caption{Äußere und gesamte innere Iterationen über der Zahl der PV-Knoten
-		für $n_\mathrm{bus}\in\{40,200,500\}$. Die gekoppelte Korrektur bildet ein
-		Plateau; zum Vergleich ist die Abbruchkante der entkoppelten Variante
-		eingezeichnet.}
-	\label{fig:p1-kout-kin-vs-npv}
-\end{figure}
-
-Die Ursache der Invarianz liegt darin, dass keiner der beiden Konvergenztreiber
-der Methode auf $n_\mathrm{pv}$ reagiert. Die gemessene innere
-Kontraktionszahl $\eta$ ist je Netz exakt konstant
-($\num{0.0257}$, $\num{0.0254}$, $\num{0.0253}$ für $n_\mathrm{bus}=40$, $200$,
-$500$) und stimmt bis auf \SI{5}{\percent} mit dem Modell aus
-Gl.~\eqref{eq:lam-etamodell} überein; der Linearisierungsfehler der äußeren
-Schleife $\varepsilon_\mathrm{lin}$ bleibt mit $\num{0.177}\ldots\num{0.222}$
-innerhalb von $\pm\SI{10}{\percent}$ ohne erkennbaren Trend. Der PV-Anteil hat
-im Nennbetrieb somit keinen Wirkkanal auf die Konvergenz, und die
-Fehlerquellen aus dem $R/X$-Verhältnis (Abschnitt~\ref{sec:rx-verhaeltnis})
-und aus der PV-Besetzung sind orthogonal.
-
-Das Niveau des Plateaus wird stattdessen von der Härte der Sollwertvorgabe und
-vom $R/X$-Verhältnis gesetzt: Eine Halbierung von $\delta$ auf
-$\num{0.002}\,\mathrm{p.u.}$ senkt $k_\mathrm{out}$ von $10$ auf $5$ und
-$k_\mathrm{in}$ von $16$ auf $8$ bei unverändertem PV-Anteil. Die Invarianz ist
-außerdem konditional: Sie gilt bis $\lambda\lesssim 2$ und $\rho\lesssim
-\num{4.6}$; bei $\lambda=5$ steigt $k_\mathrm{out}$ zwischen \SI{2}{\percent}
-und \SI{99}{\percent} PV-Anteil um den Faktor $\num{2.6}$
-(vgl.~Abschnitt~\ref{sec:pv-share-interaktion}).
 
 
 

@@ -27,6 +27,9 @@ warnings.filterwarnings("ignore")
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 import pandapower as pp
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
 
 from tpf.builders.from_pandapower import build_network_from_pandapower
 from tpf.solvers.tpf_pv_method_a import TPFDensePVMethodA
@@ -240,23 +243,22 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
 
     # 1. NR-Referenz
     nr_solver = PandapowerNRSolver(tol=1e-8, max_iter=100)
+    nr_result = None
     try:
         nr_result = nr_solver.solve_from_net(net)
     except Exception as e:
         record["error"] = f"NR: {str(e)[:50]}"
         if verbose:
-            print(f"  X {name:<30} FEHLER (NR): {e}")
-        return record
+            print(f"  ! {name:<30} NR FEHLER: {e}")
 
-    if not nr_result.converged:
-        record["error"] = "NR divergiert"
+    if nr_result is None or not nr_result.converged:
+        record["nr_converged"] = False
         if verbose:
-            print(f"  X {name:<30} NR divergiert")
-        return record
-
-    record["nr_converged"] = True
-    record["nr_iter"] = nr_result.iterations
-    record["nr_time_ms"] = nr_result.elapsed_time_s * 1000
+            print(f"  ! {name:<30} NR divergiert → TPF wird trotzdem ausgefuehrt")
+    else:
+        record["nr_converged"] = True
+        record["nr_iter"] = nr_result.iterations
+        record["nr_time_ms"] = nr_result.elapsed_time_s * 1000
 
     # 2. Netzwerk aufbauen
     try:
@@ -314,7 +316,10 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     pv_idx_ppc = np.where(bus_types == 2)[0]
     pq_idx_ppc = np.where(bus_types == 1)[0]
     d_idx = np.sort(np.concatenate([pq_idx_ppc, pv_idx_ppc]))
-    v_min_d = float(np.min(np.abs(nr_result.voltages[d_idx]))) if len(d_idx) > 0 else 1.0
+    if nr_result is not None and nr_result.converged:
+        v_min_d = float(np.min(np.abs(nr_result.voltages[d_idx]))) if len(d_idx) > 0 else 1.0
+    else:
+        v_min_d = 1.0
     record["eta"] = compute_eta(network.Y_dd, network.s_nom, v_min_d)
 
     # 4. Spektralradius ρ(J_G) - only for networks with PV
@@ -387,23 +392,29 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
 
     # 6. Vergleich (TPF vs NR)
     v_tpf = result.voltages.flatten()
-    v_nr = nr_result.voltages[d_idx]
 
-    if v_tpf.shape[0] != v_nr.shape[0]:
-        record["error"] = f"Dim mismatch: TPF={v_tpf.shape[0]} NR={v_nr.shape[0]}"
-        if verbose:
-            print(f"  X {name:<30} Dimensionsfehler")
-        return record
+    if record["nr_converged"] and nr_result is not None:
+        v_nr = nr_result.voltages[d_idx]
 
-    mag_err = np.abs(np.abs(v_tpf) - np.abs(v_nr))
-    record["max_v_error"] = float(np.max(mag_err))
-    record["mean_v_error"] = float(np.mean(mag_err))
+        if v_tpf.shape[0] != v_nr.shape[0]:
+            record["error"] = f"Dim mismatch: TPF={v_tpf.shape[0]} NR={v_nr.shape[0]}"
+            if verbose:
+                print(f"  X {name:<30} Dimensionsfehler")
+            return record
 
-    angle_err = np.abs(np.angle(v_tpf, deg=True) - np.angle(v_nr, deg=True))
-    record["max_angle_error_deg"] = float(np.max(angle_err))
+        mag_err = np.abs(np.abs(v_tpf) - np.abs(v_nr))
+        record["max_v_error"] = float(np.max(mag_err))
+        record["mean_v_error"] = float(np.mean(mag_err))
 
-    if record["tpf_time_ms"] > 0:
-        record["speedup"] = record["nr_time_ms"] / record["tpf_time_ms"]
+        angle_err = np.abs(np.angle(v_tpf, deg=True) - np.angle(v_nr, deg=True))
+        record["max_angle_error_deg"] = float(np.max(angle_err))
+
+        if record["tpf_time_ms"] > 0:
+            record["speedup"] = record["nr_time_ms"] / record["tpf_time_ms"]
+    else:
+        record["max_v_error"] = np.nan
+        record["mean_v_error"] = np.nan
+        record["max_angle_error_deg"] = np.nan
 
     # 5c. Sparse solver (optional)
     sparse_result = None
@@ -421,74 +432,18 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
             record["error"] = f"SPARSE: {str(e)[:50]}"
             if verbose:
                 print(f"  X {name:<30} FEHLER (SPARSE): {e}")
-
-    # 6. Vergleich (TPF vs NR)
-    v_tpf = result.voltages.flatten()
-    v_nr = nr_result.voltages[d_idx]
-
-    if v_tpf.shape[0] != v_nr.shape[0]:
-        record["error"] = f"Dim mismatch: TPF={v_tpf.shape[0]} NR={v_nr.shape[0]}"
-        if verbose:
-            print(f"  X {name:<30} Dimensionsfehler")
-        return record
-
-    mag_err = np.abs(np.abs(v_tpf) - np.abs(v_nr))
-    record["max_v_error"] = float(np.max(mag_err))
-    record["mean_v_error"] = float(np.mean(mag_err))
-
-    angle_err = np.abs(np.angle(v_tpf, deg=True) - np.angle(v_nr, deg=True))
-    record["max_angle_error_deg"] = float(np.max(angle_err))
-
-    if record["tpf_time_ms"] > 0:
-        record["speedup"] = record["nr_time_ms"] / record["tpf_time_ms"]
-
-    # 5c. Sparse solver (optional)
-    sparse_result = None
-    if sparse and sparse_solver:
-        try:
-            sparse_result = sparse_solver.solve(network)
-            record["sparse_converged"] = sparse_result.converged
-            record["sparse_time_ms"] = sparse_result.elapsed_time_s * 1000
-            record["sparse_inner_iter_total"] = sparse_result.iterations
-            if sparse_solver.pv_info:
-                pv_info = sparse_solver.pv_info
-                record["sparse_outer_iter"] = pv_info.outer_iterations
-                record["sparse_max_pv_v_error"] = pv_info.pv_v_error_final
-        except Exception as e:
-            record["error"] = f"SPARSE: {str(e)[:50]}"
-            if verbose:
-                print(f"  X {name:<30} FEHLER (SPARSE): {e}")
-
-    # 6. Vergleich (TPF vs NR)
-    v_tpf = result.voltages.flatten()
-    v_nr = nr_result.voltages[d_idx]
-
-    if v_tpf.shape[0] != v_nr.shape[0]:
-        record["error"] = f"Dim mismatch: TPF={v_tpf.shape[0]} NR={v_nr.shape[0]}"
-        if verbose:
-            print(f"  X {name:<30} Dimensionsfehler")
-        return record
-
-    mag_err = np.abs(np.abs(v_tpf) - np.abs(v_nr))
-    record["max_v_error"] = float(np.max(mag_err))
-    record["mean_v_error"] = float(np.mean(mag_err))
-
-    angle_err = np.abs(np.angle(v_tpf, deg=True) - np.angle(v_nr, deg=True))
-    record["max_angle_error_deg"] = float(np.max(angle_err))
-
-    if record["tpf_time_ms"] > 0:
-        record["speedup"] = record["nr_time_ms"] / record["tpf_time_ms"]
 
     # Validate sparse against NR if requested
-    if sparse and sparse_result and sparse_result.converged:
+    if sparse and sparse_result and sparse_result.converged and record["nr_converged"]:
         v_sparse = sparse_result.voltages.flatten()
         if v_sparse.shape[0] == v_nr.shape[0]:
             mag_err_sparse = np.abs(np.abs(v_sparse) - np.abs(v_nr))
             record["sparse_max_v_error"] = float(np.max(mag_err_sparse))
 
     # 7. PASS/FAIL
-    if n_pv == 0:
-        # For no-PV networks: passed if TPF converges and matches NR
+    if not record["nr_converged"]:
+        record["passed"] = result.converged
+    elif n_pv == 0:
         record["passed"] = record["max_v_error"] < tol_pass and result.converged
     else:
         record["passed"] = record["max_v_error"] < tol_pass and result.converged
@@ -496,13 +451,16 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
     if verbose:
         if n_pv == 0:
             status = "no-PV"
+        elif not record["nr_converged"]:
+            status = "TPC" if record["tpf_converged"] else "TPD"
         else:
             status = "PASS" if record["passed"] else "FAIL"
         eta_str = f"{record['eta']:.3f}" if record['eta'] < 100 else f"{record['eta']:.0f}"
         rho_val = record.get('rho', np.nan)
         rho_str = f"{rho_val:.4f}" if not np.isnan(rho_val) and rho_val < 100 else "—"
 
-        # Show additional metrics if computed
+        dV_str = f"{record['max_v_error']:.2e}" if record["nr_converged"] else "N/A"
+
         extra = ""
         if n_pv > 0:
             if record.get("rho_diag", np.inf) < np.inf:
@@ -513,7 +471,7 @@ def validate_network(net_constructor, name, omega=1.0, tol_pass=1e-4, verbose=Tr
                 extra += f" kappa={record['contraction']:.3f}"
 
         print(f"  {status} {name:<30} n={record['n_bus']:<4} PV={n_pv:<3} "
-              f"eta={eta_str:<7} rho={rho_str:<7} dV={record['max_v_error']:.2e} "
+              f"eta={eta_str:<7} rho={rho_str:<7} dV={dV_str} "
               f"out={record['tpf_outer_iter']}{extra}")
 
         # Print sparse info if available

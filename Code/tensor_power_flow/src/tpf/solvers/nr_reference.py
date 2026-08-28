@@ -112,6 +112,25 @@ class PandapowerNRSolver(BaseSolver):
 
         return pv_idx, pv_q_pu, pv_v_setpoint
 
+    def measure_overhead_ms(self, net: pp.pandapowerNet, repeats: int = 5) -> float:
+        """
+        Schätzt den konstanten pandapower-Aufrufoverhead: runpp auf einem
+        bereits gelösten Netz mit init='results' braucht ~1 NR-Iteration,
+        die gemessene Zeit ist also ≈ Overhead + 1 Iteration.
+        Damit lässt sich t_NR,solve ≈ t_NR,full − t_overhead abschätzen.
+        """
+        import copy
+        w = copy.deepcopy(net)
+        pp.runpp(w, algorithm="nr", tolerance_mva=self.tol,
+                 max_iteration=self.max_iter, enforce_q_lims=False)
+        ts = []
+        for _ in range(max(1, repeats)):
+            t0 = time.perf_counter()
+            pp.runpp(w, algorithm="nr", init="results", tolerance_mva=self.tol,
+                     max_iteration=self.max_iter, enforce_q_lims=False)
+            ts.append((time.perf_counter() - t0) * 1e3)
+        return float(np.median(ts))
+
 
     def solve_timeseries(
         self,
@@ -120,16 +139,19 @@ class PandapowerNRSolver(BaseSolver):
         pq_q_profile_mvar: NDArray,
         pv_p_profile_mw: NDArray | None = None,
         verbose: bool = False,
+        collect_stats: bool = True,
     ) -> PowerFlowResult:
+        """
+        Sequentielle runpp-Schleife. Legt Diagnostik auf der Instanz ab:
+          last_iters_per_scenario, last_converged_per_scenario,
+          last_solve_time_only_s  (nur runpp-Aufrufe, ohne Profilzuweisung)
+        """
         import copy
         t_start = time.perf_counter()
 
-        # base_mva einmalig extrahieren (net._ppc ist nach Salazar-validate schon da)
-        if hasattr(net, "_ppc") and net._ppc is not None:
-            base_mva = float(net._ppc["baseMVA"])
-        else:
+        if not hasattr(net, "_ppc") or net._ppc is None:
             pp.runpp(net, algorithm="nr")
-            base_mva = float(net._ppc["baseMVA"])
+        base_mva = float(net._ppc["baseMVA"])
 
         tau = pq_p_profile_mw.shape[1]
         n_bus = len(net.bus)
@@ -140,6 +162,7 @@ class PandapowerNRSolver(BaseSolver):
 
         p_gen_base = net.gen["p_mw"].values.copy() if len(net.gen) > 0 else None
         net_work = copy.deepcopy(net)
+        t_solve_only = 0.0
 
         for t in range(tau):
             net_work.load.loc[:, "p_mw"] = pq_p_profile_mw[:, t]
@@ -147,23 +170,22 @@ class PandapowerNRSolver(BaseSolver):
             if pv_p_profile_mw is not None and p_gen_base is not None:
                 net_work.gen.loc[:, "p_mw"] = pv_p_profile_mw[:, t]
 
+            t0 = time.perf_counter()
             try:
-                pp.runpp(net_work, algorithm="nr",
-                         tolerance_mva=self.tol,
-                         max_iteration=self.max_iter,
-                         enforce_q_lims=False)
+                pp.runpp(net_work, algorithm="nr", tolerance_mva=self.tol,
+                         max_iteration=self.max_iter, enforce_q_lims=False)
+                t_solve_only += time.perf_counter() - t0
                 conv_ps[t] = bool(net_work.converged)
                 iters_ps[t] = net_work._ppc.get("iterations", -1)
-
                 vm = net_work.res_bus["vm_pu"].values
                 va = net_work.res_bus["va_degree"].values
                 V_all[:, t] = vm * np.exp(1j * np.deg2rad(va))
-
-                # NEU: Slack-Leistung pro Szenario
-                p_s = net_work.res_ext_grid["p_mw"].values[0] / base_mva
-                q_s = net_work.res_ext_grid["q_mvar"].values[0] / base_mva
-                s_slack_all[0, t] = p_s + 1j * q_s
+                s_slack_all[0, t] = (
+                    net_work.res_ext_grid["p_mw"].values[0] / base_mva
+                    + 1j * net_work.res_ext_grid["q_mvar"].values[0] / base_mva
+                )
             except Exception:
+                t_solve_only += time.perf_counter() - t0
                 conv_ps[t] = False
                 iters_ps[t] = -1
 
@@ -171,6 +193,11 @@ class PandapowerNRSolver(BaseSolver):
                 print(f"  NR {t+1}/{tau} — {100*(t+1)/tau:.0f}%")
 
         elapsed = time.perf_counter() - t_start
+
+        if collect_stats:
+            self.last_iters_per_scenario = iters_ps
+            self.last_converged_per_scenario = conv_ps
+            self.last_solve_time_only_s = t_solve_only
 
         return PowerFlowResult(
             voltages=V_all,

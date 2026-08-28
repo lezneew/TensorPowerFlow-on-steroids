@@ -8,6 +8,7 @@ from tpf.core.network import NetworkData
 def build_network_from_pandapower(
     net: pp.pandapowerNet,
     include_pv: bool = False,
+    run_pp: bool = True,
 ) -> NetworkData:
     """
     Konvertiert ein pandapower-Netz ins interne TPF-Format.
@@ -18,8 +19,19 @@ def build_network_from_pandapower(
     include_pv : bool
         False (default): Nur PQ-Knoten (original-Verhalten)
         True: PQ + PV-Knoten im d-Block (für PV-Erweiterung)
+    run_pp : bool
+        Whether to run power flow first. Set to False for networks where NR doesn't converge.
     """
-    pp.runpp(net, algorithm="nr", tolerance_mva=1e-8)
+    if run_pp:
+        try:
+            pp.runpp(net, algorithm="nr", tolerance_mva=1e-8, max_iteration=20)
+        except Exception:
+            pass
+    else:
+        try:
+            pp.runpp(net, algorithm="nr", tolerance_mva=1e-4, max_iteration=1)
+        except Exception:
+            pass
     ppc = net._ppc
 
     from pandapower.pypower.makeYbus import makeYbus
