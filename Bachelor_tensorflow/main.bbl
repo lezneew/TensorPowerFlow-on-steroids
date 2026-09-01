@@ -1,5 +1,5 @@
 % $ biblatex auxiliary file $
-% $ biblatex bbl format version 3.2 $
+% $ biblatex bbl format version 3.3 $
 % Do not modify the above lines!
 %
 % This is an auxiliary file used by the 'biblatex' package.
@@ -18,8 +18,8 @@
 
 
 \refsection{0}
-  \datalist[entry]{none/global//global/global}
-    \entry{Salazar2024}{article}{}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{Salazar2024}{article}{}{}
       \name{author}{5}{}{%
         {{hash=0da9ae3b4152aa58d86a7e279da4d645}{%
            family={Salazar\bibnamedelima Duque},
@@ -49,10 +49,12 @@
       }
       \strng{namehash}{b8eacb012dd1e63931223887d9e8fdfd}
       \strng{fullhash}{240f08141cb334eb4bbecb72e3eb5536}
+      \strng{fullhashraw}{240f08141cb334eb4bbecb72e3eb5536}
       \strng{bibnamehash}{240f08141cb334eb4bbecb72e3eb5536}
       \strng{authorbibnamehash}{240f08141cb334eb4bbecb72e3eb5536}
       \strng{authornamehash}{b8eacb012dd1e63931223887d9e8fdfd}
       \strng{authorfullhash}{240f08141cb334eb4bbecb72e3eb5536}
+      \strng{authorfullhashraw}{240f08141cb334eb4bbecb72e3eb5536}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -62,7 +64,7 @@
       \field{title}{Tensor Power Flow Formulations for Multidimensional Analyses in Distribution Systems}
       \field{year}{2024}
     \endentry
-    \entry{Giraldo2022}{article}{}
+    \entry{Giraldo2022}{article}{}{}
       \name{author}{4}{}{%
         {{hash=0f03433a3cbd18cc521c5a1139a84c05}{%
            family={Giraldo},
@@ -87,10 +89,12 @@
       }
       \strng{namehash}{0f121ff9aea812c1de6fcc327a404ab5}
       \strng{fullhash}{9f1e91778f495c8691fbf670c59b8c6d}
+      \strng{fullhashraw}{9f1e91778f495c8691fbf670c59b8c6d}
       \strng{bibnamehash}{9f1e91778f495c8691fbf670c59b8c6d}
       \strng{authorbibnamehash}{9f1e91778f495c8691fbf670c59b8c6d}
       \strng{authornamehash}{0f121ff9aea812c1de6fcc327a404ab5}
       \strng{authorfullhash}{9f1e91778f495c8691fbf670c59b8c6d}
+      \strng{authorfullhashraw}{9f1e91778f495c8691fbf670c59b8c6d}
       \field{sortinit}{2}
       \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
@@ -105,7 +109,7 @@
       \verb 10.1016/j.epsr.2022.108326
       \endverb
     \endentry
-    \entry{TinneyHart1967}{article}{}
+    \entry{TinneyHart1967}{article}{}{}
       \name{author}{2}{}{%
         {{hash=876457820448f2bf56ffed8c45a41801}{%
            family={Tinney},
@@ -120,10 +124,12 @@
       }
       \strng{namehash}{ca955c280a9ecd5a7ebeb4550adee506}
       \strng{fullhash}{ca955c280a9ecd5a7ebeb4550adee506}
+      \strng{fullhashraw}{ca955c280a9ecd5a7ebeb4550adee506}
       \strng{bibnamehash}{ca955c280a9ecd5a7ebeb4550adee506}
       \strng{authorbibnamehash}{ca955c280a9ecd5a7ebeb4550adee506}
       \strng{authornamehash}{ca955c280a9ecd5a7ebeb4550adee506}
       \strng{authorfullhash}{ca955c280a9ecd5a7ebeb4550adee506}
+      \strng{authorfullhashraw}{ca955c280a9ecd5a7ebeb4550adee506}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
@@ -139,7 +145,7 @@
       \verb 10.1109/TPAS.1967.291823
       \endverb
     \endentry
-    \entry{Stott1974}{article}{}
+    \entry{Stott1974}{article}{}{}
       \name{author}{1}{}{%
         {{hash=ea4abf08cea760899580ccfb5c261a31}{%
            family={Stott},
@@ -149,10 +155,12 @@
       }
       \strng{namehash}{ea4abf08cea760899580ccfb5c261a31}
       \strng{fullhash}{ea4abf08cea760899580ccfb5c261a31}
+      \strng{fullhashraw}{ea4abf08cea760899580ccfb5c261a31}
       \strng{bibnamehash}{ea4abf08cea760899580ccfb5c261a31}
       \strng{authorbibnamehash}{ea4abf08cea760899580ccfb5c261a31}
       \strng{authornamehash}{ea4abf08cea760899580ccfb5c261a31}
       \strng{authorfullhash}{ea4abf08cea760899580ccfb5c261a31}
+      \strng{authorfullhashraw}{ea4abf08cea760899580ccfb5c261a31}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
@@ -168,7 +176,7 @@
       \verb 10.1109/PROC.1974.9544
       \endverb
     \endentry
-    \entry{Bernstein2018}{article}{}
+    \entry{Bernstein2018}{article}{}{}
       \name{author}{5}{}{%
         {{hash=bfea208d34175ef165d44ee27718651c}{%
            family={Bernstein},
@@ -198,10 +206,12 @@
       }
       \strng{namehash}{f2b5e8e832ad91b3b437c6156a98c191}
       \strng{fullhash}{ca00d55f2d09ecd5f9f217c87e9b0800}
+      \strng{fullhashraw}{ca00d55f2d09ecd5f9f217c87e9b0800}
       \strng{bibnamehash}{ca00d55f2d09ecd5f9f217c87e9b0800}
       \strng{authorbibnamehash}{ca00d55f2d09ecd5f9f217c87e9b0800}
       \strng{authornamehash}{f2b5e8e832ad91b3b437c6156a98c191}
       \strng{authorfullhash}{ca00d55f2d09ecd5f9f217c87e9b0800}
+      \strng{authorfullhashraw}{ca00d55f2d09ecd5f9f217c87e9b0800}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
@@ -217,7 +227,7 @@
       \verb 10.1109/TPWRS.2018.2823277
       \endverb
     \endentry
-    \entry{Chen1991}{article}{}
+    \entry{Chen1991}{article}{}{}
       \name{author}{5}{}{%
         {{hash=8d0bf6be46f7bd84f975cc0e640592fc}{%
            family={Chen},
@@ -247,10 +257,12 @@
       }
       \strng{namehash}{d27b4d7a8898f92cf06bcfa4689676a7}
       \strng{fullhash}{f8d624ac4a15df8b5a1465e4b800f269}
+      \strng{fullhashraw}{f8d624ac4a15df8b5a1465e4b800f269}
       \strng{bibnamehash}{f8d624ac4a15df8b5a1465e4b800f269}
       \strng{authorbibnamehash}{f8d624ac4a15df8b5a1465e4b800f269}
       \strng{authornamehash}{d27b4d7a8898f92cf06bcfa4689676a7}
       \strng{authorfullhash}{f8d624ac4a15df8b5a1465e4b800f269}
+      \strng{authorfullhashraw}{f8d624ac4a15df8b5a1465e4b800f269}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
@@ -266,7 +278,7 @@
       \verb 10.1109/61.85860
       \endverb
     \endentry
-    \entry{Kersting2017}{book}{}
+    \entry{Kersting2017}{book}{}{}
       \name{author}{1}{}{%
         {{hash=67f8d2b0ce5c9f9b4a3d252ceb2f404b}{%
            family={Kersting},
@@ -279,10 +291,12 @@
       }
       \strng{namehash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
       \strng{fullhash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
+      \strng{fullhashraw}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
       \strng{bibnamehash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
       \strng{authorbibnamehash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
       \strng{authornamehash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
       \strng{authorfullhash}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
+      \strng{authorfullhashraw}{67f8d2b0ce5c9f9b4a3d252ceb2f404b}
       \field{sortinit}{4}
       \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
@@ -291,7 +305,7 @@
       \field{title}{Distribution System Modeling and Analysis}
       \field{year}{2017}
     \endentry
-    \entry{Milano2010}{book}{}
+    \entry{Milano2010}{book}{}{}
       \name{author}{1}{}{%
         {{hash=a6a624e10979d64f225ea3eecae2f258}{%
            family={Milano},
@@ -307,10 +321,12 @@
       }
       \strng{namehash}{a6a624e10979d64f225ea3eecae2f258}
       \strng{fullhash}{a6a624e10979d64f225ea3eecae2f258}
+      \strng{fullhashraw}{a6a624e10979d64f225ea3eecae2f258}
       \strng{bibnamehash}{a6a624e10979d64f225ea3eecae2f258}
       \strng{authorbibnamehash}{a6a624e10979d64f225ea3eecae2f258}
       \strng{authornamehash}{a6a624e10979d64f225ea3eecae2f258}
       \strng{authorfullhash}{a6a624e10979d64f225ea3eecae2f258}
+      \strng{authorfullhashraw}{a6a624e10979d64f225ea3eecae2f258}
       \field{sortinit}{4}
       \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
@@ -321,7 +337,7 @@
       \verb 10.1007/978-3-642-13669-6
       \endverb
     \endentry
-    \entry{Grainger1994}{book}{}
+    \entry{Grainger1994}{book}{}{}
       \name{author}{2}{}{%
         {{hash=e0de754e648173edac26c50305c7af45}{%
            family={Grainger},
@@ -342,10 +358,12 @@
       }
       \strng{namehash}{178fa45e0c3da8648325bd7ff9e88de1}
       \strng{fullhash}{178fa45e0c3da8648325bd7ff9e88de1}
+      \strng{fullhashraw}{178fa45e0c3da8648325bd7ff9e88de1}
       \strng{bibnamehash}{178fa45e0c3da8648325bd7ff9e88de1}
       \strng{authorbibnamehash}{178fa45e0c3da8648325bd7ff9e88de1}
       \strng{authornamehash}{178fa45e0c3da8648325bd7ff9e88de1}
       \strng{authorfullhash}{178fa45e0c3da8648325bd7ff9e88de1}
+      \strng{authorfullhashraw}{178fa45e0c3da8648325bd7ff9e88de1}
       \field{sortinit}{5}
       \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labelnamesource}{author}
@@ -353,7 +371,7 @@
       \field{title}{Power Systems Analysis}
       \field{year}{1994}
     \endentry
-    \entry{Zimmerman2011}{article}{}
+    \entry{Zimmerman2011}{article}{}{}
       \name{author}{3}{}{%
         {{hash=2f9d7910c0ab08711b5ccb6b9a196d4f}{%
            family={Zimmerman},
@@ -373,10 +391,12 @@
       }
       \strng{namehash}{8defc62e8b9fa57afb474d641d8dce2b}
       \strng{fullhash}{204ea8e9e524a6da769ac98cb8e8f4cd}
+      \strng{fullhashraw}{204ea8e9e524a6da769ac98cb8e8f4cd}
       \strng{bibnamehash}{204ea8e9e524a6da769ac98cb8e8f4cd}
       \strng{authorbibnamehash}{204ea8e9e524a6da769ac98cb8e8f4cd}
       \strng{authornamehash}{8defc62e8b9fa57afb474d641d8dce2b}
       \strng{authorfullhash}{204ea8e9e524a6da769ac98cb8e8f4cd}
+      \strng{authorfullhashraw}{204ea8e9e524a6da769ac98cb8e8f4cd}
       \field{sortinit}{7}
       \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
       \field{labelnamesource}{author}
@@ -392,7 +412,7 @@
       \verb 10.1109/TPWRS.2010.2051168
       \endverb
     \endentry
-    \entry{Kundur1994}{book}{}
+    \entry{Kundur1994}{book}{}{}
       \name{author}{1}{}{%
         {{hash=39882366f85507fce005c512ac3b2240}{%
            family={Kundur},
@@ -408,10 +428,12 @@
       }
       \strng{namehash}{39882366f85507fce005c512ac3b2240}
       \strng{fullhash}{39882366f85507fce005c512ac3b2240}
+      \strng{fullhashraw}{39882366f85507fce005c512ac3b2240}
       \strng{bibnamehash}{39882366f85507fce005c512ac3b2240}
       \strng{authorbibnamehash}{39882366f85507fce005c512ac3b2240}
       \strng{authornamehash}{39882366f85507fce005c512ac3b2240}
       \strng{authorfullhash}{39882366f85507fce005c512ac3b2240}
+      \strng{authorfullhashraw}{39882366f85507fce005c512ac3b2240}
       \field{sortinit}{9}
       \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labelnamesource}{author}
@@ -419,7 +441,7 @@
       \field{title}{Power System Stability and Control}
       \field{year}{1994}
     \endentry
-    \entry{Milanovic2013}{article}{}
+    \entry{Milanovic2013}{article}{}{}
       \name{author}{5}{}{%
         {{hash=d31123420cbe575240353ecac4a47221}{%
            family={Milanović},
@@ -449,10 +471,12 @@
       }
       \strng{namehash}{268dec52a7e20c6c78391f36223d188f}
       \strng{fullhash}{30788e9fdfd7227c9ba3236524e7a59b}
+      \strng{fullhashraw}{30788e9fdfd7227c9ba3236524e7a59b}
       \strng{bibnamehash}{30788e9fdfd7227c9ba3236524e7a59b}
       \strng{authorbibnamehash}{30788e9fdfd7227c9ba3236524e7a59b}
       \strng{authornamehash}{268dec52a7e20c6c78391f36223d188f}
       \strng{authorfullhash}{30788e9fdfd7227c9ba3236524e7a59b}
+      \strng{authorfullhashraw}{30788e9fdfd7227c9ba3236524e7a59b}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -465,7 +489,7 @@
       \field{pages}{3038\bibrangedash 3046}
       \range{pages}{9}
     \endentry
-    \entry{daCosta1999}{article}{}
+    \entry{daCosta1999}{article}{}{}
       \name{author}{3}{}{%
         {{hash=4946a94ad692f09419f9f6d9152515d4}{%
            family={Costa},
@@ -487,10 +511,12 @@
       }
       \strng{namehash}{b48eb968830f63932e63175c0227980e}
       \strng{fullhash}{bd8a06149cd6bcbcbb0823682f202ba2}
+      \strng{fullhashraw}{bd8a06149cd6bcbcbb0823682f202ba2}
       \strng{bibnamehash}{bd8a06149cd6bcbcbb0823682f202ba2}
       \strng{authorbibnamehash}{bd8a06149cd6bcbcbb0823682f202ba2}
       \strng{authornamehash}{b48eb968830f63932e63175c0227980e}
       \strng{authorfullhash}{bd8a06149cd6bcbcbb0823682f202ba2}
+      \strng{authorfullhashraw}{bd8a06149cd6bcbcbb0823682f202ba2}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -506,7 +532,7 @@
       \verb 10.1109/59.801891
       \endverb
     \endentry
-    \entry{IEEE1547_2018}{standard}{}
+    \entry{IEEE1547_2018}{standard}{}{}
       \list{organization}{1}{%
         {IEEE}%
       }
@@ -520,7 +546,7 @@
       \verb 10.1109/IEEESTD.2018.8332112
       \endverb
     \endentry
-    \entry{IEEETF1995}{article}{}
+    \entry{IEEETF1995}{article}{}{}
       \name{author}{1}{}{%
         {{hash=5bce291ca100188665fefbea207dabeb}{%
            family={{IEEE Task Force on Load Representation for Dynamic Performance}},
@@ -528,10 +554,12 @@
       }
       \strng{namehash}{5bce291ca100188665fefbea207dabeb}
       \strng{fullhash}{5bce291ca100188665fefbea207dabeb}
+      \strng{fullhashraw}{5bce291ca100188665fefbea207dabeb}
       \strng{bibnamehash}{5bce291ca100188665fefbea207dabeb}
       \strng{authorbibnamehash}{5bce291ca100188665fefbea207dabeb}
       \strng{authornamehash}{5bce291ca100188665fefbea207dabeb}
       \strng{authorfullhash}{5bce291ca100188665fefbea207dabeb}
+      \strng{authorfullhashraw}{5bce291ca100188665fefbea207dabeb}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -544,7 +572,7 @@
       \field{pages}{1302\bibrangedash 1313}
       \range{pages}{12}
     \endentry
-    \entry{VanCutsem1998}{book}{}
+    \entry{VanCutsem1998}{book}{}{}
       \name{author}{2}{}{%
         {{hash=c0466a9e801411f7e4a3cfa5a6a58231}{%
            family={Van\bibnamedelima Cutsem},
@@ -562,10 +590,12 @@
       }
       \strng{namehash}{5bade965022b0609aaeff5ff640200eb}
       \strng{fullhash}{5bade965022b0609aaeff5ff640200eb}
+      \strng{fullhashraw}{5bade965022b0609aaeff5ff640200eb}
       \strng{bibnamehash}{5bade965022b0609aaeff5ff640200eb}
       \strng{authorbibnamehash}{5bade965022b0609aaeff5ff640200eb}
       \strng{authornamehash}{5bade965022b0609aaeff5ff640200eb}
       \strng{authorfullhash}{5bade965022b0609aaeff5ff640200eb}
+      \strng{authorfullhashraw}{5bade965022b0609aaeff5ff640200eb}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -573,7 +603,7 @@
       \field{title}{Voltage Stability of Electric Power Systems}
       \field{year}{1998}
     \endentry
-    \entry{Bolognani2016}{article}{}
+    \entry{Bolognani2016}{article}{}{}
       \name{author}{2}{}{%
         {{hash=52268ca42c4adf3bc9131a73fefa04c9}{%
            family={Bolognani},
@@ -588,10 +618,12 @@
       }
       \strng{namehash}{6973cecdb1cc85db9f27c5729e63a18b}
       \strng{fullhash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{fullhashraw}{6973cecdb1cc85db9f27c5729e63a18b}
       \strng{bibnamehash}{6973cecdb1cc85db9f27c5729e63a18b}
       \strng{authorbibnamehash}{6973cecdb1cc85db9f27c5729e63a18b}
       \strng{authornamehash}{6973cecdb1cc85db9f27c5729e63a18b}
       \strng{authorfullhash}{6973cecdb1cc85db9f27c5729e63a18b}
+      \strng{authorfullhashraw}{6973cecdb1cc85db9f27c5729e63a18b}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -607,7 +639,7 @@
       \verb 10.1109/TPWRS.2015.2395452
       \endverb
     \endentry
-    \entry{Anderson1995}{book}{}
+    \entry{Anderson1995}{book}{}{}
       \name{author}{1}{}{%
         {{hash=98b30ceb9cb335e22eda81a957efc1f9}{%
            family={Anderson},
@@ -623,10 +655,12 @@
       }
       \strng{namehash}{98b30ceb9cb335e22eda81a957efc1f9}
       \strng{fullhash}{98b30ceb9cb335e22eda81a957efc1f9}
+      \strng{fullhashraw}{98b30ceb9cb335e22eda81a957efc1f9}
       \strng{bibnamehash}{98b30ceb9cb335e22eda81a957efc1f9}
       \strng{authorbibnamehash}{98b30ceb9cb335e22eda81a957efc1f9}
       \strng{authornamehash}{98b30ceb9cb335e22eda81a957efc1f9}
       \strng{authorfullhash}{98b30ceb9cb335e22eda81a957efc1f9}
+      \strng{authorfullhashraw}{98b30ceb9cb335e22eda81a957efc1f9}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -635,7 +669,7 @@
       \field{title}{Analysis of Faulted Power Systems}
       \field{year}{1995}
     \endentry
-    \entry{Dorfler2013}{article}{}
+    \entry{Dorfler2013}{article}{}{}
       \name{author}{2}{}{%
         {{hash=10b3680a40660cdb6868139eaa1af2ab}{%
            family={Dörfler},
@@ -650,10 +684,12 @@
       }
       \strng{namehash}{7a0bd5480f3ddd0706c898a832fa6236}
       \strng{fullhash}{7a0bd5480f3ddd0706c898a832fa6236}
+      \strng{fullhashraw}{7a0bd5480f3ddd0706c898a832fa6236}
       \strng{bibnamehash}{7a0bd5480f3ddd0706c898a832fa6236}
       \strng{authorbibnamehash}{7a0bd5480f3ddd0706c898a832fa6236}
       \strng{authornamehash}{7a0bd5480f3ddd0706c898a832fa6236}
       \strng{authorfullhash}{7a0bd5480f3ddd0706c898a832fa6236}
+      \strng{authorfullhashraw}{7a0bd5480f3ddd0706c898a832fa6236}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -669,7 +705,7 @@
       \verb 10.1109/TCSI.2012.2215780
       \endverb
     \endentry
-    \entry{osipov2022}{article}{}
+    \entry{osipov2022}{article}{}{}
       \name{author}{5}{}{%
         {{hash=b9295f42f0839b9b2bc8fba08d1c932f}{%
            family={Osipov},
@@ -699,10 +735,12 @@
       }
       \strng{namehash}{3af7072eacf9a52324c724ade7b140e7}
       \strng{fullhash}{5efb9d9aa72bed93c44ec3f88c816b8e}
+      \strng{fullhashraw}{5efb9d9aa72bed93c44ec3f88c816b8e}
       \strng{bibnamehash}{5efb9d9aa72bed93c44ec3f88c816b8e}
       \strng{authorbibnamehash}{5efb9d9aa72bed93c44ec3f88c816b8e}
       \strng{authornamehash}{3af7072eacf9a52324c724ade7b140e7}
       \strng{authorfullhash}{5efb9d9aa72bed93c44ec3f88c816b8e}
+      \strng{authorfullhashraw}{5efb9d9aa72bed93c44ec3f88c816b8e}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -717,7 +755,7 @@
       \verb 10.1016/j.epsr.2022.108424
       \endverb
     \endentry
-    \entry{ALDAOUDEYEH2019105890}{article}{}
+    \entry{ALDAOUDEYEH2019105890}{article}{}{}
       \name{author}{2}{}{%
         {{hash=a4accc245991febf915623b7eb9a87ed}{%
            family={Aldaoudeyeh},
@@ -732,10 +770,12 @@
       }
       \strng{namehash}{28813506e171ace79b4eb76888bc1995}
       \strng{fullhash}{28813506e171ace79b4eb76888bc1995}
+      \strng{fullhashraw}{28813506e171ace79b4eb76888bc1995}
       \strng{bibnamehash}{28813506e171ace79b4eb76888bc1995}
       \strng{authorbibnamehash}{28813506e171ace79b4eb76888bc1995}
       \strng{authornamehash}{28813506e171ace79b4eb76888bc1995}
       \strng{authorfullhash}{28813506e171ace79b4eb76888bc1995}
+      \strng{authorfullhashraw}{28813506e171ace79b4eb76888bc1995}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -759,7 +799,7 @@
       \endverb
       \keyw{Bus impedance matrix,Grid structure,Network modeling,Load flow,Power system simulation}
     \endentry
-    \entry{Davis2006}{book}{}
+    \entry{Davis2006}{book}{}{}
       \name{author}{1}{}{%
         {{hash=65d91744b06296f07cba0205480151ba}{%
            family={Davis},
@@ -775,10 +815,12 @@
       }
       \strng{namehash}{65d91744b06296f07cba0205480151ba}
       \strng{fullhash}{65d91744b06296f07cba0205480151ba}
+      \strng{fullhashraw}{65d91744b06296f07cba0205480151ba}
       \strng{bibnamehash}{65d91744b06296f07cba0205480151ba}
       \strng{authorbibnamehash}{65d91744b06296f07cba0205480151ba}
       \strng{authornamehash}{65d91744b06296f07cba0205480151ba}
       \strng{authorfullhash}{65d91744b06296f07cba0205480151ba}
+      \strng{authorfullhashraw}{65d91744b06296f07cba0205480151ba}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
@@ -787,7 +829,7 @@
       \field{title}{Direct Methods for Sparse Linear Systems}
       \field{year}{2006}
     \endentry
-    \entry{Banach.1922}{article}{}
+    \entry{Banach.1922}{article}{}{}
       \name{author}{1}{}{%
         {{hash=4f7d48e46d9fd2124f5634f8843e0811}{%
            family={Banach},
@@ -797,10 +839,12 @@
       }
       \strng{namehash}{4f7d48e46d9fd2124f5634f8843e0811}
       \strng{fullhash}{4f7d48e46d9fd2124f5634f8843e0811}
+      \strng{fullhashraw}{4f7d48e46d9fd2124f5634f8843e0811}
       \strng{bibnamehash}{4f7d48e46d9fd2124f5634f8843e0811}
       \strng{authorbibnamehash}{4f7d48e46d9fd2124f5634f8843e0811}
       \strng{authornamehash}{4f7d48e46d9fd2124f5634f8843e0811}
       \strng{authorfullhash}{4f7d48e46d9fd2124f5634f8843e0811}
+      \strng{authorfullhashraw}{4f7d48e46d9fd2124f5634f8843e0811}
       \field{sortinit}{2}
       \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
@@ -819,7 +863,7 @@
       \verb Banach 1922 - Sur les op{\'e}rations dans les:Attachments/Banach 1922 - Sur les op{\'e}rations dans les.pdf:application/pdf
       \endverb
     \endentry
-    \entry{Sandoval.2020}{article}{}
+    \entry{Sandoval.2020}{article}{}{}
       \name{author}{4}{}{%
         {{hash=ecfe836ba33d8fc4893937dbdc405e4f}{%
            family={Sandoval},
@@ -844,10 +888,12 @@
       }
       \strng{namehash}{cae3ad35553dbfea1d178b9f3f82a046}
       \strng{fullhash}{75889b78fe8efa26ba9a2694843a1c97}
+      \strng{fullhashraw}{75889b78fe8efa26ba9a2694843a1c97}
       \strng{bibnamehash}{75889b78fe8efa26ba9a2694843a1c97}
       \strng{authorbibnamehash}{75889b78fe8efa26ba9a2694843a1c97}
       \strng{authornamehash}{cae3ad35553dbfea1d178b9f3f82a046}
       \strng{authorfullhash}{75889b78fe8efa26ba9a2694843a1c97}
+      \strng{authorfullhashraw}{75889b78fe8efa26ba9a2694843a1c97}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
@@ -870,7 +916,7 @@
       \verb https://www.sciencedirect.com/science/article/pii/S0378779620302364
       \endverb
     \endentry
-    \entry{SandovalGuzman.2022}{article}{}
+    \entry{SandovalGuzman.2022}{article}{}{}
       \name{author}{5}{}{%
         {{hash=c27d90fbea6d7ccf4eaf81d8dfee1823}{%
            family={{Sandoval Guzmán}},
@@ -900,10 +946,12 @@
       }
       \strng{namehash}{cc3b883f55e42ce227c189dc3fae4164}
       \strng{fullhash}{ccb8caa274cdcaafeb1d5da076ed1bb9}
+      \strng{fullhashraw}{ccb8caa274cdcaafeb1d5da076ed1bb9}
       \strng{bibnamehash}{ccb8caa274cdcaafeb1d5da076ed1bb9}
       \strng{authorbibnamehash}{ccb8caa274cdcaafeb1d5da076ed1bb9}
       \strng{authornamehash}{cc3b883f55e42ce227c189dc3fae4164}
       \strng{authorfullhash}{ccb8caa274cdcaafeb1d5da076ed1bb9}
+      \strng{authorfullhashraw}{ccb8caa274cdcaafeb1d5da076ed1bb9}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
@@ -926,7 +974,7 @@
       \verb https://www.sciencedirect.com/science/article/pii/S235246772200162X
       \endverb
     \endentry
-    \entry{Zhang.2015}{misc}{}
+    \entry{Zhang.2015}{misc}{}{}
       \name{author}{4}{}{%
         {{hash=fcdb4c7704baa79893b29d652aecc77f}{%
            family={Zhang},
@@ -951,10 +999,12 @@
       }
       \strng{namehash}{dc2231f638bf9e15f5f05a52530a5365}
       \strng{fullhash}{7ca0c6864196422c712266edb9c06cf8}
+      \strng{fullhashraw}{7ca0c6864196422c712266edb9c06cf8}
       \strng{bibnamehash}{7ca0c6864196422c712266edb9c06cf8}
       \strng{authorbibnamehash}{7ca0c6864196422c712266edb9c06cf8}
       \strng{authornamehash}{dc2231f638bf9e15f5f05a52530a5365}
       \strng{authorfullhash}{7ca0c6864196422c712266edb9c06cf8}
+      \strng{authorfullhashraw}{7ca0c6864196422c712266edb9c06cf8}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
@@ -973,7 +1023,7 @@
       \verb https://arxiv.org/pdf/1508.02489
       \endverb
     \endentry
-    \entry{Ghiani2015}{article}{}
+    \entry{Ghiani2015}{article}{}{}
       \name{author}{2}{}{%
         {{hash=0ba2fc61314d672707571d9c366df9af}{%
            family={Ghiani},
@@ -991,10 +1041,12 @@
       }
       \strng{namehash}{6da5d47d96afff27ea0f3cfaecdd8e5d}
       \strng{fullhash}{6da5d47d96afff27ea0f3cfaecdd8e5d}
+      \strng{fullhashraw}{6da5d47d96afff27ea0f3cfaecdd8e5d}
       \strng{bibnamehash}{6da5d47d96afff27ea0f3cfaecdd8e5d}
       \strng{authorbibnamehash}{6da5d47d96afff27ea0f3cfaecdd8e5d}
       \strng{authornamehash}{6da5d47d96afff27ea0f3cfaecdd8e5d}
       \strng{authorfullhash}{6da5d47d96afff27ea0f3cfaecdd8e5d}
+      \strng{authorfullhashraw}{6da5d47d96afff27ea0f3cfaecdd8e5d}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
@@ -1010,7 +1062,7 @@
       \verb 10.1007/s40565-015-0165-4
       \endverb
     \endentry
-    \entry{Wang2019}{article}{}
+    \entry{Wang2019}{article}{}{}
       \name{author}{6}{}{%
         {{hash=b2eccb185095fccfeb40fdffd8b2105f}{%
            family={Wang},
@@ -1048,10 +1100,12 @@
       }
       \strng{namehash}{732f5c87479ec410ccda984af68db0bf}
       \strng{fullhash}{5aa459b8264900a20fcad1daf3c6c013}
+      \strng{fullhashraw}{5aa459b8264900a20fcad1daf3c6c013}
       \strng{bibnamehash}{5aa459b8264900a20fcad1daf3c6c013}
       \strng{authorbibnamehash}{5aa459b8264900a20fcad1daf3c6c013}
       \strng{authornamehash}{732f5c87479ec410ccda984af68db0bf}
       \strng{authorfullhash}{5aa459b8264900a20fcad1daf3c6c013}
+      \strng{authorfullhashraw}{5aa459b8264900a20fcad1daf3c6c013}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
@@ -1067,7 +1121,49 @@
       \verb 10.1049/iet-gtd.2018.5428
       \endverb
     \endentry
-    \entry{Dembo1982}{article}{}
+    \entry{7953996}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=c3d5fc162da46d4c94c75406a21ccaeb}{%
+           family={Dvijotham},
+           familyi={D\bibinitperiod},
+           given={Krishnamurthy},
+           giveni={K\bibinitperiod}}}%
+        {{hash=814306896b66e0984f12dee922385b3a}{%
+           family={Mallada},
+           familyi={M\bibinitperiod},
+           given={Enrique},
+           giveni={E\bibinitperiod}}}%
+        {{hash=58fab3b162e64de82961183494fd784b}{%
+           family={Simpson-Porco},
+           familyi={S\bibinithyphendelim P\bibinitperiod},
+           given={John\bibnamedelima W.},
+           giveni={J\bibinitperiod\bibinitdelim W\bibinitperiod}}}%
+      }
+      \strng{namehash}{794aa6cb6f6a7fff50fec1c6f9566716}
+      \strng{fullhash}{19f901c6d91f9d45f4e49c224e6a9e18}
+      \strng{fullhashraw}{19f901c6d91f9d45f4e49c224e6a9e18}
+      \strng{bibnamehash}{19f901c6d91f9d45f4e49c224e6a9e18}
+      \strng{authorbibnamehash}{19f901c6d91f9d45f4e49c224e6a9e18}
+      \strng{authornamehash}{794aa6cb6f6a7fff50fec1c6f9566716}
+      \strng{authorfullhash}{19f901c6d91f9d45f4e49c224e6a9e18}
+      \strng{authorfullhashraw}{19f901c6d91f9d45f4e49c224e6a9e18}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Control Systems Letters}
+      \field{number}{2}
+      \field{title}{High-Voltage Solution in Radial Power Networks: Existence, Properties, and Equivalent Algorithms}
+      \field{volume}{1}
+      \field{year}{2017}
+      \field{pages}{322\bibrangedash 327}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1109/LCSYS.2017.2717578
+      \endverb
+      \keyw{Mathematical model;Power system stability;Voltage control;Substations;Reactive power;Stability analysis;Tools;Power systems;smart grid;stability of nonlinear systems}
+    \endentry
+    \entry{Dembo1982}{article}{}{}
       \name{author}{3}{}{%
         {{hash=c02b37e5398e734786b9b0cef4760787}{%
            family={dembo},
@@ -1087,10 +1183,12 @@
       }
       \strng{namehash}{ac69d4b1846f8afec1a2ae784a7a859c}
       \strng{fullhash}{d9983f4a42c18a32caa4a1cce8e0be4e}
+      \strng{fullhashraw}{d9983f4a42c18a32caa4a1cce8e0be4e}
       \strng{bibnamehash}{d9983f4a42c18a32caa4a1cce8e0be4e}
       \strng{authorbibnamehash}{d9983f4a42c18a32caa4a1cce8e0be4e}
       \strng{authornamehash}{ac69d4b1846f8afec1a2ae784a7a859c}
       \strng{authorfullhash}{d9983f4a42c18a32caa4a1cce8e0be4e}
+      \strng{authorfullhashraw}{d9983f4a42c18a32caa4a1cce8e0be4e}
       \field{sortinit}{4}
       \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}

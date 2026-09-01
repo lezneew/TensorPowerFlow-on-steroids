@@ -501,6 +501,7 @@ def run_validation_suite(networks: dict, omega=1.0, tol_pass=1e-4, verbose=True,
                 print(f"  W: Sparse solver nicht verfügbar: {e}")
 
     for name, info in networks.items():
+        print(name)
         record = validate_network(
             info["constructor"], name, omega=omega,
             tol_pass=tol_pass, verbose=verbose, cold_start=cold_start,

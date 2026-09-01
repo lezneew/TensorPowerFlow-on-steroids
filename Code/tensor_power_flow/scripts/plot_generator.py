@@ -19,6 +19,7 @@ import numpy as np
 from pathlib import Path
 
 SAVE_DIR = Path(r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Bachelor_tensorflow\figures")
+SAVE_DIR = Path(r"..\..\..\Bachelor_tensorflow\figures")
 
 from tpf.builders.from_pandapower import build_network_from_pandapower
 from tpf.solvers.tpf_pv_method_a import TPFDensePVMethodA
@@ -189,7 +190,7 @@ def plot_baseline_tpf_vs_nr(save_name="baseline_tpf_vs_nr.pgf"):
 
 def plot_outer_convergence_error_decoupled(
     network_names: list = None,
-    save_name: str = "outer_convergence_error_decoupled.pgf"
+    save_name: str = "outer_convergence_error_decoupled_1.pgf"
 ):
     """
     Plot max(|V| - V_spec) vs outer iteration using decoupled (diagonal) Q-update.
@@ -482,7 +483,7 @@ def print_salazar_scaling_table():
     print(r"\end{table}")
 
 
-def plot_max_pv_convergence(save_name="max_pv_convergence_1.pgf"):
+def plot_max_pv_convergence(save_name="max_pv_convergence_2.pgf"):
     """Plot max PV nodes that converge vs network size with error bars over 10 random networks per size."""
     from tpf.generators.network_generator_salazar import create_salazar_network
 
@@ -510,7 +511,7 @@ def plot_max_pv_convergence(save_name="max_pv_convergence_1.pgf"):
 
                     solver = TPFDensePVMethodA(
                         tol=1e-8, max_iter_inner=100, max_iter_outer=100,
-                        tol_pv=1e-6, omega=1.0, use_decoupled=True
+                        tol_pv=1e-6, omega=1.0, use_decoupled=True, cold_start=True
                     )
                     result = solver.solve(network)
 
@@ -635,11 +636,65 @@ def plot_outer_convergence_error_coupled(
     plt.close(fig)
 
 
+def compute_delta_q_from_v_error(pv_v_error_history, network, use_decoupled=True):
+    """Compute ΔQ from voltage error history, then normalize to voltage units.
+
+    Decoupled: ΔQ = (|V_spec|² - |v|²) / (2·X_kk)
+    Normalized back to voltage: V_equiv = X_kk * ΔQ = (|V_spec|² - |v|²) / 2 ≈ error
+
+    Coupled: ΔQ = 0.5 * X_pp^-1 * (|V_spec|² - |v|²)
+    Normalized back to voltage: V_equiv = 0.5 * X_pp * ΔQ = (|V_spec|² - |v|²) / 2 ≈ error
+
+    Parameters
+    ----------
+    pv_v_error_history : list
+        List of max voltage errors (|V_PV| - V_spec) per outer iteration
+    network : NetworkData
+        The network with PV nodes
+    use_decoupled : bool
+        If True, use decoupled formula; otherwise use coupled
+
+    Returns
+    -------
+    list
+        List of max normalized voltage values from ΔQ per outer iteration
+    """
+    if not pv_v_error_history or not network.has_pv or network.n_pv == 0:
+        return []
+
+    Z_B = np.linalg.inv(network.Y_dd)
+    X = np.imag(Z_B)
+    pv_idx = network.pv_indices
+    X_pp = X[np.ix_(pv_idx, pv_idx)]
+
+    normalized_voltage_values = []
+    for v_error in pv_v_error_history:
+        delta_v_sq = 2.0 * v_error  # |V_spec|² - |v|²
+
+        if use_decoupled:
+            X_pp_diag = np.diag(X_pp)
+            delta_q = delta_v_sq / (2.0 * X_pp_diag)
+            # Normalize back to voltage: V_eq = X_kk * ΔQ
+            v_normalized = X_pp_diag * delta_q
+        else:
+            X_pp_inv = np.linalg.inv(X_pp)
+            delta_v_vec = np.full(len(pv_idx), delta_v_sq)
+            delta_q = 0.5 * X_pp_inv @ delta_v_vec
+            # Normalize back to voltage: V_eq = 0.5 * X_pp * ΔQ
+            X_pp_pinv = np.linalg.pinv(X_pp)
+            v_normalized = 0.5 * X_pp @ delta_q
+
+        max_v_normalized = float(np.max(np.abs(v_normalized)))
+        normalized_voltage_values.append(max_v_normalized)
+
+    return normalized_voltage_values
+
+
 def plot_inner_start_comparison(
     n_bus: int = 40,
     n_pv: int = 4,
     seed: int = 42,
-    save_name: str = "inner_start_comparison.pgf"
+    save_name: str = "inner_start_comparison_q.pgf"
 ):
     """
     Compare flat start (cold_start=True) vs warm start (cold_start=False)
@@ -662,6 +717,8 @@ def plot_inner_start_comparison(
     net_pp = create_salazar_network(nodes=n_bus, n_pv=n_pv, seed=seed)
     network = build_network_from_pandapower(net_pp, include_pv=True)
 
+    use_decoupled = True
+
     print(f"  Running with cold_start=True (flat start)...")
     solver_cold = TPFDensePVMethodA(
         tol=1e-8,
@@ -669,7 +726,7 @@ def plot_inner_start_comparison(
         max_iter_outer=100,
         tol_pv=1e-8,
         omega=1.0,
-        use_decoupled=True,
+        use_decoupled=use_decoupled,
         cold_start=True
     )
     print(f"    Solver created, calling solve()...")
@@ -683,7 +740,7 @@ def plot_inner_start_comparison(
         max_iter_outer=100,
         tol_pv=1e-8,
         omega=1.0,
-        use_decoupled=True,
+        use_decoupled=use_decoupled,
         cold_start=False
     )
     print(f"    Solver created, calling solve()...")
@@ -692,6 +749,9 @@ def plot_inner_start_comparison(
 
     pv_errors_cold = solver_cold.pv_info.pv_v_error_history if solver_cold.pv_info else []
     pv_errors_warm = solver_warm.pv_info.pv_v_error_history if solver_warm.pv_info else []
+
+    delta_q_cold = compute_delta_q_from_v_error(pv_errors_cold, network, use_decoupled)
+    delta_q_warm = compute_delta_q_from_v_error(pv_errors_warm, network, use_decoupled)
 
     inner_v_change_cold = solver_cold.pv_info.inner_v_change_all if solver_cold.pv_info else []
     inner_v_change_warm = solver_warm.pv_info.inner_v_change_all if solver_warm.pv_info else []
@@ -763,18 +823,26 @@ def plot_inner_start_comparison(
     ax1.semilogy(x_cold, inner_v_change_cold, "s-", color="darkblue",
                  linewidth=1.0, markersize=2, alpha=0.8)
 
-    # ax1.set_xlabel("Kumulative Inner-Iteration", fontsize=12)
+    if delta_q_cold and outer_starts_cold:
+        x_outer_cold = [outer_starts_cold[i] + 1 for i in range(len(outer_starts_cold))]
+        ax1.semilogy(x_outer_cold, delta_q_cold, "o--", color="green",
+                     linewidth=1.5, markersize=4.5, alpha=0.4, label=r"$\max(|\Delta Q|)$")
+
     ax1.set_ylabel(r"Kalt", fontsize=12)
-    # ax1.set_title("Kaltstart (flat)", fontsize=12, fontweight="bold")
     ax1.grid(True, which="both", alpha=0.3)
     ax1.set_ylim(bottom=1e-12, top=1)
 
     ax3.semilogy(x_warm, inner_v_change_warm, "s-", color="darkred",
                  linewidth=1.0, markersize=2, alpha=0.8)
 
+    if delta_q_warm and outer_starts_warm:
+        x_outer_warm = [outer_starts_warm[i] + 1 for i in range(len(outer_starts_warm))]
+        ax3.semilogy(x_outer_warm, delta_q_warm, "o--", color="green",
+                     linewidth=1.5, markersize=4.5, alpha=0.4, label=r"$\max(|\frac{1}{2} X_pp \Delta Q|)$")
+
+    ax3.legend(fontsize=9, loc="upper right")
     ax3.set_xlabel("Iteration", fontsize=12)
     ax3.set_ylabel(r"", fontsize=12)
-    # ax3.set_title("Warm", fontsize=12, fontweight="bold")
     ax3.set_ylabel(r"Warm", fontsize=12)
 
     ax3.grid(True, which="both", alpha=0.3)
@@ -957,8 +1025,8 @@ def plot_adaptive_inner_comparison(
 
 
 def plot_salazar_scaling_comparison(
-    max_n_bus: int = 40,
-    save_name: str = "salazar_scaling_speedup.pgf"
+    max_n_bus: int = 1000,
+    save_name: str = "salazar_scaling_speedup_1.pgf"
 ):
     """
     Run Salazar scaling suite with cold start vs warm start using run_validation_suite.
@@ -1050,15 +1118,15 @@ def plot_salazar_scaling_comparison(
 
     print(r"\begin{table}[htbp]")
     print(r"\centering")
-    print(r"\begin{tabular}{r|r|r|r|r|r|r|r}")
+    print(r"\begin{tabular}{r|r|r|r|r|r|r|r|r|r}")
     print(r"\hline")
-    print(r"$n_{bus}$ & $n_{PV}$ & Inner & Outer & $t_{cold}$ (ms) & $t_{warm}$ (ms) & Speedup & Conv\\")
+    print(r"$n_{bus}$ & $n_{PV}$ & Innercold & Innerwarm & Outercold & Outerwarm & $t_{cold}$ (ms) & $t_{warm}$ (ms) & Speedup & Conv\\")
     print(r"\hline")
 
     for r in all_results:
         conv_str = r"Ja" if r["converged"] else r"Nein"
         speedup_str = f"{r['speedup']:.2f}" if r["speedup"] > 0 else "—"
-        print(f"{r['n_bus']} & {r['n_pv']} & {r['inner_cold']} & {r['outer_cold']} & {r['time_cold_ms']:.1f} & {r['time_warm_ms']:.1f} & {speedup_str} & {conv_str}\\\\")
+        print(f"{r['n_bus']} & {r['n_pv']} & {r['inner_cold']} & {r['inner_warm']} & {r['outer_cold']} & {r['outer_warm']} & {r['time_cold_ms']:.1f} & {r['time_warm_ms']:.1f} & {speedup_str} & {conv_str}\\\\")
 
     print(r"\hline")
     print(r"\end{tabular}")
@@ -1743,10 +1811,11 @@ def plot_subplot_c_from_csv(save_name="timing_vs_size_from_csv.pgf"):
 
 if __name__ == "__main__":
     # print_salazar_scaling_table()
-    plot_max_pv_convergence()
+    # plot_max_pv_convergence()
     # print_x_pp_matrices()
     # plot_outer_convergence_error_coupled()
-    # plot_inner_start_comparison()
+    # plot_outer_convergence_error_decoupled()
+    plot_inner_start_comparison()
     # plot_adaptive_inner_comparison()
     # plot_salazar_scaling_comparison()
     # plot_salazar_adaptive_speedup()
