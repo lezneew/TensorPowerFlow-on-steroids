@@ -245,7 +245,7 @@ Die gekoppelte Formulierung entspricht eher einem Netwon-Schritt über das Resid
 
 
 Die gekoppelte Q-Korrektur ist der entkoppelten Rechnungsvorschrift aufgrund der Robustheit vorzuziehen.
-Sie konvergiert für alle untersuchten PV-Anteile in $8$ bis $9$ Iterationen, und verhält sich zunächst invariant gegenüber der PV-Knotenzahl.
+Sie konvergiert für alle untersuchten PV-Anteile in $8$ bis $9$ Iterationen, und verhält sich zunächst invariant gegenüber der PV-Knotenzahl, während in der entkoppelten Variante nicht mehr als 9 PV-Knoten im Netz vorhanden sein dürfen.
 Die genaue Abhängigkeit von der Anzahl wird zu späterem Punkt in \cref{sec:pv-share-invarianz} wieder aufgegriffen, um den Einfluss konkret von anderen Einflussfaktoren, wie dem veränderten Lastprofil, zu isolieren. 
 Anhand der Ergebnisse dieses Kapitels wird die Verwendung der gekoppelten Formulierung der äußeren Blindleistungskorrekturschleife für alle nachfolgenden Simulationen begründet.
 Diese bildet nun den Standard dieser Methode.
@@ -506,7 +506,21 @@ Standardeinstellung verwendet.\\
 %	\label{tab:salazar_scaling_cold_warm}
 %\end{table}
 
+Im Verlauf der adaptiven Lösung ist ein klarer Kontrast zu erkennen.
+Der Sägezahnverlauf ist deutlich reduziert, sodass keine 2-6 inneren Iterationen aufeinander folgen, bis der Sprung durch die äußere Korrektur hervorgerufen wird.
+Die Redukltion dieses Verhaltens ist eine direkte Folge der adaptiven Toleranz.
+Durch sie bricht die innere Schleife bereits bei $\varepsilon_V^{(\ell-1)}$ ab, die in diesem Fall deutlich größer ist als die vorgegebenen $\varepsilon_\mathrm{in} = 10^{-6}$.
+Es wird nur eine innere Iteration zugelassen, bis wieder eine äußere Q-Korrektur durchgeführt wird.
+Dieses Verhalten setzt sich fort, bis die innere Toleranz zum ende des Verlaufes unter die Vorgabe $\varepsilon_\mathrm{in}$ fällt.
+Dort ist ein leicht flacherer Verlauf erkennbar und die letzten Iterationen gewährleisten die volle Genauigkeit der Lösung.
+Die adaptive Variante konvergiert in 23 Schritten.\\
 
+Für dieses Beispiel ist die Ersparnis der Gesamtiterationen somit mehr als die Hälfte.
+Genauso wie bei dem Warm-Start werden hierbei wieder nur innere Schritte eingespart.
+Die Anzahl der äußeren Korrekturen bleibt mit 11 Schleifen konstant.
+Das ist kohärent mit der Modellierung des Verfahrens, da genau dieser Fall das Ziel ist.
+In der inneren Schleife soll gerade die Toleranz erreicht werden, die benötigt wird um die selbe äußre Konvergenz zu aufrecht zu halten.
+Das proportionale Mitführen der Abbruchgrenze erreicht dies und ist dabei ausreichend, um in der äußeren Schleife die Korrekturrichtung richtig vorzugeben.
 
 \todo{-inner loop komplett konvergieren lassen vs adaptiv anzahl an inneren iteration bis zu nächsten äußeren schleife begrenzen -sägezahn charakter kann reduziert werden ein}
 
@@ -514,14 +528,55 @@ Standardeinstellung verwendet.\\
 \subsection{Adaptive innere Toleranz}
 \label{subsec:ergebnisse_adaptiv}
 
-Der Warm Start reduziert die Zahnbreite des Sägezahnmusters, lässt die innere
-Abbruchtoleranz jedoch unverändert. In jeder äußeren Iteration wird die innere
-Schleife bis auf die Endtoleranz $\epsilon_\mathrm{in}\,\text{p.u.}$
-austeriert, obwohl der zugehörige Q-Zustand noch weit vom Sollwert entfernt ist.
-Der dabei erzielte Genauigkeitsüberschuss ist wertlos, weil die anschließende
-Q-Korrektur den Arbeitspunkt ohnehin wieder verschiebt. Die äußere Schleife
-benötigt lediglich einen Spannungszustand, der genau genug ist, um die
-Korrekturrichtung $\Delta\vect{Q}^{(\ell)}$ verlässlich zu bestimmen.\\
+%Der Warm Start reduziert die Zahnbreite des Sägezahnmusters, lässt die innere
+%Abbruchtoleranz jedoch unverändert. In jeder äußeren Iteration wird die innere
+%Schleife bis auf die Endtoleranz $\epsilon_\mathrm{in}\,\text{p.u.}$
+%austeriert, obwohl der zugehörige Q-Zustand noch weit vom Sollwert entfernt ist.
+%Der dabei erzielte Genauigkeitsüberschuss ist wertlos, weil die anschließende
+%Q-Korrektur den Arbeitspunkt ohnehin wieder verschiebt. Die äußere Schleife
+%benötigt lediglich einen Spannungszustand, der genau genug ist, um die
+%Korrekturrichtung $\Delta\vect{Q}^{(\ell)}$ verlässlich zu bestimmen.\\
+
+Durch die Verwendung des Warmstarts im vorherigen \cref{subsec:ergebnisse_warmstart} kann bereits die Anzahl der inneren Iterationen reduziert werden, indem der Startpunkt der TPF-Schleife jedes mal besser geschätzt wird.
+Dort bleibt die innere Abbruchbedingung konstant bei der gesetzten Konvergenzgrenze $\varepsilon_{\mathrm{in}}$.
+Diese vollständige Konvergenz wird jedes mal berechnet, obwohl die Blindleistungen der PV-Knoten noch nicht korrekt sind.
+Dadurch wird die erreichte Genauigkeit der inneren Schleife im nächsten Durchlauf durch Veränderung des Arbeitspunktes ohnehin verworfen.
+Dadurch wird die Frage aufgeworfen, wie genau die innere Schleife konvergieren muss um eine ausreichende Q-Korrektur in der äußeren Schleife zu gewährleisten.\\
+
+Hierzu nun eine Optimierung eingeführt, durch welche die innere Toleranz adaptiv an die äußere Schleife gekoppelt ist.
+Diese ist Dembo et al.~\cite{Dembo1982} nachempfunden und verwendet als Kopplung das äußere Spannungsresiduum.
+Konkret wird mittels 
+
+\begin{equation}
+	\varepsilon_V^{(\ell)}
+	= \max_{k\in\mathcal{PV}}
+	\Bigl\{\,|V_k^{(\ell)}| - |V_k^{\spec}|\,\Bigl\}
+\end{equation}
+
+eine äußere Schleifentoleranz aus dem PV-Knoten-Satz $\mathcal{PV}$ des Durchlaufs $\ell$ generiert.
+Dieses Maximum des Spannungsresiduums wird als Obergrenze für einen Klassifizierer für die innere Schleife verwendet.
+Hierfür wird es mit der vorgegebenen inneren Toleranz verglichen und das größere wird als aktuelle Konvergenzgrenze für diesen TPF durchgang verwendet.
+Die Vorschrift lautet somit
+
+\begin{equation}
+	\varepsilon_\mathrm{in}^{(\ell)}
+	= \max\Bigl\{\varepsilon_\mathrm{in}^{\min},\;
+	\varepsilon_V^{(\ell-1)}\Bigr\},\quad
+	\varepsilon_\mathrm{in}^{\min}=10^{-6}\,\text{p.u.}
+	\label{eq:adaptive_tol}
+\end{equation}
+
+Sie erreicht somit das Ziel, dass solange das äußere Residuum betragsmäßig hoch groß ist, eine ungenauere innere Lösung als Basis für die nächste Q-Korrektur verwendet wird.
+Für höhere äußere Iterationen sinkt die Toleranz automatisch, sodass die geforderte Gesamttoleranz erreicht wird.\\
+
+Weiterhin ist anzumerken, dass diese Optimierung nur in Kombination mit dem in \cref{subsec:ergebnisse_warmstart} eingeführten Warm-Start funktioniert.
+Wenn ein Kalt-Start vorliegt, startet jeder TPF beim selben Einheitsvektor, wodurch der Vortstritt der letzen Iteration verloren ginge und die Adaptive Toleranz potentiell stagnant wäre.\\
+
+Diese Optimierung ist analog zum Konzept des inexakten Newton-Verfahren \cite{Dembo1982}. 
+Dort müssen die einzelnen Schritte ebenfalls nicht alle exakt gelöst werden, sondern es reicht, wenn sich die innere Genauigkeit mit zunehmenden äußeren Konvergenz zunimmt.
+Es bildet einen Kompromiss zwischen Rechenaufwand und Konvergenzgeschwindigkeit.\\
+
+
 
 
 \begin{figure}[htbp]
@@ -536,64 +591,66 @@ Korrekturrichtung $\Delta\vect{Q}^{(\ell)}$ verlässlich zu bestimmen.\\
 	\label{fig:adaptive_inner_comparison}
 \end{figure}
 
-Die Implementierung ist inspiriert von Dembo et al.~\cite{Dembo1982} und koppelt die innere Toleranz an das äußere Residuum.
-Mit
-\begin{equation}
-	\epsilon_V^{(\ell)}
-	= \max_{k\in\mathcal{PV}}
-	\bigl|\,|v_k^{(\ell)}| - |V_k^{\spec}|\,\bigr|
-\end{equation}
-wird die in der Iteration $\ell$ wirksame innere Toleranz zu
-\begin{equation}
-	\epsilon_\mathrm{in}^{(\ell)}
-	= \max\Bigl\{\epsilon_\mathrm{in}^{\min},\;
-	\epsilon_V^{(\ell-1)}\Bigr\},\quad
-	\epsilon_\mathrm{in}^{\min}=10^{-6}\,\text{p.u.}
-	\label{eq:adaptive_tol}
-\end{equation}
-gesetzt, wobei $\epsilon_V^{(\ell-1)}$ aus dem Spannungszustand zu Beginn der
-äußeren Iteration ausgewertet
-wird. 
-Solange das äußere Residuum groß
-ist, genügt eine grobe innere Lösung. Mit fallendem $\epsilon_V^{(\ell)}$
-verschärft sich die Forderung automatisch. Das Maximum in
-Gl.~\eqref{eq:adaptive_tol} wirkt als Untergrenze und stellt sicher, dass die
-innere Toleranz die Endgenauigkeit $\epsilon_\mathrm{in}^{\min}$ nie
-unterschreitet. \\
+%Die Implementierung ist inspiriert von Dembo et al.~\cite{Dembo1982} und koppelt die innere Toleranz an das äußere Residuum.
+%Mit
+%\begin{equation}
+%	\epsilon_V^{(\ell)}
+%	= \max_{k\in\mathcal{PV}}
+%	\left(\,|v_k^{(\ell)}| - |V_k^{\spec}|\,\right)
+%\end{equation}
+%wird die in der Iteration $\ell$ wirksame innere Toleranz zu
+%\begin{equation}
+%	\epsilon_\mathrm{in}^{(\ell)}
+%	= \max\Bigl\{\epsilon_\mathrm{in}^{\min},\;
+%	\epsilon_V^{(\ell-1)}\Bigr\},\quad
+%	\epsilon_\mathrm{in}^{\min}=10^{-6}\,\text{p.u.}
+%	\label{eq:adaptive_tol}
+%\end{equation}
+%gesetzt, wobei $\epsilon_V^{(\ell-1)}$ aus dem Spannungszustand zu Beginn der
+%äußeren Iteration ausgewertet
+%wird. 
+%Solange das äußere Residuum groß
+%ist, genügt eine grobe innere Lösung. Mit fallendem $\epsilon_V^{(\ell)}$
+%verschärft sich die Forderung automatisch. Das Maximum in
+%Gl.~\eqref{eq:adaptive_tol} wirkt als Untergrenze und stellt sicher, dass die
+%innere Toleranz die Endgenauigkeit $\epsilon_\mathrm{in}^{\min}$ nie
+%unterschreitet. \\
+%
+%Voraussetzung für die Wirksamkeit ist der in
+%Abschnitt~\ref{subsec:ergebnisse_warmstart} eingeführte Warm Start. Nur wenn der
+%unvollständig konvergierte Spannungszustand als Startwert der nächsten inneren
+%Schleife übernommen wird, geht der abgebrochene Lösungsfortschritt nicht
+%verloren. \\
 
-Voraussetzung für die Wirksamkeit ist der in
-Abschnitt~\ref{subsec:ergebnisse_warmstart} eingeführte Warm Start. Nur wenn der
-unvollständig konvergierte Spannungszustand als Startwert der nächsten inneren
-Schleife übernommen wird, geht der abgebrochene Lösungsfortschritt nicht
-verloren. \\
+Um  den Effekt dieser Maßnahme zu visualisieren wird wieder eine Berechnung an einem 40-Knoten-Netz durchgeführt unter Verwendung des Warm-Starts.
+In Abbildung~\ref{fig:adaptive_inner_comparison} werden die Ergebnisse gezeigt.
+Im oberen Graphen ist der Konvergenzverlauf ohne adaptive Toleranz gezeigt und der untere Graph enthält den Verlauf mit der adaptiven inneren Toleranz. 
+Dabei ist die Spannungsänderung gegen die Gesamtanzahl von inneren und äußeren Iterationen aufgezeichnet.\\
+
+Im oberen Verlauf unter Verwendung eines konstanten Toleranzwertes ist das typische Sägezahnmuster, wie es in \cref{subsec:ergebnisse_warmstart} beobachtbar ist.
+Das System konvergiert nach 55 Iterationen.\\
 
 
 
-Abbildung~\ref{fig:adaptive_inner_comparison} stellt beide Varianten für dasselbe
-40-Knoten-Netz gegenüber und macht die Wirkung der Toleranzkopplung unmittelbar
-sichtbar. Bei fixierter innerer Toleranz (oberer Verlauf) bleibt das in
-Abschnitt~\ref{subsec:ergebnisse_warmstart} beschriebene Sägezahnmuster in
-vollem Umfang erhalten. 
-Der adaptive Verlauf (unterer Teil) zeigt dieses Muster nicht mehr. Da die
-innere Schleife nach Gl.~\eqref{eq:adaptive_tol} bereits abbricht, sobald die
-Schrittweite unter $\epsilon_V^{(\ell-1)}$ fällt, genügen in den frühen
-äußeren Iterationen wenige innere
-Iterationen. Das Sägezahnmuster minimiert sich dadurch. Der verbleibende, gegen Ende leicht flachere
-Bereich entspricht der Phase, in der die Untergrenze
-$\epsilon_\mathrm{in}^{\min}$ greift und die innere Schleife wieder auf volle
-Genauigkeit gelöst wird.\\
 
-Quantitativ reduziert sich die Gesamtzahl der inneren Iterationen im gezeigten
-Beispiel von etwa $55$ auf etwa $23$, also um mehr als die Hälfte.  Die adaptive
-Toleranz beschleunigt die Auswertung der äußeren Residuumsfunktion, ohne die
-äußere Konvergenzrate zu verschlechtern. Dies bestätigt die theoretische
-Erwartung an ein inexaktes Newton-Verfahren. Solange die innere Genauigkeit
-proportional zum äußeren Residuum mitgeführt wird, bleibt die Korrekturrichtung
-$\Delta\vect{Q}^{(\ell)}$ hinreichend genau, um die äußere Konvergenz zu tragen.
-Die Genauigkeit der Endlösung ist ebenfalls unbeeinflusst, da das äußere
-Abbruchkriterium unverändert am tatsächlichen Spannungsresiduum
-$\epsilon_V^{(\ell)}$ geprüft wird und der Fixpunkt allein durch die exakt
-gelöste letzte innere Schleife definiert ist.\\
+%Abbildung~\ref{fig:adaptive_inner_comparison} stellt beide Varianten für dasselbe
+%40-Knoten-Netz gegenüber und macht die Wirkung der Toleranzkopplung unmittelbar
+%sichtbar. Bei fixierter innerer Toleranz (oberer Verlauf) bleibt das in
+%Abschnitt~\ref{subsec:ergebnisse_warmstart} beschriebene Sägezahnmuster in
+%vollem Umfang erhalten. 
+%Der adaptive Verlauf (unterer Teil) zeigt dieses Muster nicht mehr. Da die
+%innere Schleife nach Gl.~\eqref{eq:adaptive_tol} bereits abbricht, sobald die
+%Schrittweite unter $\epsilon_V^{(\ell-1)}$ fällt, genügen in den frühen
+%äußeren Iterationen wenige innere
+%Iterationen. Das Sägezahnmuster minimiert sich dadurch. Der verbleibende, gegen Ende leicht flachere
+%Bereich entspricht der Phase, in der die Untergrenze
+%$\epsilon_\mathrm{in}^{\min}$ greift und die innere Schleife wieder auf volle
+%Genauigkeit gelöst wird.\\
+
+%Quantitativ reduziert sich die Gesamtzahl der inneren Iterationen im gezeigten Beispiel von etwa $55$ auf etwa $23$, also um mehr als die Hälfte.  
+%Die adaptive Toleranz beschleunigt die Auswertung der äußeren Residuumsfunktion, ohne die äußere Konvergenzrate zu verschlechtern. Dies bestätigt die theoretische Erwartung an ein inexaktes Newton-Verfahren. 
+%Solange die innere Genauigkeit proportional zum äußeren Residuum mitgeführt wird, bleibt die Korrekturrichtung $\Delta\vect{Q}^{(\ell)}$ hinreichend genau, um die äußere Konvergenz zu tragen.
+%Die Genauigkeit der Endlösung ist ebenfalls unbeeinflusst, da das äußere Abbruchkriterium unverändert am tatsächlichen Spannungsresiduum $\epsilon_V^{(\ell)}$ geprüft wird und der Fixpunkt allein durch die exakt gelöste letzte innere Schleife definiert ist.\\
 
 \begin{figure}[H]
 	\centering
@@ -609,17 +666,42 @@ gelöste letzte innere Schleife definiert ist.\\
 	\label{fig:salazar_adaptive_speedup}
 \end{figure}
 
-Um die Effektivität dieser Maßnahme beurteilen zu können, werden in Abbildung \ref{fig:salazar_adaptive_speedup} die Einsparungen der Anzahl an Iterationen für verschiedene Netze aufgetragen. Dabei werden Netzgrößen bis zu 1000 Bussen analysiert. Dabei entspricht ein Eintrag in der Abbildung einer Netzgröße bei verschiedenen PV-Bus Anteilen (bis 60\%).
-Hier ist zumal Erkennbar, dass die Einsparung je nach Größe durchaus schwankt und besonders bei dem großen 1000-Knoten-Netz eine kleinerer Beitrag erkennbar ist. 
-Dieser Abfall der Einsparung ist konsistent mit der Erwartung, da größere Netze längere Pfade enthalten die Kontraktion insgesamt geringer ausfällt.
-Dennoch ist im Durchschnitt mit einer Einsparung von $\sim 1.6$, entsprechend einer Einsparung von rund einem
-Drittel der Iterationen, zu rechnen. Bei einzelnen Netzkonfigurationen ist darüber hinaus eine Beschleunigung vom Faktor 3 möglich.\\
 
+
+Nachdem diese Optimierung anhand eines konkreten Beispiels eingeführt wurde, steht noch eine allgemeinere Prüfung der Maßnahme aus.
+Bevor die adaptive Variante als Standard übernommen wird, sollen verschiedene Netze, unterschiedlicher Größe, Konfiguration, PV-Anteil und Belastungszustand getestet werden.
+Gemessen wird das Verhältnis der zwischen der Iterationsanzahl dem Verfahren mit konstanten Toleranz und der Iterationsanzahl des adaptiven Verfahrens als Maß der Einsparung.
+Abbildung~\ref{fig:salazar_adaptive_speedup}  zeigt diese Einsparung für Netze bis zu 1000 Knoten als Box-Plot. 
+Eine Box beinhaltet dabei 7 verschiedene Netzkonfigurationen (PV-Anteil bis zu $60\,\%$) einer Größe.\\
+
+Es ist zunächst erkennbar, dass die Einsparung für eine Netzgröße schwankt. 
+Beobachtet man z.B. die 350-Knoten-Netze streut die Einsparung vom Faktor 1,47 bis 2,95, wohingegen bei 750-Knoten-Netzen das Band enger um 1,75 gebündelt ist.
+Dies lässt sich über die verschiedenen Belastungen und Konfigurationen der Netze erklären.
+Bei Netzen die fern von der Lösbarkeitsgrenze liegen und die eine günstigere Verteilung von PV-Knoten haben, kann eine hohe Einsparung erzielt werden.
+Dahingegen konvergieren die äußeren Schleifen Netze mit kleiner Einsparung langsamer, wodurch das die dynamische Toleranz  $\varepsilon_V^{(\ell)}$ kleiner ausfällt und womit näher an der vollständigen Konvergenzgrenze $\varepsilon_\mathrm{in}$ liegt.
+Dort wird also die innere Schleife fast vollständig durchgeführt und nur selten früher abgebrochen.\\
+
+Wenn die Durchschnittlichen Werte betrachtet werden, schwanken diese zwischen 1,5 und 1,8.
+Nur für 1000-Knoten-Netze liegt der Durchschnitt niedriger bei 1,24.
+Dies kann an der schlechteren Kontraktion aufgrund von längeren Pfaden liegen.
+Selbst unter Berücksichtigung der Ausreißer ist die Einsparung größer eins, es werden als für alle konvergierende Netze Iterationen eingespart.
+Diese Methode kann deswegen als Standard für alle weiteren Analysen verwendet werden.
+Es wird eine durchschnittliche Einsparung von $\sim1,6$, was ca. einem Drittel entspricht, mit dieser Optimierung erzielt.
+In Einzelfällen kann dies auf eine Beschleunigung vom Faktor 3 steigen.
+
+
+
+
+%Um die Effektivität dieser Maßnahme beurteilen zu können, werden in Abbildung \ref{fig:salazar_adaptive_speedup} die Einsparungen der Anzahl an Iterationen für verschiedene Netze aufgetragen. Dabei werden Netzgrößen bis zu 1000 Bussen analysiert. Dabei entspricht ein Eintrag in der Abbildung einer Netzgröße bei verschiedenen PV-Bus Anteilen (bis 60\%).
+%Hier ist zumal Erkennbar, dass die Einsparung je nach Größe durchaus schwankt und besonders bei dem großen 1000-Knoten-Netz eine kleinerer Beitrag erkennbar ist. 
+%Dieser Abfall der Einsparung ist konsistent mit der Erwartung, da größere Netze längere Pfade enthalten die Kontraktion insgesamt geringer ausfällt.
+%Dennoch ist im Durchschnitt mit einer Einsparung von $\sim 1.6$, entsprechend einer Einsparung von rund einem
+%Drittel der Iterationen, zu rechnen. Bei einzelnen Netzkonfigurationen ist darüber hinaus eine Beschleunigung vom Faktor 3 möglich.\\
+%
 Insgesamt bestätigt
 Abbildung~\ref{fig:salazar_adaptive_speedup} damit die Übertragbarkeit des am
 40-Knoten-Netz demonstrierten Verhaltens auf den gesamten untersuchten
-Größenbereich. Die adaptive innere Toleranz wird daher in allen folgenden
-Untersuchungen gemeinsam mit dem Warm Start als Standardeinstellung verwendet.
+Größenbereich.
 
 
 

@@ -25,7 +25,7 @@ from tpf.builders.from_pandapower import build_network_from_pandapower
 from tpf.solvers.tpf_pv_method_a import TPFDensePVMethodA
 from tpf.solvers.tpf_dense import TPFDenseSolver
 from tpf.solvers.nr_reference import PandapowerNRSolver
-from tpf.generators.network_generator_salazar import get_salazar_scaling_networks, get_salazar_low_rx10_networks, get_salazar_pq_size_sweep
+from tpf.generators.network_generator_salazar import get_salazar_scaling_networks, get_salazar_low_rx10_networks, get_salazar_low_vm_networks, get_salazar_pq_size_sweep
 import pandapower as pp
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
@@ -1180,7 +1180,7 @@ def plot_salazar_scaling_comparison(
 
 def plot_salazar_adaptive_speedup(
     max_n_bus: int = 1000,
-    save_name: str = "salazar_adaptive_speedup.pgf"
+    save_name: str = "salazar_adaptive_speedup_1.pgf"
 ):
     """
     Run Salazar scaling suite with adaptive_inner=False vs adaptive_inner=True.
@@ -1193,7 +1193,10 @@ def plot_salazar_adaptive_speedup(
     save_name : str
         Output filename for boxplot
     """
-    networks = get_salazar_scaling_networks()
+    scaling_networks = get_salazar_scaling_networks()
+    low_rx_networks = get_salazar_low_rx10_networks()
+    low_vm_networks = get_salazar_low_vm_networks()
+    networks = {**scaling_networks, **low_rx_networks, **low_vm_networks}
     filtered = {k: v for k, v in networks.items() if v["n_bus_total"] <= max_n_bus and v["n_pv"]>0}
 
     sizes = sorted(set(v["n_bus_total"] for v in filtered.values()))
@@ -1818,7 +1821,7 @@ if __name__ == "__main__":
     plot_inner_start_comparison()
     # plot_adaptive_inner_comparison()
     # plot_salazar_scaling_comparison()
-    # plot_salazar_adaptive_speedup()
+    plot_salazar_adaptive_speedup()
     # plot_pq_scaling_time()
     # plot_baseline_tpf_vs_nr()
     # plot_timing_vs_size()
