@@ -21,12 +21,24 @@ from pathlib import Path
 SAVE_DIR = Path(r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Bachelor_tensorflow\figures")
 SAVE_DIR = Path(r"..\..\..\Bachelor_tensorflow\figures")
 
-from tpf.builders.from_pandapower import build_network_from_pandapower
-from tpf.solvers.tpf_pv_method_a import TPFDensePVMethodA
-from tpf.solvers.tpf_dense import TPFDenseSolver
-from tpf.solvers.nr_reference import PandapowerNRSolver
-from tpf.generators.network_generator_salazar import get_salazar_scaling_networks, get_salazar_low_rx10_networks, get_salazar_low_vm_networks, get_salazar_pq_size_sweep
-import pandapower as pp
+try:
+    from tpf.builders.from_pandapower import build_network_from_pandapower
+    from tpf.solvers.tpf_pv_method_a import TPFDensePVMethodA
+    from tpf.solvers.tpf_dense import TPFDenseSolver
+    from tpf.solvers.nr_reference import PandapowerNRSolver
+    from tpf.generators.network_generator_salazar import get_salazar_scaling_networks, get_salazar_low_rx10_networks, get_salazar_low_vm_networks, get_salazar_pq_size_sweep
+    import pandapower as pp
+except ModuleNotFoundError as e:
+    print(f"Warning: {e}")
+    build_network_from_pandapower = None
+    TPFDensePVMethodA = None
+    TPFDenseSolver = None
+    PandapowerNRSolver = None
+    get_salazar_scaling_networks = None
+    get_salazar_low_rx10_networks = None
+    get_salazar_low_vm_networks = None
+    get_salazar_pq_size_sweep = None
+    pp = None
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 from convergence_analysis import (
@@ -34,8 +46,16 @@ from convergence_analysis import (
     compute_spectral_radius_corrected,
     compute_empirical_contraction,
 )
-from validate_pv_method_a_comprehensive import run_validation_suite
-from plot_network_topology import generate_radial_coordinates
+try:
+    from validate_pv_method_a_comprehensive import run_validation_suite
+except ModuleNotFoundError as e:
+    print(f"Warning: {e}")
+    run_validation_suite = None
+try:
+    from plot_network_topology import generate_radial_coordinates
+except ModuleNotFoundError as e:
+    print(f"Warning: {e}")
+    generate_radial_coordinates = None
 from matplotlib.lines import Line2D
 
 
@@ -1711,11 +1731,13 @@ def plot_subplot_c_from_csv(save_name="timing_vs_size_from_csv.pgf"):
     #     r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Code\tensor_power_flow\tau_benchmark_results\validation_salazar_scaling_w1.0_20260806_170258.csv")
     # csv_path = Path(
     #     r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Code\tensor_power_flow\tau_benchmark_results\test.csv")
+    # csv_path = Path(
+    #     r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Code\tensor_power_flow\scripts\tau_benchmark_results\test2.csv")
     csv_path = Path(
-        r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Code\tensor_power_flow\scripts\tau_benchmark_results\test2.csv")
+        r"tau_benchmark_results\test2.csv")
 
     if not csv_path.exists():
-        print(f"  ! CSV file not found: {csv_path}")
+        print(f"  CSV file not found: {csv_path}")
         return
 
     print(f"  Reading timing data from: {csv_path}")
@@ -1812,20 +1834,264 @@ def plot_subplot_c_from_csv(save_name="timing_vs_size_from_csv.pgf"):
         plt.show()
     plt.close(fig)
 
+def plot_subplot_c_from_csvlog_log(save_name="timing_vs_size_from_csv_lin.pgf"):
+    """
+    Plot subplot (c): Solver time vs network size (n_bus) - boxplot.
+    Reads data from the CSV file exported by validation suite.
+    """
+    import csv
+    from collections import defaultdict
+
+    # csv_path = Path(
+    #     r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Code\tensor_power_flow\tau_benchmark_results\validation_salazar_scaling_w1.0_20260806_170258.csv")
+    # csv_path = Path(
+    #     r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Code\tensor_power_flow\tau_benchmark_results\test.csv")
+    # csv_path = Path(
+    #     r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Code\tensor_power_flow\scripts\tau_benchmark_results\test2.csv")
+    csv_path = Path(
+        r"tau_benchmark_results\test2.csv")
+
+    if not csv_path.exists():
+        print(f"  CSV file not found: {csv_path}")
+        return
+
+    print(f"  Reading timing data from: {csv_path}")
+
+    with open(csv_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        records = list(reader)
+
+    nr_by_size = defaultdict(list)
+    tpf_by_size = defaultdict(list)
+    sparse_by_size = defaultdict(list)
+    has_sparse = False
+
+    for r in records:
+        try:
+            n_bus = int(r["n_bus"])
+            nr_time = float(r["nr_time_ms"]) if r.get("nr_time_ms") else np.nan
+            tpf_time = float(r["tpf_time_ms"]) if r.get("tpf_time_ms") else np.nan
+            sparse_time = float(r["sparse_time_ms"]) if r.get("sparse_time_ms") else np.nan
+
+            if nr_time > 0 and not np.isnan(nr_time):
+                nr_by_size[n_bus].append(nr_time)
+            if tpf_time > 0 and not np.isnan(tpf_time):
+                tpf_by_size[n_bus].append(tpf_time)
+            if sparse_time > 0 and not np.isnan(sparse_time):
+                sparse_by_size[n_bus].append(sparse_time)
+                has_sparse = True
+        except (ValueError, KeyError):
+            continue
+
+    sizes = sorted(nr_by_size.keys())
+    if not sizes:
+        print("  ! No valid timing data found")
+        return
+
+    print(f"  Found data for {len(sizes)} sizes: {sizes}, sparse={has_sparse}")
+
+    fig, ax = plt.subplots(figsize=(5.91, 4.5))
+
+    sizes_arr = np.array([s + 1 for s in sizes], dtype=float)
+    box_width = 0.3
+    sizes_label = [s + 1 for s in sizes]
+    pos_nr = sizes_arr #- box_width * sizes_arr * 0.3
+    pos_tpf = sizes_arr
+    pos_sparse = sizes_arr + box_width * sizes_arr * 0.3 if has_sparse else None
+
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+
+
+    ax.boxplot([nr_by_size[s] for s in sizes], positions=pos_nr, widths=box_width * sizes_arr * 0.25,
+               patch_artist=True,
+               boxprops=dict(facecolor="tab:red", alpha=0.6),
+               medianprops=dict(color="darkred", linewidth=1.5),
+               whiskerprops=dict(color="tab:red", linewidth=1.2),
+               capprops=dict(color="tab:red", linewidth=1.2),
+               flierprops=dict(marker="s", markerfacecolor="tab:red", markersize=4, alpha=0.6))
+
+    ax.boxplot([tpf_by_size[s] for s in sizes], positions=pos_tpf, widths=box_width * sizes_arr * 0.25,
+               patch_artist=True,
+               boxprops=dict(facecolor="tab:blue", alpha=0.6),
+               medianprops=dict(color="darkblue", linewidth=1.5),
+               whiskerprops=dict(color="tab:blue", linewidth=1.2),
+               capprops=dict(color="tab:blue", linewidth=1.2),
+               flierprops=dict(marker="o", markerfacecolor="tab:blue", markersize=4, alpha=0.6))
+
+    if has_sparse:
+        ax.boxplot([sparse_by_size[s] for s in sizes], positions=pos_sparse, widths=box_width * sizes_arr * 0.25,
+                   patch_artist=True,
+                   boxprops=dict(facecolor="tab:green", alpha=0.6),
+                   medianprops=dict(color="darkgreen", linewidth=1.5),
+                   whiskerprops=dict(color="tab:green", linewidth=1.2),
+                   capprops=dict(color="tab:green", linewidth=1.2),
+                   flierprops=dict(marker="^", markerfacecolor="tab:green", markersize=4, alpha=0.6))
+
+    ax.set_xticks(sizes_arr)
+    ax.set_xticklabels(sizes_label)
+    ax.set_xlim(sizes_arr[0] * 0.7, 2000)
+    ax.set_xlabel(r"$n_{\mathrm{bus}}$", fontsize=12)
+    ax.set_ylabel("Rechenzeit [ms]", fontsize=12)
+    ax.grid(True, which="both", alpha=0.3)
+
+    legend_items = [
+        plt.Rectangle((0, 0), 1, 1, fc="tab:red", alpha=0.6),
+        plt.Rectangle((0, 0), 1, 1, fc="tab:blue", alpha=0.6),
+    ]
+    legend_labels = ["NR (pandapower)", "TPF"]
+    if has_sparse:
+        legend_items.append(plt.Rectangle((0, 0), 1, 1, fc="tab:green", alpha=0.6))
+        legend_labels.append("TPF Methode A (sparse)")
+    ax.legend(legend_items, legend_labels, fontsize=9, loc="upper left")
+
+    plt.tight_layout()
+    save_path = SAVE_DIR / save_name
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    print(f"\n  Plot saved: {save_path}")
+    if not USE_PGF:
+        plt.show()
+    plt.close(fig)
+
+
+def plot_pv_share_analysis(save_name="pv_share_k_in_time.pgf"):
+    """
+    Plot k_in vs n_pv (top) and t_solve_ms vs n_pv (bottom) - stacked vertically.
+    Uses data from results_pv_share/e1_1.csv.
+    """
+    import pandas as pd
+    from pathlib import Path
+
+    data_dir = Path(__file__).parent / "results_pv_share"
+    e1_path = data_dir / "e1_1.csv"
+
+    if not e1_path.exists():
+        print(f"  Error: Data file not found: {e1_path}")
+        return
+
+    e1 = pd.read_csv(e1_path)
+
+    conv_summary = e1.groupby(['n_bus', 'n_pv', 'variant']).agg(
+        total=('converged', 'count'),
+        converged=('converged', 'sum')
+    ).reset_index()
+
+    conv_pivot = conv_summary.pivot_table(
+        index=['n_bus', 'n_pv'],
+        columns='variant',
+        values=['total', 'converged']
+    ).fillna(0).astype(int)
+
+    print("\n=== Konvergenz-Ubersicht ===")
+    print(f"{'n_bus':>6} {'n_PV':>5} {'Share':>7} {'Total':>6} {'Gekoppelt':>10} {'Entkoppelt':>11}")
+    print("-" * 55)
+
+    for (n_bus, n_pv), row in conv_pivot.iterrows():
+        share = n_pv / n_bus * 100
+        total_coupled = row[('total', 'coupled')]
+        total_decoupled = row[('total', 'decoupled')]
+        conv_coupled = row[('converged', 'coupled')]
+        conv_decoupled = row[('converged', 'decoupled')]
+        total = max(total_coupled, total_decoupled)
+        print(f"{n_bus:>6} {n_pv:>5} {share:>6.1f}% {total:>6} {conv_coupled:>10} {conv_decoupled:>11}")
+
+    print("\n=== Linearitatsanalyse: t_solve = f(n_pv) ===")
+    print(f"{'n_bus':>6} {'Variant':<10} {'R2':>8} {'RMSE':>10} {'nRMSE%':>10} {'a (ms/PV)':>12} {'b (ms)':>10}")
+    print("-" * 70)
+
+    for n_bus in sorted(e1['n_bus'].unique()):
+        for variant in ['coupled', 'decoupled']:
+            subset = e1[(e1['n_bus'] == n_bus) & (e1['variant'] == variant) & e1['converged']]
+            if len(subset) < 3:
+                continue
+
+            mean_time = subset.groupby('n_pv')['t_solve_ms'].mean().reset_index()
+            x = mean_time['n_pv'].values
+            y = mean_time['t_solve_ms'].values
+
+            if len(x) < 3:
+                continue
+
+            coeffs = np.polyfit(x, y, 1)
+            a, b = coeffs[0], coeffs[1]
+            y_pred = a * x + b
+
+            ss_res = np.sum((y - y_pred) ** 2)
+            ss_tot = np.sum((y - np.mean(y)) ** 2)
+            r2 = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0
+
+            rmse = np.sqrt(np.mean((y - y_pred) ** 2))
+            nrmse_pct = (rmse / np.mean(y)) * 100 if np.mean(y) > 0 else 0
+
+            var_label = "gekoppelt" if variant == "coupled" else "entkoppelt"
+            print(f"{n_bus:>6} {var_label:<10} {r2:>8.4f} {rmse:>10.3f} {nrmse_pct:>9.2f}% {a:>12.4f} {b:>10.3f}")
+
+    print(f"\n  Loaded data: {len(e1)} rows, n_bus values: {sorted(e1['n_bus'].unique())}")
+
+    CLR = {40: "#C0392B", 120: "#8E44AD", 200: "#1F6FB2",
+           350: "#16A085", 500: "#2E8B57", 1000: "#D68910"}
+
+    fig, ax = plt.subplots(2, 1, figsize=(5.9, 5.9))
+
+    for n, g in e1.groupby("n_bus"):
+        c = CLR.get(n, "k")
+        for var, ls in (("coupled", "-"), ("decoupled", "--")):
+            gv = g[g.variant == var]
+            median_kin = gv[gv.converged].groupby("n_pv")["k_in"].median()
+            mean_time = gv[gv.converged].groupby("n_pv")["t_solve_ms"].mean()
+            std_time = gv[gv.converged].groupby("n_pv")["t_solve_ms"].std().fillna(0)
+
+            ax[0].plot(median_kin.index, median_kin.values,
+                       ls=ls, color=c, marker="o", markersize=2, linewidth=0.8,
+                       label=f"$n={n}$, {'gek.' if var=='coupled' else 'entk.'}")
+            if var == "coupled":
+                ax[1].errorbar(mean_time.index, mean_time.values, yerr=std_time.values,
+                               ls=ls, color=c, marker="o", markersize=2, linewidth=0.8,
+                               capsize=2, capthick=0.8,
+                               label=f"$n={n}$, {'gek.' if var=='coupled' else 'entk.'}")
+
+    for a in ax:
+        a.grid(True, which="both", alpha=0.25)
+
+    ax[0].set_xscale("log")
+    ax[0].set_yscale("log")
+    ax[0].set_xlabel(r"$n_\mathrm{pv}$")
+    ax[0].set_ylabel(r"$k_\mathrm{in}$")
+    ax[0].legend(loc="upper right", ncol=2, fontsize=8)
+
+    ax[1].set_xscale("log")
+    ax[1].set_yscale("log")
+    ax[1].set_xlabel(r"$n_\mathrm{pv}$")
+    ax[1].set_ylabel(r"$t_\mathrm{solve}$ [ms]")
+    plt.tight_layout()
+
+    save_path = SAVE_DIR / save_name
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    print(f"\n  Plot saved: {save_path}")
+
+    if not USE_PGF:
+        plt.show()
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     # print_salazar_scaling_table()
     # plot_max_pv_convergence()
     # print_x_pp_matrices()
     # plot_outer_convergence_error_coupled()
     # plot_outer_convergence_error_decoupled()
-    plot_inner_start_comparison()
+    # plot_inner_start_comparison()
     # plot_adaptive_inner_comparison()
     # plot_salazar_scaling_comparison()
-    plot_salazar_adaptive_speedup()
+    # plot_pv_share_analysis()
+    # plot_salazar_adaptive_speedup()
     # plot_pq_scaling_time()
     # plot_baseline_tpf_vs_nr()
     # plot_timing_vs_size()
     # plot_subplot_c_from_csv()
+    plot_subplot_c_from_csvlog_log()
     # plot_timing_vs_pv_ratio()
     # plot_radial_networks_for_convergence()
     # plot_outer_convergence_error_decoupled()

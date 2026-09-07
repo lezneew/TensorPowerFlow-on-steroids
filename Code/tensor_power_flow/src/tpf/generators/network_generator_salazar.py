@@ -437,7 +437,7 @@ def create_salazar_network(
     pandapowerNet
     """
     r_ohm = 0.3144
-    x_ohm = 1.954
+    x_ohm = 0.054# x_ohm = 1.954
     if rx_ratio is not None:
         r_ohm = x_ohm * rx_ratio
 

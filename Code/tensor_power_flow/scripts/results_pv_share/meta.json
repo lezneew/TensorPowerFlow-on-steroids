@@ -1,0 +1,17 @@
+{
+  "quick": false,
+  "python": "3.11.15",
+  "numpy": "2.4.6",
+  "pandapower": "3.5.4",
+  "machine": "AMD64",
+  "processor": "AMD64 Family 23 Model 8 Stepping 2, AuthenticAMD",
+  "v_min_target": 0.97,
+  "cosphi_load": 0.95,
+  "z0_ref": 0.647,
+  "rho_ref": 7.73,
+  "length_km": 0.03,
+  "tol_pv": 1e-06,
+  "tol_inner": 1e-08,
+  "omega": 1.0,
+  "note": "PV-Knoten mit P_gen=0 (pv_p_factor=0) -> Lastbilanz unabhaengig von n_pv"
+}

@@ -459,7 +459,7 @@ Wendet man die Differenz auf das Betragsquadrat an an, kann der Ausdruck
 \end{equation}
 
 formuliert werden.
-Da ohnehin die Linearisierung um $V_k$ betrachtet wird, kann $|\Delta V_k|^2$ vernachlässigt werden. Durch die Identität $z + z^* = 2\,\re(z)$ reduziert sich der Ausdruck \eqref{eq:V2} zu
+Da ohnehin die Linearisierung um $V_k$ betrachtet wird, kann $|\Delta V_k|^2$ als Term höherer Ordnung vernachlässigt werden. Durch die Identität $z + z^* = 2\,\re(z)$ reduziert sich der Ausdruck \eqref{eq:V2} zu
 
 \begin{equation}
 	\Delta(|V_k|^2) \;=\; 2\,\re\bigl(V_k^*\cdot\Delta V_k\bigr)
@@ -562,7 +562,7 @@ Dieser kann folglich als Korrekturformel verwendet werden, nach dem im inneren T
 \subsection{Berücksichtigung der PV-PV-Kopplung}
 \label{subsec:PV-PV-Kopplung}
 
-Jedoch wird in \cref{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität} der Ergebnisse gezeigt, dass diese reine Thévenin-Formulierung der Sensitivität einen großen Nachteil hat.
+Jedoch wird in \cref{sec:Optimierung der Methode} der Ergebnisse gezeigt, dass diese reine Thévenin-Formulierung der Sensitivität einen großen Nachteil hat.
 Die zuvor vorgeschlagene Herleitung~\eqref{eq:thevenin_skalar}--\eqref{eq:methode_a_dQ_scalar} behandelt jeden PV-Knoten einzeln.
 Dies hat zur Folge, dass bei der ausschließlichen Verwendung von den Diagonalelementen von~$Z^{(\ell)}_{B,kk}$ die Kopplung von zwei verschiedenen PV-Knoten unterschlagen wird.
 Jedoch kann diese Annahme nur gelten, wenn mehrere PV-Knoten keinen Einfluss aufeinander haben.
@@ -575,7 +575,9 @@ Da die Kopplungen zwischen Knoten werden im Netzmodell (\cref{subsec:admittanz})
 Dies motiviert eine konsequente Erweiterung der skalaren Formulierung der Sensitivität \eqref{eq:methode_a_dQ_scalar} in eine Matrixform, um die gesamte Impedanzmatrix verwenden zu können.
 Die Skalare $\Delta Q_k$ und $\Delta V_{k}$ werden durch die korrespondierenden Vektorgrößern $\Delta\mathbf{Q}$,
 $\Delta\mathbf{V}_{\mathrm{pv}}$ erweitert, wobei der $k$-te PV-Knoten in der $k$-ten Zeile der Vektoren steht.
-Für die Impedanz wird aus der Geamtmatrix $\ZB$ gebaut, indem alle PV-PV-Einträge zu einem Block $\Delta\mathbf{V}_\mathrm{pv}$ zusammengetragen werden.
+Für die Impedanz wird der entsprechende PV-Teil aus der Gesamtmatrix $\ZB$ gebaut, indem alle PV-PV-Einträge zu einem Block %$\Delta\mathbf{V}_\mathrm{pv}$ 
+$\mathbf{Z}_\mathrm{pp}$
+zusammengetragen werden.
 Die Nebendiagonalelemente dieser Matrix beschreiben genau den Einfluss der PV-Knoten auf einander.\\
 
 Die einzelnen Rechenschritte der Herleitung bleiben die selben.

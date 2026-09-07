@@ -19,6 +19,8 @@ CLR = {40: "#C0392B", 120: "#8E44AD", 200: "#1F6FB2",
        350: "#16A085", 500: "#2E8B57", 1000: "#D68910"}
 MRK = {"random": "o", "clustered": "s", "spread": "^", "leaves": "D", "feeders": "v"}
 
+SAVE_DIR = Path(r"..\..\..\Bachelor_tensorflow\figures")
+
 
 def style(pgf: bool):
     mpl.rcParams.update({
@@ -34,10 +36,13 @@ def style(pgf: bool):
 
 def save(fig, out: Path, name: str, pgf: bool):
     out.mkdir(parents=True, exist_ok=True)
+    pgf = True
     fig.savefig(out / f"{name}.pdf")
     fig.savefig(out / f"{name}.png", dpi=200)
     if pgf:
         fig.savefig(out / f"{name}.pgf")
+        SAVE_DIR.mkdir(parents=True, exist_ok=True)
+        fig.savefig(SAVE_DIR / f"{name}.pgf")
     plt.close(fig)
     print(f"  {name}")
 
@@ -49,7 +54,7 @@ def load(d: Path, name: str):
 
 # --- P1 -----------------------------------------------------------------------
 def p1(e1, out, pgf):
-    fig, ax = plt.subplots(1, 2, figsize=(7.2, 3.0))
+    fig, ax = plt.subplots(1, 2, figsize=(5.9, 3.0))
     for n, g in e1.groupby("n_bus"):
         c = CLR.get(n, "k")
         for var, ls in (("coupled", "-"), ("decoupled", "--")):
@@ -68,7 +73,8 @@ def p1(e1, out, pgf):
     ax[0].legend(ncol=2)
     fig.suptitle("P1  Aufwand über der PV-Knotenzahl (Kreuze: keine Konvergenz)",
                  fontsize=8)
-    save(fig, out, "p1_kout_kin_vs_npv", pgf)
+    plt.tight_layout()
+    save(fig, out, "p1_kout_kin_vs_npv_1", pgf)
 
 
 # --- P2 -----------------------------------------------------------------------
@@ -267,14 +273,14 @@ def main():
     a = ap.parse_args()
     style(a.pgf)
     d, out = Path(a.data), Path(a.fig)
-    e1, e3, e4 = load(d, "e1"), load(d, "e3"), load(d, "e4")
+    e1, e3, e4 = load(d, "e1_1"), load(d, "e3"), load(d, "e4")
     e5, e6, e7, e8 = load(d, "e5"), load(d, "e6"), load(d, "e7"), load(d, "e8")
     print("Plots:")
     if e1 is not None:
         p1(e1, out, a.pgf); p2(e1, out, a.pgf)
-    p3(e3, out, a.pgf); p4(e4, out, a.pgf); p5(e5, out, a.pgf)
-    p6(e6, out, a.pgf); p7(e7, out, a.pgf); p8(e8, out, a.pgf)
-    p9(d, out, a.pgf)
+    # p3(e3, out, a.pgf); p4(e4, out, a.pgf); p5(e5, out, a.pgf)
+    # p6(e6, out, a.pgf); p7(e7, out, a.pgf); p8(e8, out, a.pgf)
+    # p9(d, out, a.pgf)
 
 
 if __name__ == "__main__":

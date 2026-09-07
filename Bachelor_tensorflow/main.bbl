@@ -1204,6 +1204,43 @@
       \verb 10.1137/0719025
       \endverb
     \endentry
+    \entry{E.LiuandJ.Bebic:GEGlobalResearch.}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=c006ff956f9015efef9e838bcb9451ff}{%
+           family={{E. Liu and J. Bebic: GE Global Research}},
+           familyi={E\bibinitperiod}}}%
+        {{hash=c9e730af920e2dd17c687ef162892641}{%
+           family={Niskayuna},
+           familyi={N\bibinitperiod}}}%
+        {{hash=9e7c680cb4d2dfd52bc33009b4710969}{%
+           family={{New York}},
+           familyi={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{e722a5ecff4e5f79acce8a6afb198f2e}
+      \strng{fullhash}{58fc88466b33ea9a7dbcadd0b5362657}
+      \strng{fullhashraw}{58fc88466b33ea9a7dbcadd0b5362657}
+      \strng{bibnamehash}{58fc88466b33ea9a7dbcadd0b5362657}
+      \strng{authorbibnamehash}{58fc88466b33ea9a7dbcadd0b5362657}
+      \strng{authornamehash}{e722a5ecff4e5f79acce8a6afb198f2e}
+      \strng{authorfullhash}{58fc88466b33ea9a7dbcadd0b5362657}
+      \strng{authorfullhashraw}{58fc88466b33ea9a7dbcadd0b5362657}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This report examines the performance of commonly used distribution voltage regulation methods under reverse power flow.}
+      \field{title}{Distribution System Voltage Performance Analysis for High-Penetration Photovoltaics}
+      \verb{file}
+      \verb Distribution System Voltage Performance Analysis for High-Penetration Photovoltaics - 42298:Attachments/Distribution System Voltage Performance Analysis for High-Penetration Photovoltaics - 42298.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://www1.eere.energy.gov/solar/pdfs/42298.pdf
+      \endverb
+      \verb{url}
+      \verb https://www1.eere.energy.gov/solar/pdfs/42298.pdf
+      \endverb
+      \warn{\item article entry 'E.LiuandJ.Bebic:GEGlobalResearch.' (references.bib): Invalid format '9/4/2026' of date field 'urldate' - ignoring}
+    \endentry
   \enddatalist
   \missing{bibid}
   \missing{pandapower}

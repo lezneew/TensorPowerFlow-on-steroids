@@ -314,7 +314,7 @@ Das hat auch zur Folge, dass sich eine konstanter Flankenabstand von 6 inneren I
 Diese Prozedere wiederholt sich, bis die äußere Schleife, wie in \cref{fig:outer_convergence_error_coupled}, die PV-Spannungsbeträge angeglichen hat.
 In diesem Beispiel konvergiert das gesamte Verfahren nach 106 Iterationen.\\
 
-Im Spannungsverlauf unter Verwendung des Warm-Starts (~\ref{fig:inner_start_comparison} untere Grafik) ist das Sägezahnmuster ebenfalls erkennbar, aber mit einem Unterschied:
+Im Spannungsverlauf unter Verwendung des Warm-Starts (\ref{fig:inner_start_comparison} untere Grafik) ist das Sägezahnmuster ebenfalls erkennbar, aber mit einem Unterschied:
 Die Spitzen der Spannungsdifferenz sinken mit jedem äußeren Schleifendurchlauf.
 Dadurch sind ebenfalls die Flankenabstände nicht mehr konstant, da bei kleinerer initialen Spannungsdifferenz weniger Schritte bis zur Konvergenzgrenze benötigt werden.
 Dadurch werden demnach pro äußerer Schleife weniger innere Iterationen berechnet und das Verfahren erreicht nach bereits 70 Iterationen die selbe Netzlösung.
@@ -350,18 +350,20 @@ Das bestätigt, dass die Laufzeit von der inneren Schleife dominiert wird und de
 Das unterstützt auch die Tatsache, dass bei diesem Experiment nur innere Iterationen eingespart werden, da die äußere Schleife unbeeinflusst bleibt.
 Diese braucht bei beiden Varianten des Experiments 17 Durchläufe.\\
 
-Wird dieser Vergleich zwischen Cold und Warm-Start mit einer Reihe von Netzen durchgeführt lässt sich die Statistik in Tabelle \ref{tab:cold-warm} formulieren.
-Dort wurden xx Netze verschiedener Größen und mit jeweils verschiedenem PV-Anteilen und Belastungen berechnet.\\
+Wird dieser Vergleich zwischen Cold und Warm-Start mit einer Reihe von Netzen durchgeführt lässt sich die Statistik in Tabelle \ref{tab:kalt_warm_uebersicht} formulieren.
+Dort wurden 57 Netze verschiedener Größen und mit jeweils verschiedenem PV-Anteilen und Belastungen berechnet.\\
 \todo{warten auf ergebnisse---}
 
 
 
 
 \begin{table}[htbp]
+		\caption{Übersicht: Kaltstart vs. Warmstart (konvergierte Netze)}
+	\label{tab:kalt_warm_uebersicht}
 	\centering
 	\begin{tabular}{c|c|c|c}
 		\hline
-		\textbf{Iteration} & \textbf{Start} & \textbf{Wertebereich} & \textbf{Beschleunigung} \\
+		\textbf{--} & \textbf{Start} & \textbf{Wertebereich} & \textbf{$\diameter$ Beschleunigung} \\
 		\hline
 		\multirow{2}{*}{Innere}
 		& Kaltstart & 60--70 & \multirow{2}{*}{1,18$\times$} \\
@@ -376,12 +378,11 @@ Dort wurden xx Netze verschiedener Größen und mit jeweils verschiedenem PV-Ant
 		& Warmstart & 40--60\,ms & \\
 		\hline
 	\end{tabular}
-	\caption{Übersicht: Kaltstart vs. Warmstart (konvergierte Netze, $n=57$)}
-	\label{tab:kalt_warm_uebersicht}
+
 \end{table}
 
 
-Damit stehen **„Innere“, „Äußere“, „Zeit“ und die jeweilige Beschleunigung** jeweils nur einmal in der Mitte der beiden zugehörigen Zeilen.
+
 
 
 %Quantitativ reduziert der Warm Start die Gesamtzahl der inneren Iterationen von
@@ -688,10 +689,6 @@ Selbst unter Berücksichtigung der Ausreißer ist die Einsparung größer eins, 
 Diese Methode kann deswegen als Standard für alle weiteren Analysen verwendet werden.
 Es wird eine durchschnittliche Einsparung von $\sim1,6$, was ca. einem Drittel entspricht, mit dieser Optimierung erzielt.
 In Einzelfällen kann dies auf eine Beschleunigung vom Faktor 3 steigen.
-
-
-
-
 %Um die Effektivität dieser Maßnahme beurteilen zu können, werden in Abbildung \ref{fig:salazar_adaptive_speedup} die Einsparungen der Anzahl an Iterationen für verschiedene Netze aufgetragen. Dabei werden Netzgrößen bis zu 1000 Bussen analysiert. Dabei entspricht ein Eintrag in der Abbildung einer Netzgröße bei verschiedenen PV-Bus Anteilen (bis 60\%).
 %Hier ist zumal Erkennbar, dass die Einsparung je nach Größe durchaus schwankt und besonders bei dem großen 1000-Knoten-Netz eine kleinerer Beitrag erkennbar ist. 
 %Dieser Abfall der Einsparung ist konsistent mit der Erwartung, da größere Netze längere Pfade enthalten die Kontraktion insgesamt geringer ausfällt.
@@ -709,97 +706,180 @@ Größenbereich.
 \section{PV-Anteil}
 \label{sec:pv-share-invarianz}
 
-Um den Einfluss des PV-Anteils isoliert zu erfassen, wird die Zahl der PV-Knoten
-$n_\mathrm{pv}$ bei fester Netzgröße von einem Knoten bis zur vollständigen
-Besetzung ($n_\mathrm{pv}=n_\mathrm{bus}-1$) variiert. Die PV-Knoten werden mit
-$P_\mathrm{gen}=0$ betrieben, sodass die Wirkleistungsbilanz und damit der
-Arbeitspunkt unabhängig von $n_\mathrm{pv}$ bleiben; die Sollwerte werden
-relativ zur Ausgangslösung mit $\delta=\num{0.005}\,\mathrm{p.u.}$ gesetzt.
-Alle Läufe verwenden die gekoppelte Q-Korrektur mit Warm Start und adaptiver
-innerer Toleranz bei $\rho=R/X=\num{7.73}$ und $v_\mathrm{min}=\num{0.97}\,\mathrm{p.u.}$
 
-Tabelle~\ref{tab:pv-share-invarianz} zeigt das Ergebnis. Über den gesamten
-Bereich bleiben die äußeren Iterationen $k_\mathrm{out}$ auf $8\ldots10$ und die
-gesamten inneren Iterationen $k_\mathrm{in}$ auf $15\ldots18$ beschränkt,
-während die Kondition der PV-PV-Matrix $\operatorname{cond}(\vect X_{pp})$ um
-mehr als vier Dekaden und der Jacobi-Spektralradius $\rho_\mathrm{J}$ um den
-Faktor $84$ anwachsen. Der leichte Anstieg von $8$ auf $10$ vollzieht sich
-zwischen $n_\mathrm{pv}=1$ und $n_\mathrm{pv}\approx 8$ und sättigt danach
-vollständig. Alle 48 Läufe konvergieren, die Abweichung zur
-Newton-Raphson-Referenz bleibt bei $\max|\Delta V|<\num{1e-6}\,\mathrm{p.u.}$
+Die zentrale Größe, dessen Analyse durch die erweiterte Methode der äußeren Schleife ermöglicht wird, sind PV-Knoten.
+Nachdem bereits im \cref{sec:Optimierung der Methode} der Optimierung festgestellt werden konnte, dass hohe PV-Anteil in elektrischen Netzen mit dieser Methode konvergieren, steht bislang noch die konkrete, isolierte Analyse dieser Variable aus.
+Deswegen wird in diesem Abschnitt die Anzahl der PV-Knoten (PV-Anteil) näher untersucht, und dessen Auswirkung auf die Konvergenz charakterisiert.\\
+
+In der Untersuchung werden Netze der Größen 40, 200, 500 und 1000 Knoten angeschaut.
+Für jede Größe werden die PV-Anteile bis $100\,\%$ in 6 Schritten pro Dekade gesteigert.
+Es werden also beide Extremfälle von keinem PV-Knoten bis nur PV- und Slack-Knoten abgedeckt.
+Weiterhin werden für jeden PV-Anteil 5 unterschiedliche Konfigurationen (Positionierungen) der PV-Knoten generiert.\\
+
+Anders als im Optimierungsteil soll hier aber die Belastung des Netzes zwischen den PV-Anteilen vergleichbar bleiben.
+Um eine strikte Isolierung der reinen Anzahl zu gewährleisten, wird die Wirkleistung $P_\mathrm{pv} = 0$ gesetzt.
+Dadurch verändert sich bei Erhöhung der PV-Knoten bei einer Netzgröße der Arbeitspunkt nicht.
+Damit ist lässt sich der Einfluss von Störgröße der Wirkleistungsbilanz abgrenzen.
+Die Spannungsvorgaben der PV-Knoten werden gleichmäßig von der Basislösung ohne PV-Knoten festgelegt.
+Dabei wird die Basis um einen festen Wert $\Delta V = 0.005\,\mathrm{p.u.}$ versetzt.
+Damit ist die Distanz für alle PV-Knoten zur Ausgangslösung gleich, und ändert somit eine vergleichbare Spannungsanforderung über eine Erhöhung der PV-Anzahl sicher.
+Die Netzkonfigurationen unterscheiden sich damit nur noch durch die Anzahl und nicht mehr durch Arbeitspunkt und Spannungsanforderung.\\
 
 \begin{table}[htbp]
+	\caption{PV-Anteil $n_{\mathrm{PV}}$ für verschiedene Netzgrößen $n_{\mathrm{bus}}$. Angegeben sind die Kondition der PV-PV-Reaktanz, äußere und innere Iterationenanzahl und Konvergenzzeit.}
+	\label{tab:pv_share_coupled}
 	\centering
-	\caption{Gekoppelte Q-Korrektur, einzelner Lastfluss ($\tau=1$): Iterationen
-		und Rechenzeit über den PV-Anteil. Median über Seeds.}
-	\label{tab:pv-share-invarianz}
-	\begin{tabular}{rrrrrrrr}
+	\begin{tabular}{r|r|r|r|r|r|r}
 		\toprule
-		$n_\mathrm{bus}$ & $n_\mathrm{pv}$ & Anteil &
-		$\operatorname{cond}(\vect X_{pp})$ & $\rho_\mathrm{J}$ &
-		$k_\mathrm{out}$ & $k_\mathrm{in}$ & $t$ / ms \\
+		$n_{\mathrm{bus}}$ & $n_{\mathrm{PV}}$ & Anteil & $\operatorname{cond}(\mathbf{X}_{\mathrm{pp}})$ & $k_{\mathrm{out}}$ & $k_{\mathrm{in}}$ & $t$ [ms] \\
 		\midrule
-		40  & 1   & 0.026 & 1.0                & 0.00  & 8  & 16 & 1.07 \\
-		40  & 4   & 0.103 & 10.4               & 0.82  & 9  & 16 & 0.63 \\
-		40  & 10  & 0.256 & 39.8               & 2.20  & 10 & 16 & 1.22 \\
-		40  & 20  & 0.513 & 81.3               & 3.18  & 10 & 16 & 0.77 \\
-		40  & 39  & 1.000 & 199.7              & 6.26  & 10 & 16 & 0.93 \\
+		40 &   1 & 0.025 &   1.0 &  8 & 16 &  1.02 \\
+		40 &   4 & 0.100 &  10.4  &  9 & 16 &  1.35 \\
+		40 &  10 & 0.250 &  39.8  & 10 & 16 &  1.21 \\
+		40 &  20 & 0.500 &  81.3  & 10 & 16 &  1.24 \\
+		40 &  39 & 0.975 & 199.7  & 10 & 16 &  1.25 \\
 		\midrule
-		200 & 1   & 0.005 & 1.0                & 0.00  & 8  & 16 & 5.09 \\
-		200 & 10  & 0.050 & 76.6               & 1.80  & 10 & 16 & 5.22 \\
-		200 & 50  & 0.251 & 912.7              & 10.03 & 10 & 16 & 4.31 \\
-		200 & 100 & 0.503 & $\num{1.93e3}$     & 17.96 & 10 & 16 & 5.75 \\
-		200 & 199 & 1.000 & $\num{4.74e3}$     & 33.67 & 10 & 16 & 5.62 \\
+		200 &   1 & 0.005 &   1.0  &  8 & 16 &  1.91 \\
+		200 &  10 & 0.050 &  76.6  & 10 & 16 &  1.83 \\
+		200 &  50 & 0.250 & 912.7 &   10 & 16 &  1.81 \\
+		200 & 100 & 0.500 & $\num{1.9e3}$ &   10 & 16 &  1.92 \\
+		200 & 199 & 0.995 & $\num{4.7e3}$ &   10 & 16 &  2.27 \\
 		\midrule
-		500 & 1   & 0.002 & 1.0                & 0.00  & 8  & 16 & 7.24 \\
-		500 & 10  & 0.020 & 136.5              & 1.53  & 10 & 16 & 7.96 \\
-		500 & 50  & 0.100 & $\num{1.45e3}$     & 9.59  & 9  & 15 & 6.89 \\
-		500 & 250 & 0.501 & $\num{1.28e4}$     & 44.67 & 9  & 15 & 7.56 \\
-		500 & 499 & 1.000 & $\num{3.43e4}$     & 84.08 & 10 & 16 & 9.14 \\
+		500 &   1 & 0.002 &   1.0 &     8 & 16 &  4.61 \\
+		500 &  10 & 0.020 & 136.5 &    10 & 16 &  5.69 \\
+		500 &  50 & 0.100 & $\num{1.4e3}$ &     9 & 15 &  5.14 \\
+		500 & 250 & 0.500 & $\num{1.3e4}$ &    9 & 15 &  4.86 \\
+		500 & 499 & 0.998 & $\num{3.4e4}$ &   10 & 16 &  6.71 \\
+		\midrule
+		1000 &   1 & 0.001 &   1.0 &    8 & 16 & 23.61 \\
+		1000 &  10 & 0.010 &  69.2 &    10 & 16 & 20.93 \\
+		1000 &  50 & 0.050 & $\num{3.4e3}$ &    10 & 16 & 21.43 \\
+		1000 & 500 & 0.500 & $\num{5.0e4}$ &   12 & 19 & 30.36 \\
+		1000 & 999 & 0.999 & $\num{1.4e5}$ &  12 & 19 & 47.59 \\
 		\bottomrule
 	\end{tabular}
+	
 \end{table}
 
-Die Rechenzeit folgt diesem Bild: Innerhalb einer Netzgröße streut sie um
-höchstens den Faktor $2.5$ ($n_\mathrm{bus}=40$: $\num{0.55}\ldots\num{1.37}\,\mathrm{ms}$)
-bzw. $1.5$ ($n_\mathrm{bus}=500$: $\num{6.07}\ldots\num{9.18}\,\mathrm{ms}$),
-ohne monotonen Trend über $n_\mathrm{pv}$. Der Grund ist, dass das einmalige
-Faktorisieren von $\vect X_{pp}$ in die Vorberechnung fällt und pro äußerer
-Iteration nur ein Vor-/Rückwärtseinsetzen der Größe $n_\mathrm{pv}$ anfällt,
-das gegenüber der inneren GEMM mit $O(n_\mathrm{bus}^2)$ nicht ins Gewicht
-fällt. Die Laufzeit wird damit von $n_\mathrm{bus}$ bestimmt, nicht vom
-PV-Anteil.
+Alle Lösungen werden mit gekoppelt mit adaptiver innerer Toleranz und unter Warm-Start durchgeführt.
+Eine zusammengefasste Übersicht über die Ergebnisse wird in Tabelle~\ref{tab:pv_share_coupled} aufgeführt.
+Die Beziehungen zwischen Iterationen, Lösungszeiten und PV-Anteilen werden in Abbildung \ref{fig:p1-kout-kin-vs-npv} dargestellt.
+Neben der Netzgröße und PV-Anteil wird die Kondition der PV-PV-Submatrix angegeben. 
+Diese ist ein Maß für die numerische Stabilität und ist ein Indikator für die Kopplung zwischen den PV-Knoten. \cite{bibid}\todo{literatur}.
+Dies ist auch in der Tabelle erkennbar.
+Für steigenden PV-Anteil steigt verschlechtert sich die Kondition hohe Werte, wohingegen bei einem einzigen PV-Knoten keine Kopplung und somit auch eine gute Kondition von $1$ vorliegt.
+Während die Kopplung bei allen Größen stark über mehrere Dekaden ansteigt, vergrößert sich wiederum die Anzahl der äußeren Iterationen $k_\mathrm{out}$ nur geringfügig von 8 auf 12.
+Die Gesamtanzahl der Iterationen $k_\mathrm{in}$ erhöht sich auch nur geringfügig von 16 auf 19 Iterationen.
+Alle 330 Lastflussberechnungen konvergieren unter der erweiterten optimierten Methode und gleichen sich im Ergebnis der Newton-Raphson-Referenzrechnung.\\
+
+Dass die Anzahl an Iterationen für steigende PV-Anteile nahezu konstant bleibt, zeigt auch Abbildung~\ref{fig:p1-kout-kin-vs-npv} (oben).
+Dort ist die mittlere Iterationenanzahl des Verfahrens gegen die PV-Knotenanzahl aufgetragen. 
+die gekoppelten (durchgängige Linien) Verläufe aller Netzgrößen variieren nur geringfügig und überschreiten keine 19 Iterationen. 
+Als Vergleich sind hier auch noch die Verläufe der gekoppelten Q-Korrektur aufgetragen (gestrichelt).
+Es bestätigt auch für die isolierte PV-Analyse die These aus \cref{subsec:PV-PV-Kopplung}.
+Die Iterationen nehmen für steigende PV-Knotenanzahl stark auf über 60 Iterationen bei wenigen PV-Knoten zu.
+Ab 9 PV-Bussen konvergiert das Verfahren nicht mehr.
+Damit ist gezeigt, dass die entkoppelte Sensitivität für schlecht konditionierte Korrektur-Matrizen $\mathbf{X}_\mathrm{pp}$ auch bei einem konstanten Arbeitspunkt und Spannungsbedingung scheitert.\\
+
+
+
+
+
+
+
+
+
+%Um den Einfluss des PV-Anteils isoliert zu erfassen, wird die Zahl der PV-Knoten
+%$n_\mathrm{pv}$ bei fester Netzgröße von einem Knoten bis zur vollständigen
+%Besetzung ($n_\mathrm{pv}=n_\mathrm{bus}-1$) variiert. Die PV-Knoten werden mit
+%$P_\mathrm{gen}=0$ betrieben, sodass die Wirkleistungsbilanz und damit der
+%Arbeitspunkt unabhängig von $n_\mathrm{pv}$ bleiben; die Sollwerte werden
+%relativ zur Ausgangslösung mit $\delta=\num{0.005}\,\mathrm{p.u.}$ gesetzt.
+%Alle Läufe verwenden die gekoppelte Q-Korrektur mit Warm Start und adaptiver
+%innerer Toleranz bei $\rho=R/X=\num{7.73}$ und $v_\mathrm{min}=\num{0.97}\,\mathrm{p.u.}$
+%
+%Tabelle~\ref{tab:pv-share-invarianz} zeigt das Ergebnis. Über den gesamten
+%Bereich bleiben die äußeren Iterationen $k_\mathrm{out}$ auf $8\ldots10$ und die
+%gesamten inneren Iterationen $k_\mathrm{in}$ auf $15\ldots18$ beschränkt,
+%während die Kondition der PV-PV-Matrix $\operatorname{cond}(\vect X_{pp})$ um
+%mehr als vier Dekaden und der Jacobi-Spektralradius $\rho_\mathrm{J}$ um den
+%Faktor $84$ anwachsen. Der leichte Anstieg von $8$ auf $10$ vollzieht sich
+%zwischen $n_\mathrm{pv}=1$ und $n_\mathrm{pv}\approx 8$ und sättigt danach
+%vollständig. Alle 48 Läufe konvergieren, die Abweichung zur
+%Newton-Raphson-Referenz bleibt bei $\max|\Delta V|<\num{1e-6}\,\mathrm{p.u.}$
+
+
+
+%Die Rechenzeit folgt diesem Bild: Innerhalb einer Netzgröße streut sie um
+%höchstens den Faktor $2.5$ ($n_\mathrm{bus}=40$: $\num{0.55}\ldots\num{1.37}\,\mathrm{ms}$)
+%bzw. $1.5$ ($n_\mathrm{bus}=500$: $\num{6.07}\ldots\num{9.18}\,\mathrm{ms}$),
+%ohne monotonen Trend über $n_\mathrm{pv}$. Der Grund ist, dass das einmalige
+%Faktorisieren von $\vect X_{pp}$ in die Vorberechnung fällt und pro äußerer
+%Iteration nur ein Vor-/Rückwärtseinsetzen der Größe $n_\mathrm{pv}$ anfällt,
+%das gegenüber der inneren GEMM mit $O(n_\mathrm{bus}^2)$ nicht ins Gewicht
+%fällt. Die Laufzeit wird damit von $n_\mathrm{bus}$ bestimmt, nicht vom
+%PV-Anteil.
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.9\textwidth]{figures/p1_kout_kin_vs_npv.pdf}
-	\caption{Äußere und gesamte innere Iterationen über der Zahl der PV-Knoten
-		für $n_\mathrm{bus}\in\{40,200,500\}$. Die gekoppelte Korrektur bildet ein
-		Plateau; zum Vergleich ist die Abbruchkante der entkoppelten Variante
-		eingezeichnet.}
+	\input{figures/pv_share_k_in_time.pgf}
+	\caption{Gesamte innere Iterationen und Rechenzeit über der Zahl der PV-Knoten
+		für $n_\mathrm{bus}\in\{40,200,500,1000\}$.}
 	\label{fig:p1-kout-kin-vs-npv}
 \end{figure}
 
-Die Ursache der Invarianz liegt darin, dass keiner der beiden Konvergenztreiber
-der Methode auf $n_\mathrm{pv}$ reagiert. Die gemessene innere
-Kontraktionszahl $\eta$ ist je Netz exakt konstant
-($\num{0.0257}$, $\num{0.0254}$, $\num{0.0253}$ für $n_\mathrm{bus}=40$, $200$,
-$500$) und stimmt bis auf \SI{5}{\percent} mit dem Modell aus
-Gl.~\eqref{eq:lam-etamodell} überein; der Linearisierungsfehler der äußeren
-Schleife $\varepsilon_\mathrm{lin}$ bleibt mit $\num{0.177}\ldots\num{0.222}$
-innerhalb von $\pm\SI{10}{\percent}$ ohne erkennbaren Trend. Der PV-Anteil hat
-im Nennbetrieb somit keinen Wirkkanal auf die Konvergenz, und die
-Fehlerquellen aus dem $R/X$-Verhältnis (Abschnitt~\ref{sec:rx-verhaeltnis})
-und aus der PV-Besetzung sind orthogonal.
 
-Das Niveau des Plateaus wird stattdessen von der Härte der Sollwertvorgabe und
-vom $R/X$-Verhältnis gesetzt: Eine Halbierung von $\delta$ auf
-$\num{0.002}\,\mathrm{p.u.}$ senkt $k_\mathrm{out}$ von $10$ auf $5$ und
-$k_\mathrm{in}$ von $16$ auf $8$ bei unverändertem PV-Anteil. Die Invarianz ist
-außerdem konditional: Sie gilt bis $\lambda\lesssim 2$ und $\rho\lesssim
-\num{4.6}$; bei $\lambda=5$ steigt $k_\mathrm{out}$ zwischen \SI{2}{\percent}
-und \SI{99}{\percent} PV-Anteil um den Faktor $\num{2.6}$
-(vgl.~Abschnitt~\ref{sec:pv-share-interaktion}).
+Das Ergebnis, der nahezu konstanten Iterationenzahl, lässt außerdem die These aufstellen, dass die Berechnungszeit des Lastflusses auch indifferent gegenüber des PV-Anteils ist.
+Tabelle~\ref{tab:pv_share_coupled} und die untere Grafik der Abbildung~\ref{fig:p1-kout-kin-vs-npv} bestätigen dieses Verhalten über einen großen Bereich.
+Für 40, 200 und 500-Knoten-Netze über den gesamten PV-Bereich kein Trend erkennbar. 
+Bei 200-Knoten zeigen die Mittelwerte der Zeiten in der Tabelle zwar einen geringen Anstieg auf $2,27\,\mathrm{ms}$
+Jedoch ist bei Betrachtung der Durchschnittswerte und dessen Streuung über verschiedene Konfigurationen (Abbildung mit Streuungsbalken) kein Trend erkennbar, der Linearisierungsfehler bleibt bei unter $\pm\SI{10}{\percent}$.\\
+
+Bei dem größeren Netz (1000 Knoten) ist in der Tabelle ein größerer Anstieg der Mittelwerte von 23,6 auf 47.6 Millisekunden verzeichnet, was fast einer Verdopplung entspricht.
+In der Abbildung wird das Verhalten genauer aufgeschlüsselt.
+Für PV-Anteile bis zu etwa 50 Knoten ist dort ebenfalls kein Anstieg erkennbar.
+Wird der PV-Anteil größer, steigt die Zeit im Durchschnitt jedoch an.
+Dieses Verhalten lässt sich auf die einhergehende Vergrößerung der PV-Reaktanzmatrix $\mathbf{X}_\mathrm{pp}$ zurückführen.
+Bei größeren PV-Anteilen wächst auch die Dimension der Matrix gemäß $n_\mathrm{pv} \times n_\mathrm{pv}$. 
+Die Konstruktion der Sensitivität erfolgt durch eine Matrixinversion. 
+Diese Operation hat den Rechenaufwand $\mathcal{O}(n^3)$.\todo{literatur}
+Trotz der einmaligen Berechnung dieser Sensitivität, dauert diese Initialisierung bei vielen PV-Knoten dadurch deutlich länger und wirkt sich dadurch auch auf die Gesamtrechnung aus.
+Dafür spricht auch, dass die Iterationenanzahl der inneren und äußeren Schritte sich kaum ändert.
+Dadurch liegt die Ursache des geringfügigen zeitlichen Anstiegs in den Matrix-Operationen selber, statt in der wiederholten Ausführung der Q-Korrektur.
+Es sei aber angemerkt, dass auch hier die Wurzel des mittleren quadratischen Fehlers gering mit $9,09\,\%$ ist.
+Damit liegt selbst hier noch ein nahezu konstanter Zusammenhang zwischen PV-Anteil und der Gesamtzeit vor.\\
+
+In der Abbildung~\ref{fig:p1-kout-kin-vs-npv} ist auch erkennbar, dass die Plateaus der Konvergenzzeiten sich um einen konstanten Offset unterscheiden.
+Dieses Verhalten spricht dafür dass die Zeit hier primär eine Funktion der Netzgröße ist. 
+Die konkrete Abhängigkeit wird im nächsten Abschnitt näher beleuchtet.\\
+
+Die hier vorgestellten Ergebnisse unterstützen überwiegend die in der Optimierung zugrunde gelegte Vermutung einer Invarianz gegenüber des PV-Knoten-Anteils.
+Es wurde gezeigt dass die Anzahl der Iterationen für alle betrachteten Netzgrößen unabhängig von der PV-Durchdringung konvergiert.
+Dieses Verhalten spiegelt sich auch in der Berechnungszeit wieder. 
+Es ist aber zu erwarten, dass bei besonders großen Netzen mit vielen PV-Knoten die Vorberechnung der Sensitivitätsmatrix zu einem erhöhten Aufwant führt und die Berechnung dadurch länger dauern kann.
+
+
+
+%Die Ursache der Invarianz liegt darin, dass keiner der beiden Konvergenztreiber
+%der Methode auf $n_\mathrm{pv}$ reagiert. Die gemessene innere
+%Kontraktionszahl $\eta$ ist je Netz exakt konstant
+%($\num{0.0257}$, $\num{0.0254}$, $\num{0.0253}$ für $n_\mathrm{bus}=40$, $200$,
+%$500$) und stimmt bis auf \SI{5}{\percent} mit dem Modell aus
+%Gl.~\eqref{eq:lam-etamodell} überein; der Linearisierungsfehler der äußeren
+%Schleife $\varepsilon_\mathrm{lin}$ bleibt mit $\num{0.177}\ldots\num{0.222}$
+%innerhalb von $\pm\SI{10}{\percent}$ ohne erkennbaren Trend. Der PV-Anteil hat
+%im Nennbetrieb somit keinen Wirkkanal auf die Konvergenz, und die
+%Fehlerquellen aus dem $R/X$-Verhältnis (Abschnitt~\ref{sec:rx-verhaeltnis})
+%und aus der PV-Besetzung sind orthogonal.
+%
+%Das Niveau des Plateaus wird stattdessen von der Härte der Sollwertvorgabe und
+%vom $R/X$-Verhältnis gesetzt: Eine Halbierung von $\delta$ auf
+%$\num{0.002}\,\mathrm{p.u.}$ senkt $k_\mathrm{out}$ von $10$ auf $5$ und
+%$k_\mathrm{in}$ von $16$ auf $8$ bei unverändertem PV-Anteil. Die Invarianz ist
+%außerdem konditional: Sie gilt bis $\lambda\lesssim 2$ und $\rho\lesssim
+%\num{4.6}$; bei $\lambda=5$ steigt $k_\mathrm{out}$ zwischen \SI{2}{\percent}
+%und \SI{99}{\percent} PV-Anteil um den Faktor $\num{2.6}$
+%(vgl.~Abschnitt~\ref{sec:pv-share-interaktion}).
 
 
 
@@ -809,28 +889,138 @@ und \SI{99}{\percent} PV-Anteil um den Faktor $\num{2.6}$
 \section{Einfluss der Netzgröße}
 \label{sec:einzelner_lastfluss}
 
-Die in Abschnitt~\ref{sec:Optimierung der Methode A} identifizierten
-Einstellungen (gekoppelte Q-Korrektur, Warm Start und adaptive innere Toleranz) werden im Folgenden als Standardkonfiguration verwendet. Damit stellt sich folgend die
-Frage nach der Konkurrenzfähigkeit des Verfahrens bezüglich der  Rechenzeit. Bis zu welcher
-Netzgröße ist die Fixpunktiteration schneller als das Newton-Raphson-Verfahren
- der Referenzimplementierung \texttt{pandapower}? Untersucht wird dabei
-zunächst der Fall eines \emph{einzelnen} Lastflusses, also einer Batch-Dimension
-von $\tau=1$, bei dem die Tensorstruktur des Verfahrens noch keinen
-Vorteil ausspielen kann.\\
+%Die in Abschnitt~\ref{sec:Optimierung der Methode A} identifizierten
+%Einstellungen (gekoppelte Q-Korrektur, Warm Start und adaptive innere Toleranz) werden im Folgenden als Standardkonfiguration verwendet. Damit stellt sich folgend die
+%Frage nach der Konkurrenzfähigkeit des Verfahrens bezüglich der  Rechenzeit. Bis zu welcher
+%Netzgröße ist die Fixpunktiteration schneller als das Newton-Raphson-Verfahren
+% der Referenzimplementierung \texttt{pandapower}? Untersucht wird dabei
+%zunächst der Fall eines \emph{einzelnen} Lastflusses, also einer Batch-Dimension
+%von $\tau=1$, bei dem die Tensorstruktur des Verfahrens noch keinen
+%Vorteil ausspielen kann.\\
+%
+%Variiert werden die Netzgröße $n_\mathrm{bus}$ von $20$ bis
+%$1000$ Knoten und der PV-Anteil bis $60\,\%$. Da in
+%Abschnitt~\ref{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität}
+%gezeigt wurde, dass die äußere Iterationszahl der gekoppelten Formulierung
+%nahezu unabhängig vom PV-Anteil ist, werden die Konfigurationen gleicher
+%Netzgröße in Abbildung~\ref{fig:timing_vs_size_from_csv} zu jeweils einem
+%Boxplot zusammengefasst. Eine Box umfasst somit mehrere Netze identischer
+%Größe, die sich ausschließlich in der Anzahl und Platzierung der PV-Knoten
+%unterscheiden.\\
 
-Variiert werden die Netzgröße $n_\mathrm{bus}$ von $20$ bis
-$1000$ Knoten und der PV-Anteil bis $60\,\%$. Da in
-Abschnitt~\ref{sec:Konvergenz der äußeren Schleife: Entkoppelte Sensitivität}
-gezeigt wurde, dass die äußere Iterationszahl der gekoppelten Formulierung
-nahezu unabhängig vom PV-Anteil ist, werden die Konfigurationen gleicher
-Netzgröße in Abbildung~\ref{fig:timing_vs_size_from_csv} zu jeweils einem
-Boxplot zusammengefasst. Eine Box umfasst somit mehrere Netze identischer
-Größe, die sich ausschließlich in der Anzahl und Platzierung der PV-Knoten
-unterscheiden.\\
+Wie bereits im vorherigen \cref{sec:pv-share-invarianz} in Abbildung \ref{fig:p1-kout-kin-vs-npv} beobachtet werden kann, skaliert die Rechenzeit mit der Netzgröße, wohingegen die Anzahl der Iterationen weitestgehend in einem schmalen konstanten Band bleibt.
+Die Konsequenz dieser Beobachtung ist, dass der Aufwand der Berechnung pro Iteration höher wird.
+Eine nähere Analyse der Netzgröße wird in diesem Abschnitt durchgeführt.
+Diese Abhängigkeit wird bereits von Salazar et al.  als treibender Faktor für den Berechnungsaufwand identifiziert~\cite{Salazar2024}.
+Dort wird bereits erkannt, dass die gewonnene Effizienz durch Verwendung des Fixpunkt-Ansatzes durch die Netzgröße beschränkt ist, sofern ein einzelner Lastfluss berechnet wird.\\
+
+Es werden weiterhin die Optimierung aus \cref{sec:Optimierung der Methode} übernommen. 
+Das bedeutet, es wird die gekoppelte Q-Korrektur, Warm-Start und die adaptive innere Toleranz für die äußere Schleife verwendet.
+Für die erste Untersuchung wird für Netzgrößen bis 1000 Knoten die Berechnungszeit pro Iteration aufgenommen. 
+Dafür werden unter den selben Bedingungen wie zuvor, Netze mit vier verschiedenen PV-Anteilen und fünf PV-Verteilungen erzeugt und mit der erweiterten TPF-Methode gelöst.
+In Abbildung~\ref{fig:size_analysis_time_per_iter} wird das Ergebnis dieser Analyse dargestellt.
+Es ist die Zeit pro Iteration gegen die Netzgröße aufgeführt.
+Jede Box umfasst dementsprechend 20 Konfigurationen einer Netzgröße.
+Der Verlauf des Graphen verläuft steigend für größere Netze.
+Für kleinere Netze bis 75 Knoten ist der Verlauf schwach, nimmt aber für größere Netze deutlich zu.\\
+
+Dieser Verlauf bestätigt die These der Einführung des Abschnittes.
+Größere Netze erfordern mehr Rechenzeit in jeder Iteration.
+Dieser Anstieg lässt sich durch den Aufbau des erweiterten TPF erklären.
+Mehr Knoten im elektrischen Netz bedeuten auch größere Systemmatrizen für den FPI und somit auch für den TPF.
+Da die Verarbeitung der Matrizen Element-weise erfolgt, steigt somit auch der Aufwand der Berechnung mit steigender Netzgröße.
+Für kleinere Netze ist das Matrix-Matrix-Produkt zur Folge nur schwach ausgeprägt und trägt nur wenig zur Gesamtlaufzeit bei. 
+Dort dominieren Initialisierungsprozesse, wie die Erstellung der Sensitivitätsmatrix für die äußere Schleife, oder auch die Faktorisierung der konstanten Matrizen des TPF.
+Bei Erhöhung der Knotenanzahl verlieren diese Prozesse an Dominanz und die eigentliche Berechnung des Iterationsschritts bestimmt die Zeit.\\
+
+
 
 \begin{figure}[htb]
 	\centering
-	\input{figures/timing_vs_size_from_csv.pgf}
+	\input{figures/size_analysis_time_per_iter.pgf}
+	\caption{Rechenzeit eines einzelnen Lastflusses für das Fixpunktverfahren
+		(TPF) und das Newton-Raphson-Verfahren von \texttt{pandapower} (NR),
+		aufgetragen über der Netzgröße $n_\mathrm{bus}$. Jede Box fasst mehrere Netze
+		derselben Größe mit PV-Anteilen von $0$ bis $60\,\%$ zusammen.}
+	\label{fig:size_analysis_time_per_iter}
+\end{figure}
+
+Interessant für die Bewertung des Verfahrens ist der Vergleich zum NR-Verfahren.
+Durch die Eigenschaft der wachsenden Berechnungsaufwandes pro Iteration des TPF muss folglich untersucht werden, für welche Netzgrößen dieses Verfahren eine Beschleunigung erzielen kann. 
+Hierzu wird folgende Simulationskampange durchgeführt: 
+Es werden Netze zwischen 20 und 1500 Knoten getestet.  
+Die PV-Anteile werden auch wieder für jede Netzgröße bis $60\,\%$ variiert, jedoch wird eine Wirkleistung von $50\,\mathrm{kW}$ zugelassen, welche sich nach den PQ-Knoten richtet.
+Dadurch soll die Belastung und somit auch der Arbeitspunkt der Netze variiert werden, um auch unvorteilhaftere Fälle zu berücksichtigen.
+Mittels der Beachtung der \emph{Worst-Case}-Szenarien soll eine konservativere Aussage über den Vorteilsbereich des TPF gegenüber dem NR-Verfahren getätigt werden.
+Die Spannungsvorgabe geschieht analog zu \cref{sec:pv_auswirkung}, um den natürlichen Spannungsabfall über die Distanz zum Slack-Knoten aufrecht zu halten~\cite{E.LiuandJ.Bebic:GEGlobalResearch.}.
+Das R/X-Verhältnis wird in Referenz an Salazar et al. bei 5,8 konstant gehalten.\\
+
+
+In Abbildung~\ref{fig:timing_vs_size_from_csv} werden die Gesamtberechnungszeiten über die Netzgrößen aufgeführt.
+Jede Box beinhaltet acht verschiedene Konfigurationen.
+Rote Boxen entsprechen den Konvergenzzeiten der Referenzlösung des NR-Verfahrens von \texttt{pandapower}.
+Blaue Boxen kennzeichnen die des erweiterten TPF.\\
+
+Die Zeiten des NR-Verfahren sind bis auf wenige Ausreißer indifferent gegenüber der Netzgröße. 
+Diese halten sich überwiegend bei $\sim 20\,\mathrm{ms}$ und streckt sich von $17{,}9\,\mathrm{ms}$
+($40$ Knoten) bis $26{,}5\,\mathrm{ms}$ ($1500$ Knoten).
+Das ist aufgrund der quadratischen Konvergenz des Verfahrens zu erwarten.\todo{lit.}
+Für die durchschnittlichen Gesamtlaufzeiten des erweiterten TPF liegt ein monotoner Anstieg über die Busanzahl vor.
+Kleine 20-Knoten-Netze werden $\sim66$ mal schneller im Vergleich zur Referenzlösung innerhalb von $0,21 - 0,61\,\mathrm{ms}$ gelöst.
+Die größten getesteten 1500-Knoten-Netze erfordern über $200\,\mathrm{ms}$, also $\sim11$ mal länger als das NR-Verfahren.
+Dieser Anstiegt ist konsistent mit dem vorherigen Ergebnis der erhöhten Rechenzeit pro Iteration durch die größeren Systemmatrizen.
+Durch eine Vergrößerung wachsen die Kosten quadratisch \cite{bibid}\todo{lit}.\\
+
+Darüber hinaus sind die Boxen des TPF für die meisten Netzgrößen breiter als die korrespondierenden Boxen des NR-Verfahrens.
+Die Zeiten Streuen für den TPF folglich mehr.
+Dies liegt an am Konvergenzverhalten des erweiterten Verfahren. 
+Wie bereits im Versuchsaufbau beschrieben wurde, werden hier auch ungünstige Netzkonfigurationen berechnet.
+Dadurch benötigt der erweiterte TPF für schlecht konditionierte Netze mehr Iterationen.
+Im Beispiel der 200-Knoten-Netze konvergiert das Verfahren für PV-Anteile bis 80 Knoten innerhalb 14 Iterationen und  $4\,\mathrm{ms}$ (4 Iterationen mit NR).
+Für die größeren PV-Anteile verschiebt sich der Arbeitspunkt durch den erhöhten Wirkleistungsbedarf.
+Bei 100 PV-Knoten benötigt der TPF 99 Iterationen und das NR-Verfahren 7 Iterationen um diese Konfiguration zu lösen.
+Daraus folgt einer der Ausreißer der 200-Knoten-Box.
+Dieser Trend lässt sich in allen Netzgrößen beobachten. 
+Netze mit erhöhtem Wirkleistungsbedarf durch mehr PV-Knoten erfordern mehr TPF Iterationen und somit eine längere Laufzeit, welche für eine größere Streuung der Messpunkte verantwortlich ist.
+Der Einfluss der Netzbelastung ist für den erweiterten TPF ausgeprägter als für das NR-Verfahren. 
+Die konkrete Abhängigkeit vom Lastfaktor wird in \cref{sec:lastfaktor} charakterisiert.\\
+
+Für diese Analyse steht die Konkurenzfähigkeit des TPF für das gesamte Netzsortiment im Fokus.
+Aus dem Schnittpunkt der beiden Kurven des TPF und NR ergibt sich die Grenze, bis zu welcher der erweiterte TPF einen rechnerischen Vorteil gegenüber der Referenz.
+Diese liegt zwischen 500 und 750 Knoten, sofern die Mediane betrachtet werden. 
+Für besonders problematische Netzkonditionen kann der TPF bereits bei 120 Knoten ähnlich lange rechnen wie das NR-Verfahren, wie es an den Ausreißern zu erkennen ist.
+Die mittleren Beschleunigungen durch das Verfahren für Netze bis 500 Knoten sind in Tabelle \ref{tab:speedups} angegeben.\\
+Für Netze, welche größer sind, dauert die Berechnung länger als die von \texttt{pandapower}.
+Wenn einzelne Lastflüsse berechnet werden sollen, verliert der erweiterte TPF gegen den NR für Netze über 500 Knoten.
+
+\begin{table}[htbp]
+	\caption{Beschleunigungen für Netzgrößen bis 500 Knoten}
+	\label{tab:speedups}
+	\centering
+	\begin{tabular}{c|r|r|r|r|r|r|r}
+		\toprule
+		Beschleunigung & $20$ & $40$ & $75$ & $120$ & $200$ & $350$ & $500$ \\
+		\midrule
+		Mittelwert & 59.52&21.84&17.59&8.25&4.18&2.01&1.56\\
+		Max & 76.97&41.39&27.23&12.60&5.53&2.54&1,64\\
+		Min & 19.60&10.08&10.82&5.70&1.48&1.51&0.33\\
+		\bottomrule
+	\end{tabular}
+	
+\end{table}
+
+Sämtliche hier gezeigten Ergebnisse aller Netzkonfigurationen des erweiterten TPF entsprechen der Referenzlösung von \texttt{pandapower} überein.
+Dabei liegt der maximale Spannungsfehler unter $10^{-6}\,\mathrm{p.u.}$ und der Winkelfehler unter $0{,}0025^\circ$.
+Es sei jedoch angemerkt, dass in dieser Versuchsreihe die Tensorisierungseigenschaft des TPF nicht ausgenutzt wird, da in diesem Abschnitt nur einzelne Lastflüsse analysiert werden. 
+Der durch die simultane Berechnung vieler Szenarien gewonnene Vorteil wird in \cref{sec:batch_lastfluss} aufgegriffen.
+
+
+%Für die erste Untersuchung werden die Netze aus \texttt{salazar\_scaling\_networks}
+
+
+\begin{figure}[htb]
+	\centering
+	\input{figures/timing_vs_size_from_csv_1.pgf}
 	\caption{Rechenzeit eines einzelnen Lastflusses für das Fixpunktverfahren
 		(TPF) und das Newton-Raphson-Verfahren von \texttt{pandapower} (NR),
 		aufgetragen über der Netzgröße $n_\mathrm{bus}$. Jede Box fasst mehrere Netze
@@ -838,82 +1028,82 @@ unterscheiden.\\
 	\label{fig:timing_vs_size_from_csv}
 \end{figure}
 
-Die beiden Verfahren zeigen ein grundlegend verschiedenes Skalierungsverhalten.
-Die Rechenzeit des NR-Verfahrens ist über den gesamten untersuchten
-Größenbereich nahezu konstant und liegt im Median zwischen $17{,}9\,\mathrm{ms}$
-($40$ Knoten) und $26{,}5\,\mathrm{ms}$ ($1000$ Knoten), also bei 
-$\sim 20\,\mathrm{ms}$. Die Rechenzeit des Fixpunktverfahrens hingegen
-steigt monoton mit der Netzgröße an, von $0{,}34\,\mathrm{ms}$ bei $20$ Knoten
-auf $80{,}6\,\mathrm{ms}$ bei $1000$ Knoten.\\
-
-Aus dem Schnittpunkt beider Verläufe ergibt sich die gesuchte
-Konkurrenzfähigkeitsgrenze. Bei kleinen Netzen ist das Fixpunktverfahren
-deutlich überlegen: Bei $20$ Knoten beträgt der Beschleunigungsfaktor im Median
-$62$, bei $40$ Knoten noch $19$ und bei $120$ Knoten $7{,}6$. Mit steigender
-Netzgröße schrumpft der Vorsprung, bleibt bei $500$ Knoten mit einem Faktor von
-$1{,}6$ aber noch bestehen. Bei $750$ Knoten kehrt sich das Verhältnis um
-(Faktor $0{,}66$), bei $1000$ Knoten ist das Fixpunktverfahren um den Faktor $3$
-langsamer. Der Break-even liegt somit bei etwa $500$ Knoten.\\
-
-%Das konstante Verhalten des NR-Verfahrens erklärt sich daraus, dass es in diesem
-%Größenbereich nicht durch die eigentliche Lösung, sondern durch den konstanten
-%Overhead der Implementierung dominiert wird: Aufbau der Admittanzmatrix,
-%Initialisierung und Rückschreiben der Ergebnisse fallen unabhängig von
-%$n_\mathrm{bus}$ an. 
-Die Anzahl der \texttt{pandapower} NR-Iterationen liegt über alle
-Konfigurationen hinweg zwischen $3$ und $7$ und wächst nicht mit der Netzgröße. Dieses Verhalten lässt sich über das quadratische Konvergenzverhalten der Methode erklären. \cite{bibid}.\todo{literatur}
-Weiterhin verhält sich die sparse LU-Faktorisierung radialer Netze skaliert nahezu linear, welches sich bei gegebenen Netzgrößen aufgrund des Overheads von \texttt{pandapower} nicht bemerkbar macht \cite{bibid}\todo{literatur}. Der
-Anstieg beim Fixpunktverfahren ist dagegen eine direkte Folge der dichten
-Impedanzmatrix. Der dominierende Aufwand pro innerer Iteration ist das
-Matrix-Vektor-Produkt mit $\vect{Z}$, dessen Kosten quadratisch mit
-$n_\mathrm{bus}$ wachsen \cite{bibid}\todo{literatur}. Bei einem einzelnen Lastfluss existiert keine
-Batch-Dimension, über die dieser Aufwand amortisiert werden könnte, sodass das
-Verfahren hier gegen das
-NR-Verfahren für größere Netze verliert.\\
-
-Auffällig ist ferner, dass die Boxen des Fixpunktverfahrens deutlich breiter
-sind als die des NR-Verfahrens. Bei $200$ Knoten streuen die TPF-Rechenzeiten
-über den PV-Anteil hinweg um den Faktor $4$ ($3{,}6$ bis
-$14{,}6\,\mathrm{ms}$), während die NR-Zeiten lediglich um den Faktor $1{,}35$
-variieren. Der obere Whisker bei $200$
-Knoten entspricht der Konfiguration mit $50\,\%$ PV-Anteil, die $41$ äußere und
-$99$ innere Iterationen benötigt und den Beschleunigungsfaktor dort von
-typischerweise $4{,}6$ auf $1{,}5$ reduziert.\\
-
-Diese Zunahme steht nicht im Widerspruch zu der in
-Abschnitt~\ref{sec:Konvergenz der äußeren Schleife: Gekoppelte Sensitivität}
-festgestellten Robustheit der gekoppelten Q-Korrektur. Dort wurde gezeigt, dass
-die äußere Schleife bei fester Netzgröße für  alle ntersuchten PV-Anteile
-konvergiert und die Divergenzgrenze der entkoppelten Formulierung entfällt. Die hier beobachteten  gesamten Iterationszahlen zeigen, dass
-die Konvergenz robust, die Konvergenzgeschwindigkeit aber  durchaus streuen kann.\\
-
-%Zu beachten ist schließlich, dass das NR-Verfahren von \texttt{pandapower} bei
-%Netzgrößen von $500$ bis $1000$ Knoten und gleichzeitig PV-Anteilen oberhalb von
-%etwa $20\,\%$ nicht mehr konvergiert, sodass keine Referenzlösung und damit kein
-%Laufzeitvergleich vorliegt. Die Boxen großer Netze umfassen deshalb
-%ausschließlich Konfigurationen mit niedrigem PV-Anteil und sind mit den Boxen der
-%kleinen Netze, die PV-Anteile bis $60\,\%$ abdecken, nur eingeschränkt
-%vergleichbar. Umgekehrt liefert das Fixpunktverfahren auch in diesen
-%Konfigurationen keine Lösung, da die Äußere Schleife durch die Theveninnäherung ähnliche Konvergenzeigenschaften hat wie das NR-Verfahren. Da in diesem Größenbereich der
-%Laufzeitvorteil des Fixpunktverfahrens jedoch ohnehin verloren geht, ist dieser
-%Robustheitsvorteil für den hier betrachteten Einzellastfluss von untergeordneter Bedeutung. Wer ein einzelnes großes Netz mit hoher PV-Durchdringung
-%rechnen will, gewinnt Robustheit auf Kosten der Rechenzeit. \\
-\todo{fail cases mal anschauen ob sie sinnvoll}
-Die Ergebnisse beider Verfahren stimmen über alle Konfigurationen hinweg überein. Der
-maximale Spannungsfehler gegenüber der NR-Lösung liegt unter
-$10^{-6}\,\text{p.u.}$, der maximale Winkelfehler unter $0{,}0025^\circ$. Damit
-ist sichergestellt, dass die Laufzeitvergleiche auf identischen Lösungen beruhen
-und die Beschleunigung nicht durch eine reduzierte Genauigkeit erkauft wird.\\
-
-Für einen einzelnen Lastfluss ist das Fixpunktverfahren somit nur im Bereich
-kleiner bis mittlerer Verteilnetze bis etwa $600$ Knoten vorteilhaft. Dies ist ein
-Bereich, der einen großen Teil realer Niederspannungsnetze abdeckt.v\cite{bibid}\todo{literatur} Der
-eigentliche Anwendungsfall des Verfahrens liegt jedoch nicht im Einzellastfluss, sondern  in der Berechnung von Zeitreihen.
-Da der dominierende Aufwand aus einem dichten Matrix-Vektor-Produkt besteht,
-lässt sich dieses über viele Lastszenarien hinweg zu einem einzigen
-Matrix-Matrix-Produkt zusammenfassen. Wie sich der Break-even unter Ausnutzung
-dieser Batch-Dimension verschiebt, wird in
-Abschnitt~\ref{sec:batch_lastfluss} untersucht.
+%Die beiden Verfahren zeigen ein grundlegend verschiedenes Skalierungsverhalten.
+%Die Rechenzeit des NR-Verfahrens ist über den gesamten untersuchten
+%Größenbereich nahezu konstant und liegt im Median zwischen $17{,}9\,\mathrm{ms}$
+%($40$ Knoten) und $26{,}5\,\mathrm{ms}$ ($1000$ Knoten), also bei 
+%$\sim 20\,\mathrm{ms}$. Die Rechenzeit des Fixpunktverfahrens hingegen
+%steigt monoton mit der Netzgröße an, von $0{,}34\,\mathrm{ms}$ bei $20$ Knoten
+%auf $80{,}6\,\mathrm{ms}$ bei $1000$ Knoten.\\
+%
+%Aus dem Schnittpunkt beider Verläufe ergibt sich die gesuchte
+%Konkurrenzfähigkeitsgrenze. Bei kleinen Netzen ist das Fixpunktverfahren
+%deutlich überlegen: Bei $20$ Knoten beträgt der Beschleunigungsfaktor im Median
+%$62$, bei $40$ Knoten noch $19$ und bei $120$ Knoten $7{,}6$. Mit steigender
+%Netzgröße schrumpft der Vorsprung, bleibt bei $500$ Knoten mit einem Faktor von
+%$1{,}6$ aber noch bestehen. Bei $750$ Knoten kehrt sich das Verhältnis um
+%(Faktor $0{,}66$), bei $1000$ Knoten ist das Fixpunktverfahren um den Faktor $3$
+%langsamer. Der Break-even liegt somit bei etwa $500$ Knoten.\\
+%
+%%Das konstante Verhalten des NR-Verfahrens erklärt sich daraus, dass es in diesem
+%%Größenbereich nicht durch die eigentliche Lösung, sondern durch den konstanten
+%%Overhead der Implementierung dominiert wird: Aufbau der Admittanzmatrix,
+%%Initialisierung und Rückschreiben der Ergebnisse fallen unabhängig von
+%%$n_\mathrm{bus}$ an. 
+%Die Anzahl der \texttt{pandapower} NR-Iterationen liegt über alle
+%Konfigurationen hinweg zwischen $3$ und $7$ und wächst nicht mit der Netzgröße. Dieses Verhalten lässt sich über das quadratische Konvergenzverhalten der Methode erklären. \cite{bibid}.\todo{literatur}
+%Weiterhin verhält sich die sparse LU-Faktorisierung radialer Netze skaliert nahezu linear, welches sich bei gegebenen Netzgrößen aufgrund des Overheads von \texttt{pandapower} nicht bemerkbar macht \cite{bibid}\todo{literatur}. Der
+%Anstieg beim Fixpunktverfahren ist dagegen eine direkte Folge der dichten
+%Impedanzmatrix. Der dominierende Aufwand pro innerer Iteration ist das
+%Matrix-Vektor-Produkt mit $\vect{Z}$, dessen Kosten quadratisch mit
+%$n_\mathrm{bus}$ wachsen \cite{bibid}\todo{literatur}. Bei einem einzelnen Lastfluss existiert keine
+%Batch-Dimension, über die dieser Aufwand amortisiert werden könnte, sodass das
+%Verfahren hier gegen das
+%NR-Verfahren für größere Netze verliert.\\
+%
+%Auffällig ist ferner, dass die Boxen des Fixpunktverfahrens deutlich breiter
+%sind als die des NR-Verfahrens. Bei $200$ Knoten streuen die TPF-Rechenzeiten
+%über den PV-Anteil hinweg um den Faktor $4$ ($3{,}6$ bis
+%$14{,}6\,\mathrm{ms}$), während die NR-Zeiten lediglich um den Faktor $1{,}35$
+%variieren. Der obere Whisker bei $200$
+%Knoten entspricht der Konfiguration mit $50\,\%$ PV-Anteil, die $41$ äußere und
+%$99$ innere Iterationen benötigt und den Beschleunigungsfaktor dort von
+%typischerweise $4{,}6$ auf $1{,}5$ reduziert.\\
+%
+%Diese Zunahme steht nicht im Widerspruch zu der in
+%Abschnitt~\ref{sec:Konvergenz der äußeren Schleife: Gekoppelte Sensitivität}
+%festgestellten Robustheit der gekoppelten Q-Korrektur. Dort wurde gezeigt, dass
+%die äußere Schleife bei fester Netzgröße für  alle ntersuchten PV-Anteile
+%konvergiert und die Divergenzgrenze der entkoppelten Formulierung entfällt. Die hier beobachteten  gesamten Iterationszahlen zeigen, dass
+%die Konvergenz robust, die Konvergenzgeschwindigkeit aber  durchaus streuen kann.\\
+%
+%%Zu beachten ist schließlich, dass das NR-Verfahren von \texttt{pandapower} bei
+%%Netzgrößen von $500$ bis $1000$ Knoten und gleichzeitig PV-Anteilen oberhalb von
+%%etwa $20\,\%$ nicht mehr konvergiert, sodass keine Referenzlösung und damit kein
+%%Laufzeitvergleich vorliegt. Die Boxen großer Netze umfassen deshalb
+%%ausschließlich Konfigurationen mit niedrigem PV-Anteil und sind mit den Boxen der
+%%kleinen Netze, die PV-Anteile bis $60\,\%$ abdecken, nur eingeschränkt
+%%vergleichbar. Umgekehrt liefert das Fixpunktverfahren auch in diesen
+%%Konfigurationen keine Lösung, da die Äußere Schleife durch die Theveninnäherung ähnliche Konvergenzeigenschaften hat wie das NR-Verfahren. Da in diesem Größenbereich der
+%%Laufzeitvorteil des Fixpunktverfahrens jedoch ohnehin verloren geht, ist dieser
+%%Robustheitsvorteil für den hier betrachteten Einzellastfluss von untergeordneter Bedeutung. Wer ein einzelnes großes Netz mit hoher PV-Durchdringung
+%%rechnen will, gewinnt Robustheit auf Kosten der Rechenzeit. \\
+%\todo{fail cases mal anschauen ob sie sinnvoll}
+%Die Ergebnisse beider Verfahren stimmen über alle Konfigurationen hinweg überein. Der
+%maximale Spannungsfehler gegenüber der NR-Lösung liegt unter
+%$10^{-6}\,\text{p.u.}$, der maximale Winkelfehler unter $0{,}0025^\circ$. Damit
+%ist sichergestellt, dass die Laufzeitvergleiche auf identischen Lösungen beruhen
+%und die Beschleunigung nicht durch eine reduzierte Genauigkeit erkauft wird.\\
+%
+%Für einen einzelnen Lastfluss ist das Fixpunktverfahren somit nur im Bereich
+%kleiner bis mittlerer Verteilnetze bis etwa $600$ Knoten vorteilhaft. Dies ist ein
+%Bereich, der einen großen Teil realer Niederspannungsnetze abdeckt.v\cite{bibid}\todo{literatur} Der
+%eigentliche Anwendungsfall des Verfahrens liegt jedoch nicht im Einzellastfluss, sondern  in der Berechnung von Zeitreihen.
+%Da der dominierende Aufwand aus einem dichten Matrix-Vektor-Produkt besteht,
+%lässt sich dieses über viele Lastszenarien hinweg zu einem einzigen
+%Matrix-Matrix-Produkt zusammenfassen. Wie sich der Break-even unter Ausnutzung
+%dieser Batch-Dimension verschiebt, wird in
+%Abschnitt~\ref{sec:batch_lastfluss} untersucht.
 
 %\section{Robustheit gegenüber NR}
 \todo{-aufbauend auf dem vorherigen kapitel bei netzen die bei NR nicht konvergieren -}

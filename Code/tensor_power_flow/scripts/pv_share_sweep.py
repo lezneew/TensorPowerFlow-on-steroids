@@ -576,7 +576,7 @@ def npv_grid(n_bus: int, quick: bool) -> list[int]:
 
 
 def exp_e1(quick: bool) -> pd.DataFrame:
-    sizes = [40, 200] if quick else [40, 200, 500]
+    sizes = [40, 200] if quick else [40, 200, 500, 1000]
     seeds = range(2) if quick else range(5)
     rows = []
     for n in sizes:
@@ -729,14 +729,14 @@ def main():
         df.to_csv(out / f"{name}.csv", index=False)
         print(f"--> {name}.csv  ({len(df)} Zeilen, {time.perf_counter()-t0:.1f} s)")
 
-    go("e1", exp_e1)
-    go("e1b", exp_e1b)
-    go("e3", exp_e3)
-    go("e4", exp_e4)
-    go("e5", exp_e5)
-    go("e6", exp_e6)
-    go("e7", exp_e7)
-    go("e8", exp_e8)
+    go("e1_1", exp_e1)
+    # go("e1b", exp_e1b)
+    # go("e3", exp_e3)
+    # go("e4", exp_e4)
+    # go("e5", exp_e5)
+    # go("e6", exp_e6)
+    # go("e7", exp_e7)
+    # go("e8", exp_e8)
 
     (out / "meta.json").write_text(json.dumps(dict(
         quick=args.quick, python=platform.python_version(),

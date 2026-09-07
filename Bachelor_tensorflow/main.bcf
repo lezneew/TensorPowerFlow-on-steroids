@@ -2452,14 +2452,15 @@
     <bcf:citekey order="40" intorder="1">Salazar2024</bcf:citekey>
     <bcf:citekey order="41" intorder="1">7953996</bcf:citekey>
     <bcf:citekey order="42" intorder="1">Dembo1982</bcf:citekey>
-    <bcf:citekey order="43" intorder="1">bibid</bcf:citekey>
+    <bcf:citekey order="43" intorder="1">Dembo1982</bcf:citekey>
     <bcf:citekey order="44" intorder="1">bibid</bcf:citekey>
-    <bcf:citekey order="45" intorder="1">bibid</bcf:citekey>
-    <bcf:citekey order="46" intorder="1">bibid</bcf:citekey>
-    <bcf:citekey order="47" intorder="1">stott1974</bcf:citekey>
-    <bcf:citekey order="47" intorder="2">tinney1967</bcf:citekey>
-    <bcf:citekey order="48" intorder="1">pandapower</bcf:citekey>
+    <bcf:citekey order="45" intorder="1">Salazar2024</bcf:citekey>
+    <bcf:citekey order="46" intorder="1">E.LiuandJ.Bebic:GEGlobalResearch.</bcf:citekey>
+    <bcf:citekey order="47" intorder="1">bibid</bcf:citekey>
+    <bcf:citekey order="48" intorder="1">stott1974</bcf:citekey>
+    <bcf:citekey order="48" intorder="2">tinney1967</bcf:citekey>
     <bcf:citekey order="49" intorder="1">pandapower</bcf:citekey>
+    <bcf:citekey order="50" intorder="1">pandapower</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">
