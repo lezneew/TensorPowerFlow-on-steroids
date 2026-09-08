@@ -2554,55 +2554,22 @@ Der durch die simultane Berechnung vieler Szenarien gewonnene Vorteil wird in \c
 \label{sec:rx}
 %======================================================================
 
-Das Verhältnis von Längswiderstand zu Längsreaktanz $\rho \coloneqq R/X$ gilt als
-klassische Schwierigkeit iterativer Lastflussverfahren. Der Ursprung dieser
-Einschätzung liegt in den entkoppelten Verfahren: Der \emph{Fast Decoupled Load
-	Flow} setzt $R \ll X$ voraus, um die Kopplung zwischen Wirkleistung und
-Spannungsbetrag sowie zwischen Blindleistung und Spannungswinkel vernachlässigen
-zu können; verletzt ein Netz diese Annahme, verschlechtert sich die Konvergenz
-systematisch oder das Verfahren divergiert~\cite{stott1974,tinney1967}. Diese
-Erfahrung wurde vielfach zu der Aussage verallgemeinert, hohe $R/X$-Verhältnisse
-seien für Lastflussverfahren generell problematisch.\\
 
-Für das hier untersuchte Verfahren ist diese Verallgemeinerung nicht zwingend, und
-zwar für die beiden Schleifen aus unterschiedlichen Gründen. In die
-Kontraktionskonstante der inneren Fixpunktiteration
-\begin{equation}
-	\eta \;=\; \bigl\lVert \vect{Z}_B \diag(\vect{s}_d^{*})
-	\diag(\vect{v}^{(k)})^{-2} \bigr\rVert
-	\label{eq:eta-recap}
-\end{equation}
-geht die Netzimpedanz ausschließlich über $\vect{Z}_B = \vect{Y}_{dd}^{-1}$ ein.
-Eine Zerlegung nach Real- und Imaginärteil findet nicht statt; das Verfahren
-rechnet durchgängig komplex und trifft keine Entkopplungsannahme. Daraus folgt die
-Hypothese, dass allein der \emph{Betrag} $\lvert z\rvert=\sqrt{R^{2}+X^{2}}$ die
-Kontraktion bestimmt, während der Impedanzwinkel $\arg z = \arctan(1/\rho)$ ohne
-Einfluss bleibt. Die äußere Q-Korrektur nach
-Abschnitt~\ref{subsec:methode_a_herleitung} stützt sich dagegen auf die
-Sensitivität $\partial |V_k|^{2}/\partial Q_k = 2\,X^{(\ell)}_{kk}$, in der der
-Widerstandsanteil nach Gl.~\eqref{eq:realteil_skalar} vollständig herausfällt; sie
-kennt somit ausschließlich den Imaginärteil der Knotenimpedanz. Beide Schleifen
-sollten demnach \emph{komplementär} auf denselben Sweep reagieren. Ziel dieses
-Abschnitts ist es, diese beiden Hypothesen experimentell zu trennen und die daraus
-folgende Anwendungsgrenze des Verfahrens zu bestimmen.
+Für diesen Abschnitt wird ein weiterer Parameter der Testnetze analysiert, welcher zuvor konstant gehalten wurde.
+Dabei handelt es sich um das R/X-Verhältnis  $\rho \coloneqq R/X$.
+Es beschreibt das Verhältnis zwischen Ohmschen Widerständen und Reaktanzen von elektrischen Leitungen.
+Es Bestimmt den Impedanzwinkel der komplexen Leitungsimpedanz.
+Ist das Verhältnis klein, ist die Leitung überwiegend induktiv, da der Winkel gegen $\frac{\pi}{2}$ läuft.
+Bei großen $\rho$-Werten wirkt die Leitung Ohmsch aufgrund eines niedrigen Impedanzwinkels.\\
 
-%----------------------------------------------------------------------
-\subsection{Versuchsaufbau: Trennung von Impedanzbetrag und Impedanzwinkel}
-\label{subsec:rx_setup}
-%----------------------------------------------------------------------
-
-Die Hypothese lässt sich an realen Netzen nicht prüfen, weil dort $\rho$ und
-$\lvert z\rvert$ korreliert sind: Beide wachsen mit sinkendem Leiterquerschnitt, da
-$R\propto 1/A$ gilt, während $X$ nahezu querschnittsunabhängig bleibt. Ein
-Vergleich zweier Netze unterschiedlichen $R/X$-Verhältnisses vergleicht damit
-implizit zwei unterschiedliche Impedanzbeträge, und ein beobachteter
-Konvergenzunterschied ist keiner der beiden Ursachen eindeutig zuzuordnen.
-Tabelle~\ref{tab:rx-real} zeigt zugleich, dass die Korrelation nicht monoton ist:
-Das Mittelspannungskabel NA2XS2Y~$1\times150$ besitzt bei $\rho=1{,}78$ nur ein
-Drittel des Impedanzbetrags der Freileitung 48-AL1/8-ST1A bei $\rho=1{,}60$.
-Kabelnetze sind trotz hoher $\rho$-Werte elektrisch kurz, Freileitungen trotz
-moderater $\rho$-Werte elektrisch lang.
-
+Besonders in entkoppelten Lastflussmethoden, wie dem \emph{Fast Decoupled Load Flow} wird $R \ll X$ vorausgesetzt, um Wirk- und Blindleistungsfluss voneinander zu entkoppeln.
+Unter Verletzung dieser Annahme verschlechtern sich Konvergenzeigenschaften der Verfahren und  führen möglicherweise sogar zu Divergenz~\cite{Stott1974FDLF, Stott1974Review, Zimmerman1995, Kersting2017,  Shirmohammadi1988, Teng2003, Tinney1967, Tripathy1982}.
+Entsprechend ist es von Interesse, den erweiterten TPF auf dessen Abhängigkeit zu analysieren, um mögliche Abhängigkeiten und Konvergenzgrenzen zu charakterisieren.
+Diese Fragestellung folgt auch durch die Verwendung von Verteilernetzen.
+In Tabelle~\ref{tab:rx-real} sind verschiedene R/X-Verhältnisse für unterschiedliche Kabel aufgeführt. 
+Es ist auffällig, dass sie für Mittel- und Niederspannungskabel (MS, NS) steigen, da der Ohmsche Widerstand invers-proportional zu dem Leiterquerschnitt ist, während die Reaktanz keine solche Abhängigkeit aufweist.
+Genau in der niederen Spannungsebene befinden sich in der Regel die radialen Verteilernetze, die der Gegenstand dieser Analyse sind.
+\\
 \begin{table}[htbp]
 	\centering
 	\caption{Typische Leitungsparameter und resultierende $R/X$-Verhältnisse
@@ -2627,6 +2594,150 @@ moderater $\rho$-Werte elektrisch lang.
 		\bottomrule
 	\end{tabular}
 \end{table}
+
+Für den erweiterten TPF lassen sich vor der quantitativen Analyse, bereits aufgrund struktureller Eigenschaften aussagen über des Einfluss des Verhältnisses treffen.
+Für die innere Schleife kann zunächst die Kontraktionszahl $\eta$ aus Gleichung~\eqref{eq:eta} betrachtet werden. 
+Sie ist proportional zur Busimpedanzmatrix $\ZB$.
+Die Leitungsimpedanzen können nur über diese einen Beitrag zur Kontraktion leisten.
+Es werden folglich weder Aufteilung in Imaginär- und Realteil durchgeführt, noch werden Entkopplungsmaßnahmen vorgenommen.
+Es ist daher naheliegend dass das R/X-Verhältnis bloß als Betrag
+
+\begin{equation}
+	\lvert z\rvert=\sqrt{R^{2}+X^{2}}
+\end{equation}
+
+Einfluss auf die Konvergenz nehmen kann. 
+Der Winkel hat anhand dieser Betrachtung keinen Einfluss auf die Konvergenzrate.\\
+
+Für die äußere Q-Korrektur muss für eine Aussage über die Leitungsabhängigkeit die Sensitivität~\eqref{eq:methode_a_dQ_coupled} betrachtet werden.
+Dort ist die Leitungsimpedanz ein Teil der PV-PV-Reaktanzmatrix und geht invers in die Korrekturformel ein.
+der reelle Widerstandsanteil fällt dadurch komplett weg und lediglich die Reaktanz hat einen Einfluss auf die Schrittweite der Korrektur.
+Daraus lassen sich im Gegensatz zur inneren Schleife keine direkten aussagen über eine Skalierung mit dem Impeanzbetrag oder dem Winkel treffen.\\
+
+Diese oberflächlichen Beobachtungen sind dennoch praktische Anhaltspunkte für den experimentellen Entwurf.
+Aus diesen tritt hervor, dass Betrag und Winkel separat variiert werden müssen. 
+In Realität ist dies schwer zu gewährleisten, da das R/X-Verhältnis und der Impedanzbetrag dort in der Regel korrelieren, was aus Tabelle~\ref{tab:rx-real} und der inversen Proportionalität zum Leiterquerschnitt hervorgeht. 
+Die Korrelation ist außerdem nicht monoton.
+Die Mittelspannungsleitung NA2XS2Y~$1\times150$ besitzt bei $\rho=1{,}78$ knapp ein
+Drittel des Impedanzbetrags der Freileitung 48-AL1/8-ST1A bei $\rho=1{,}60$.
+Entsprechend muss für die Analyse künstlich eine Separation der Einflussgrößen erflogen.
+Für das Experiment werden deshalb zwei Betriebszustände eingeführt welche dies bezwecken sollen.\\
+
+Im ersten Betriebsmodus  \texttt{const\_z} soll der Impedanzbetrag $\lvert z\rvert$ für sich ändernde R/X-Verhältnisse $\rho$ konstant gehalten werden. 
+Durch $z = R + \mathrm{j}X$ ist können Reaktanz und Widerstand durch 
+
+\begin{equation}
+	R(\rho) \;=\; \lvert z\rvert\,\frac{\rho}{\sqrt{1+\rho^{2}}},
+	\qquad
+	X(\rho) \;=\; \frac{\lvert z\rvert}{\sqrt{1+\rho^{2}}}
+	\label{eq:mode-constz}
+\end{equation}
+
+als Funktion des Verhältnisses dargestellt werden.
+Dadurch wird eine reiner Winkeleffekt durch die Änderung des Verhältnisses erzwungen.
+Für die Simulationsreihe wird das Niederspannungskabel NAYY~$4\times50$~SE als Referenz mit Betrag $\qty{0.649}{\ohm\per\kilo\metre}$ verwendet.\\
+
+Im zweiten Betriebszustand \texttt{const\_x} des Experiments wird jedoch die Reaktanz bei $X$ auf diesem Wert festgehalten und  der Widerstand wird gemäß 
+
+\begin{equation}
+	R(\rho)=\rho\,X
+\end{equation}
+
+skaliert. 
+Der Impedanzbetrag kann dadurch ebenfalls in eine R/X-abhängige Form 
+
+\begin{equation}
+\lvert z(\rho)\rvert = x_0\sqrt{1+\rho^{2}}
+\end{equation}
+
+gebracht werden.
+Er wächst dementsprechend mit dem Verhältnis.
+Dieser Modus soll einen realistischeren Fall darstellen, wie dieser in der Tabelle ersichtlich ist.
+Es dient als naive Erzeugung eines ungünstigeren Verhältnisses durch simple Erhöhung des Widerstandbelags der Leitung.\\
+
+
+
+
+
+
+
+
+
+
+
+%Das Verhältnis von Längswiderstand zu Längsreaktanz $\rho \coloneqq R/X$ gilt als
+%klassische Schwierigkeit iterativer Lastflussverfahren. Der Ursprung dieser
+%Einschätzung liegt in den entkoppelten Verfahren: Der \emph{Fast Decoupled Load
+%	Flow} setzt $R \ll X$ voraus, um die Kopplung zwischen Wirkleistung und
+%Spannungsbetrag sowie zwischen Blindleistung und Spannungswinkel vernachlässigen
+%zu können; verletzt ein Netz diese Annahme, verschlechtert sich die Konvergenz
+%systematisch oder das Verfahren divergiert~\cite{stott1974,tinney1967}. Diese
+%Erfahrung wurde vielfach zu der Aussage verallgemeinert, hohe $R/X$-Verhältnisse
+%seien für Lastflussverfahren generell problematisch.\\
+%
+%Für das hier untersuchte Verfahren ist diese Verallgemeinerung nicht zwingend, und
+%zwar für die beiden Schleifen aus unterschiedlichen Gründen. In die
+%Kontraktionskonstante der inneren Fixpunktiteration
+%\begin{equation}
+%	\eta \;=\; \bigl\lVert \vect{Z}_B \diag(\vect{s}_d^{*})
+%	\diag(\vect{v}^{(k)})^{-2} \bigr\rVert
+%	\label{eq:eta-recap}
+%\end{equation}
+%geht die Netzimpedanz ausschließlich über $\vect{Z}_B = \vect{Y}_{dd}^{-1}$ ein.
+%Eine Zerlegung nach Real- und Imaginärteil findet nicht statt; das Verfahren
+%rechnet durchgängig komplex und trifft keine Entkopplungsannahme. Daraus folgt die
+%Hypothese, dass allein der \emph{Betrag} $\lvert z\rvert=\sqrt{R^{2}+X^{2}}$ die
+%Kontraktion bestimmt, während der Impedanzwinkel $\arg z = \arctan(1/\rho)$ ohne
+%Einfluss bleibt. Die äußere Q-Korrektur nach
+%Abschnitt~\ref{subsec:methode_a_herleitung} stützt sich dagegen auf die
+%Sensitivität $\partial |V_k|^{2}/\partial Q_k = 2\,X^{(\ell)}_{kk}$, in der der
+%Widerstandsanteil nach Gl.~\eqref{eq:realteil_skalar} vollständig herausfällt; sie
+%kennt somit ausschließlich den Imaginärteil der Knotenimpedanz. Beide Schleifen
+%sollten demnach \emph{komplementär} auf denselben Sweep reagieren. Ziel dieses
+%Abschnitts ist es, diese beiden Hypothesen experimentell zu trennen und die daraus
+%folgende Anwendungsgrenze des Verfahrens zu bestimmen.
+
+%%----------------------------------------------------------------------
+%\subsection{Versuchsaufbau: Trennung von Impedanzbetrag und Impedanzwinkel}
+%\label{subsec:rx_setup}
+%%----------------------------------------------------------------------
+%
+%Die Hypothese lässt sich an realen Netzen nicht prüfen, weil dort $\rho$ und
+%$\lvert z\rvert$ korreliert sind: Beide wachsen mit sinkendem Leiterquerschnitt, da
+%$R\propto 1/A$ gilt, während $X$ nahezu querschnittsunabhängig bleibt. Ein
+%Vergleich zweier Netze unterschiedlichen $R/X$-Verhältnisses vergleicht damit
+%implizit zwei unterschiedliche Impedanzbeträge, und ein beobachteter
+%Konvergenzunterschied ist keiner der beiden Ursachen eindeutig zuzuordnen.
+%Tabelle~\ref{tab:rx-real} zeigt zugleich, dass die Korrelation nicht monoton ist:
+%Das Mittelspannungskabel NA2XS2Y~$1\times150$ besitzt bei $\rho=1{,}78$ nur ein
+%Drittel des Impedanzbetrags der Freileitung 48-AL1/8-ST1A bei $\rho=1{,}60$.
+%Kabelnetze sind trotz hoher $\rho$-Werte elektrisch kurz, Freileitungen trotz
+%moderater $\rho$-Werte elektrisch lang.
+%
+%\begin{table}[htbp]
+%	\centering
+%	\caption{Typische Leitungsparameter und resultierende $R/X$-Verhältnisse
+%		realer Betriebsmittel (Auswahl). Werte nach den Standardtypen der
+%		pandapower-Bibliothek~\cite{pandapower}. Der praktisch relevante
+%		Wertebereich erstreckt sich über knapp zwei Dekaden.}
+%	\label{tab:rx-real}
+%	\sisetup{table-number-alignment = center}
+%	\begin{tabular}{@{}llS[table-format=1.3]S[table-format=1.3]S[table-format=1.3]S[table-format=2.2]@{}}
+%		\toprule
+%		Netzebene & Betriebsmittel
+%		& {$R$} & {$X$} & {$\lvert z\rvert$} & {$R/X$} \\
+%		&  & {\unit{\ohm\per\kilo\metre}} & {\unit{\ohm\per\kilo\metre}}
+%		& {\unit{\ohm\per\kilo\metre}} & \\
+%		\midrule
+%		HöS \qty{380}{\kilo\volt}       & 490-AL1/64-ST1A      & 0.059 & 0.253 & 0.260 & 0.23 \\
+%		HS \qty{110}{\kilo\volt}        & 149-AL1/24-ST1A      & 0.194 & 0.400 & 0.445 & 0.49 \\
+%		MS \qty{20}{\kilo\volt}, Freil. & 48-AL1/8-ST1A        & 0.594 & 0.372 & 0.701 & 1.60 \\
+%		MS \qty{20}{\kilo\volt}, Kabel  & NA2XS2Y 1x150 RM/25  & 0.206 & 0.116 & 0.236 & 1.78 \\
+%		NS \qty{0.4}{\kilo\volt}, Kabel & NAYY 4x50 SE         & 0.642 & 0.083 & 0.647 & 7.73 \\
+%		NS \qty{0.4}{\kilo\volt}, HA    & NAYY 4x35 SE         & 0.868 & 0.085 & 0.872 & 10.2 \\
+%		\bottomrule
+%	\end{tabular}
+%\end{table}
 
 Um beide Einflussgrößen zu separieren, wird $\rho$ in zwei Betriebsarten variiert,
 die sich in der festgehaltenen Größe unterscheiden. Im Modus \texttt{const\_z}
