@@ -23,9 +23,9 @@ import numpy as np
 import pandas as pd
 import matplotlib
 
-OUT_DEFAULT = Path(r"C:\Users\sgrigorevski-admin\TensorPowerFlow"
-                   r"\TensorPowerFlow-on-steroids\Bachelor_tensorflow\figures")
-
+# OUT_DEFAULT = Path(r"C:\Users\sgrigorevski-admin\TensorPowerFlow"
+#                    r"\TensorPowerFlow-on-steroids\Bachelor_tensorflow\figures")
+OUT_DEFAULT = Path(r"D:\Projects\TPF\TensorPowerFlow-on-steroids\Bachelor_tensorflow\figures")
 OUTER_CAP = 60        # max_outer aus run_rx_sweep
 INNER_CAP = 500       # max_inner der Ratenmessung
 V_TOL_SLOW = 1e-4     # Grenzzyklus vs. echte Divergenz
@@ -42,7 +42,13 @@ XKK_CANDS = ("x_kk_mean", "xpp_diag_mean", "mean_x_kk", "x_diag_mean")
 FACTS: list[dict] = []
 TABLES: dict[str, pd.DataFrame] = {}
 OUT = OUT_DEFAULT
-
+matplotlib.use("pgf")
+matplotlib.rcParams.update({
+    "pgf.texsystem": "pdflatex",
+    'font.family': 'serif',
+    'text.usetex': True,
+    'pgf.rcfonts': False,
+})
 
 # ----------------------------------------------------------------------
 # Setup, Helfer
@@ -51,12 +57,16 @@ def setup_mpl(use_pgf: bool):
     if use_pgf:
         matplotlib.use("pgf")
         matplotlib.rcParams.update({
-            "pgf.texsystem": "pdflatex", "font.family": "serif",
-            "text.usetex": True, "pgf.rcfonts": False,
-            "pgf.preamble": r"\usepackage[utf8]{inputenc}"
-                            r"\usepackage[T1]{fontenc}"})
-    matplotlib.rcParams.update({"font.size": 8, "axes.titlesize": 8,
-                                "legend.fontsize": 6.5})
+            "pgf.texsystem": "pdflatex",
+            "font.family": "serif",
+            "text.usetex": True,
+            "pgf.rcfonts": False,
+        })
+    matplotlib.rcParams.update({
+        "font.size": 8,
+        "axes.titlesize": 8,
+        "legend.fontsize": 6.5,
+    })
     global plt, VIR
     import matplotlib.pyplot as plt  # noqa: E402
     try:
@@ -190,7 +200,7 @@ def load(path) -> pd.DataFrame:
 
     # publizierte Rate ist eta_emp (so beschriftet in fig:rx-inner);
     # der Fit dient nur der Konsistenzpruefung
-    df["eta_pub"] = col(df, "eta_emp")
+    df["eta_pub"] = col(df, "eta_inf")#col(df, "eta_emp")
     both = col(df, "eta_fit").notna() & df["eta_pub"].notna()
     if both.any():
         dev = (col(df, "eta_fit")[both] / df["eta_pub"][both] - 1).abs()
@@ -254,27 +264,27 @@ def fig_inner(df, inset=True):
                       ms=4, mfc=c if st["fill"] else "none")
             ax[0].plot(gk["rx"], gk["eta_pub"], **kw)
             ax[1].plot(gk["rx"], gk["inner_iter_pq"], **kw)
-            gb = g[~ok.reindex(g.index, fill_value=False)]
-            if len(gb):
-                ax[0].plot(gb["rx"], gb["eta_2"], "x", color="crimson",
-                           ms=6, mew=1.4, zorder=5)
-                ax[1].plot(gb["rx"], np.full(len(gb), INNER_CAP), "x",
-                           color="crimson", ms=6, mew=1.4, zorder=5)
+            # gb = g[~ok.reindex(g.index, fill_value=False)]
+            # if len(gb):
+            #     ax[0].plot(gb["rx"], gb["eta_2"], "x", color="crimson",
+            #                ms=6, mew=1.4, zorder=5)
+            #     ax[1].plot(gb["rx"], np.full(len(gb), INNER_CAP), "x",
+            #                color="crimson", ms=6, mew=1.4, zorder=5)
 
-    # graue Referenz, verankert am const_x-Lauf mit den meisten Punkten
-    gx = d[(d["mode"] == "const_x") & ok.reindex(d.index, fill_value=False)]
-    if len(gx) > 1:
-        n_ref = gx["nodes"].value_counts().idxmax()
-        gr = gx[gx["nodes"] == n_ref].sort_values("rx")
-        r0, e0 = gr["rx"].iloc[0], gr["eta_pub"].iloc[0]
-        rr = np.geomspace(d["rx"].min(), d["rx"].max(), 200)
-        ax[0].plot(rr, e0 * np.sqrt(1 + rr ** 2) / np.sqrt(1 + r0 ** 2),
-                   color="0.55", lw=.9, zorder=0)
+    # # graue Referenz, verankert am const_x-Lauf mit den meisten Punkten
+    # gx = d[(d["mode"] == "const_x") & ok.reindex(d.index, fill_value=False)]
+    # if len(gx) > 1:
+    #     n_ref = gx["nodes"].value_counts().idxmax()
+    #     gr = gx[gx["nodes"] == n_ref].sort_values("rx")
+    #     r0, e0 = gr["rx"].iloc[0], gr["eta_pub"].iloc[0]
+    #     rr = np.geomspace(d["rx"].min(), d["rx"].max(), 200)
+    #     ax[0].plot(rr, e0 * np.sqrt(1 + rr ** 2) / np.sqrt(1 + r0 ** 2),
+    #                color="0.55", lw=.9, zorder=0)
     ax[0].axhline(1.0, ls=":", c="k", lw=.8)
     ax[0].set(xscale="log", yscale="log", xlabel="$R/X$",
-              ylabel=r"$\eta_{\mathrm{emp}}$",
+              ylabel=r"$\eta$",
               title="(a) Kontraktionsrate")
-    ax[1].axhline(INNER_CAP, ls=":", c="k", lw=.8)
+    # ax[1].axhline(INNER_CAP, ls=":", c="k", lw=.8)
     ax[1].set(xscale="log", yscale="log", xlabel="$R/X$",
               ylabel="innere Iterationen", title="(b) Iterationszahl")
     for a in ax:
@@ -283,12 +293,11 @@ def fig_inner(df, inset=True):
     h_m = [plt.Line2D([], [], color="k", ls=st["ls"], marker=st["marker"],
                       mfc="k" if st["fill"] else "none", label=st["tex"])
            for st in MODE.values()]
-    h_m.append(plt.Line2D([], [], color="0.55", lw=.9,
-                          label=r"$\propto\sqrt{1+(R/X)^2}$"))
+    # h_m.append(plt.Line2D([], [], color="0.55", lw=.9,
+    #                       label=r"$\propto\sqrt{1+(R/X)^2}$"))
     h_n = [plt.Line2D([], [], color=node_color(n, nodes), lw=1.5,
                       label=f"$n={n}$") for n in nodes]
-    ax[0].legend(handles=h_m, loc="upper left")
-    ax[1].legend(handles=h_n, loc="upper left")
+    ax[1].legend(handles=h_m + h_n, loc="upper left")
 
     if inset:
         _inset_crossing(ax[0], d, ok, nodes)
@@ -298,6 +307,7 @@ def fig_inner(df, inset=True):
 
 def _inset_crossing(a, d, ok, nodes):
     """Zoom auf den Punkt, an dem |z| in beiden Modi uebereinstimmt."""
+    from matplotlib.ticker import MaxNLocator
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
     cx = d[d["mode"] == "const_x"]
     if cx.empty:
@@ -308,7 +318,7 @@ def _inset_crossing(a, d, ok, nodes):
             & ok.reindex(d.index, fill_value=False)]
     if len(win) < 4:
         return
-    axi = inset_axes(a, width="24%", height="26%", loc="upper center")
+    axi = inset_axes(a, width="35%", height="26%", loc="upper left")
     for m, st in MODE.items():
         g = win[win["mode"] == m].sort_values("rx")
         c = node_color(n0, nodes)
@@ -321,8 +331,11 @@ def _inset_crossing(a, d, ok, nodes):
     axi.set(xscale="log", xlim=(win["rx"].min() * .95, 2.2 * rho_c),
             ylim=(lo - pad, hi + pad))
     axi.tick_params(labelsize=5)
+    axi.xaxis.set_major_locator(MaxNLocator(nbins=1))
     axi.grid(alpha=.2, which="both")
+    axi.tick_params(axis='x', which='both', length=0, labelbottom=False)
     mark_inset(a, axi, loc1=3, loc2=4, fc="none", ec="0.4", lw=0.8)
+    axi.set_yticks([])
     fact("inner.crossing.rho", round(rho_c, 3), "", "|z| in beiden Modi gleich")
 
 
@@ -635,14 +648,16 @@ def tab_outer_struct(df, mode="const_z", ratios=(0.10, 0.50)):
     if var:
         fact("xpp.cond_var_pct_max", max(var), "%",
              "groesste Variation von cond(X_pp) ueber rho")
+    col_npv = "$n_\\mathrm{pv}$"
     for n, g in pd.DataFrame(full).groupby("$n$"):
-        g = g.sort_values("$n_\\mathrm{pv}$")
+        g = g.sort_values(col_npv)
         if len(g) > 1:
+            npv0 = int(g[col_npv].iloc[0])
+            npv1 = int(g[col_npv].iloc[-1])
             fact(f"xpp.cond_growth_npv.n{int(n)}",
                  round(float(g["$\\mathrm{cond}$"].iloc[-1]
                              / g["$\\mathrm{cond}$"].iloc[0]), 2), "",
-                 f"n_pv {int(g['$n_\\mathrm{pv}$'].iloc[0])}"
-                 f"->{int(g['$n_\\mathrm{pv}$'].iloc[-1])}")
+                 f"n_pv {npv0}->{npv1}")
         gt = g[g["$\\rho_{\\mathrm{J}}$"] > 1]
         if len(gt):
             fact(f"xpp.first_pv_rhoJ_gt1.n{int(n)}",

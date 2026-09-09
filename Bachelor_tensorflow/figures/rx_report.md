@@ -15,24 +15,24 @@ Zeilen: 780 | PQ: 78 | PV: 702 | PV gekoppelt: 234
 
 ```
                                       key       text      daten     delta     tol      status
-0          inner.eta_rise_pct.const_z.n40    2.20000    2.20000   0.00000  0.3000          ok
-1         inner.eta_rise_pct.const_z.n120    5.80000    5.80000   0.00000  0.3000          ok
-2         inner.eta_rise_pct.const_z.n350   21.70000   21.70000   0.00000  0.5000          ok
+0          inner.eta_rise_pct.const_z.n40    2.20000    2.40000   0.20000  0.3000          ok
+1         inner.eta_rise_pct.const_z.n120    5.80000    6.20000   0.40000  0.3000  ABWEICHUNG
+2         inner.eta_rise_pct.const_z.n350   21.70000   22.80000   1.10000  0.5000  ABWEICHUNG
 3              inner.vmin_lo.const_z.n350    0.97250    0.97250   0.00000  0.0010          ok
 4              inner.vmin_hi.const_z.n350    0.87740    0.87740   0.00000  0.0010          ok
-5          inner.eta_pred_hi.const_z.n350    0.13430    0.13432   0.00002  0.0005          ok
-6               inner.eta_hi.const_z.n350    0.13306    0.13306   0.00000  0.0005          ok
-7         inner.pred_err_pct.const_z.n350    0.90000    0.94000   0.04000  0.2000          ok
-8            inner.eta_growth.const_x.n40   13.80000   13.81000   0.01000  0.2000          ok
+5          inner.eta_pred_hi.const_z.n350    0.13430    0.14038   0.00608  0.0005  ABWEICHUNG
+6               inner.eta_hi.const_z.n350    0.13306    0.14038   0.00732  0.0005  ABWEICHUNG
+7         inner.pred_err_pct.const_z.n350    0.90000    0.00000  -0.90000  0.2000  ABWEICHUNG
+8            inner.eta_growth.const_x.n40   13.80000   14.36000   0.56000  0.2000  ABWEICHUNG
 9                  inner.k_hi.const_x.n40   16.00000   16.00000   0.00000  0.0000          ok
 10          inner.vmin_factor.const_x.n40    1.43600    1.43600   0.00000  0.0100          ok
 11                 inner.crossing.dev_pct    0.20000        NaN       NaN  0.1000       fehlt
-12                  inner.eta_max_success    0.62000    0.62600   0.00600  0.0200          ok
-13                         kappa.mean.n40    0.01260    0.01290   0.00030  0.0002  ABWEICHUNG
-14                        kappa.mean.n120    0.03260    0.03310   0.00050  0.0005          ok
-15                        kappa.mean.n350    0.10340    0.10260  -0.00080  0.0010          ok
-16                   kappa.spread_pct_max    3.40000    7.70000   4.30000  0.2000  ABWEICHUNG
-17                    kappa.exponent_in_n    0.97000    0.95600  -0.01400  0.0200          ok
+12                  inner.eta_max_success    0.62000    0.69400   0.07400  0.0200  ABWEICHUNG
+13                         kappa.mean.n40    0.01260    0.01430   0.00170  0.0002  ABWEICHUNG
+14                        kappa.mean.n120    0.03260    0.03580   0.00320  0.0005  ABWEICHUNG
+15                        kappa.mean.n350    0.10340    0.10810   0.00470  0.0010  ABWEICHUNG
+16                   kappa.spread_pct_max    3.40000    0.00000  -3.40000  0.2000  ABWEICHUNG
+17                    kappa.exponent_in_n    0.97000    0.93200  -0.03800  0.0200  ABWEICHUNG
 18                   xpp.cond_var_pct_max    0.00000    0.00000   0.00000  0.0500          ok
 19                xpp.cond_growth_npv.n40   21.70000   21.52000  -0.18000  0.3000          ok
 20               xpp.cond_growth_npv.n120   28.60000   28.71000   0.11000  0.3000          ok
@@ -67,88 +67,88 @@ Zeilen: 780 | PQ: 78 | PV: 702 | PV gekoppelt: 234
 
 ```
                                               key              value  unit                                              note
-0                    inner.eta_fit_vs_emp_max_pct              0.746     %          Konsistenz Log-Fit gegen empirische Rate
+0                    inner.eta_fit_vs_emp_max_pct             58.598     %          Konsistenz Log-Fit gegen empirische Rate
 1                                inner.fit_r2_min           0.148466                    kleinstes R^2 des geometrischen Fits
 2                              inner.crossing.rho              0.147                               |z| in beiden Modi gleich
-3                        inner.eta_lo.const_x.n40            0.01292                                                        
-4                        inner.eta_hi.const_x.n40            0.17845                                              bei rho=10
-5                    inner.eta_growth.const_x.n40              13.81                                                        
-6                  inner.eta_rise_pct.const_x.n40             1281.0     %                                                  
+3                        inner.eta_lo.const_x.n40            0.01428                                                        
+4                        inner.eta_hi.const_x.n40            0.20516                                              bei rho=10
+5                    inner.eta_growth.const_x.n40              14.36                                                        
+6                  inner.eta_rise_pct.const_x.n40             1336.4     %                                                  
 7                       inner.vmin_lo.const_x.n40             0.9971  p.u.                                                  
 8                       inner.vmin_hi.const_x.n40              0.832  p.u.                                                  
 9                          inner.k_lo.const_x.n40                7.0                                                        
 10                         inner.k_hi.const_x.n40               16.0                                                        
-11                  inner.eta_pred_hi.const_x.n40             0.1856        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
-12                 inner.pred_err_pct.const_x.n40               4.01     %                                                  
+11                  inner.eta_pred_hi.const_x.n40            0.20516        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+12                 inner.pred_err_pct.const_x.n40                0.0     %                                                  
 13                  inner.vmin_factor.const_x.n40              1.436                                                        
-14                    inner.k_pred_lo.const_x.n40                6.4                                         ln(tol)/ln(eta)
-15                    inner.k_pred_hi.const_x.n40               16.0                                         ln(tol)/ln(eta)
-16                       inner.eta_lo.const_z.n40            0.01302                                                        
-17                       inner.eta_hi.const_z.n40             0.0133                                              bei rho=10
+14                    inner.k_pred_lo.const_x.n40                6.5                                         ln(tol)/ln(eta)
+15                    inner.k_pred_hi.const_x.n40               17.4                                         ln(tol)/ln(eta)
+16                       inner.eta_lo.const_z.n40             0.0144                                                        
+17                       inner.eta_hi.const_z.n40            0.01474                                              bei rho=10
 18                   inner.eta_growth.const_z.n40               1.02                                                        
-19                 inner.eta_rise_pct.const_z.n40                2.2     %                                                  
+19                 inner.eta_rise_pct.const_z.n40                2.4     %                                                  
 20                      inner.vmin_lo.const_z.n40             0.9971  p.u.                                                  
 21                      inner.vmin_hi.const_z.n40             0.9855  p.u.                                                  
 22                         inner.k_lo.const_z.n40                7.0                                                        
 23                         inner.k_hi.const_z.n40                7.0                                                        
-24                  inner.eta_pred_hi.const_z.n40            0.01333        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
-25                 inner.pred_err_pct.const_z.n40                0.2     %                                                  
+24                  inner.eta_pred_hi.const_z.n40            0.01474        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+25                 inner.pred_err_pct.const_z.n40                0.0     %                                                  
 26                  inner.vmin_factor.const_z.n40              1.024                                                        
-27                    inner.k_pred_lo.const_z.n40                6.4                                         ln(tol)/ln(eta)
-28                    inner.k_pred_hi.const_z.n40                6.4                                         ln(tol)/ln(eta)
-29                      inner.eta_lo.const_x.n120             0.0336                                                        
-30                      inner.eta_hi.const_x.n120            0.53432                                          bei rho=6.8129
-31                  inner.eta_growth.const_x.n120               15.9                                                        
-32                inner.eta_rise_pct.const_x.n120             1490.1     %                                                  
+27                    inner.k_pred_lo.const_z.n40                6.5                                         ln(tol)/ln(eta)
+28                    inner.k_pred_hi.const_z.n40                6.6                                         ln(tol)/ln(eta)
+29                      inner.eta_lo.const_x.n120            0.03608                                                        
+30                      inner.eta_hi.const_x.n120            0.62689                                          bei rho=6.8129
+31                  inner.eta_growth.const_x.n120              17.38                                                        
+32                inner.eta_rise_pct.const_x.n120             1637.7     %                                                  
 33                     inner.vmin_lo.const_x.n120             0.9924  p.u.                                                  
 34                     inner.vmin_hi.const_x.n120             0.6231  p.u.                                                  
 35                        inner.k_lo.const_x.n120                9.0                                                        
 36                        inner.k_hi.const_x.n120               42.0                                                        
-37                 inner.eta_pred_hi.const_x.n120            0.58391        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
-38                inner.pred_err_pct.const_x.n120               9.28     %                                                  
+37                 inner.eta_pred_hi.const_x.n120            0.62689        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+38                inner.pred_err_pct.const_x.n120                0.0     %                                                  
 39                 inner.vmin_factor.const_x.n120              2.536                                                        
-40                   inner.k_pred_lo.const_x.n120                8.1                                         ln(tol)/ln(eta)
-41                   inner.k_pred_hi.const_x.n120               44.1                                         ln(tol)/ln(eta)
-42                      inner.eta_lo.const_z.n120            0.03387                                                        
-43                      inner.eta_hi.const_z.n120            0.03583                                              bei rho=10
+40                   inner.k_pred_lo.const_x.n120                8.3                                         ln(tol)/ln(eta)
+41                   inner.k_pred_hi.const_x.n120               59.2                                         ln(tol)/ln(eta)
+42                      inner.eta_lo.const_z.n120            0.03636                                                        
+43                      inner.eta_hi.const_z.n120            0.03862                                              bei rho=10
 44                  inner.eta_growth.const_z.n120               1.06                                                        
-45                inner.eta_rise_pct.const_z.n120                5.8     %                                                  
+45                inner.eta_rise_pct.const_z.n120                6.2     %                                                  
 46                     inner.vmin_lo.const_z.n120             0.9923  p.u.                                                  
 47                     inner.vmin_hi.const_z.n120             0.9629  p.u.                                                  
 48                        inner.k_lo.const_z.n120                9.0                                                        
 49                        inner.k_hi.const_z.n120                9.0                                                        
-50                 inner.eta_pred_hi.const_z.n120            0.03597        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
-51                inner.pred_err_pct.const_z.n120                0.4     %                                                  
+50                 inner.eta_pred_hi.const_z.n120            0.03862        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+51                inner.pred_err_pct.const_z.n120                0.0     %                                                  
 52                 inner.vmin_factor.const_z.n120              1.062                                                        
-53                   inner.k_pred_lo.const_z.n120                8.2                                         ln(tol)/ln(eta)
-54                   inner.k_pred_hi.const_z.n120                8.3                                         ln(tol)/ln(eta)
-55                      inner.eta_lo.const_x.n350            0.10843                                                        
-56                      inner.eta_hi.const_x.n350            0.62632                                          bei rho=2.1544
-57                  inner.eta_growth.const_x.n350               5.78                                                        
-58                inner.eta_rise_pct.const_x.n350              477.6     %                                                  
+53                   inner.k_pred_lo.const_z.n120                8.3                                         ln(tol)/ln(eta)
+54                   inner.k_pred_hi.const_z.n120                8.5                                         ln(tol)/ln(eta)
+55                      inner.eta_lo.const_x.n350            0.11333                                                        
+56                      inner.eta_hi.const_x.n350            0.69359                                          bei rho=2.1544
+57                  inner.eta_growth.const_x.n350               6.12                                                        
+58                inner.eta_rise_pct.const_x.n350              512.0     %                                                  
 59                     inner.vmin_lo.const_x.n350             0.9727  p.u.                                                  
 60                     inner.vmin_hi.const_x.n350             0.6045  p.u.                                                  
 61                        inner.k_lo.const_x.n350               13.0                                                        
 62                        inner.k_hi.const_x.n350               55.0                                                        
-63                 inner.eta_pred_hi.const_x.n350            0.66364        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
-64                inner.pred_err_pct.const_x.n350               5.96     %                                                  
+63                 inner.eta_pred_hi.const_x.n350            0.69359        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+64                inner.pred_err_pct.const_x.n350                0.0     %                                                  
 65                 inner.vmin_factor.const_x.n350               2.59                                                        
-66                   inner.k_pred_lo.const_x.n350               12.4                                         ln(tol)/ln(eta)
-67                   inner.k_pred_hi.const_x.n350               59.1                                         ln(tol)/ln(eta)
-68                      inner.eta_lo.const_z.n350            0.10934                                                        
-69                      inner.eta_hi.const_z.n350            0.13306                                              bei rho=10
-70                  inner.eta_growth.const_z.n350               1.22                                                        
-71                inner.eta_rise_pct.const_z.n350               21.7     %                                                  
+66                   inner.k_pred_lo.const_x.n350               12.7                                         ln(tol)/ln(eta)
+67                   inner.k_pred_hi.const_x.n350               75.5                                         ln(tol)/ln(eta)
+68                      inner.eta_lo.const_z.n350            0.11428                                                        
+69                      inner.eta_hi.const_z.n350            0.14038                                              bei rho=10
+70                  inner.eta_growth.const_z.n350               1.23                                                        
+71                inner.eta_rise_pct.const_z.n350               22.8     %                                                  
 72                     inner.vmin_lo.const_z.n350             0.9725  p.u.                                                  
 73                     inner.vmin_hi.const_z.n350             0.8774  p.u.                                                  
 74                        inner.k_lo.const_z.n350               13.0                                                        
 75                        inner.k_hi.const_z.n350               14.0                                                        
-76                 inner.eta_pred_hi.const_z.n350            0.13432        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
-77                inner.pred_err_pct.const_z.n350               0.94     %                                                  
+76                 inner.eta_pred_hi.const_z.n350            0.14038        eta_lo * z_rel-Verhaeltnis / v_min^2-Verhaeltnis
+77                inner.pred_err_pct.const_z.n350                0.0     %                                                  
 78                 inner.vmin_factor.const_z.n350              1.228                                                        
-79                   inner.k_pred_lo.const_z.n350               12.5                                         ln(tol)/ln(eta)
-80                   inner.k_pred_hi.const_z.n350               13.7                                         ln(tol)/ln(eta)
-81                          inner.eta_max_success              0.626                                                        
+79                   inner.k_pred_lo.const_z.n350               12.7                                         ln(tol)/ln(eta)
+80                   inner.k_pred_hi.const_z.n350               14.1                                         ln(tol)/ln(eta)
+81                          inner.eta_max_success              0.694                                                        
 82         inner.nonconv.eta_1.const_x.n120.rho10              3.732                                                        
 83         inner.nonconv.eta_2.const_x.n120.rho10              1.928                                                        
 84       inner.nonconv.eta_inf.const_x.n120.rho10              1.908                                                        
@@ -169,18 +169,18 @@ Zeilen: 780 | PQ: 78 | PV: 702 | PV gekoppelt: 234
 99         inner.nonconv.eta_2.const_x.n350.rho10              1.597                                                        
 100      inner.nonconv.eta_inf.const_x.n350.rho10              1.513                                                        
 101        inner.nonconv.v_min.const_x.n350.rho10              0.842                                                        
-102                                kappa.mean.n40             0.0129                                                        
-103                          kappa.spread_pct.n40                3.4     %                                                  
+102                                kappa.mean.n40             0.0143                                                        
+103                          kappa.spread_pct.n40                0.0     %                                                  
 104                              kappa.points.n40                 26                                                        
-105                               kappa.mean.n120             0.0331                                                        
-106                         kappa.spread_pct.n120                7.7     %                                                  
+105                               kappa.mean.n120             0.0358                                                        
+106                         kappa.spread_pct.n120                0.0     %                                                  
 107                             kappa.points.n120                 25                                                        
-108                               kappa.mean.n350             0.1026                                                        
-109                         kappa.spread_pct.n350                4.9     %                                                  
+108                               kappa.mean.n350             0.1081                                                        
+109                         kappa.spread_pct.n350                0.0     %                                                  
 110                             kappa.points.n350                 22                                                        
-111                          kappa.spread_pct_max                7.7     %                                                  
-112                           kappa.exponent_in_n              0.956                                log-log-Fit kappa_bar(n)
-113                                  kappa.kappa1           0.000293             kappa_bar/n, Vorfaktor in Gl. eta-empirisch
+111                          kappa.spread_pct_max                0.0     %                                                  
+112                           kappa.exponent_in_n              0.932                                log-log-Fit kappa_bar(n)
+113                                  kappa.kappa1           0.000309             kappa_bar/n, Vorfaktor in Gl. eta-empirisch
 114            kappa.from_eta2.n120.const_x.rho10              0.036                        Einordnung des divergenten Laufs
 115        kappa.from_eta2.n350.const_x.rho3.1623              0.114                        Einordnung des divergenten Laufs
 116        kappa.from_eta2.n350.const_x.rho4.6416              0.114                        Einordnung des divergenten Laufs
@@ -297,8 +297,8 @@ Zeilen: 780 | PQ: 78 | PV: 702 | PV gekoppelt: 234
 227                  pred.spearman_inner.cond_xpp             -0.087                                                        
 228                      pred.spearman_outer.n_pv              -0.19                                                        
 229                      pred.spearman_inner.n_pv              0.038                                                        
-230                   pred.spearman_outer.eta_pub              0.155                                                        
-231                   pred.spearman_inner.eta_pub              0.447                                                        
+230                   pred.spearman_outer.eta_pub              0.159                                                        
+231                   pred.spearman_inner.eta_pub              0.454                                                        
 232                     pred.spearman_outer.nodes             -0.068                                                        
 233                     pred.spearman_inner.nodes              0.222                                                        
 234                                   pred.n_runs                217                        konvergente PV-Laeufe, alle Modi
@@ -323,12 +323,12 @@ Zeilen: 780 | PQ: 78 | PV: 702 | PV gekoppelt: 234
 
 ```
    $n$     Modus  $\eta(0{,}1)$  $\eta(10)$  $k(0{,}1)$  $k(10)$
-0   40  const\_z       0.013023    0.013304         7.0      7.0
-1  120  const\_z       0.033869    0.035827         9.0      9.0
-2  350  const\_z       0.109340    0.133063        13.0     14.0
-3   40  const\_x       0.012921    0.178445         7.0     16.0
-4  120  const\_x       0.033602         NaN         9.0      NaN
-5  350  const\_x       0.108433         NaN        13.0      NaN
+0   40  const\_z       0.014396    0.014736         7.0      7.0
+1  120  const\_z       0.036363    0.038618         9.0      9.0
+2  350  const\_z       0.114278    0.140383        13.0     14.0
+3   40  const\_x       0.014283    0.205157         7.0     16.0
+4  120  const\_x       0.036075         NaN         9.0      NaN
+5  350  const\_x       0.113328         NaN        13.0      NaN
 ```
 
 ## tab_rx_outer_struct
@@ -389,7 +389,7 @@ Zeilen: 780 | PQ: 78 | PV: 702 | PV gekoppelt: 234
 5             $\rho_{\mathrm{J}}$                                  -0.239851                                 -0.089488
 6  $\mathrm{cond}(\vect{X}_{pp})$                                  -0.238683                                 -0.086646
 7                 $n_\mathrm{pv}$                                  -0.190069                                  0.037871
-8                          $\eta$                                   0.154968                                  0.446834
+8                          $\eta$                                   0.158605                                  0.453842
 9                             $n$                                  -0.067772                                  0.222087
 ```
 

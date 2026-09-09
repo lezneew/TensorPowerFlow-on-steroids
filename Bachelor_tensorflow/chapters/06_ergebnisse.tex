@@ -2644,17 +2644,22 @@ Im zweiten Betriebszustand \texttt{const\_x} des Experiments wird jedoch die Rea
 \end{equation}
 
 skaliert. 
+Die Variable wird aufgrund der realen inversen Proportionalität zum Querschnitt gewählt.
 Der Impedanzbetrag kann dadurch ebenfalls in eine R/X-abhängige Form 
 
 \begin{equation}
-\lvert z(\rho)\rvert = x_0\sqrt{1+\rho^{2}}
+\lvert z(\rho)\rvert = X\sqrt{1+\rho^{2}}
 \end{equation}
 
 gebracht werden.
 Er wächst dementsprechend mit dem Verhältnis.
 Dieser Modus soll einen realistischeren Fall darstellen, wie dieser in der Tabelle ersichtlich ist.
+Hier ändert sich sowohl Betrag als auch um den Winkel.
 Es dient als naive Erzeugung eines ungünstigeren Verhältnisses durch simple Erhöhung des Widerstandbelags der Leitung.\\
 
+Für beide Modi werden 3 Netzgrößen (40, 120, 350 Knoten) mit PV-Anteilen bis $50\,\%$ untersucht. 
+Dabei folgt die PV-Modellierung  dem Verfahren aus \cref{sec:pv_auswirkung}.
+Es werden 13 logarithmisch verteilte Verhältnisse $\rho$ zwischen 0,1 und 10 betrachtet.
 
 
 
@@ -2739,98 +2744,135 @@ Es dient als naive Erzeugung eines ungünstigeren Verhältnisses durch simple Er
 %	\end{tabular}
 %\end{table}
 
-Um beide Einflussgrößen zu separieren, wird $\rho$ in zwei Betriebsarten variiert,
-die sich in der festgehaltenen Größe unterscheiden. Im Modus \texttt{const\_z}
-wird der Betrag $\lvert z\rvert=z_0$ festgehalten und ausschließlich der
-Impedanzwinkel gedreht:
-\begin{equation}
-	R(\rho) \;=\; z_0\,\frac{\rho}{\sqrt{1+\rho^{2}}},
-	\qquad
-	X(\rho) \;=\; \frac{z_0}{\sqrt{1+\rho^{2}}}.
-	\label{eq:mode-constz}
-\end{equation}
-Als Anker dient $z_0=\qty{0.6597}{\ohm\per\kilo\metre}$ entsprechend dem
-Niederspannungskabel NAYY~$4\times50$~SE. Da die Kurzschlussimpedanz jedes Knotens
-näherungsweise unverändert bleibt, isoliert dieser Modus den reinen Winkeleffekt
-und ist das eigentliche Kontrollexperiment. Im Modus \texttt{const\_x} wird
-dagegen $X=x_0=\qty{0.6513}{\ohm\per\kilo\metre}$ festgehalten und der Widerstand
-mit $R(\rho)=\rho\,x_0$ skaliert, sodass
-$\lvert z(\rho)\rvert = x_0\sqrt{1+\rho^{2}}$ mitwächst. Dieser Modus bildet die
-in realen Netzen vorliegende Korrelation nach und entspricht zugleich dem naiven
-Vorgehen, zur Erzeugung eines ungünstigen $R/X$-Verhältnisses lediglich den
-Widerstandsbelag zu erhöhen. Der Vergleich beider Modi erlaubt daher nicht nur die
-Trennung der Ursachen, sondern auch eine Aussage darüber, welchem Effekt in der
-Literatur berichtete $R/X$-Sensitivitäten zuzuordnen sind.\\
-
-Ausgewertet wird auf $13$ logarithmisch äquidistanten Stützstellen
-$\rho_k=10^{-1+k/6}$, $k=0,\dots,12$, also $\rho\in[0{,}1;\,10]$, für die
-Netzgrößen $n\in\{40,120,350\}$ des in Abschnitt~\ref{sec:testnetze} eingeführten
-Datensatzes und die PV-Anteile $\mathrm{pv}\in\{0;\,0{,}10;\,0{,}25;\,0{,}50\}$
-bei konstantem Lastfaktor $\lambda=2{,}0$; der Fall $\mathrm{pv}=0$ prüft die
-innere Fixpunktiteration isoliert. Die Sollspannungen der PV-Knoten werden nach
-jeder Impedanzänderung aus der jeweiligen Basislösung neu kalibriert
-($+0{,}005\,\text{p.u.}$), damit die Vorgaben erreichbar bleiben. Die innere
-Schleife bricht für die Ratenmessung bei
-$\lVert\Delta\vect{V}\rVert_\infty<10^{-12}\,\text{p.u.}$ ab, die äußere bei
-$\max_k\lvert v_k-V^{\spec}_k\rvert<10^{-6}\,\text{p.u.}$ mit einem Limit von
-$60$ Iterationen und ohne Dämpfung ($\omega=1$).\\
-
-Eine Einschränkung ist vorab zu benennen: Im Modus \texttt{const\_x} übersteigen
-die Impedanzbeträge ab $\rho\gtrsim3$ jeden praktisch verlegten Querschnitt, und
-die Testnetze sind bei $\lambda=2{,}0$ elektrisch überlastet. $45$ der $702$
-PV-Läufe lassen sich daher nicht auswerten, weil bereits die Fallkonstruktion
-keine konvergierte Basislösung findet; betroffen sind ausschließlich
-\texttt{const\_x}-Punkte mit $z_{\mathrm{rel}}\ge3{,}3$, nämlich $n=120$ bei
-$\rho=10$ sowie $n=350$ bei $\rho\ge3{,}16$. Diese Punkte liegen außerhalb des
-lösbaren Bereichs des Testnetzes und werden nicht als Fehlschlag des Verfahrens
-gezählt. Aussagen über den Einfluss von $\rho$ \emph{allein} stützen sich deshalb
-ausschließlich auf den Modus \texttt{const\_z}.
+%Um beide Einflussgrößen zu separieren, wird $\rho$ in zwei Betriebsarten variiert,
+%die sich in der festgehaltenen Größe unterscheiden. Im Modus \texttt{const\_z}
+%wird der Betrag $\lvert z\rvert=z_0$ festgehalten und ausschließlich der
+%Impedanzwinkel gedreht:
+%\begin{equation}
+%	R(\rho) \;=\; z_0\,\frac{\rho}{\sqrt{1+\rho^{2}}},
+%	\qquad
+%	X(\rho) \;=\; \frac{z_0}{\sqrt{1+\rho^{2}}}.
+%	\label{eq:mode-constz}
+%\end{equation}
+%Als Anker dient $z_0=\qty{0.6597}{\ohm\per\kilo\metre}$ entsprechend dem
+%Niederspannungskabel NAYY~$4\times50$~SE. Da die Kurzschlussimpedanz jedes Knotens
+%näherungsweise unverändert bleibt, isoliert dieser Modus den reinen Winkeleffekt
+%und ist das eigentliche Kontrollexperiment. Im Modus \texttt{const\_x} wird
+%dagegen $X=x_0=\qty{0.6513}{\ohm\per\kilo\metre}$ festgehalten und der Widerstand
+%mit $R(\rho)=\rho\,x_0$ skaliert, sodass
+%$\lvert z(\rho)\rvert = x_0\sqrt{1+\rho^{2}}$ mitwächst. Dieser Modus bildet die
+%in realen Netzen vorliegende Korrelation nach und entspricht zugleich dem naiven
+%Vorgehen, zur Erzeugung eines ungünstigen $R/X$-Verhältnisses lediglich den
+%Widerstandsbelag zu erhöhen. Der Vergleich beider Modi erlaubt daher nicht nur die
+%Trennung der Ursachen, sondern auch eine Aussage darüber, welchem Effekt in der
+%Literatur berichtete $R/X$-Sensitivitäten zuzuordnen sind.\\
+%
+%Ausgewertet wird auf $13$ logarithmisch äquidistanten Stützstellen
+%$\rho_k=10^{-1+k/6}$, $k=0,\dots,12$, also $\rho\in[0{,}1;\,10]$, für die
+%Netzgrößen $n\in\{40,120,350\}$ des in Abschnitt~\ref{sec:testnetze} eingeführten
+%Datensatzes und die PV-Anteile $\mathrm{pv}\in\{0;\,0{,}10;\,0{,}25;\,0{,}50\}$
+%bei konstantem Lastfaktor $\lambda=2{,}0$; der Fall $\mathrm{pv}=0$ prüft die
+%innere Fixpunktiteration isoliert. Die Sollspannungen der PV-Knoten werden nach
+%jeder Impedanzänderung aus der jeweiligen Basislösung neu kalibriert
+%($+0{,}005\,\text{p.u.}$), damit die Vorgaben erreichbar bleiben. Die innere
+%Schleife bricht für die Ratenmessung bei
+%$\lVert\Delta\vect{V}\rVert_\infty<10^{-12}\,\text{p.u.}$ ab, die äußere bei
+%$\max_k\lvert v_k-V^{\spec}_k\rvert<10^{-6}\,\text{p.u.}$ mit einem Limit von
+%$60$ Iterationen und ohne Dämpfung ($\omega=1$).\\
+%
+%Eine Einschränkung ist vorab zu benennen: Im Modus \texttt{const\_x} übersteigen
+%die Impedanzbeträge ab $\rho\gtrsim3$ jeden praktisch verlegten Querschnitt, und
+%die Testnetze sind bei $\lambda=2{,}0$ elektrisch überlastet. $45$ der $702$
+%PV-Läufe lassen sich daher nicht auswerten, weil bereits die Fallkonstruktion
+%keine konvergierte Basislösung findet; betroffen sind ausschließlich
+%\texttt{const\_x}-Punkte mit $z_{\mathrm{rel}}\ge3{,}3$, nämlich $n=120$ bei
+%$\rho=10$ sowie $n=350$ bei $\rho\ge3{,}16$. Diese Punkte liegen außerhalb des
+%lösbaren Bereichs des Testnetzes und werden nicht als Fehlschlag des Verfahrens
+%gezählt. Aussagen über den Einfluss von $\rho$ \emph{allein} stützen sich deshalb
+%ausschließlich auf den Modus \texttt{const\_z}.
 
 %----------------------------------------------------------------------
 \subsection{Innere Fixpunktiteration}
 \label{subsec:rx_inner}
 %----------------------------------------------------------------------
 
-Bei konstantem Impedanzbetrag verlaufen die Kurven in
-Abbildung~\ref{fig:rx-inner} über zwei Dekaden praktisch waagerecht. Die
-Kontraktionsrate steigt um $2{,}2\,\%$ ($n=40$), $5{,}8\,\%$ ($n=120$) und
-$21{,}7\,\%$ ($n=350$); die Iterationszahl bleibt für $n=40$ und $n=120$ über alle
-$13$ Stützstellen exakt konstant und wächst bei $n=350$ um einen einzigen Schritt
-von $13$ auf $14$ (Tabelle~\ref{tab:rx-inner}).
+Zuerst wird der innere TPF mit den beiden Modi getestet.
+Hierbei werden dementsprechend zunächst PV-Knoten außen vor gelassen, um die äußere Korrektur nicht auszulösen.
+Um das zuvor genannte Verhalten zu bestätigen wird über die Modi \texttt{const\_z} und \texttt{const\_x} das Verhältnis verändert und die Kontraktion aus \eqref{eq:eta} berechnet.
+Abbildung~\ref{fig:rx-inner} zeigt das Ergebnis.
+In Plot (a) ist die Kontraktionskonstante aufgetragen und in Plot (b) wird die Gesamtanzahl an inneren Iterationen gemessen.
+Die Quadrate kennzeichnen den Verlauf im Modus \texttt{const\_x} und die Punkte den unter \texttt{const\_z} für jeweils drei Netze.\\
 
 \begin{figure}[htbp]
 	\centering
 	\input{figures/rx_inner_invariance.pgf}
 	\caption{Kontrollexperiment zur $R/X$-Abhängigkeit der inneren
-		Fixpunktiteration ($n_\mathrm{pv}=0$, Lastfaktor $2{,}0$). Links die
-		gemessene Kontraktionsrate $\eta_{\mathrm{emp}}$, rechts die Zahl innerer
-		Iterationen. Farbe kodiert die Netzgröße; durchgezogene Linien mit gefüllten
-		Kreisen bezeichnen den Modus \texttt{const\_z} (konstantes
-		$\lvert z\rvert$), gestrichelte Linien mit offenen Quadraten den Modus
-		\texttt{const\_x} (konstantes $X$). Die graue Linie im linken Diagramm ist
-		die Referenz $\propto\sqrt{1+\rho^{2}}$, die Punktlinie die Schranke
-		$\eta=1$. Rote Kreuze markieren Läufe ohne Konvergenz innerhalb von $500$
-		Iterationen; dort ist die Normschranke $\eta_2$ eingetragen. Kernaussage:
-		\texttt{const\_z} verläuft flach, \texttt{const\_x} folgt der Referenz.}
+		Fixpunktiteration. Links die
+		berechnete Kontraktionsrate $\eta$, rechts die Zahl innerer
+		Iterationen. Farbe kodiert die Netzgröße. Die durchgezogene Linien mit gefüllten
+		Kreisen bezeichnen den Modus \texttt{const\_z}, die gestrichelte Linien mit offenen Quadraten den Modus
+		\texttt{const\_x}, die Punktlinie die Schranke
+		$\eta=1$.}
 	\label{fig:rx-inner}
 \end{figure}
 
-Die verbleibende Restvariation ist kein Winkeleffekt, sondern eine Verschiebung
-des Arbeitspunkts. Mit steigendem $R$ nehmen die Wirkleistungsverluste zu, und die
-kleinste Knotenspannung sinkt von $v_{\min}=0{,}9725$ auf $0{,}8774$ ($n=350$).
-Dass $v_{\min}$ quadratisch eingeht, folgt aus
-$\partial_{\vect{v}^{*}}(\vect{s}_d^{*}\oslash\vect{v}^{*})
-=-\diag(\vect{s}_d^{*}\oslash(\vect{v}^{*})^{2})$, weshalb die
-Schranke~\eqref{eq:eta-bound} den schwächsten Knoten mit $1/v_{\min}^{2}$ abdecken
-muss. Die Vorhersage
-$\eta(10)\approx\eta(0{,}1)\,(v_{\min}(0{,}1)/v_{\min}(10))^{2}
-=0{,}1093\cdot1{,}228=0{,}1343$ trifft den gemessenen Wert $0{,}1331$ auf
-$0{,}9\,\%$; für $n=40$ und $n=120$ liegt der Vorhersagefehler bei $0{,}2\,\%$
-bzw.\ $0{,}4\,\%$. Rechnet man den Arbeitspunkteffekt heraus, verbleibt vom
-Einfluss des Impedanzwinkels nichts. Das ist konsistent mit der Struktur des
-Verfahrens: $\vect{Y}_{dd}$ wird ohne Entkopplungsannahme invertiert und geht in
-die Schranke nur über $\lVert\vect{Z}_B\rVert$, also über Impedanz\emph{beträge},
-ein.\\
+Die Linke Abbildung bestätigt direkt die Hypothese aus dem Anfang des Abschnitts. 
+Die Kontraktion ist unter konstantem Impedanzbetrag nahezu indifferent gegenüber dem R/X-Verhältnis.
+Besonders bei den zwei kleineren Netzen steigt die Kontraktionszahl mit 2,2 und $5,8\,\%$.
+Für das größere 350-Knoten-Netz steigt der Wert jedoch um knapp $20\,\%$, bildet aber ein Plateau und führt lediglich zu einem Iterationsanstieg von einem Schritt von 13 auf 14.
+Dieser prominentere Anstiegt der Kontraktion passiert aufgrund einer Arbeitspunktverschiebung des Netzes.
+Durch eine simultane Vergrößerung des Widerstandes und Verkleinerung der Reaktanz in diesem Modus nehmen Wirkleistungsverluste in den Leitungen zu, wodurch der Spannungsabfall entlang einer Ader des Netzes höher ist.
+Die Konsequenz ist dabei, dass die kontraktionsrelevante minimale Spannung $v_\mathrm{min}$ kleiner wird, was nach \eqref{eq:eta} zu einer schlechteren Kontraktion führt.
+Bei größeren Netzen ist dieser Effekt ausgeprägter, da bei Verteilernetzen die Impedanzen additiv entlang eines Stranges ins Gewicht fallen.\todo{literatur}\\ 
+
+Zur Überprüfung wird in Abbildung~\ref{fig:rx_voltage_profile_350} das Spannungsprofil des 350-Knoten-Netzes für die Verhältnisse $\rho=0,1$ (links) und $\rho=10$ (rechts) gezeigt. 
+Die Profile folgen aus der Lösung des Lastflussproblems.
+In beiden Fällen fallen wie zu erwarten die Knotenspannungen stetig mit dessen Distanz zum Slack-Knoten\todo{literatur}.
+Für den Fall des kleinen Verhältnisses fällt $\rho$ auf  minimal $0,9725\,$p.u..
+Unter dem hohen R/X-Wert fallen die Spannungen der am nächsten gelegenen Busse unter diesen Wert und erreichen einen minimales Spannungsniveau von $0,8774\,$p.u..
+Aus dem deutlich stärkeren Abfall der Knotenspannungen auch in den experimentellen Ergebnissen wird der höhere Kontraktionswert bestätigt.
+Daraus Folgt auch, dass dieser restliche Anstieg in der Kontraktion weniger durch den Winkel  selbst, sondern durch die Arbeitspunktverschiebung entsteht.\\
+
+
+
+
+
+\begin{figure}[htbp]
+	\centering
+	\input{figures/rx_voltage_profile_350.pgf}
+	\caption{Spannungsprofil eines radialen 350-Knoten Netzes. In (a) wird für die Leitungen das R/X-Verhältnis 0.1 verwendet. In (b) ein Verhältnis 10. Aufgetragen wird die Spannung gegen die Distanz der Busse (Punkte) zum Slack (Quadrat). Die Verbindungslinien symbolisieren die Leitungen. }
+	\label{fig:rx_voltage_profile_350}
+\end{figure}
+
+
+
+
+
+%Bei konstantem Impedanzbetrag verlaufen die Kurven in
+%Abbildung~\ref{fig:rx-inner} über zwei Dekaden praktisch waagerecht. Die
+%Kontraktionsrate steigt um $2{,}2\,\%$ ($n=40$), $5{,}8\,\%$ ($n=120$) und
+%$21{,}7\,\%$ ($n=350$); die Iterationszahl bleibt für $n=40$ und $n=120$ über alle
+%$13$ Stützstellen exakt konstant und wächst bei $n=350$ um einen einzigen Schritt
+%von $13$ auf $14$ (Tabelle~\ref{tab:rx-inner}).
+
+
+
+%Die verbleibende Restvariation ist kein Winkeleffekt, sondern eine Verschiebung
+%des Arbeitspunkts. Mit steigendem $R$ nehmen die Wirkleistungsverluste zu, und die
+%kleinste Knotenspannung sinkt von $v_{\min}=0{,}9725$ auf $0{,}8774$ ($n=350$).
+%Dass $v_{\min}$ quadratisch eingeht, folgt aus
+%$\partial_{\vect{v}^{*}}(\vect{s}_d^{*}\oslash\vect{v}^{*})
+%=-\diag(\vect{s}_d^{*}\oslash(\vect{v}^{*})^{2})$, weshalb die
+%Schranke~\eqref{eq:eta-bound} den schwächsten Knoten mit $1/v_{\min}^{2}$ abdecken
+%muss. Die Vorhersage
+%$\eta(10)\approx\eta(0{,}1)\,(v_{\min}(0{,}1)/v_{\min}(10))^{2}
+%=0{,}1093\cdot1{,}228=0{,}1343$ trifft den gemessenen Wert $0{,}1331$ auf
+%$0{,}9\,\%$; für $n=40$ und $n=120$ liegt der Vorhersagefehler bei $0{,}2\,\%$
+%bzw.\ $0{,}4\,\%$. Rechnet man den Arbeitspunkteffekt heraus, verbleibt vom
+%Einfluss des Impedanzwinkels nichts. Das ist konsistent mit der Struktur des
+%Verfahrens: $\vect{Y}_{dd}$ wird ohne Entkopplungsannahme invertiert und geht in
+%die Schranke nur über $\lVert\vect{Z}_B\rVert$, also über Impedanz\emph{beträge},
+%ein.\\
 
 Im Modus \texttt{const\_x} ergibt sich das gegenteilige Bild: Für $n=40$ wächst
 $\eta$ von $0{,}0129$ auf $0{,}1784$, also um den Faktor $13{,}8$, und die
@@ -2851,36 +2893,36 @@ $k\approx\ln(\varepsilon/e_0)/\ln\eta$, und die vorhergesagten $6{,}4$ bzw.\
 $13{,}1$ Schritte treffen die gemessenen $7$ bzw.\ $14$. Ein zusätzlicher,
 $\rho$-abhängiger Mechanismus existiert also nicht.
 
-\begin{table}[htbp]
-	\centering
-	\caption{Zahlenwerte zu Abbildung~\ref{fig:rx-inner} ($n_\mathrm{pv}=0$,
-		Lastfaktor $2{,}0$, Abbruch bei
-		$\lVert\Delta\vect{V}\rVert_\infty<10^{-12}\,\text{p.u.}$). $k$ bezeichnet
-		die Zahl innerer Iterationen.}
-	\label{tab:rx-inner}
-	\begin{tabular}{llS[table-format=1.5]S[table-format=1.5]cc}
-		\toprule
-		$n$ & Modus & {$\eta(0{,}1)$} & {$\eta(10)$}
-		& {$k(0{,}1)$} & {$k(10)$} \\
-		\midrule
-		40  & \texttt{const\_z} & 0.01302 & 0.01330 & 7  & 7  \\
-		120 & \texttt{const\_z} & 0.03387 & 0.03583 & 9  & 9  \\
-		350 & \texttt{const\_z} & 0.10934 & 0.13306 & 13 & 14 \\
-		\midrule
-		40  & \texttt{const\_x} & 0.01292 & 0.17845 & 7  & 16   \\
-		120 & \texttt{const\_x} & 0.03360 & {--}    & 9  & {--} \\
-		350 & \texttt{const\_x} & 0.10871 & {--}    & 13 & {--} \\
-		\bottomrule
-	\end{tabular}
-	
-	\smallskip
-	\footnotesize
-	\raggedright
-	,,--`` bezeichnet fehlende Konvergenz innerhalb von $500$ Iterationen. Für
-	$n=120$, $\rho=10$ gilt $\eta_2=1{,}93$ und $v_{\min}=0{,}43\,\text{p.u.}$; für
-	$n=350$ tritt der Verlust der Kontraktion bereits ab $\rho\ge2{,}15$ auf, wo
-	auch die Newton-Raphson-Referenz keine Lösung findet.
-\end{table}
+%\begin{table}[htbp]
+%	\centering
+%	\caption{Zahlenwerte zu Abbildung~\ref{fig:rx-inner} ($n_\mathrm{pv}=0$,
+%		Lastfaktor $2{,}0$, Abbruch bei
+%		$\lVert\Delta\vect{V}\rVert_\infty<10^{-12}\,\text{p.u.}$). $k$ bezeichnet
+%		die Zahl innerer Iterationen.}
+%	\label{tab:rx-inner}
+%	\begin{tabular}{llS[table-format=1.5]S[table-format=1.5]cc}
+%		\toprule
+%		$n$ & Modus & {$\eta(0{,}1)$} & {$\eta(10)$}
+%		& {$k(0{,}1)$} & {$k(10)$} \\
+%		\midrule
+%		40  & \texttt{const\_z} & 0.01302 & 0.01330 & 7  & 7  \\
+%		120 & \texttt{const\_z} & 0.03387 & 0.03583 & 9  & 9  \\
+%		350 & \texttt{const\_z} & 0.10934 & 0.13306 & 13 & 14 \\
+%		\midrule
+%		40  & \texttt{const\_x} & 0.01292 & 0.17845 & 7  & 16   \\
+%		120 & \texttt{const\_x} & 0.03360 & {--}    & 9  & {--} \\
+%		350 & \texttt{const\_x} & 0.10871 & {--}    & 13 & {--} \\
+%		\bottomrule
+%	\end{tabular}
+%	
+%	\smallskip
+%	\footnotesize
+%	\raggedright
+%	,,--`` bezeichnet fehlende Konvergenz innerhalb von $500$ Iterationen. Für
+%	$n=120$, $\rho=10$ gilt $\eta_2=1{,}93$ und $v_{\min}=0{,}43\,\text{p.u.}$; für
+%	$n=350$ tritt der Verlust der Kontraktion bereits ab $\rho\ge2{,}15$ auf, wo
+%	auch die Newton-Raphson-Referenz keine Lösung findet.
+%\end{table}
 
 Beide Modi lassen sich auf eine gemeinsame Kennzahl zurückführen. Rechnet man die
 mitvariierten Größen heraus, ergibt sich die korrigierte Rate
