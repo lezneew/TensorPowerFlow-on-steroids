@@ -21,10 +21,10 @@ xpp.cond_var_pct_max,0.0,0.0,0.0,0.05,ok
 xpp.cond_growth_npv.n40,21.7,21.52,-0.17999999999999972,0.3,ok
 xpp.cond_growth_npv.n120,28.6,28.71,0.10999999999999943,0.3,ok
 xpp.cond_growth_npv.n350,21.6,21.58,-0.020000000000003126,0.3,ok
-outer.q_growth.pv0.10,20.2,20.2,0.0,0.5,ok
-outer.q_growth.pv0.25,30.1,30.1,0.0,0.5,ok
-outer.q_growth.pv0.50,18.7,18.7,0.0,0.5,ok
-outer.sens_corr_q,0.67,0.75,0.07999999999999996,0.03,ABWEICHUNG
+outer.q_growth.pv0.10,20.2,4094.7,4074.5,0.5,ABWEICHUNG
+outer.q_growth.pv0.25,30.1,26729.7,26699.600000000002,0.5,ABWEICHUNG
+outer.q_growth.pv0.50,18.7,25366.6,25347.899999999998,0.5,ABWEICHUNG
+outer.sens_corr_q,0.67,0.67,0.0,0.03,ok
 outer.inner_per_outer_conv_med,5.5,4.5,-1.0,0.2,ABWEICHUNG
 outer.k_max_below_limit,7.0,17.0,10.0,0.0,ABWEICHUNG
 outer.quote.const_z.coupled,88.9,88.9,0.0,0.3,ok

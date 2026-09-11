@@ -14,53 +14,53 @@ Zeilen: 780 | PQ: 78 | PV: 702 | PV gekoppelt: 234
 ## Soll-Ist gegen den Text
 
 ```
-                                      key       text      daten     delta     tol      status
-0          inner.eta_rise_pct.const_z.n40    2.20000    2.40000   0.20000  0.3000          ok
-1         inner.eta_rise_pct.const_z.n120    5.80000    6.20000   0.40000  0.3000  ABWEICHUNG
-2         inner.eta_rise_pct.const_z.n350   21.70000   22.80000   1.10000  0.5000  ABWEICHUNG
-3              inner.vmin_lo.const_z.n350    0.97250    0.97250   0.00000  0.0010          ok
-4              inner.vmin_hi.const_z.n350    0.87740    0.87740   0.00000  0.0010          ok
-5          inner.eta_pred_hi.const_z.n350    0.13430    0.14038   0.00608  0.0005  ABWEICHUNG
-6               inner.eta_hi.const_z.n350    0.13306    0.14038   0.00732  0.0005  ABWEICHUNG
-7         inner.pred_err_pct.const_z.n350    0.90000    0.00000  -0.90000  0.2000  ABWEICHUNG
-8            inner.eta_growth.const_x.n40   13.80000   14.36000   0.56000  0.2000  ABWEICHUNG
-9                  inner.k_hi.const_x.n40   16.00000   16.00000   0.00000  0.0000          ok
-10          inner.vmin_factor.const_x.n40    1.43600    1.43600   0.00000  0.0100          ok
-11                 inner.crossing.dev_pct    0.20000        NaN       NaN  0.1000       fehlt
-12                  inner.eta_max_success    0.62000    0.69400   0.07400  0.0200  ABWEICHUNG
-13                         kappa.mean.n40    0.01260    0.01430   0.00170  0.0002  ABWEICHUNG
-14                        kappa.mean.n120    0.03260    0.03580   0.00320  0.0005  ABWEICHUNG
-15                        kappa.mean.n350    0.10340    0.10810   0.00470  0.0010  ABWEICHUNG
-16                   kappa.spread_pct_max    3.40000    0.00000  -3.40000  0.2000  ABWEICHUNG
-17                    kappa.exponent_in_n    0.97000    0.93200  -0.03800  0.0200  ABWEICHUNG
-18                   xpp.cond_var_pct_max    0.00000    0.00000   0.00000  0.0500          ok
-19                xpp.cond_growth_npv.n40   21.70000   21.52000  -0.18000  0.3000          ok
-20               xpp.cond_growth_npv.n120   28.60000   28.71000   0.11000  0.3000          ok
-21               xpp.cond_growth_npv.n350   21.60000   21.58000  -0.02000  0.3000          ok
-22                  outer.q_growth.pv0.10   20.20000   20.20000   0.00000  0.5000          ok
-23                  outer.q_growth.pv0.25   30.10000   30.10000   0.00000  0.5000          ok
-24                  outer.q_growth.pv0.50   18.70000   18.70000   0.00000  0.5000          ok
-25                      outer.sens_corr_q    0.67000    0.75000   0.08000  0.0300  ABWEICHUNG
-26         outer.inner_per_outer_conv_med    5.50000    4.50000  -1.00000  0.2000  ABWEICHUNG
-27                outer.k_max_below_limit    7.00000   17.00000  10.00000  0.0000  ABWEICHUNG
-28            outer.quote.const_z.coupled   88.90000   88.90000   0.00000  0.3000          ok
-29            outer.quote.const_x.coupled   74.40000   74.40000   0.00000  0.3000          ok
-30          outer.quote.const_z.decoupled   12.80000   12.80000   0.00000  0.3000          ok
-31     outer.rho_star_med.const_z.coupled    7.32000    7.32000   0.00000  0.0500          ok
-32     outer.rho_star_med.const_x.coupled    4.64000    4.64000   0.00000  0.0500          ok
-33        outer.k_out_med.const_z.coupled    3.00000    3.00000   0.00000  0.0000          ok
-34         outer.k_in_med.const_z.coupled   16.50000   16.50000   0.00000  0.5000          ok
-35  pred.spearman_outer.sens_error_median    0.89900    0.89900   0.00000  0.0100          ok
-36                 pred.spearman_outer.rx    0.53700    0.53700   0.00000  0.0100          ok
-37         pred.spearman_outer.rho_jacobi   -0.24000   -0.24000   0.00000  0.0100          ok
-38              pred.spearman_outer.nodes   -0.06800   -0.06800   0.00000  0.0100          ok
-39                            pred.n_runs  217.00000  217.00000   0.00000  0.0000          ok
-40                        nr.faelle.beide  191.00000  191.00000   0.00000  0.0000          ok
-41                       nr.faelle.keines   41.00000   41.00000   0.00000  0.0000          ok
-42                       nr.faelle.nur NR    2.00000    2.00000   0.00000  0.0000          ok
-43                      nr.faelle.nur TPF    0.00000    0.00000   0.00000  0.0000          ok
-44                              nr.n_runs  234.00000  234.00000   0.00000  0.0000          ok
-45                   nr.skipped_in_keines   15.00000    0.00000 -15.00000  0.0000  ABWEICHUNG
+                                      key       text        daten        delta     tol      status
+0          inner.eta_rise_pct.const_z.n40    2.20000      2.40000      0.20000  0.3000          ok
+1         inner.eta_rise_pct.const_z.n120    5.80000      6.20000      0.40000  0.3000  ABWEICHUNG
+2         inner.eta_rise_pct.const_z.n350   21.70000     22.80000      1.10000  0.5000  ABWEICHUNG
+3              inner.vmin_lo.const_z.n350    0.97250      0.97250      0.00000  0.0010          ok
+4              inner.vmin_hi.const_z.n350    0.87740      0.87740      0.00000  0.0010          ok
+5          inner.eta_pred_hi.const_z.n350    0.13430      0.14038      0.00608  0.0005  ABWEICHUNG
+6               inner.eta_hi.const_z.n350    0.13306      0.14038      0.00732  0.0005  ABWEICHUNG
+7         inner.pred_err_pct.const_z.n350    0.90000      0.00000     -0.90000  0.2000  ABWEICHUNG
+8            inner.eta_growth.const_x.n40   13.80000     14.36000      0.56000  0.2000  ABWEICHUNG
+9                  inner.k_hi.const_x.n40   16.00000     16.00000      0.00000  0.0000          ok
+10          inner.vmin_factor.const_x.n40    1.43600      1.43600      0.00000  0.0100          ok
+11                 inner.crossing.dev_pct    0.20000          NaN          NaN  0.1000       fehlt
+12                  inner.eta_max_success    0.62000      0.69400      0.07400  0.0200  ABWEICHUNG
+13                         kappa.mean.n40    0.01260      0.01430      0.00170  0.0002  ABWEICHUNG
+14                        kappa.mean.n120    0.03260      0.03580      0.00320  0.0005  ABWEICHUNG
+15                        kappa.mean.n350    0.10340      0.10810      0.00470  0.0010  ABWEICHUNG
+16                   kappa.spread_pct_max    3.40000      0.00000     -3.40000  0.2000  ABWEICHUNG
+17                    kappa.exponent_in_n    0.97000      0.93200     -0.03800  0.0200  ABWEICHUNG
+18                   xpp.cond_var_pct_max    0.00000      0.00000      0.00000  0.0500          ok
+19                xpp.cond_growth_npv.n40   21.70000     21.52000     -0.18000  0.3000          ok
+20               xpp.cond_growth_npv.n120   28.60000     28.71000      0.11000  0.3000          ok
+21               xpp.cond_growth_npv.n350   21.60000     21.58000     -0.02000  0.3000          ok
+22                  outer.q_growth.pv0.10   20.20000   4094.70000   4074.50000  0.5000  ABWEICHUNG
+23                  outer.q_growth.pv0.25   30.10000  26729.70000  26699.60000  0.5000  ABWEICHUNG
+24                  outer.q_growth.pv0.50   18.70000  25366.60000  25347.90000  0.5000  ABWEICHUNG
+25                      outer.sens_corr_q    0.67000      0.67000      0.00000  0.0300          ok
+26         outer.inner_per_outer_conv_med    5.50000      4.50000     -1.00000  0.2000  ABWEICHUNG
+27                outer.k_max_below_limit    7.00000     17.00000     10.00000  0.0000  ABWEICHUNG
+28            outer.quote.const_z.coupled   88.90000     88.90000      0.00000  0.3000          ok
+29            outer.quote.const_x.coupled   74.40000     74.40000      0.00000  0.3000          ok
+30          outer.quote.const_z.decoupled   12.80000     12.80000      0.00000  0.3000          ok
+31     outer.rho_star_med.const_z.coupled    7.32000      7.32000      0.00000  0.0500          ok
+32     outer.rho_star_med.const_x.coupled    4.64000      4.64000      0.00000  0.0500          ok
+33        outer.k_out_med.const_z.coupled    3.00000      3.00000      0.00000  0.0000          ok
+34         outer.k_in_med.const_z.coupled   16.50000     16.50000      0.00000  0.5000          ok
+35  pred.spearman_outer.sens_error_median    0.89900      0.89900      0.00000  0.0100          ok
+36                 pred.spearman_outer.rx    0.53700      0.53700      0.00000  0.0100          ok
+37         pred.spearman_outer.rho_jacobi   -0.24000     -0.24000      0.00000  0.0100          ok
+38              pred.spearman_outer.nodes   -0.06800     -0.06800      0.00000  0.0100          ok
+39                            pred.n_runs  217.00000    217.00000      0.00000  0.0000          ok
+40                        nr.faelle.beide  191.00000    191.00000      0.00000  0.0000          ok
+41                       nr.faelle.keines   41.00000     41.00000      0.00000  0.0000          ok
+42                       nr.faelle.nur NR    2.00000      2.00000      0.00000  0.0000          ok
+43                      nr.faelle.nur TPF    0.00000      0.00000      0.00000  0.0000          ok
+44                              nr.n_runs  234.00000    234.00000      0.00000  0.0000          ok
+45                   nr.skipped_in_keines   15.00000      0.00000    -15.00000  0.0000  ABWEICHUNG
 ```
 
 ## Kennzahlen
@@ -186,21 +186,21 @@ Zeilen: 780 | PQ: 78 | PV: 702 | PV gekoppelt: 234
 116        kappa.from_eta2.n350.const_x.rho4.6416              0.114                        Einordnung des divergenten Laufs
 117        kappa.from_eta2.n350.const_x.rho6.8129              0.114                        Einordnung des divergenten Laufs
 118            kappa.from_eta2.n350.const_x.rho10              0.114                        Einordnung des divergenten Laufs
-119                         outer.q_growth.pv0.10               20.2                                                        
-120                       outer.sens_slope.pv0.10               1.21                           log-log-Steigung eps_lin(rho)
-121                         outer.q_growth.pv0.25               30.1                                                        
-122                       outer.sens_slope.pv0.25               1.19                           log-log-Steigung eps_lin(rho)
-123                         outer.q_growth.pv0.50               18.7                                                        
+119                         outer.q_growth.pv0.10             4094.7                                                        
+120                       outer.sens_slope.pv0.10               1.32                           log-log-Steigung eps_lin(rho)
+121                         outer.q_growth.pv0.25            26729.7                                                        
+122                       outer.sens_slope.pv0.25                1.3                           log-log-Steigung eps_lin(rho)
+123                         outer.q_growth.pv0.50            25366.6                                                        
 124                       outer.sens_slope.pv0.50               1.19                           log-log-Steigung eps_lin(rho)
 125                          outer.lever_expected               10.0                           sqrt(1+rho^2) ueber den Sweep
-126                             outer.sens_corr_q               0.75                                                        
+126                             outer.sens_corr_q               0.67                                                        
 127                outer.inner_per_outer_conv_med                4.5                                                        
-128               outer.inner_per_outer.Divergenz        114.6-196.8                                                        
+128               outer.inner_per_outer.Divergenz        114.6-197.1                                                        
 129             outer.inner_per_outer.Grenzzyklus            5.0-5.2                                                        
 130                       outer.k_max_below_limit                 17                            max. k_out fuer eps_lin<=0.6
-131                  outer.ms_per_inner_slope.n40              -0.12                                                        
-132                 outer.ms_per_inner_slope.n120              -0.18                                                        
-133                 outer.ms_per_inner_slope.n350              -0.84                                                        
+131                  outer.ms_per_inner_slope.n40               -0.2                                                        
+132                 outer.ms_per_inner_slope.n120              -0.35                                                        
+133                 outer.ms_per_inner_slope.n350              -0.76                                                        
 134                   outer.quote.const_x.coupled               74.4     %                                        117 Laeufe
 135               outer.k_out_med.const_x.coupled                3.0                                                        
 136                outer.k_in_med.const_x.coupled               16.0                                                        

@@ -118,21 +118,21 @@ kappa.from_eta2.n350.const_x.rho3.1623,0.114,,Einordnung des divergenten Laufs
 kappa.from_eta2.n350.const_x.rho4.6416,0.114,,Einordnung des divergenten Laufs
 kappa.from_eta2.n350.const_x.rho6.8129,0.114,,Einordnung des divergenten Laufs
 kappa.from_eta2.n350.const_x.rho10,0.114,,Einordnung des divergenten Laufs
-outer.q_growth.pv0.10,20.2,,
-outer.sens_slope.pv0.10,1.21,,log-log-Steigung eps_lin(rho)
-outer.q_growth.pv0.25,30.1,,
-outer.sens_slope.pv0.25,1.19,,log-log-Steigung eps_lin(rho)
-outer.q_growth.pv0.50,18.7,,
+outer.q_growth.pv0.10,4094.7,,
+outer.sens_slope.pv0.10,1.32,,log-log-Steigung eps_lin(rho)
+outer.q_growth.pv0.25,26729.7,,
+outer.sens_slope.pv0.25,1.3,,log-log-Steigung eps_lin(rho)
+outer.q_growth.pv0.50,25366.6,,
 outer.sens_slope.pv0.50,1.19,,log-log-Steigung eps_lin(rho)
 outer.lever_expected,10.0,,sqrt(1+rho^2) ueber den Sweep
-outer.sens_corr_q,0.75,,
+outer.sens_corr_q,0.67,,
 outer.inner_per_outer_conv_med,4.5,,
-outer.inner_per_outer.Divergenz,114.6-196.8,,
+outer.inner_per_outer.Divergenz,114.6-197.1,,
 outer.inner_per_outer.Grenzzyklus,5.0-5.2,,
 outer.k_max_below_limit,17,,max. k_out fuer eps_lin<=0.6
-outer.ms_per_inner_slope.n40,-0.12,,
-outer.ms_per_inner_slope.n120,-0.18,,
-outer.ms_per_inner_slope.n350,-0.84,,
+outer.ms_per_inner_slope.n40,-0.2,,
+outer.ms_per_inner_slope.n120,-0.35,,
+outer.ms_per_inner_slope.n350,-0.76,,
 outer.quote.const_x.coupled,74.4,%,117 Laeufe
 outer.k_out_med.const_x.coupled,3.0,,
 outer.k_in_med.const_x.coupled,16.0,,

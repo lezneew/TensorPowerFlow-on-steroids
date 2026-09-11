@@ -23,9 +23,9 @@ import numpy as np
 import pandas as pd
 import matplotlib
 
-# OUT_DEFAULT = Path(r"C:\Users\sgrigorevski-admin\TensorPowerFlow"
-#                    r"\TensorPowerFlow-on-steroids\Bachelor_tensorflow\figures")
-OUT_DEFAULT = Path(r"D:\Projects\TPF\TensorPowerFlow-on-steroids\Bachelor_tensorflow\figures")
+OUT_DEFAULT = Path(r"C:\Users\sgrigorevski-admin\TensorPowerFlow"
+                   r"\TensorPowerFlow-on-steroids\Bachelor_tensorflow\figures")
+# OUT_DEFAULT = Path(r"D:\Projects\TPF\TensorPowerFlow-on-steroids\Bachelor_tensorflow\figures")
 OUTER_CAP = 60        # max_outer aus run_rx_sweep
 INNER_CAP = 500       # max_inner der Ratenmessung
 V_TOL_SLOW = 1e-4     # Grenzzyklus vs. echte Divergenz
@@ -262,7 +262,7 @@ def fig_inner(df, inset=True):
             gk = g[ok.reindex(g.index, fill_value=False)]
             kw = dict(color=c, ls=st["ls"], lw=1.2, marker=st["marker"],
                       ms=4, mfc=c if st["fill"] else "none")
-            ax[0].plot(gk["rx"], gk["eta_pub"], **kw)
+            ax[0].plot(g["rx"], g["eta_pub"], **kw)
             ax[1].plot(gk["rx"], gk["inner_iter_pq"], **kw)
             # gb = g[~ok.reindex(g.index, fill_value=False)]
             # if len(gb):
@@ -462,60 +462,97 @@ def fig_collapse(df):
 
 
 # ----------------------------------------------------------------------
-# Abbildung 3: fig:rx-outer
+# Abbildung 3: fig:rx-outer (2x2: const_z + const_x, outer_iter + epsilon)
 # ----------------------------------------------------------------------
-def fig_outer(df, mode="const_z"):
-    d = pv(df, "coupled", mode)
+def fig_outer(df):
+    d = pv(df, "coupled")
     if d.empty:
         print("  fig_outer: keine Daten"); return
     nodes = sorted(d["nodes"].unique())
-    ratios = sorted(d["pv_ratio"].unique())
-    fig, ax = _fig(1, 2, h=2.7)
+    fig, ax = plt.subplots(2, 2, figsize=(5.91, 2.7 * 2),
+                           constrained_layout=True)
 
-    for n in nodes:
-        c = node_color(n, nodes)
-        for r in ratios:
-            g = d[(d["nodes"] == n) & (d["pv_ratio"] == r)].sort_values("rx")
-            if g.empty:
-                continue
-            mk = PV_MARKER.get(round(float(r), 2), "o")
-            gk = g[g["cls"] == "conv"]
-            ax[0].plot(gk["rx"], gk["outer_iter"], color=c, ls="-", lw=1.1,
-                       marker=mk, ms=3.8)
-            gs = g[g["cls"].isin(["Grenzzyklus", "Divergenz"])]
-            ax[0].plot(gs["rx"], gs["outer_iter"].fillna(OUTER_CAP), "x",
-                       color="crimson", ms=6, mew=1.3, zorder=5)
-            gg = g.dropna(subset=["sens_error_median"])
-            ax[1].plot(gg["rx"], gg["sens_error_median"], color=c, ls="-",
-                       lw=1.1, marker=mk, ms=3.8)
+    for row, mode in enumerate(["const_z", "const_x"]):
+        dm = d[d["mode"] == mode]
+        if dm.empty:
+            continue
 
-    ax[0].axhline(OUTER_CAP, ls=":", c="k", lw=.8)
-    ax[0].set(xscale="log", yscale="log", xlabel="$R/X$",
-              ylabel=r"\"au\ss ere Iterationen", title="(a) Iterationszahl")
+        for n in nodes:
+            c = node_color(n, nodes)
+            dn = dm[dm["nodes"] == n].sort_values("rx")
 
-    g0 = d[np.isclose(d["rx"], d["rx"].min())].dropna(
-        subset=["sens_error_median"])
-    if not g0.empty:
-        r0 = float(d["rx"].min())
-        s0 = float(g0["sens_error_median"].median())
-        rr = np.geomspace(d["rx"].min(), d["rx"].max(), 200)
-        ax[1].plot(rr, s0 * (1 + rr ** 2) / (1 + r0 ** 2), color="0.55",
-                   lw=.9, zorder=0, label=r"$\propto 1+(R/X)^2$")
-    ax[1].axhline(1.0, ls="-", c="0.3", lw=.7)
-    ax[1].axhline(SENS_LIMIT, ls="--", c="k", lw=.8,
-                  label=fr"$\varepsilon_{{\mathrm{{lin}}}}={SENS_LIMIT}$")
-    ax[1].set(xscale="log", yscale="log", xlabel="$R/X$",
-              ylabel=r"$\varepsilon_{\mathrm{lin}}$ (Median)",
-              title="(b) Linearisierungsfehler")
-    ax[1].legend(loc="lower right")
-    for a in ax:
-        a.grid(alpha=.3, which="both")
+            rx_vals, outer_med, outer_lo, outer_hi = [], [], [], []
+            eps_med, eps_lo, eps_hi = [], [], []
+
+            for rx_val, g in dn.groupby("rx"):
+                gk = g[g["cls"] == "conv"]
+                if len(gk) == 0:
+                    continue
+
+                rx_vals.append(rx_val)
+
+                om = gk["outer_iter"].median()
+                outer_med.append(om)
+                outer_lo.append(om - gk["outer_iter"].min())
+                outer_hi.append(gk["outer_iter"].max() - om)
+
+                ge = gk.dropna(subset=["sens_error_median"])
+                if len(ge) > 0:
+                    em = ge["sens_error_median"].median()
+                    eps_med.append(em)
+                    eps_lo.append(em - ge["sens_error_median"].min())
+                    eps_hi.append(ge["sens_error_median"].max() - em)
+                else:
+                    eps_med.append(np.nan)
+                    eps_lo.append(np.nan)
+                    eps_hi.append(np.nan)
+
+            if rx_vals:
+                ax[row, 0].errorbar(rx_vals, outer_med,
+                                    yerr=[outer_lo, outer_hi],
+                                    color=c, fmt="-", lw=1.1,
+                                    marker="o", ms=3.8, capsize=2)
+
+                valid_eps = [(r, m, l, h) for r, m, l, h in
+                             zip(rx_vals, eps_med, eps_lo, eps_hi)
+                             if np.isfinite(m)]
+                if valid_eps:
+                    rx_e, med_e, lo_e, hi_e = zip(*valid_eps)
+                    ax[row, 1].errorbar(rx_e, med_e,
+                                        yerr=[lo_e, hi_e],
+                                        color=c, fmt="-", lw=1.1,
+                                        marker="o", ms=3.8, capsize=2)
+
+        ax[row, 0].axhline(OUTER_CAP, ls=":", c="k", lw=.8)
+        ax[row, 0].set(xscale="log", yscale="log", xlabel="$R/X$",
+                       ylabel=r"\"au\ss ere Iterationen")
+        ax[row, 0].set_title(f"({'a' if row == 0 else 'c'}) "
+                             f"{MODE[mode]['tex']}: Iterationen")
+
+        dm_conv = dm[dm["cls"] == "conv"]
+        g0 = dm_conv[np.isclose(dm_conv["rx"], dm_conv["rx"].min())].dropna(
+            subset=["sens_error_median"])
+        if not g0.empty:
+            r0 = float(dm_conv["rx"].min())
+            s0 = float(g0["sens_error_median"].median())
+            rr = np.geomspace(dm_conv["rx"].min(), dm_conv["rx"].max(), 200)
+            ax[row, 1].plot(rr, s0 * (1 + rr ** 2) / (1 + r0 ** 2),
+                            color="0.55", lw=.9, zorder=0,
+                            label=r"$\propto 1+(R/X)^2$")
+
+        ax[row, 1].set(xscale="log", yscale="log", xlabel="$R/X$",
+                       ylabel=r"$\varepsilon_{\mathrm{lin}}$ (Median)")
+        ax[row, 1].set_title(f"({'b' if row == 0 else 'd'}) "
+                             f"{MODE[mode]['tex']}: Linearisierungsfehler")
+        if row == 1:
+            ax[row, 1].legend(loc="lower right")
+
+        for a in ax[row]:
+            a.grid(alpha=.3, which="both")
+
     h = [plt.Line2D([], [], color=node_color(n, nodes), lw=1.5,
                     label=f"$n={n}$") for n in nodes]
-    h += [plt.Line2D([], [], color="k", ls="none",
-                     marker=PV_MARKER.get(round(float(r), 2), "o"),
-                     label=fr"${r*100:.0f}\,\%$ PV") for r in ratios]
-    ax[0].legend(handles=h, ncol=2, loc="upper left")
+    ax[0, 0].legend(handles=h, ncol=2, loc="upper left")
     _save(fig, "rx_outer_iterations")
     _facts_outer(df, d)
 

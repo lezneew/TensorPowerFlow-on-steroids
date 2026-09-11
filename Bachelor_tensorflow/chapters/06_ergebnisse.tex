@@ -2641,6 +2641,7 @@ Im zweiten Betriebszustand \texttt{const\_x} des Experiments wird jedoch die Rea
 
 \begin{equation}
 	R(\rho)=\rho\,X
+	\label{eq:const_x}
 \end{equation}
 
 skaliert. 
@@ -2649,6 +2650,7 @@ Der Impedanzbetrag kann dadurch ebenfalls in eine R/X-abhängige Form
 
 \begin{equation}
 \lvert z(\rho)\rvert = X\sqrt{1+\rho^{2}}
+\label{eq:zrho}
 \end{equation}
 
 gebracht werden.
@@ -2660,7 +2662,6 @@ Es dient als naive Erzeugung eines ungünstigeren Verhältnisses durch simple Er
 Für beide Modi werden 3 Netzgrößen (40, 120, 350 Knoten) mit PV-Anteilen bis $50\,\%$ untersucht. 
 Dabei folgt die PV-Modellierung  dem Verfahren aus \cref{sec:pv_auswirkung}.
 Es werden 13 logarithmisch verteilte Verhältnisse $\rho$ zwischen 0,1 und 10 betrachtet.
-
 
 
 
@@ -2831,7 +2832,8 @@ In beiden Fällen fallen wie zu erwarten die Knotenspannungen stetig mit dessen 
 Für den Fall des kleinen Verhältnisses fällt $\rho$ auf  minimal $0,9725\,$p.u..
 Unter dem hohen R/X-Wert fallen die Spannungen der am nächsten gelegenen Busse unter diesen Wert und erreichen einen minimales Spannungsniveau von $0,8774\,$p.u..
 Aus dem deutlich stärkeren Abfall der Knotenspannungen auch in den experimentellen Ergebnissen wird der höhere Kontraktionswert bestätigt.
-Daraus Folgt auch, dass dieser restliche Anstieg in der Kontraktion weniger durch den Winkel  selbst, sondern durch die Arbeitspunktverschiebung entsteht.\\
+Daraus Folgt auch, dass dieser restliche Anstieg in der Kontraktion weniger durch den Winkel  selbst, sondern durch die Arbeitspunktverschiebung entsteht.
+Damit hält die Aussage vom Anfang, dass der Impedanzwinkel selber nahezu keinen Einfluss auf die Konvergenz des Lastflusses hat.\\
 
 
 
@@ -2874,24 +2876,57 @@ Daraus Folgt auch, dass dieser restliche Anstieg in der Kontraktion weniger durc
 %die Schranke nur über $\lVert\vect{Z}_B\rVert$, also über Impedanz\emph{beträge},
 %ein.\\
 
-Im Modus \texttt{const\_x} ergibt sich das gegenteilige Bild: Für $n=40$ wächst
-$\eta$ von $0{,}0129$ auf $0{,}1784$, also um den Faktor $13{,}8$, und die
-Iterationszahl steigt von $7$ auf $16$; für $n=120$ werden bei $\rho=6{,}81$
-bereits $42$ Iterationen benötigt, und bei $\rho=10$ konvergiert die Iteration
-innerhalb von $500$ Schritten nicht mehr, wobei $\eta_2=1{,}93$ die Voraussetzung
-des Banachschen Fixpunktsatzes verletzt. Genau dieser Verlauf würde konventionell
-als $R/X$-Grenze interpretiert. Dass die Ursache nicht der Impedanzwinkel ist,
-zeigen zwei Prüfungen. Erstens erklärt sich das Wachstum vollständig aus Betrag
-und Arbeitspunkt: Bei festem $X$ bedeutet $\rho=10$ einen um $10$ größeren
-Impedanzbetrag, und mit $v_{\min}=0{,}832$ ($n=40$) folgt
-$10{,}0\cdot1{,}436=14{,}4$ gegenüber dem gemessenen Faktor $13{,}8$. Zweitens
-stimmen die Raten am Schnittpunkt beider Kurvenfamilien bei $\rho\approx0{,}16$,
-wo $\lvert z\rvert$ in beiden Modi übereinstimmt, mit $0{,}01304$ und $0{,}01301$
-auf $0{,}2\,\%$ überein. Das rechte Diagramm liefert keine unabhängige
-Information: Da die Residuen streng geometrisch abfallen ($R^{2}>0{,}99999$), gilt
-$k\approx\ln(\varepsilon/e_0)/\ln\eta$, und die vorhergesagten $6{,}4$ bzw.\
-$13{,}1$ Schritte treffen die gemessenen $7$ bzw.\ $14$. Ein zusätzlicher,
-$\rho$-abhängiger Mechanismus existiert also nicht.
+Ein gegensätzliches Verhalten ist unter Verwendung des Modus \texttt{const\_x} zu beobachten.
+In Abbildung~\ref{fig:rx-inner} (a) zeigen die Verläufe der drei Netze einen starken Anstieg für eine Vergrößerung des R/X-Verhältnisses.
+Die Kontraktion verschlechtert sich für das 40-Knoten-Netz um das 20-fache von $\eta=0{,}01$ auf $0{,}2$.
+Bei den beiden größeren Netzen ist darüber hinaus fehlende Konvergenz zu beobachten.
+Die Verfahren finden bei dem 120-Knoten-Netz für $\rho=10$ keine Lösung, bei dem 350-Knoten-Netz bereits für Verhältnisse über 3,1623.\\
+
+An der Stelle ist die Korrelation zwischen der Kontraktionszahl und der Anzahl an Iterationen zur Lastflusslösung.
+Die Verläufe der Iterationen (Plot b) folgen den Verläufen der Kontraktionszahlen.
+Eine Verschlechterung der Kontraktion führt zu mehr benötigten Rechenschritten.
+Der Anstieg der Kontraktion verläuft für $\eta < 1 $ monoton steigend zusammen mit den Iterationen. 
+Für $\eta>1$ ist die Kontraktion nicht mehr monoton wachsend, die Konvergenzbedingung aus \cref{subsec:banach} wird verletzt.
+Genau in diesen Fällen überschreiten die Iterationen auch die maximal zugelassene Iterationsanzahl 500 und das Lastflussproblem konvergiert folglich nicht.
+Der nicht-monotone Verlauf für $\eta>1$ entsteht durch Verwendung von inkorrekten Spannungswerten aus dem nicht-konvergierten abgebrochenen Berechnungen. 
+Diese Punkte stellen aufgrund des fehlgeschlagenen Lösungsverfahrens keine korrekte Kontraktionszahl mehr dar, kennzeichnen aber R/X-Verhältnisse, die zu einem Fehlschlag des TPF führen.\\
+
+Die unter diesem Modus gefundenen Konvergenzeinschränkungen stellen die konventionellen R/X-Grenzen dar\todo{lit.}.
+Der Winkeleffekt wird minimal, da er für große $R$ gegen null läuft. 
+Tragend ist daher der Impedanzbetrag, welcher sich hier proportional zum R/X-Verhältnis skaliert.
+Ein 100-mal größeres Verhältnis überträgt sich zu einem 100-mal größerer Serienwiderstand der Leitung (siehe Gleichung~\eqref{eq:const_x}).
+Durch die den bereits diskutierten stärkeren Spannungsabfall unter einem größeren Widerstand vervielfacht sich hier dieser Effekt.
+Wo im Modus \texttt{cont\_z} nur geringe Widerstandsänderungen durch das Festhalten des Betrags zu kleinen Kontraktionsänderungen geführt haben, sorgt die Verhundertfachung des Widerstandes für das extreme Verhalten.
+Der große Widerstand erzeugt einen hohen Wirkleistungsbedarf, welcher den Arbeitspunkt weiter verschiebt und einen noch größeren Spannungsabfall an den Knoten erzeugt.
+Der Kontraktionsrelevante minimale Spannungswert $v_\mathrm{min}$ geht quadratisch in $\eta$ ein (Gleichung \eqref{eq:eta}).
+Zusammen mit der Proportionalität zum Impedanzbetrag bestärkt die inverse Proportionalität des Spannungsquadrats den Anstieg der Kontraktionszahl. \\
+
+Die Aussage vom Anfang des Abschnitts wird dadurch bestärkt: Die Kontraktion verschlechtert sich zunehmend für größere Ohmsche Leitungswiderstände.
+Die hier beobachteten fehlgeschlagenen Rechnungen schlagen alle sowohl für das NR, als auch für den TPF fehl.
+Das spricht für eine Abwesenheit einer physikalischen Lösung, statt für das Versagen eines der Rechenvorschriften.
+
+
+
+
+
+%Im Modus \texttt{const\_x} ergibt sich das gegenteilige Bild: Für $n=40$ wächst
+%$\eta$ von $0{,}0129$ auf $0{,}1784$, also um den Faktor $13{,}8$, und die
+%Iterationszahl steigt von $7$ auf $16$; für $n=120$ werden bei $\rho=6{,}81$
+%bereits $42$ Iterationen benötigt, und bei $\rho=10$ konvergiert die Iteration
+%innerhalb von $500$ Schritten nicht mehr, wobei $\eta_2=1{,}93$ die Voraussetzung
+%des Banachschen Fixpunktsatzes verletzt. Genau dieser Verlauf würde konventionell
+%als $R/X$-Grenze interpretiert. Dass die Ursache nicht der Impedanzwinkel ist,
+%zeigen zwei Prüfungen. Erstens erklärt sich das Wachstum vollständig aus Betrag
+%und Arbeitspunkt: Bei festem $X$ bedeutet $\rho=10$ einen um $10$ größeren
+%Impedanzbetrag, und mit $v_{\min}=0{,}832$ ($n=40$) folgt
+%$10{,}0\cdot1{,}436=14{,}4$ gegenüber dem gemessenen Faktor $13{,}8$. Zweitens
+%stimmen die Raten am Schnittpunkt beider Kurvenfamilien bei $\rho\approx0{,}16$,
+%wo $\lvert z\rvert$ in beiden Modi übereinstimmt, mit $0{,}01304$ und $0{,}01301$
+%auf $0{,}2\,\%$ überein. Das rechte Diagramm liefert keine unabhängige
+%Information: Da die Residuen streng geometrisch abfallen ($R^{2}>0{,}99999$), gilt
+%$k\approx\ln(\varepsilon/e_0)/\ln\eta$, und die vorhergesagten $6{,}4$ bzw.\
+%$13{,}1$ Schritte treffen die gemessenen $7$ bzw.\ $14$. Ein zusätzlicher,
+%$\rho$-abhängiger Mechanismus existiert also nicht.
 
 %\begin{table}[htbp]
 %	\centering
@@ -2924,208 +2959,244 @@ $\rho$-abhängiger Mechanismus existiert also nicht.
 %	auch die Newton-Raphson-Referenz keine Lösung findet.
 %\end{table}
 
-Beide Modi lassen sich auf eine gemeinsame Kennzahl zurückführen. Rechnet man die
-mitvariierten Größen heraus, ergibt sich die korrigierte Rate
-\begin{equation}
-	\kappa \;\coloneqq\; \frac{\eta\,v_{\min}^{2}}{z_{\mathrm{rel}}},
-	\qquad
-	z_{\mathrm{rel}} = \frac{\lvert z\rvert}{\lvert z\rvert_{\mathrm{ref}}},
-	\label{eq:kappa-def}
-\end{equation}
-mit $\lvert z\rvert_{\mathrm{ref}}$ als Impedanzbetrag der
-\texttt{const\_z}-Läufe. Gl.~\eqref{eq:kappa-def} enthält keinen freien
-Parameter; die Reskalierung kann folglich scheitern, und ein verbleibender Anstieg
-wäre als echter Winkeleffekt zu interpretieren. Der Test fällt positiv aus
-(Abbildung~\ref{fig:rx-collapse}): Über beide Modi und alle konvergenten
-Stützstellen bleibt die Restschwankung von $\kappa$ unter $3{,}4\,\%$
-($\bar\kappa=0{,}0126$, $0{,}0326$, $0{,}1034$ für $n=40$, $120$, $350$), obwohl
-$\eta$ selbst um den Faktor $13{,}8$ variiert. Auch der divergente Lauf fügt sich
-ein: Für $n=120$, \texttt{const\_x}, $\rho=10$ ergeben $\eta_2=1{,}93$,
-$v_{\min}=0{,}43$ und $z_{\mathrm{rel}}=9{,}92$ ein $\kappa\approx0{,}036$
-gegenüber $\bar\kappa=0{,}033$ derselben Netzgröße.
-
-\begin{figure}[htbp]
-	\centering
-	\input{figures/rx_collapse.pgf}
-	\caption{Test der Skalierung~\eqref{eq:kappa-def} ($n_\mathrm{pv}=0$).
-		(a)~Rohdaten wie in Abbildung~\ref{fig:rx-inner}, hier mit an
-		Diagramm~(b) angepasster Achsenskalierung: \texttt{const\_z}
-		(durchgezogen, gefüllte Kreise) verläuft flach, \texttt{const\_x}
-		(gestrichelt, offene Quadrate) entlang der grauen Referenz
-		$\propto\sqrt{1+\rho^{2}}$. (b)~Nach Reskalierung fallen beide Modi je
-		Netzgröße auf einen konstanten Wert zusammen; die Restschwankung bleibt
-		unter $3{,}4\,\%$. Die Netzgröße wird nicht wegskaliert, die drei Niveaus
-		bleiben getrennt.}
-	\label{fig:rx-collapse}
-\end{figure}
-
-Was $\kappa$ nicht wegskaliert, ist die Netzgröße:
-$\ln(0{,}1034/0{,}0126)/\ln(350/40)=0{,}97$, also näherungsweise linear in $n$.
-Das ist die erwartete Konsequenz der radialen Topologie, da sich die
-Serienimpedanzen entlang des Strangs addieren und die Thévenin-Impedanz am
-Strangende proportional zu $n$ wächst. Empirisch gilt somit
-\begin{equation}
-	\eta \;\approx\; \kappa_1\,\frac{n\,\lvert z\rvert}{v_{\min}^{2}},
-	\qquad \kappa_1\approx 3{,}1\cdot10^{-4},
-	\label{eq:eta-empirisch}
-\end{equation}
-also eine Funktion von Netzlänge, Impedanzbetrag und Arbeitspunkt, nicht von
-$\rho$. Zwei Einschränkungen bleiben: Gl.~\eqref{eq:kappa-def} ist empirisch und
-stützt die Struktur der Schranke~\eqref{eq:eta-bound}, ohne sie zu beweisen, da
-diese hinreichend und nicht notwendig ist; entsprechend ist $\eta<1$ kein
-Konvergenzkriterium im strengen Sinne. Für die \emph{gemessene} Rate trifft die
-Äquivalenz im vorliegenden Datensatz allerdings zu: Jeder Lauf mit
-$\eta_{\mathrm{emp}}<1$ konvergiert, der größte erfolgreiche Wert liegt bei
-$0{,}62$, und der einzige nicht konvergierende PQ-Fall überschreitet in allen drei
-Normschranken die Eins. Für den praktischen Gebrauch genügt
-Gl.~\eqref{eq:eta-empirisch}: Die Konvergenzgeschwindigkeit der inneren Schleife
-lässt sich aus $\lvert z\rvert$, $v_{\min}$ und der Netzgröße abschätzen, ohne
-$R/X$ zu kennen.
+%Beide Modi lassen sich auf eine gemeinsame Kennzahl zurückführen. Rechnet man die
+%mitvariierten Größen heraus, ergibt sich die korrigierte Rate
+%\begin{equation}
+%	\kappa \;\coloneqq\; \frac{\eta\,v_{\min}^{2}}{z_{\mathrm{rel}}},
+%	\qquad
+%	z_{\mathrm{rel}} = \frac{\lvert z\rvert}{\lvert z\rvert_{\mathrm{ref}}},
+%	\label{eq:kappa-def}
+%\end{equation}
+%mit $\lvert z\rvert_{\mathrm{ref}}$ als Impedanzbetrag der
+%\texttt{const\_z}-Läufe. Gl.~\eqref{eq:kappa-def} enthält keinen freien
+%Parameter; die Reskalierung kann folglich scheitern, und ein verbleibender Anstieg
+%wäre als echter Winkeleffekt zu interpretieren. Der Test fällt positiv aus
+%(Abbildung~\ref{fig:rx-collapse}): Über beide Modi und alle konvergenten
+%Stützstellen bleibt die Restschwankung von $\kappa$ unter $3{,}4\,\%$
+%($\bar\kappa=0{,}0126$, $0{,}0326$, $0{,}1034$ für $n=40$, $120$, $350$), obwohl
+%$\eta$ selbst um den Faktor $13{,}8$ variiert. Auch der divergente Lauf fügt sich
+%ein: Für $n=120$, \texttt{const\_x}, $\rho=10$ ergeben $\eta_2=1{,}93$,
+%$v_{\min}=0{,}43$ und $z_{\mathrm{rel}}=9{,}92$ ein $\kappa\approx0{,}036$
+%gegenüber $\bar\kappa=0{,}033$ derselben Netzgröße.
+%
+%\begin{figure}[htbp]
+%	\centering
+%	\input{figures/rx_collapse.pgf}
+%	\caption{Test der Skalierung~\eqref{eq:kappa-def} ($n_\mathrm{pv}=0$).
+%		(a)~Rohdaten wie in Abbildung~\ref{fig:rx-inner}, hier mit an
+%		Diagramm~(b) angepasster Achsenskalierung: \texttt{const\_z}
+%		(durchgezogen, gefüllte Kreise) verläuft flach, \texttt{const\_x}
+%		(gestrichelt, offene Quadrate) entlang der grauen Referenz
+%		$\propto\sqrt{1+\rho^{2}}$. (b)~Nach Reskalierung fallen beide Modi je
+%		Netzgröße auf einen konstanten Wert zusammen; die Restschwankung bleibt
+%		unter $3{,}4\,\%$. Die Netzgröße wird nicht wegskaliert, die drei Niveaus
+%		bleiben getrennt.}
+%	\label{fig:rx-collapse}
+%\end{figure}
+%
+%Was $\kappa$ nicht wegskaliert, ist die Netzgröße:
+%$\ln(0{,}1034/0{,}0126)/\ln(350/40)=0{,}97$, also näherungsweise linear in $n$.
+%Das ist die erwartete Konsequenz der radialen Topologie, da sich die
+%Serienimpedanzen entlang des Strangs addieren und die Thévenin-Impedanz am
+%Strangende proportional zu $n$ wächst. Empirisch gilt somit
+%\begin{equation}
+%	\eta \;\approx\; \kappa_1\,\frac{n\,\lvert z\rvert}{v_{\min}^{2}},
+%	\qquad \kappa_1\approx 3{,}1\cdot10^{-4},
+%	\label{eq:eta-empirisch}
+%\end{equation}
+%also eine Funktion von Netzlänge, Impedanzbetrag und Arbeitspunkt, nicht von
+%$\rho$. Zwei Einschränkungen bleiben: Gl.~\eqref{eq:kappa-def} ist empirisch und
+%stützt die Struktur der Schranke~\eqref{eq:eta-bound}, ohne sie zu beweisen, da
+%diese hinreichend und nicht notwendig ist; entsprechend ist $\eta<1$ kein
+%Konvergenzkriterium im strengen Sinne. Für die \emph{gemessene} Rate trifft die
+%Äquivalenz im vorliegenden Datensatz allerdings zu: Jeder Lauf mit
+%$\eta_{\mathrm{emp}}<1$ konvergiert, der größte erfolgreiche Wert liegt bei
+%$0{,}62$, und der einzige nicht konvergierende PQ-Fall überschreitet in allen drei
+%Normschranken die Eins. Für den praktischen Gebrauch genügt
+%Gl.~\eqref{eq:eta-empirisch}: Die Konvergenzgeschwindigkeit der inneren Schleife
+%lässt sich aus $\lvert z\rvert$, $v_{\min}$ und der Netzgröße abschätzen, ohne
+%$R/X$ zu kennen.
 
 %----------------------------------------------------------------------
 \subsection{Äußere Blindleistungskorrektur}
 \label{subsec:rx_outer}
 %----------------------------------------------------------------------
 
-Alle bisherigen Netze waren reine PQ-Netze. Ein einsetzbares Verfahren muss jedoch
-PV-Knoten behandeln, und dort wird der Impedanzwinkel aus einem Grund relevant,
-der mit der Kontraktionsrate nichts zu tun hat: Die äußere Schleife verwendet
-Blindleistung als Stellgröße für die Spannung, und deren Hebel hängt allein an
-$X$.
+Bisher wurde nur der PV-lose Fall betrachtet um den Effekt auf die innere TPF-Schleife zu isolieren.
+Zur Analyse des gesamten erweiterten TPF-Verfahrens wird in diesem Abschnitt die äußere Q-Korrektur auf die R/X-Verhältnisabhängigkeit untersucht.
+Insbesondere ist hier die Abhängigkeit vom Impedanzwinkel interessant, da die Korrektur~\eqref{eq:sensitivity_skalar} nur von der Reaktanz $X$ abhängt, nicht mehr alleine vom Impedanzbetrag.\\
 
-\paragraph{Der Faktor $\sqrt{1+\rho^{2}}$ ist keine Eigenschaft des Sweep-Modus.}
-Für ein Netz mit einheitlichem komplexem Längsbelag
-$z=\lvert z\rvert e^{\jj\varphi}$ und vernachlässigten Quergliedern gilt
-$\vect{Y}_{dd}=z^{-1}\vect{M}$ mit reeller, nur von Topologie und Leitungslängen
-abhängiger Matrix $\vect{M}$, also $\vect{Z}_B=z\,\vect{M}^{-1}$. Alle Einträge
-von $\vect{Z}_B$ tragen damit denselben Winkel $\varphi$, und mit
-$\rho=\cot\varphi$ folgt
+Ausgehend von Gleichung~\eqref{eq:zrho} ist die Abhängigkeit des Impedanzbetrags von $\rho$ und $X$ gegeben.
+Bei der äußeren Schleife ist das Verhältnis 
+
 \begin{equation}
-	X_{kk}=\lvert z_{kk}\rvert\sin\varphi,
-	\qquad
-	R_{kk}=\rho\,X_{kk},
-	\qquad
-	\frac{\lvert z_{kk}\rvert}{X_{kk}}=\frac{1}{\sin\varphi}=\sqrt{1+\rho^{2}}.
+	\frac{\lvert z\rvert}{X}=\sqrt{1+\rho^{2}}.
 	\label{eq:zbb-angle}
 \end{equation}
-Dieses Verhältnis ist unabhängig davon, ob $\lvert z\rvert$ oder $X$ festgehalten
-wird; die Modi unterscheiden sich nur in der \emph{absoluten} Größe von $X_{kk}$.
-Die im Folgenden nachgewiesene $\rho$-Abhängigkeit der äußeren Schleife ist damit,
-anders als in Abschnitt~\ref{subsec:rx_inner}, \emph{kein} Artefakt der
-Parametrierung, sondern eine echte Eigenschaft der auf $X$ gestützten
-Spannungsregelung. Gl.~\eqref{eq:zbb-angle} setzt den einheitlichen Leitungstyp
-der synthetischen Testnetze voraus; in gemischten realen Netzen gilt sie nur
-näherungsweise.
 
-\paragraph{Die Struktur des PV--PV-Blocks bleibt unverändert.}
-Bevor der Effekt dem Betrag von $X$ zugeschrieben werden kann, ist auszuschließen,
-dass sich mit $\rho$ auch die \emph{Form} von $\vect{X}_{pp}$ verschlechtert. Nach
-Gl.~\eqref{eq:zbb-angle} ist $\vect{X}^{(\ell)}_{pp}(\rho)=
-\bigl(X(\rho)/X_{\mathrm{ref}}\bigr)\,\vect{X}^{(\ell)}_{pp,\mathrm{ref}}$, also
-eine reine Streckung. Tabelle~\ref{tab:rx-outer-struct} bestätigt dies numerisch:
-Diagonaldominanz, Nebendiagonalanteil, Konditionszahl und der Spektralradius
-$\rho_{\mathrm{J}}$ der Jacobi-Iterationsmatrix der entkoppelten Näherung
-variieren über alle $13$ Stützstellen in allen $18$ Konfigurationen um
-$0{,}0\,\%$; nur der Betrag $\bar{x}_{kk}$ skaliert mit
-$X(\rho)\propto(1+\rho^{2})^{-1/2}$, im Sweep also um den Faktor $10$. Über die
-PV-Anzahl wächst die Konditionszahl dagegen um den Faktor $21{,}7$, $28{,}6$ und
-$21{,}6$ für $n=40$, $120$ und $350$.\\
+unabhängig vom verwendeten Betriebsmodus.
+Die Korrekturformel nutzt lediglich den Realteil $X$, während die Spannungsänderung aber die gesamte Impedanz $\lvert z\rvert$ sieht.
+Das Verhältnis der beiden Größen bildet den Modellfehler und ist nach~\eqref{eq:zbb-angle} charakterisiert.
+Voraussetzung für dafür ist eine einheitliche Verwendung eines Leitertypen (selbes $\rho$), da dann alle Einträge der Busimpedanzmatrix damit den selben Winkel haben.
+Aus dieser initialen Überlegung ist für die äußere Schleife eine tatächlich Abhängigkeit des R/X-Verhältnisses zu erwarten.\\
 
-Damit ergänzt Tabelle~\ref{tab:rx-outer-struct} zugleich
-Abschnitt~\ref{sec:methode_a_sensitivitaet}: $\rho_{\mathrm{J}}$ misst, wie gut
-die entkoppelte Näherung $\vect{X}_{pp}\approx\diag(X_{kk})$ trägt, und Werte
-$\rho_{\mathrm{J}}>1$ schließen deren Konvergenz aus. Er überschreitet Eins
-bereits bei $\mathrm{pv}=0{,}25$ ($n=40$: $\rho_{\mathrm{J}}=1{,}36$) bzw.\
-$\mathrm{pv}=0{,}10$ ($n=120$) und erreicht $33{,}1$ bei $n=350$,
-$\mathrm{pv}=0{,}50$ -- und zwar $\rho$-unabhängig. Die beiden Fehlerquellen der
-äußeren Schleife sind somit orthogonal: Die vernachlässigte PV--PV-Kopplung
-skaliert mit PV-Anteil und Netzgröße, aber nicht mit $R/X$; die im Folgenden
-untersuchte vernachlässigte Nichtlinearität skaliert mit $R/X$, aber kaum mit dem
-PV-Anteil.
+Es die zentrale Stellgröße für die Korrektur ist die PV-PV-Reaktanzmatrix $\mathbf{X_\mathrm{pp}}$.
+Durch eine einheitliche Verwendung eines Leitungstypen für das gesamte Netz und unter Vernachlässigung der Shunt-Admittanzen \cite{Salazar2024} kann für diesen Analysefall der Impedanzbelag $z=\lvert z\rvert e^{\jj\varphi}$ aus der Impedanzmatrix als Skalierungsfaktor 
+
+\begin{equation}
+\ZB=z\,\mathbf{M}^{-1}
+\end{equation}
+
+isoliert werden, wobei $\mathbf{M}$ nur noch von der Topologie und Leitungslängen abhängt.
+Wird daraus der PV-PV-Block extrahiert, bleibt diese Skalierungseigenschaft erhalten.
+Bei Änderung des R/X-Verhältnisses wird die Matrix nur gestreckt oder gestaucht.
+Die restliche Struktur bleibt unbeeinflusst, die Kondition und der Spektralradius sind konstant über alle $\rho$, was in Tabelle \ref{tab:pv-pv-orthogonal} für die getesteten Netze nachgewiesen wird.
+Dadurch ist sichergestellt, dass mögliche Abhängigkeiten nicht durch die PV-PV-Kopplung hervorgerufen werden, sondern durch den Impedanzwinkel.\\
+
 
 \begin{table}[htbp]
 	\centering
 	\caption{Kennzahlen des PV--PV-Blocks $\vect{X}_{pp}$ im Modus
-		\texttt{const\_z} (Auswahl). Alle Strukturgrößen sind über die $13$
-		$\rho$-Stützstellen konstant ($0{,}0\,\%$ Variation); nur $\bar{x}_{kk}$
-		skaliert mit $X(\rho)$, angegeben bei $\rho=0{,}1$. $\rho_{\mathrm{J}}$
-		bezeichnet den Spektralradius der Jacobi-Iterationsmatrix der entkoppelten
-		Näherung.}
-	\label{tab:rx-outer-struct}
-	\begin{tabular}{S[table-format=3.0]S[table-format=1.2]S[table-format=3.0]
-			S[table-format=3.1]S[table-format=2.2]S[table-format=1.5]}
-		\toprule
-		{$n$} & {pv} & {$n_\mathrm{pv}$} & {$\mathrm{cond}$}
-		& {$\rho_{\mathrm{J}}$} & {$\bar{x}_{kk}$} \\
-		\midrule
-		40  & 0.10 & 4   & 3.7   & 0.77  & 0.01492 \\
-		40  & 0.50 & 20  & 80.3  & 5.23  & 0.01275 \\
-		120 & 0.10 & 12  & 10.6  & 1.18  & 0.01944 \\
-		120 & 0.50 & 60  & 303.6 & 13.50 & 0.01709 \\
-		350 & 0.10 & 35  & 45.2  & 3.58  & 0.02434 \\
-		350 & 0.50 & 175 & 975.5 & 33.13 & 0.02186 \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-
-\paragraph{Beobachtung: Plateau, Anstieg, Abbruch.}
-Der Verlauf der äußeren Iterationen (Tabelle~\ref{tab:rx-outer},
-Abbildung~\ref{fig:rx-outer} links) gliedert sich in drei Abschnitte. Bis
-$\rho\approx1$ liegt ein Plateau von drei Iterationen -- in acht der neun
-Konfigurationen exakt drei, lediglich bei $n=350$, $n_\mathrm{pv}=35$ vier --, und
-zwar unabhängig vom PV-Anteil, obwohl $\mathrm{cond}(\vect{X}_{pp})$ zwischen den
-Zeilen um mehr als zwei Größenordnungen variiert. Bis $\rho\approx6{,}8$ folgt ein
-moderater, ebenfalls PV-anteilsunabhängiger Anstieg auf sieben Iterationen; danach
-bricht die Iteration ab. Die Lage des Abbruchs ist nicht monoton in der
-Netzgröße: Für $n=120$ tritt bis $\rho=10$ kein Versagen auf, allerdings mit $35$
-bis $43$ Iterationen an der oberen Gittergrenze, für $n=40$ liegt
-$\rho^\ast=10$, für $n=350$ dagegen bereits bei $3{,}16$ bzw.\ $4{,}64$.
-Konsistent dazu korreliert die Knotenzahl praktisch nicht mit dem Aufwand
-($\rho_{\mathrm{S}}=-0{,}07$, Tabelle~\ref{tab:rx-predictor}); maßgeblich ist der
-Betriebspunkt, nicht die Dimension. Innerhalb der gekoppelten Variante ist der
-PV-Anteil kein Risikofaktor, sondern wirkt bei $n=350$ leicht stabilisierend:
-$\rho^\ast$ steigt von $3{,}16$ bei $35$ auf $4{,}64$ bei $88$ und $175$
-PV-Knoten, und die Plateauhöhe sinkt von vier auf drei Iterationen. Je mehr Knoten
-geregelt werden, desto kleiner ist der an jedem einzelnen Knoten zu korrigierende
-Spannungsmismatch, weil die gekoppelte Formulierung die gegenseitige Stützung über
-die Nebendiagonalen von $\vect{X}_{pp}$ von vornherein berücksichtigt.
-
-\begin{table}[htbp]
-	\centering
-	\caption{Äußere Iterationen $k_{\mathrm{out}}$ im Modus \texttt{const\_z} mit
-		gekoppelter Q-Korrektur. Die Spalte $\rho\le0{,}68$ gibt den über die sechs
-		kleinsten Stützstellen konstanten Plateauwert an; $\rho^\ast$ ist das
-		kleinste $R/X$ ohne Konvergenz. Die Versagensart ist in
-		Tabelle~\ref{tab:rx-outer-fail} aufgeschlüsselt.}
-	\label{tab:rx-outer}
-	\begin{tabular}{S[table-format=3.0]S[table-format=3.0]
-			S[table-format=1.0]S[table-format=2.0]S[table-format=2.0]
-			S[table-format=2.2]l}
-		\toprule
-		{$n$} & {$n_\mathrm{pv}$} & {$\le0{,}68$} & {$\rho=2{,}15$}
-		& {$\rho=6{,}81$} & {$\rho^\ast$} & Versagensart \\
-		\midrule
-		40  & 4   & 3 & 4 & 7      & 10.00 & Grenzzyklus \\
-		40  & 10  & 3 & 4 & 7      & 10.00 & Grenzzyklus \\
-		40  & 20  & 3 & 4 & 7      & 10.00 & Grenzzyklus \\
-		\midrule
-		120 & 12  & 3 & 3 & 7      & {--}  & {--} \\
-		120 & 30  & 3 & 3 & 7      & {--}  & {--} \\
-		120 & 60  & 3 & 4 & 7      & {--}  & {--} \\
-		\midrule
-		350 & 35  & 4 & 9 & {\dag} & 3.16  & Divergenz \\
-		350 & 88  & 3 & 7 & {\dag} & 4.64  & Divergenz \\
-		350 & 175 & 3 & 6 & {\dag} & 4.64  & Divergenz \\
-		\bottomrule
-	\end{tabular}
+			\texttt{const\_z} (Auswahl). Alle Strukturgrößen sind über die $13$
+			$\rho$-Stützstellen konstant ($0{,}0\,\%$ Variation)}
+	\label{tab:pv-pv-orthogonal}
+%	\begin{tabular}{crcrc}
+%		\toprule
+%		$n$ & $n_{pv}$ & pv & $\mathrm{cond}(X_{pp})$ & $Spektralradius$\\
+%		\midrule
+%		40  & 5  & 0.10 & 21.7 $\pm$0.0 & 0.52 $\pm$0.0  \\
+%		40  & 20 & 0.50 & 53.0 $\pm$0.0 & 0.76 $\pm$0.0 \\
+%		120 & 15 & 0.10 & 62.0 $\pm$0.0 & 0.52 $\pm$0.0  \\
+%		120 & 74 & 0.50 & 154.0 $\pm$0.0 & 0.76 $\pm$0.0  \\
+%		350 & 44 & 0.10 & 177.0 $\pm$0.0 & 0.52 $\pm$0.0 \\
+%		350 & 218& 0.50 & 438.0 $\pm$0.0 & 0.76 $\pm$0.0  \\
+%		\bottomrule
+%	\end{tabular}
+\begin{tabular}{cccrc}
+	\toprule
+	$n$ & $n_{pv}$ & pv & $\mathrm{cond}(X_{pp})$ & $\rho_J$ \\
+	\midrule
+	40  & 4   & 0.10 & 3.73  $\pm$0.0 & 0.77 $\pm$0.0   \\
+	40  & 10  & 0.25 & 15.13 $\pm$0.0 & 1.36 $\pm$0.0  \\
+	40  & 20  & 0.50 & 80.31 $\pm$0.0 & 5.23 $\pm$0.0  \\
+	120 & 12  & 0.10 & 10.57 $\pm$0.0 & 1.18 $\pm$0.0 \\
+	120 & 30  & 0.25 & 71.24 $\pm$0.0 & 4.58 $\pm$0.0 \\
+	120 & 60  & 0.50 & 303.6 $\pm$0.0 & 13.5 $\pm$0.0  \\
+	350 & 35  & 0.10 & 45.21 $\pm$0.0 & 3.58 $\pm$0.0  \\
+	350 & 88  & 0.25 & 263.0 $\pm$0.0 & 12.6 $\pm$0.0  \\
+	350 & 175 & 0.50 & 975.5 $\pm$0.0 & 33.1 $\pm$0.0  \\
+	\bottomrule
+\end{tabular}
 	
-	\smallskip
-	\footnotesize
-	\raggedright
-	{\dag}~Iterationslimit von $60$ äußeren Schritten erreicht. ,,--`` bedeutet,
-	dass im gesamten Sweep bis $\rho=10$ kein Versagen auftritt; bei $\rho=10$
-	werden dort $35$ bis $43$ Iterationen benötigt.
+	\medskip
+%	\footnotesize
+%	Diagonaldominanz, Jacobi-Spektralradius $\rho_J$ und Kondition $\mathrm{cond}(X_{pp})$ 
+%	bleiben \"uber alle 13 $\rho$-St\"utzstellen exakt konstant ($\pm$0.0\% Variation). 
+%	Nur der Betrag $|\vect{X}_{pp}|$ skaliert mit $\rho$. 
+%	
+%	Zum Vergleich: $\mathrm{cond}(X_{pp})$ w\"achst stark mit $n_{pv}$ (21--29$\times$ von pv=0.10 zu pv=0.50) 
+%	--- das ist die orthogonale, bereits bekannte Fehlerquelle aus Kapitel 5.
 \end{table}
+%Alle bisherigen Netze waren reine PQ-Netze. Ein einsetzbares Verfahren muss jedoch
+%PV-Knoten behandeln, und dort wird der Impedanzwinkel aus einem Grund relevant,
+%der mit der Kontraktionsrate nichts zu tun hat: Die äußere Schleife verwendet
+%Blindleistung als Stellgröße für die Spannung, und deren Hebel hängt allein an
+%$X$.
+
+%\paragraph{Der Faktor $\sqrt{1+\rho^{2}}$ ist keine Eigenschaft des Sweep-Modus.}
+%Für ein Netz mit einheitlichem komplexem Längsbelag
+%$z=\lvert z\rvert e^{\jj\varphi}$ und vernachlässigten Quergliedern gilt
+%$\vect{Y}_{dd}=z^{-1}\vect{M}$ mit reeller, nur von Topologie und Leitungslängen
+%abhängiger Matrix $\vect{M}$, also $\vect{Z}_B=z\,\vect{M}^{-1}$. Alle Einträge
+%von $\vect{Z}_B$ tragen damit denselben Winkel $\varphi$, und mit
+%$\rho=\cot\varphi$ folgt
+%\begin{equation}
+%	X_{kk}=\lvert z_{kk}\rvert\sin\varphi,
+%	\qquad
+%	R_{kk}=\rho\,X_{kk},
+%	\qquad
+%	\frac{\lvert z_{kk}\rvert}{X_{kk}}=\frac{1}{\sin\varphi}=\sqrt{1+\rho^{2}}.
+%	\label{eq:zbb-angle}
+%\end{equation}
+%Dieses Verhältnis ist unabhängig davon, ob $\lvert z\rvert$ oder $X$ festgehalten
+%wird; die Modi unterscheiden sich nur in der \emph{absoluten} Größe von $X_{kk}$.
+%Die im Folgenden nachgewiesene $\rho$-Abhängigkeit der äußeren Schleife ist damit,
+%anders als in Abschnitt~\ref{subsec:rx_inner}, \emph{kein} Artefakt der
+%Parametrierung, sondern eine echte Eigenschaft der auf $X$ gestützten
+%Spannungsregelung. Gl.~\eqref{eq:zbb-angle} setzt den einheitlichen Leitungstyp
+%der synthetischen Testnetze voraus; in gemischten realen Netzen gilt sie nur
+%näherungsweise.
+
+%\paragraph{Die Struktur des PV--PV-Blocks bleibt unverändert.}
+%Bevor der Effekt dem Betrag von $X$ zugeschrieben werden kann, ist auszuschließen,
+%dass sich mit $\rho$ auch die \emph{Form} von $\vect{X}_{pp}$ verschlechtert. Nach
+%Gl.~\eqref{eq:zbb-angle} ist $\vect{X}^{(\ell)}_{pp}(\rho)=
+%\bigl(X(\rho)/X_{\mathrm{ref}}\bigr)\,\vect{X}^{(\ell)}_{pp,\mathrm{ref}}$, also
+%eine reine Streckung. Tabelle~\ref{tab:rx-outer-struct} bestätigt dies numerisch:
+%Diagonaldominanz, Nebendiagonalanteil, Konditionszahl und der Spektralradius
+%$\rho_{\mathrm{J}}$ der Jacobi-Iterationsmatrix der entkoppelten Näherung
+%variieren über alle $13$ Stützstellen in allen $18$ Konfigurationen um
+%$0{,}0\,\%$; nur der Betrag $\bar{x}_{kk}$ skaliert mit
+%$X(\rho)\propto(1+\rho^{2})^{-1/2}$, im Sweep also um den Faktor $10$. Über die
+%PV-Anzahl wächst die Konditionszahl dagegen um den Faktor $21{,}7$, $28{,}6$ und
+%$21{,}6$ für $n=40$, $120$ und $350$.\\
+%
+%Damit ergänzt Tabelle~\ref{tab:rx-outer-struct} zugleich
+%Abschnitt~\ref{sec:methode_a_sensitivitaet}: $\rho_{\mathrm{J}}$ misst, wie gut
+%die entkoppelte Näherung $\vect{X}_{pp}\approx\diag(X_{kk})$ trägt, und Werte
+%$\rho_{\mathrm{J}}>1$ schließen deren Konvergenz aus. Er überschreitet Eins
+%bereits bei $\mathrm{pv}=0{,}25$ ($n=40$: $\rho_{\mathrm{J}}=1{,}36$) bzw.\
+%$\mathrm{pv}=0{,}10$ ($n=120$) und erreicht $33{,}1$ bei $n=350$,
+%$\mathrm{pv}=0{,}50$ -- und zwar $\rho$-unabhängig. Die beiden Fehlerquellen der
+%äußeren Schleife sind somit orthogonal: Die vernachlässigte PV--PV-Kopplung
+%skaliert mit PV-Anteil und Netzgröße, aber nicht mit $R/X$; die im Folgenden
+%untersuchte vernachlässigte Nichtlinearität skaliert mit $R/X$, aber kaum mit dem
+%PV-Anteil.
+%
+%\begin{table}[htbp]
+%	\centering
+%	\caption{Kennzahlen des PV--PV-Blocks $\vect{X}_{pp}$ im Modus
+%		\texttt{const\_z} (Auswahl). Alle Strukturgrößen sind über die $13$
+%		$\rho$-Stützstellen konstant ($0{,}0\,\%$ Variation); nur $\bar{x}_{kk}$
+%		skaliert mit $X(\rho)$, angegeben bei $\rho=0{,}1$. $\rho_{\mathrm{J}}$
+%		bezeichnet den Spektralradius der Jacobi-Iterationsmatrix der entkoppelten
+%		Näherung.}
+%	\label{tab:rx-outer-struct}
+%	\begin{tabular}{S[table-format=3.0]S[table-format=1.2]S[table-format=3.0]
+%		S[table-format=2.2]S[table-format=1.5]}
+%		\toprule
+%		{$n$} & {pv} & {$n_\mathrm{pv}$}
+%		& {$\rho_{\mathrm{J}}$} & {$\bar{x}_{kk}$} \\
+%		\midrule
+%		40  & 0.10 & 4    & 0.77  & 0.01492 \\
+%		40  & 0.50 & 20   & 5.23  & 0.01275 \\
+%		120 & 0.10 & 12   & 1.18  & 0.01944 \\
+%		120 & 0.50 & 60   & 13.50 & 0.01709 \\
+%		350 & 0.10 & 35   & 3.58  & 0.02434 \\
+%		350 & 0.50 & 175  & 33.13 & 0.02186 \\
+%		\bottomrule
+%	\end{tabular}
+%\end{table}
+
+
+Da nun etabliert wurde, dass $\rho$ als isolierter Parameter fungiert, werden die bisherigen Netzgrößen mit jeweils drei PV-Durchdringungen mittels des erweiterten, gekoppelten TPF mit adaptiver Toleranz unter Warm-Start für den selben R/X-Bereich berechnet.
+In Abbildung~\ref{fig:rx-outer} (a) und (b) werden die Anzahl der Q-Korrekturen gegen $\rho$ aufgetragen.
+Die PV-Anteile einer Netzgröße werden aufgrund ähnlicher Werte in einem Datenpunkt mit Streuung zusammengefasst.\\
+
+Für \texttt{const\_z} in Plot (a) ist ein monotoner Anstieg in der Anzahl der äußeren Iterationen für größere R/X-Verhältnisse zu beobachten.
+Für 40 und 120-Knoten-Netze konvergieren alle Konfigurationen für den gesamten R/X-Bereich.
+Sowohl das NR als auch der erweiterte TPF finden bei den 350-Knoten Netzen für $\rho>3,1623$ keine Lösung.
+Für alle Größen ist das selbe Verhalten vorhanden: erst halten sich die äußeren Iteration auf einem konstanten Wert von 3, dann steigen sie, bis sie eventuell abbrechen.
+Eine PV-Abhängigkeit ist wie nicht zu erkennen, was kohärent mit der einleitenden Hypothese und \cref{sec:pv-share-invarianz} ist.
+Dieses Verhalten wird überwiegend von der äußeren Schleife hervorgerufen.
+Der innere TPF trägt nahezu keinen Beitrag zu dem Anstieg bei, da für \texttt{const\_z} in \cref{subsec:rx_inner} bereits eine Invarianz begründet und experimentell gezeigt wurde.\\
+
+Unter Modus \texttt{const\_x} (c) liegen ähnliche Verläufe vor. 
+Der unterschied zwischen den Modi liegt in deutlich früheren Konvergenzverlusten bei allen Netzgrößen.
+Das konstante Plateau, der anschließende Anstieg bleiben jedoch erhalten.
+Durch die Vergrößerung des Impedanzbetrages verschlechtert sich bereits die Konvergenz der inneren Schleife (\cref{subsec:rx_inner}), wodurch hier ein kombinierter Effekt zwischen TPF und Q-Korrektur durch eine starke Arbeitspunktverschiebung dargestellt ist. 
+Generell ist aber ein schlechteres Lösungsverhalten im Vergleich zu \texttt{const\_z} zu beobachten. 
+Kovergenzverlust setzt bereits im 40-Knoten Netz bei $\rho>7$ ein.\\
 
 \begin{figure}[htbp]
 	\centering
@@ -3142,6 +3213,159 @@ die Nebendiagonalen von $\vect{X}_{pp}$ von vornherein berücksichtigt.
 		$\varepsilon_{\mathrm{lin}}$.}
 	\label{fig:rx-outer}
 \end{figure}
+
+In \texttt{const\_z} zeigt die äußere Schleife eine tatsächliche Abhängigkeit vom Impedanzwinkel auf. 
+Die Ursache für das schlechtere Konvergenzverhalten entspringt aus der Herleitung der Q-Korrektur aus \cref{subsec:methode_a_herleitung}. 
+Dort wird in Gleichung \eqref{eq:betragsquadrat_identitaet} verwendet, um das Residuum des Spannungsbetragsquadrats aus der winkelbehafteten Spannungsgröße zu nähern.
+Hierfür wird in Gleichung~\eqref{eq:V2} der quadratische Term $|\Delta V_k|^2$ aufgrund der Annahme kleiner Spannungsänderungen als Term höherer Ordnung vernachlässigt.
+%Dadurch entsteht ein Linearisierungsfehler $\varepsilon_{\mathrm{lin}}$, welcher durch das Verhältnis zwischen des vernachlässigten und exaktem Term
+%
+%\begin{equation}
+%	\varepsilon_{\mathrm{lin}} = \frac{|\Delta V_k|^{2}}{\Delta (|V_k|^2)}
+%	\label{eq:lin-error-scaling}
+%\end{equation}
+%
+%quantifiziert werden kann~\cite{Puente_Leon2015-ug}.
+%Solange 
+Das Verhältnis zwischen dem vernachlässigten und Berücksichtigten Term wird hier als Bewertungsmetrik $\varepsilon_{\mathrm{lin}}$ aufgefasst, anhand der abgelesen werden kann wie groß der quadratische Spannungsterm ist.
+Das Verhältnis ist folglich 
+
+%\begin{equation}
+%	\varepsilon_{\mathrm{lin}} =\frac{|\Delta V_k|^{2}}{2X_{kk}\,\Delta Q_k}.
+%%	\;=\; \frac{\Delta Q_k\,\lvert z_{kk}\rvert^{2}}{2X_{kk}|v_k|^{2}}
+%%	\;\overset{\eqref{eq:methode_a_dQ_scalar}}{=}\;
+%%	\underbrace{\bigl(1+\rho^{2}\bigr)}_{\text{Hebel}}\cdot
+%%	\underbrace{\frac{\Delta(|V_k|^{2})}{4|v_k|^{2}}}_{\text{Betriebspunkt}}.
+%	\label{eq:lin-error-scaling}
+%\end{equation}
+\begin{equation}
+	\mathbf{\varepsilon}_{\mathrm{lin}}
+	\;\coloneqq\; \frac{|\Delta\mathbf{V}_\mathrm{pv}|^2}{2\,\mathbf{X}_\mathrm{pp}^{(\ell)}\,\Delta\mathbf{Q}}.
+	\label{eq:eps-coupled-step1c}
+\end{equation}
+
+%Da bei einheitlichem Leitungstyp $\vect{Z}_{pp}^{(\ell)}=z\,(\vect{M}^{-1})_{pp}$
+%gilt (Gl.~\eqref{eq:zbb-angle}), unterscheiden sich $\Delta\vect{V}_{pv}$
+%und $\vect{X}_{pp}^{(\ell)}\Delta\vect{Q}$ nur um den komplexen Vorfaktor
+%$z/(V_{\mathrm{ref}}\sin\varphi)$, sodass elementweise
+%\begin{equation}
+%	|\Delta\vect{V}_{pv}|^2
+%	\;\approx\; \frac{1+\rho^2}{V_{\mathrm{ref}}^2}\,
+%	\bigl(\vect{X}_{pp}^{(\ell)}\,\Delta\vect{Q}\bigr)^{\odot 2}.
+%	\label{eq:eps-c2}
+%\end{equation}
+%Einsetzen von~\eqref{eq:eps-c2} in das Verhältnis
+%$\vect{\varepsilon}_{\mathrm{lin}}=|\Delta\vect{V}_{pv}|^2/(2\vect{X}_{pp}^{(\ell)}\Delta\vect{Q})$
+%und Ersetzen von $\vect{X}_{pp}^{(\ell)}\Delta\vect{Q}$ durch das
+%Spannungsresiduum via Gl.~\eqref{eq:methode_a_dQ_coupled} liefert
+%\begin{equation}
+%	\boxed{\;
+%		\varepsilon_{\mathrm{lin},k}
+%		\;=\; \bigl(1+\rho^2\bigr)\cdot
+%		\frac{\Delta(|V_k|^2)}{4|V_k|^2}
+%		\;} ,\qquad k\in\mathcal{P},
+%	\label{eq:eps-c3}
+%\end{equation}
+%also exakt dieselbe Formel wie im Skalarfall~\eqref{eq:eps-final}: der
+%Hebel $(1+\rho^2)$ ist unabhängig von der PV-PV-Kopplung, die
+%ausschließlich in die Suchrichtung $\Delta\vect{Q}$ eingeht.
+
+Die Division ist elementweise zu verstehen. 
+Für $\Delta \mathbf{V}_\mathrm{pv}$ können Gleichungen~(\ref{eq:spannung_skalar}, \ref{eq:strom_linear}) eingesetzt werden. 
+Für die Blindleistungsinjektion $\Delta\mathbf{Q}$ kann Gleichung~\eqref{eq:methode_a_dQ_coupled} verwendet werden.
+Da hier einheitliche Leitungstypen und -längen vorliegen, ist weiterhin Gleichung~\eqref{eq:zbb-angle}
+anwendbar, sodass das Verhältnis zwischen dem linearen (beachteten) und quadratischen (unbeachtetem) Term  elementweise
+\begin{equation}
+		\varepsilon_{\mathrm{lin}}
+		=
+		(1+\rho^2)
+		\frac{\Delta(|V_k|^2)}{4|V_k|^2}
+\end{equation}
+ergibt.
+Diese Gleichung zeigt, dass eine starke quadratische Abhängigkeit von dem R/X-Verhältnis vorliegt.
+Dem zufolge wächst der vernachlässigte Spannungsterm für große $\rho$, wodurch die Linearisierung in der Q-Korrektur nicht tragbar ist, was anschließend zu einer schwächeren/abwesenden Konvergenzeigenschaft führt.\\
+
+In Abbildungen~\ref{fig:rx-outer} (b) und (d) ist der tatsächliche relative Linearisierungsfehler der Q-Korrektur gegen verschiedene $\rho$ aufgetragen.
+Dafür wird das Spannungsresiduum durch die linearisierte Korrektur berechnet.
+Eine vollständige innere TPF-Schleife wird durchgeführt.
+Der sich daraus nach vollst\"andiger Konvergenz ergebende Spannungswert wird mit der durch das Residuum vorhergesagten \"Anderung verglichen.
+Ihr Verh\"altnis bestimmt den Linearisierungsfehler. \\
+%\begin{equation}
+%	\varepsilon_{\mathrm{lin}}^{(\ell+1)}
+%	=
+%	\frac{\bigl\|\,\lvert v_{pv}^{(\ell+1)}\rvert^2 - \lvert v_{pv}^{(\ell)}\rvert^2
+%		- \omega\bigl(\lvert V_{pv}^{\spec}\rvert^2 - \lvert v_{pv}^{(\ell)}\rvert^2\bigr)\bigr\|_\infty}
+%	{\bigl\|\,\omega\bigl(\lvert V_{pv}^{\spec}\rvert^2 - \lvert v_{pv}^{(\ell)}\rvert^2\bigr)\bigr\|_\infty}.
+%	\label{eq:sens_error_code}
+%\end{equation}
+%Dabei wurde die Abweichung von der berechneten linearisierten Spannungskorrektur gegen die tatsächliche, nach innerer Konvergenz, eingetretene Spannungsänderung  genommen. 
+Die $\varepsilon_\mathrm{lin}$-Werte der 40-Knoten Netze folgen der quadratischen $\rho$-Abhängigkeit sehr gut, während die beiden größeren Netze Schwankungen und Stauchungen aufweisen.
+Die Verläufe selber sind aber alle steigend für größere $\rho$.
+Da der das berechnete Verhältnis $\varepsilon_{\mathrm{lin}}$ kein klassischer relativer Fehler ist sondern nur den beachteten Term gegen den Unberücksichtigten aufwiegt, ist dieser nur für kleine Linearitätsfehler mit dem tatsächlichen relativen Fehler zu vergleichen.
+Der analytische Ausdruck dient hier primär zur Aussage, dass der vernachlässigte quadratische Term für große R/X-Verhältnisse nicht mehr vernachlässigbar ist. 
+Der empirische Fehler bestätigt diese Vorhersage, da alle Verläufe für $\rho>1$ stark ansteigen.
+
+
+%\paragraph{Beobachtung: Plateau, Anstieg, Abbruch.}
+%Der Verlauf der äußeren Iterationen (Tabelle~\ref{tab:rx-outer},
+%Abbildung~\ref{fig:rx-outer} links) gliedert sich in drei Abschnitte. Bis
+%$\rho\approx1$ liegt ein Plateau von drei Iterationen -- in acht der neun
+%Konfigurationen exakt drei, lediglich bei $n=350$, $n_\mathrm{pv}=35$ vier --, und
+%zwar unabhängig vom PV-Anteil, obwohl $\mathrm{cond}(\vect{X}_{pp})$ zwischen den
+%Zeilen um mehr als zwei Größenordnungen variiert. Bis $\rho\approx6{,}8$ folgt ein
+%moderater, ebenfalls PV-anteilsunabhängiger Anstieg auf sieben Iterationen; danach
+%bricht die Iteration ab. Die Lage des Abbruchs ist nicht monoton in der
+%Netzgröße: Für $n=120$ tritt bis $\rho=10$ kein Versagen auf, allerdings mit $35$
+%bis $43$ Iterationen an der oberen Gittergrenze, für $n=40$ liegt
+%$\rho^\ast=10$, für $n=350$ dagegen bereits bei $3{,}16$ bzw.\ $4{,}64$.
+%Konsistent dazu korreliert die Knotenzahl praktisch nicht mit dem Aufwand
+%($\rho_{\mathrm{S}}=-0{,}07$, Tabelle~\ref{tab:rx-predictor}); maßgeblich ist der
+%Betriebspunkt, nicht die Dimension. Innerhalb der gekoppelten Variante ist der
+%PV-Anteil kein Risikofaktor, sondern wirkt bei $n=350$ leicht stabilisierend:
+%$\rho^\ast$ steigt von $3{,}16$ bei $35$ auf $4{,}64$ bei $88$ und $175$
+%PV-Knoten, und die Plateauhöhe sinkt von vier auf drei Iterationen. Je mehr Knoten
+%geregelt werden, desto kleiner ist der an jedem einzelnen Knoten zu korrigierende
+%Spannungsmismatch, weil die gekoppelte Formulierung die gegenseitige Stützung über
+%die Nebendiagonalen von $\vect{X}_{pp}$ von vornherein berücksichtigt.
+
+%\begin{table}[htbp]
+%	\centering
+%	\caption{Äußere Iterationen $k_{\mathrm{out}}$ im Modus \texttt{const\_z} mit
+%		gekoppelter Q-Korrektur. Die Spalte $\rho\le0{,}68$ gibt den über die sechs
+%		kleinsten Stützstellen konstanten Plateauwert an; $\rho^\ast$ ist das
+%		kleinste $R/X$ ohne Konvergenz. Die Versagensart ist in
+%		Tabelle~\ref{tab:rx-outer-fail} aufgeschlüsselt.}
+%	\label{tab:rx-outer}
+%	\begin{tabular}{S[table-format=3.0]S[table-format=3.0]
+%			S[table-format=1.0]S[table-format=2.0]S[table-format=2.0]
+%			S[table-format=2.2]l}
+%		\toprule
+%		{$n$} & {$n_\mathrm{pv}$} & {$\le0{,}68$} & {$\rho=2{,}15$}
+%		& {$\rho=6{,}81$} & {$\rho^\ast$} & Versagensart \\
+%		\midrule
+%		40  & 4   & 3 & 4 & 7      & 10.00 & Grenzzyklus \\
+%		40  & 10  & 3 & 4 & 7      & 10.00 & Grenzzyklus \\
+%		40  & 20  & 3 & 4 & 7      & 10.00 & Grenzzyklus \\
+%		\midrule
+%		120 & 12  & 3 & 3 & 7      & {--}  & {--} \\
+%		120 & 30  & 3 & 3 & 7      & {--}  & {--} \\
+%		120 & 60  & 3 & 4 & 7      & {--}  & {--} \\
+%		\midrule
+%		350 & 35  & 4 & 9 & {\dag} & 3.16  & Divergenz \\
+%		350 & 88  & 3 & 7 & {\dag} & 4.64  & Divergenz \\
+%		350 & 175 & 3 & 6 & {\dag} & 4.64  & Divergenz \\
+%		\bottomrule
+%	\end{tabular}
+%	
+%	\smallskip
+%	\footnotesize
+%	\raggedright
+%	{\dag}~Iterationslimit von $60$ äußeren Schritten erreicht. ,,--`` bedeutet,
+%	dass im gesamten Sweep bis $\rho=10$ kein Versagen auftritt; bei $\rho=10$
+%	werden dort $35$ bis $43$ Iterationen benötigt.
+%\end{table}
+
+
 
 \paragraph{Ursache: Verlust der Linearisierung.}
 Der Abbruch lässt sich auf den in Gl.~\eqref{eq:betragsquadrat_identitaet}
