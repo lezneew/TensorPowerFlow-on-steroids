@@ -2076,6 +2076,85 @@ def plot_pv_share_analysis(save_name="pv_share_k_in_time.pgf"):
     plt.close(fig)
 
 
+def plot_e1_inner_convergence(save_name="e1_inner_convergence.pgf"):
+    """
+    Plot eta and k_in vs lambda from e1_inner.csv.
+    Subplot (a): eta_inf (labeled as eta) vs lambda
+    Subplot (b): k_in (k_in_12) vs lambda with vertical line at critical lambda
+    Three networks: n=40 (red dots), n=120 (green x), n=350 (darkblue line)
+    Only converged data is plotted.
+    """
+    import pandas as pd
+
+    csv_path = Path(__file__).parent / "results_lastfaktor" / "e1_inner.csv"
+
+    if not csv_path.exists():
+        print(f"  Error: CSV file not found: {csv_path}")
+        return
+
+    print(f"  Reading data from: {csv_path}")
+    df = pd.read_csv(csv_path)
+
+    df_conv = df[df["conv"] == True].copy()
+
+    print(f"  Total rows: {len(df)}, Converged: {len(df_conv)}")
+
+    network_sizes = [40, 120, 350]
+
+    fig, axes = plt.subplots(1, 2, figsize=(5.91, 2.8))
+
+    for ax_idx, (col, ylabel) in enumerate([("etainf", r"$\eta$"), ("k_in_12", r"$k_\mathrm{in}$")]):
+        for n in network_sizes:
+            data = df_conv[df_conv["n"] == n].sort_values("lam")
+            lam = data["lam"].values
+            y = data[col].values
+
+            if n == 40:
+                axes[ax_idx].plot(lam, y, "o", color="red", markersize=2,
+                                  markerfacecolor="red", markeredgecolor="red",
+                                 label=r"$n=40$", markevery=2, zorder=3)
+            elif n == 120:
+                axes[ax_idx].plot(lam, y, "x", color="green", markersize=4,
+                                  markeredgewidth=1.2, label=r"$n=120$", markevery=2, zorder=2)
+            elif n == 350:
+                axes[ax_idx].plot(lam, y, "-", color="darkblue", linewidth=0.5,
+                                  label=r"$n=350$", zorder=1)
+        # axes[ax_idx].set_xscale("log")
+        # axes[ax_idx].set_yscale("log")
+
+        axes[ax_idx].set_xlabel(r"$\lambda$", fontsize=11)
+        axes[ax_idx].set_ylabel(ylabel, fontsize=11)
+        axes[ax_idx].grid(True, which="both", alpha=0.3)
+        axes[ax_idx].legend(fontsize=9, loc="upper left")
+
+    axes[0].set_xscale("log")
+    axes[0].set_yscale("log")
+    # axes[0].set_ylim()
+    axes[0].set_xlim(0.18, 10)
+    # axes[1].set_xscale("log")
+    # axes[1].set_yscale("log")
+    axes[1].set_ylim(0,100)
+    axes[1].set_xlim(0, 10)
+    for n in network_sizes:
+        n_data = df[df["n"] == n]
+        non_conv = n_data[n_data["conv"] == False]
+        if len(non_conv) > 0:
+            crit_lam = non_conv["lam"].min()
+            print(f"  Critical lambda for n={n}: {crit_lam:.2f}")
+            axes[1].axvline(x=crit_lam, color="gray", linestyle="--", linewidth=1.0, alpha=0.7)
+
+    plt.tight_layout()
+
+    save_path = SAVE_DIR / save_name
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    print(f"\n  Plot saved: {save_path}")
+
+    if not USE_PGF:
+        plt.show()
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     # print_salazar_scaling_table()
     # plot_max_pv_convergence()
@@ -2091,7 +2170,8 @@ if __name__ == "__main__":
     # plot_baseline_tpf_vs_nr()
     # plot_timing_vs_size()
     # plot_subplot_c_from_csv()
-    plot_subplot_c_from_csvlog_log()
+    plot_e1_inner_convergence()
+    # plot_subplot_c_from_csvlog_log()
     # plot_timing_vs_pv_ratio()
     # plot_radial_networks_for_convergence()
     # plot_outer_convergence_error_decoupled()

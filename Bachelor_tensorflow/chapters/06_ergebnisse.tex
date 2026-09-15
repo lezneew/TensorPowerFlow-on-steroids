@@ -3205,12 +3205,9 @@ Kovergenzverlust setzt bereits im 40-Knoten Netz bei $\rho>7$ ein.\\
 		Links die Zahl der äußeren Iterationen, rechts der relative
 		Linearisierungsfehler $\varepsilon_{\mathrm{lin}}$ der
 		Sensitivitätsbeziehung (Median über die äußeren Schritte) über $\rho$. Farbe
-		kodiert die Netzgröße, der Marker den PV-Anteil. Rote Kreuze markieren Läufe
-		ohne Konvergenz innerhalb von $60$ äußeren Iterationen, die graue Linie im
+		kodiert die Netzgröße, der Marker den PV-Anteil. Die graue Linie im
 		rechten Diagramm die Referenzsteigung $\propto\rho^{2}$ nach
-		Gl.~\eqref{eq:lin-error-scaling}. Kernaussage: Plateau bis $\rho\approx1$
-		bei drei Iterationen, danach Anstieg gemeinsam mit
-		$\varepsilon_{\mathrm{lin}}$.}
+		Gl.~\eqref{eq:lin-error-scaling}.}
 	\label{fig:rx-outer}
 \end{figure}
 
@@ -3227,7 +3224,7 @@ Hierfür wird in Gleichung~\eqref{eq:V2} der quadratische Term $|\Delta V_k|^2$ 
 %
 %quantifiziert werden kann~\cite{Puente_Leon2015-ug}.
 %Solange 
-Das Verhältnis zwischen dem vernachlässigten und Berücksichtigten Term wird hier als Bewertungsmetrik $\varepsilon_{\mathrm{lin}}$ aufgefasst, anhand der abgelesen werden kann wie groß der quadratische Spannungsterm ist.
+Das Verhältnis zwischen dem vernachlässigten und Berücksichtigten Term wird hier als Bewertungsmetrik $\varepsilon$ aufgefasst, anhand der abgelesen werden kann wie groß der quadratische Spannungsterm im Vergleich zum linearen Term ist.
 Das Verhältnis ist folglich 
 
 %\begin{equation}
@@ -3239,7 +3236,7 @@ Das Verhältnis ist folglich
 %	\label{eq:lin-error-scaling}
 %\end{equation}
 \begin{equation}
-	\mathbf{\varepsilon}_{\mathrm{lin}}
+	\mathbf{\varepsilon}
 	\;\coloneqq\; \frac{|\Delta\mathbf{V}_\mathrm{pv}|^2}{2\,\mathbf{X}_\mathrm{pp}^{(\ell)}\,\Delta\mathbf{Q}}.
 	\label{eq:eps-coupled-step1c}
 \end{equation}
@@ -3276,10 +3273,10 @@ Für die Blindleistungsinjektion $\Delta\mathbf{Q}$ kann Gleichung~\eqref{eq:met
 Da hier einheitliche Leitungstypen und -längen vorliegen, ist weiterhin Gleichung~\eqref{eq:zbb-angle}
 anwendbar, sodass das Verhältnis zwischen dem linearen (beachteten) und quadratischen (unbeachtetem) Term  elementweise
 \begin{equation}
-		\varepsilon_{\mathrm{lin}}
+		\varepsilon
 		=
-		(1+\rho^2)
-		\frac{\Delta(|V_k|^2)}{4|V_k|^2}
+		\underbrace{(1+\rho^2)}_{\text{Hebel}}
+		\underbrace{\frac{\Delta(|V_k|^2)}{4|V_k|^2}}_{\text{Betriebspunkt}}
 \end{equation}
 ergibt.
 Diese Gleichung zeigt, dass eine starke quadratische Abhängigkeit von dem R/X-Verhältnis vorliegt.
@@ -3289,21 +3286,32 @@ In Abbildungen~\ref{fig:rx-outer} (b) und (d) ist der tatsächliche relative Lin
 Dafür wird das Spannungsresiduum durch die linearisierte Korrektur berechnet.
 Eine vollständige innere TPF-Schleife wird durchgeführt.
 Der sich daraus nach vollst\"andiger Konvergenz ergebende Spannungswert wird mit der durch das Residuum vorhergesagten \"Anderung verglichen.
-Ihr Verh\"altnis bestimmt den Linearisierungsfehler. \\
-%\begin{equation}
-%	\varepsilon_{\mathrm{lin}}^{(\ell+1)}
-%	=
-%	\frac{\bigl\|\,\lvert v_{pv}^{(\ell+1)}\rvert^2 - \lvert v_{pv}^{(\ell)}\rvert^2
-%		- \omega\bigl(\lvert V_{pv}^{\spec}\rvert^2 - \lvert v_{pv}^{(\ell)}\rvert^2\bigr)\bigr\|_\infty}
-%	{\bigl\|\,\omega\bigl(\lvert V_{pv}^{\spec}\rvert^2 - \lvert v_{pv}^{(\ell)}\rvert^2\bigr)\bigr\|_\infty}.
-%	\label{eq:sens_error_code}
-%\end{equation}
+Ihr Verh\"altnis
+\begin{equation}
+	\varepsilon_{\mathrm{lin}}^{(\ell+1)}
+	=
+	\frac{\,\lvert v_{pv}^{(\ell+1)}\rvert^2 - \lvert v_{pv}^{(\ell)}\rvert^2
+		- (\lvert V_{pv}^{\spec}\rvert^2 - \lvert v_{pv}^{(\ell)}\rvert^2)}
+	{\,\lvert V_{pv}^{\spec}\rvert^2 - \lvert v_{pv}^{(\ell)}\rvert^2}.
+	\label{eq:sens_error_code}
+\end{equation}
+
+bestimmt den Linearisierungsfehler.
 %Dabei wurde die Abweichung von der berechneten linearisierten Spannungskorrektur gegen die tatsächliche, nach innerer Konvergenz, eingetretene Spannungsänderung  genommen. 
 Die $\varepsilon_\mathrm{lin}$-Werte der 40-Knoten Netze folgen der quadratischen $\rho$-Abhängigkeit sehr gut, während die beiden größeren Netze Schwankungen und Stauchungen aufweisen.
 Die Verläufe selber sind aber alle steigend für größere $\rho$.
-Da der das berechnete Verhältnis $\varepsilon_{\mathrm{lin}}$ kein klassischer relativer Fehler ist sondern nur den beachteten Term gegen den Unberücksichtigten aufwiegt, ist dieser nur für kleine Linearitätsfehler mit dem tatsächlichen relativen Fehler zu vergleichen.
-Der analytische Ausdruck dient hier primär zur Aussage, dass der vernachlässigte quadratische Term für große R/X-Verhältnisse nicht mehr vernachlässigbar ist. 
-Der empirische Fehler bestätigt diese Vorhersage, da alle Verläufe für $\rho>1$ stark ansteigen.
+Da der das berechnete Verhältnis $\varepsilon$ kein klassischer relativer Fehler ist sondern nur den beachteten linearen Term gegen den Unberücksichtigten aufwiegt, ist dieser nur für kleine Linearitätsfehler mit dem tatsächlichen relativen Fehler zu vergleichen.
+Der analytische Ausdruck dient hier primär zur Aussage, dass die Vernachlässigung des quadratischen Terms für große R/X-Verhältnisse den Gültigkeitsbereich durch eine starke R/X-Abhängigkeit verlässt. 
+Der empirische Fehler $\varepsilon_{\mathrm{lin}}$ bestätigt diese Vorhersage, da alle Verläufe für $\rho>1$ stark ansteigen.\\
+
+Die in der Abbildung erkennbaren Schwankungen und Abweichungen von dem quadratischen Verlauf entspringend dem Linearisierungsfehler durch den Betriebspunkt.
+Dies wird auch zwischen (b) und (c) ersichtlich. 
+Wo im oberen Graphen dem quadratischen Referenzverlauf stark ähneln, steigen und schwanken die Verläufe des unteren Plots deutlich stärker, da dort in \texttt{cont\_x} der Arbeitspunkt durch den größer werdenden Impedanzbetrag stärker verschoben wird.
+Zwischen Abbildungen (a) und (b) als auch (c) und (d) ist weiterhin eine Korrelation erkennbar. 
+Steigt der Linearisierungfehler, benötigt das Verfahren auch mehr äußere Korrekturen.
+Dabei setzt die Erhöhung der Iterationen von 3 auf 4 für alle betrachteten Netze ab $\varepsilon_{\mathrm{lin}}\approx0.02$ ein und die Steigungen der Iterationserhöhungen ähneln denen der Linearitätsfehler. 
+Besonders in (c) und (d) ist dies erkennbar, da die Iterationen und Fehler für das 40-Knoten-Netz am langsamsten und für das 120 Knoten Netz am stärksten steigt, während die Verläufe des 350 Knoten Netzes dazwischen liegen.\\
+
 
 
 %\paragraph{Beobachtung: Plateau, Anstieg, Abbruch.}
@@ -3367,204 +3375,221 @@ Der empirische Fehler bestätigt diese Vorhersage, da alle Verläufe für $\rho>
 
 
 
-\paragraph{Ursache: Verlust der Linearisierung.}
-Der Abbruch lässt sich auf den in Gl.~\eqref{eq:betragsquadrat_identitaet}
-vernachlässigten quadratischen Term zurückführen. Mit
-$\Delta V_k=\tfrac{\Delta Q_k}{|v_k|}(X_{kk}-\jj R_{kk})e^{\jj\theta_k}$ nach
-Gl.~\eqref{eq:spannung_ausmult} gilt
-$|\Delta V_k|=\Delta Q_k\,\lvert z_{kk}\rvert/|v_k|$, und das Verhältnis von
-vernachlässigtem zu berücksichtigtem Term wird mit Gl.~\eqref{eq:zbb-angle}
-\begin{equation}
-	\underbrace{\frac{|\Delta V_k|^{2}}{2X_{kk}\,\Delta Q_k}}_{\eqqcolon\,\varepsilon_{\mathrm{lin}}}
-	\;=\; \frac{\Delta Q_k\,\lvert z_{kk}\rvert^{2}}{2X_{kk}|v_k|^{2}}
-	\;\overset{\eqref{eq:methode_a_dQ_scalar}}{=}\;
-	\underbrace{\bigl(1+\rho^{2}\bigr)}_{\text{Hebel}}\cdot
-	\underbrace{\frac{\Delta(|V_k|^{2})}{4|v_k|^{2}}}_{\text{Betriebspunkt}}.
-	\label{eq:lin-error-scaling}
-\end{equation}
-Beide Faktoren wachsen mit $\rho$, jedoch aus verschiedenen Gründen. Der erste ist
-geometrisch: Die Sensitivität $2X_{kk}$ im Nenner der
-Korrekturformel~\eqref{eq:methode_a_dQ_coupled} ist um $\sqrt{1+\rho^{2}}$ kleiner
-als der Impedanzbetrag, sodass derselbe Spannungsmismatch einen entsprechend
-größeren Q-Schritt erzwingt -- und dieser Schritt verlässt den
-Gültigkeitsbereich der Linearisierung, die ihn erzeugt hat. Der zweite Faktor ist
-der Arbeitspunkt: Mit steigendem $R$ wachsen die Wirkleistungsverluste, das
-Spannungsprofil sinkt, und der aus dem Startzustand $\vect{Q}=\vect{0}$ zu
-schließende Mismatch wird selbst größer. Physikalisch entspricht dies der
-bekannten Beobachtung, dass Blindleistung in Netzen mit hohem $R/X$ ein schlechtes
-Stellmittel zur Spannungshaltung ist.\\
+%\paragraph{Ursache: Verlust der Linearisierung.}
+%Der Abbruch lässt sich auf den in Gl.~\eqref{eq:betragsquadrat_identitaet}
+%vernachlässigten quadratischen Term zurückführen. Mit
+%$\Delta V_k=\tfrac{\Delta Q_k}{|v_k|}(X_{kk}-\jj R_{kk})e^{\jj\theta_k}$ nach
+%Gl.~\eqref{eq:spannung_ausmult} gilt
+%$|\Delta V_k|=\Delta Q_k\,\lvert z_{kk}\rvert/|v_k|$, und das Verhältnis von
+%vernachlässigtem zu berücksichtigtem Term wird mit Gl.~\eqref{eq:zbb-angle}
+%\begin{equation}
+%	\underbrace{\frac{|\Delta V_k|^{2}}{2X_{kk}\,\Delta Q_k}}_{\eqqcolon\,\varepsilon_{\mathrm{lin}}}
+%	\;=\; \frac{\Delta Q_k\,\lvert z_{kk}\rvert^{2}}{2X_{kk}|v_k|^{2}}
+%	\;\overset{\eqref{eq:methode_a_dQ_scalar}}{=}\;
+%	\underbrace{\bigl(1+\rho^{2}\bigr)}_{\text{Hebel}}\cdot
+%	\underbrace{\frac{\Delta(|V_k|^{2})}{4|v_k|^{2}}}_{\text{Betriebspunkt}}.
+%	\label{eq:lin-error-scaling}
+%\end{equation}
+%Beide Faktoren wachsen mit $\rho$, jedoch aus verschiedenen Gründen. Der erste ist
+%geometrisch: Die Sensitivität $2X_{kk}$ im Nenner der
+%Korrekturformel~\eqref{eq:methode_a_dQ_coupled} ist um $\sqrt{1+\rho^{2}}$ kleiner
+%als der Impedanzbetrag, sodass derselbe Spannungsmismatch einen entsprechend
+%größeren Q-Schritt erzwingt -- und dieser Schritt verlässt den
+%Gültigkeitsbereich der Linearisierung, die ihn erzeugt hat. Der zweite Faktor ist
+%der Arbeitspunkt: Mit steigendem $R$ wachsen die Wirkleistungsverluste, das
+%Spannungsprofil sinkt, und der aus dem Startzustand $\vect{Q}=\vect{0}$ zu
+%schließende Mismatch wird selbst größer. Physikalisch entspricht dies der
+%bekannten Beobachtung, dass Blindleistung in Netzen mit hohem $R/X$ ein schlechtes
+%Stellmittel zur Spannungshaltung ist.\\
 
-Der Blindleistungsbedarf bestätigt die Aufspaltung quantitativ: Zwischen
-$\rho=0{,}1$ und $\rho=10$ steigt $\max_k\lvert Q_k\rvert$ im Median über die
-Netzgrößen um den Faktor $20{,}2$, $30{,}1$ und $18{,}7$ (für
-$\mathrm{pv}=0{,}10$, $0{,}25$, $0{,}50$), während der Hebelterm allein
-$\sqrt{1+\rho^{2}}\approx10{,}0$ erwarten lässt; die verbleibenden Faktoren
-$1{,}9$ bis $3{,}0$ sind der Beitrag des Betriebspunktterms. Dass der erzwungene
-Q-Schritt die Linearisierung entwertet, belegt die Rangkorrelation zwischen
-$\max_k\lvert Q_k\rvert$ und dem gemessenen Sensitivitätsfehler von
-$\rho_{\mathrm{S}}=0{,}67$. Das rechte Diagramm von
-Abbildung~\ref{fig:rx-outer} prüft Gl.~\eqref{eq:lin-error-scaling} direkt: Über
-den gesamten Sweep ergibt sich eine log-log-Steigung von $1{,}19$ bis $1{,}21$, in
-allen PV-Anteilen praktisch identisch. Dieser Wert ist eine \emph{untere}
-Schranke, denn das relative Fehlermaß sättigt konstruktionsbedingt bei Eins -- alle
-divergenten Läufe liegen zwischen $0{,}999$ und $1{,}014$
-(Tabelle~\ref{tab:rx-outer-fail}) --, sodass die Ausgleichsgerade im oberen
-$\rho$-Bereich abknickt.\\
+%Der Blindleistungsbedarf bestätigt die Aufspaltung quantitativ: Zwischen
+%$\rho=0{,}1$ und $\rho=10$ steigt $\max_k\lvert Q_k\rvert$ im Median über die
+%Netzgrößen um den Faktor $20{,}2$, $30{,}1$ und $18{,}7$ (für
+%$\mathrm{pv}=0{,}10$, $0{,}25$, $0{,}50$), während der Hebelterm allein
+%$\sqrt{1+\rho^{2}}\approx10{,}0$ erwarten lässt; die verbleibenden Faktoren
+%$1{,}9$ bis $3{,}0$ sind der Beitrag des Betriebspunktterms. Dass der erzwungene
+%Q-Schritt die Linearisierung entwertet, belegt die Rangkorrelation zwischen
+%$\max_k\lvert Q_k\rvert$ und dem gemessenen Sensitivitätsfehler von
+%$\rho_{\mathrm{S}}=0{,}67$. Das rechte Diagramm von
+%Abbildung~\ref{fig:rx-outer} prüft Gl.~\eqref{eq:lin-error-scaling} direkt: Über
+%den gesamten Sweep ergibt sich eine log-log-Steigung von $1{,}19$ bis $1{,}21$, in
+%allen PV-Anteilen praktisch identisch. Dieser Wert ist eine \emph{untere}
+%Schranke, denn das relative Fehlermaß sättigt konstruktionsbedingt bei Eins -- alle
+%divergenten Läufe liegen zwischen $0{,}999$ und $1{,}014$
+%(Tabelle~\ref{tab:rx-outer-fail}) --, sodass die Ausgleichsgerade im oberen
+%$\rho$-Bereich abknickt.\\
 
-Der Vorhersagewert bleibt dennoch hoch: Mit $\rho_{\mathrm{S}}=0{,}90$ ist
-$\varepsilon_{\mathrm{lin}}$ die weitaus stärkste Korrelationsgröße für die Zahl
-äußerer Iterationen und deutlich schärfer als $\rho$ selbst ($0{,}54$). Alle Läufe
-mit $\varepsilon_{\mathrm{lin}}\le0{,}54$ konvergieren in höchstens sieben äußeren
-Iterationen, alle mit $\varepsilon_{\mathrm{lin}}\ge0{,}92$ erreichen die Toleranz
-gar nicht oder nur im letzten zugelassenen Schritt; als praktisches
-Frühwarnkriterium lässt sich daraus $\varepsilon_{\mathrm{lin}}\lesssim0{,}6$
-ableiten. Die naheliegenden Alternativerklärungen scheiden aus
-(Tabelle~\ref{tab:rx-predictor}): Konditionszahl und Spektralradius von
-$\vect{X}_{pp}$ korrelieren mit $-0{,}24$ negativ und damit gegenläufig zur
-Erwartung, die PV-Anzahl mit $-0{,}19$ ebenfalls, die Kontraktionsrate $\eta$ der
-inneren Schleife liegt mit $0{,}15$ nahe null und die Knotenzahl mit $-0{,}07$
-praktisch bei null. Weder eine schlechtere Kondition der Sensitivitätsmatrix noch
-die vernachlässigte PV--PV-Kopplung noch die innere Iteration erklären den Aufwand
-der äußeren Schleife.
+%Der Vorhersagewert bleibt dennoch hoch: Mit $\rho_{\mathrm{S}}=0{,}90$ ist
+%$\varepsilon_{\mathrm{lin}}$ die weitaus stärkste Korrelationsgröße für die Zahl
+%äußerer Iterationen und deutlich schärfer als $\rho$ selbst ($0{,}54$). Alle Läufe
+%mit $\varepsilon_{\mathrm{lin}}\le0{,}54$ konvergieren in höchstens sieben äußeren
+%Iterationen, alle mit $\varepsilon_{\mathrm{lin}}\ge0{,}92$ erreichen die Toleranz
+%gar nicht oder nur im letzten zugelassenen Schritt; als praktisches
+%Frühwarnkriterium lässt sich daraus $\varepsilon_{\mathrm{lin}}\lesssim0{,}6$
+%ableiten. Die naheliegenden Alternativerklärungen scheiden aus
+%(Tabelle~\ref{tab:rx-predictor}): Konditionszahl und Spektralradius von
+%$\vect{X}_{pp}$ korrelieren mit $-0{,}24$ negativ und damit gegenläufig zur
+%Erwartung, die PV-Anzahl mit $-0{,}19$ ebenfalls, die Kontraktionsrate $\eta$ der
+%inneren Schleife liegt mit $0{,}15$ nahe null und die Knotenzahl mit $-0{,}07$
+%praktisch bei null. Weder eine schlechtere Kondition der Sensitivitätsmatrix noch
+%die vernachlässigte PV--PV-Kopplung noch die innere Iteration erklären den Aufwand
+%der äußeren Schleife.
 
-\paragraph{Zwei Versagensmechanismen.}
-Die Läufe am Iterationslimit zerfallen in zwei klar unterscheidbare Klassen
-(Tabelle~\ref{tab:rx-outer-fail}). Bei $n=40$ und $\rho=10$ liegt keine Divergenz
-vor, sondern ein Überschwing-Grenzzyklus des ungedämpften Newton-Schritts: Das
-Spannungsresiduum fällt auf $9{,}6\cdot10^{-7}$ bis
-$2{,}6\cdot10^{-5}\,\text{p.u.}$ ab, die Blindleistungen bleiben mit $6$ bis
-$17\,\text{p.u.}$ endlich, und die innere Schleife benötigt mit $5{,}0$ bis
-$5{,}2$ Iterationen pro äußerem Schritt genauso viele wie bei $\rho=0{,}1$; die
-Amplitude des Zyklus wird durch den Linearisierungsfehler von $0{,}92$ bis
-$0{,}97$ gesetzt. Bei $n=350$ divergiert die Schleife dagegen tatsächlich: Das
-Residuum stagniert zwischen $0{,}36$ und $0{,}89\,\text{p.u.}$, die
-Blindleistungen erreichen $6{,}2\cdot10^{2}$ bis
-$4{,}7\cdot10^{4}\,\text{p.u.}$, und das Verhältnis innerer zu äußeren Iterationen
-springt von $5{,}5$ auf $115$ bis $197$. Ursache ist eine Rückkopplung über den
-Arbeitspunkt: Die unphysikalischen Q-Injektionen treiben die Spannungen so weit
-aus dem Nennbereich, dass $\eta$ nach Gl.~\eqref{eq:eta-recap} über Eins steigt
-und die innere Kontraktion verloren geht. Dass dies allein von der äußeren
-Schleife verursacht wird, belegt der Schätzwert am nominalen Arbeitspunkt: Selbst
-in den gescheiterten Fällen bleibt $\eta_2$ mit einem Median von $0{,}142$
-deutlich unter Eins (Tabelle~\ref{tab:rx-nr}). Die in
-Abschnitt~\ref{subsec:rx_inner} nachgewiesene Robustheit der inneren Schleife ist
-somit an physikalisch sinnvolle Injektionen gebunden und kann durch die äußere
-Schleife ausgehebelt werden.
+Basierend auf dem Modus \texttt{const\_z}, welcher Betriebspunktschwankungen weitestgehend unterbindet, kann eine Versagensgrenze für die äußere Schleife aufgestellt werden.
+Alle betrachteten Simulationen konvergieren für Linearitätsfehler $\varepsilon_{\mathrm{lin}} < 0,5$ innerhalb sieben Korrekturen. Für $\varepsilon_{\mathrm{lin}} > 0,9$ findet keines der Netze eine Lösung.
+Ist der relative Fehler bei der Linearisierung des Spannungsquadraten somit $\varepsilon_{\mathrm{lin, krit}} > 0,5$, kann dies als konservative Warnung aufgefasst werden, bei der das Verfahren der äußeren Schleife ihren Gültigkeitsbereich verlässt.
+Für Werte über dieser Grenze kann das Verfahren potentiell durch eine künstliche Skalierung des Spannungsresiduums korrigiert werden~\cite{IwamotoTamura1981}, was Gegenstand des Ausblicks des Projekts ist, da dies außerhalb des Rahmens dieser Ausarbeitung ist.
+\\
 
-\paragraph{Gegenprobe im Modus \texttt{const\_x}.}
-Nach Gl.~\eqref{eq:zbb-angle} ist der Hebelterm $1+\rho^{2}$ modusunabhängig; im
-Modus \texttt{const\_x} kommt lediglich hinzu, dass mit
-$\lvert z\rvert=x_0\sqrt{1+\rho^{2}}$ auch der Betriebspunktterm stark wächst. Die
-äußere Schleife muss dort folglich \emph{früher} versagen, und genau das zeigen
-die Daten: Die Konvergenzquote sinkt von $88{,}9\,\%$ auf $74{,}4\,\%$, der Median
-von $\rho^\ast$ von $7{,}32$ auf $4{,}64$, und die Grenzen verschieben sich
-einheitlich zu kleineren Werten. Eine $\rho$-Invarianz der äußeren Schleife bei
-festem $X$, wie sie eine ausschließliche Betrachtung von $X_{kk}$ nahelegen würde,
-liegt somit nicht vor; maßgeblich ist das Verhältnis
-$\lvert z_{kk}\rvert/X_{kk}$. Die Rollenverteilung der beiden Schleifen bleibt
-dennoch komplementär: Die innere Iteration sieht ausschließlich $\lvert z\rvert$
-und ist gegen $\rho$ invariant, die äußere sieht $\rho$ unmittelbar und in beiden
-Modi.
+%\paragraph{Zwei Versagensmechanismen.}
+%Die Läufe am Iterationslimit zerfallen in zwei klar unterscheidbare Klassen
+%(Tabelle~\ref{tab:rx-outer-fail}). Bei $n=40$ und $\rho=10$ liegt keine Divergenz
+%vor, sondern ein Überschwing-Grenzzyklus des ungedämpften Newton-Schritts: Das
+%Spannungsresiduum fällt auf $9{,}6\cdot10^{-7}$ bis
+%$2{,}6\cdot10^{-5}\,\text{p.u.}$ ab, die Blindleistungen bleiben mit $6$ bis
+%$17\,\text{p.u.}$ endlich, und die innere Schleife benötigt mit $5{,}0$ bis
+%$5{,}2$ Iterationen pro äußerem Schritt genauso viele wie bei $\rho=0{,}1$; die
+%Amplitude des Zyklus wird durch den Linearisierungsfehler von $0{,}92$ bis
+%$0{,}97$ gesetzt. Bei $n=350$ divergiert die Schleife dagegen tatsächlich: Das
+%Residuum stagniert zwischen $0{,}36$ und $0{,}89\,\text{p.u.}$, die
+%Blindleistungen erreichen $6{,}2\cdot10^{2}$ bis
+%$4{,}7\cdot10^{4}\,\text{p.u.}$, und das Verhältnis innerer zu äußeren Iterationen
+%springt von $5{,}5$ auf $115$ bis $197$. Ursache ist eine Rückkopplung über den
+%Arbeitspunkt: Die unphysikalischen Q-Injektionen treiben die Spannungen so weit
+%aus dem Nennbereich, dass $\eta$ nach Gl.~\eqref{eq:eta-recap} über Eins steigt
+%und die innere Kontraktion verloren geht. Dass dies allein von der äußeren
+%Schleife verursacht wird, belegt der Schätzwert am nominalen Arbeitspunkt: Selbst
+%in den gescheiterten Fällen bleibt $\eta_2$ mit einem Median von $0{,}142$
+%deutlich unter Eins (Tabelle~\ref{tab:rx-nr}). Die in
+%Abschnitt~\ref{subsec:rx_inner} nachgewiesene Robustheit der inneren Schleife ist
+%somit an physikalisch sinnvolle Injektionen gebunden und kann durch die äußere
+%Schleife ausgehebelt werden.
 
-\paragraph{Aufwand pro Iteration und Vergleich mit der entkoppelten Näherung.}
-Im konvergenten Bereich bleibt das Verhältnis innerer zu äußeren Iterationen
-nahezu konstant bei $5{,}5$, und die log-log-Steigungen des Aufwands \emph{pro}
-innerer Iteration über $\rho$ liegen zwischen $-0{,}04$ und $-0{,}17$, sind also
-leicht fallend und ohne erkennbaren Trend. Die Systemmatrix bleibt im Sweep
-unverändert faktorisierbar; ein höheres $R/X$ verteuert die einzelne Iteration
-nicht, sondern erhöht nur deren Anzahl in der äußeren Schleife. Für Absolutzeiten
-ist der dedizierte Benchmark aus Abschnitt~\ref{sec:einzelner_lastfluss}
-maßgeblich, da die hier gemessenen Zeiten von BLAS-Aufwärmphase und einmaliger
-Faktorisierung dominiert werden. Die Entscheidung für die gekoppelte Korrektur aus
-Abschnitt~\ref{sec:methode_a_sensitivitaet} bestätigt sich im Sweep deutlich: Über
-je $117$ Läufe erreicht die gekoppelte Variante im Modus \texttt{const\_z} eine
-Konvergenzquote von $88{,}9\,\%$ bei einem Median von drei äußeren und $16{,}5$
-inneren Iterationen, die entkoppelte lediglich $12{,}8\,\%$ bei $31$ äußeren und
-$114$ inneren. Ihr Versagen ist nicht $\rho$-getrieben, sondern durch
-$\rho_{\mathrm{J}}>1$ aus Tabelle~\ref{tab:rx-outer-struct} bestimmt; der
-PV-Anteil, der in der gekoppelten Variante leicht stabilisierend wirkt, ist in der
-entkoppelten das dominante Ausschlusskriterium.\footnote{Die zusätzlich vermessene
-	Variante mit numerisch gebildeter Sensitivität konvergierte in keinem der $117$
-	Läufe und wird als Implementierungsdefekt von der Interpretation ausgenommen;
-	siehe Abschnitt~\ref{sec:ausblick}.}
+%\paragraph{Gegenprobe im Modus \texttt{const\_x}.}
+%Nach Gl.~\eqref{eq:zbb-angle} ist der Hebelterm $1+\rho^{2}$ modusunabhängig; im
+%Modus \texttt{const\_x} kommt lediglich hinzu, dass mit
+%$\lvert z\rvert=x_0\sqrt{1+\rho^{2}}$ auch der Betriebspunktterm stark wächst. Die
+%äußere Schleife muss dort folglich \emph{früher} versagen, und genau das zeigen
+%die Daten: Die Konvergenzquote sinkt von $88{,}9\,\%$ auf $74{,}4\,\%$, der Median
+%von $\rho^\ast$ von $7{,}32$ auf $4{,}64$, und die Grenzen verschieben sich
+%einheitlich zu kleineren Werten. Eine $\rho$-Invarianz der äußeren Schleife bei
+%festem $X$, wie sie eine ausschließliche Betrachtung von $X_{kk}$ nahelegen würde,
+%liegt somit nicht vor; maßgeblich ist das Verhältnis
+%$\lvert z_{kk}\rvert/X_{kk}$. Die Rollenverteilung der beiden Schleifen bleibt
+%dennoch komplementär: Die innere Iteration sieht ausschließlich $\lvert z\rvert$
+%und ist gegen $\rho$ invariant, die äußere sieht $\rho$ unmittelbar und in beiden
+%Modi.
 
-\paragraph{Abgrenzung von Verfahrens- und Lösbarkeitsgrenze.}
-Ob die beobachtete Grenze dem Verfahren oder dem Netzzustand zuzurechnen ist,
-entscheidet der Vergleich mit der Newton-Raphson-Referenz, die für jeden Fall aus
-dem Flat Start mitgerechnet wird. Über alle $234$ gekoppelten Läufe beider Modi
-konvergieren in $191$ Fällen beide Verfahren, in $41$ Fällen keines von beiden, in
-zwei Fällen nur Newton-Raphson -- und in keinem einzigen Fall nur das hier
-untersuchte Verfahren (Tabelle~\ref{tab:rx-nr}). Die $41$ gemeinsam gescheiterten
-Läufe liegen ausnahmslos bei $\rho\ge2{,}15$ und weisen mit
-$v_{\min}=0{,}884\,\text{p.u.}$ im Median einen deutlich abgesenkten
-Betriebspunkt auf; $15$ von ihnen sind die in Abschnitt~\ref{subsec:rx_setup}
-beschriebenen, nicht konstruierbaren Fälle. In dieser Klasse scheitert die äußere
-Schleife nicht an ihrer Linearisierung, sondern am Fehlen einer erreichbaren
-Lösung. Damit verbleiben genau zwei von $234$ Läufen als echte Verfahrensgrenze;
-beide liegen bei $\rho=10$ und $v_{\min}\approx0{,}989\,\text{p.u.}$, also in
-einem elektrisch unkritischen Betriebspunkt, und beide gehören zur Klasse der
-Grenzzyklen. Ein Residuum von $3\cdot10^{-6}\,\text{p.u.}$ nach $60$ Schritten ist
-kein Konvergenzproblem im eigentlichen Sinne, sondern ein Dämpfungsproblem: Eine
-Schrittweitensteuerung $\omega<1$ würde diese Fälle mit hoher Wahrscheinlichkeit
-einfangen, die verbleibenden $41$ dagegen nicht, weil dort keine Lösung existiert.
+%\paragraph{Aufwand pro Iteration und Vergleich mit der entkoppelten Näherung.}
+%Im konvergenten Bereich bleibt das Verhältnis innerer zu äußeren Iterationen
+%nahezu konstant bei $5{,}5$, und die log-log-Steigungen des Aufwands \emph{pro}
+%innerer Iteration über $\rho$ liegen zwischen $-0{,}04$ und $-0{,}17$, sind also
+%leicht fallend und ohne erkennbaren Trend. Die Systemmatrix bleibt im Sweep
+%unverändert faktorisierbar; ein höheres $R/X$ verteuert die einzelne Iteration
+%nicht, sondern erhöht nur deren Anzahl in der äußeren Schleife. Für Absolutzeiten
+%ist der dedizierte Benchmark aus Abschnitt~\ref{sec:einzelner_lastfluss}
+%maßgeblich, da die hier gemessenen Zeiten von BLAS-Aufwärmphase und einmaliger
+%Faktorisierung dominiert werden. Die Entscheidung für die gekoppelte Korrektur aus
+%Abschnitt~\ref{sec:methode_a_sensitivitaet} bestätigt sich im Sweep deutlich: Über
+%je $117$ Läufe erreicht die gekoppelte Variante im Modus \texttt{const\_z} eine
+%Konvergenzquote von $88{,}9\,\%$ bei einem Median von drei äußeren und $16{,}5$
+%inneren Iterationen, die entkoppelte lediglich $12{,}8\,\%$ bei $31$ äußeren und
+%$114$ inneren. Ihr Versagen ist nicht $\rho$-getrieben, sondern durch
+%$\rho_{\mathrm{J}}>1$ aus Tabelle~\ref{tab:rx-outer-struct} bestimmt; der
+%PV-Anteil, der in der gekoppelten Variante leicht stabilisierend wirkt, ist in der
+%entkoppelten das dominante Ausschlusskriterium.\footnote{Die zusätzlich vermessene
+%	Variante mit numerisch gebildeter Sensitivität konvergierte in keinem der $117$
+%	Läufe und wird als Implementierungsdefekt von der Interpretation ausgenommen;
+%	siehe Abschnitt~\ref{sec:ausblick}.}
+
+%\paragraph{Abgrenzung von Verfahrens- und Lösbarkeitsgrenze.}
+%Ob die beobachtete Grenze dem Verfahren oder dem Netzzustand zuzurechnen ist,
+%entscheidet der Vergleich mit der Newton-Raphson-Referenz, die für jeden Fall aus
+%dem Flat Start mitgerechnet wird. Über alle $234$ gekoppelten Läufe beider Modi
+%konvergieren in $191$ Fällen beide Verfahren, in $41$ Fällen keines von beiden, in
+%zwei Fällen nur Newton-Raphson -- und in keinem einzigen Fall nur das hier
+%untersuchte Verfahren (Tabelle~\ref{tab:rx-nr}). Die $41$ gemeinsam gescheiterten
+%Läufe liegen ausnahmslos bei $\rho\ge2{,}15$ und weisen mit
+%$v_{\min}=0{,}884\,\text{p.u.}$ im Median einen deutlich abgesenkten
+%Betriebspunkt auf; $15$ von ihnen sind die in Abschnitt~\ref{subsec:rx_setup}
+%beschriebenen, nicht konstruierbaren Fälle. In dieser Klasse scheitert die äußere
+%Schleife nicht an ihrer Linearisierung, sondern am Fehlen einer erreichbaren
+%Lösung. Damit verbleiben genau zwei von $234$ Läufen als echte Verfahrensgrenze;
+%beide liegen bei $\rho=10$ und $v_{\min}\approx0{,}989\,\text{p.u.}$, also in
+%einem elektrisch unkritischen Betriebspunkt, und beide gehören zur Klasse der
+%Grenzzyklen. Ein Residuum von $3\cdot10^{-6}\,\text{p.u.}$ nach $60$ Schritten ist
+%kein Konvergenzproblem im eigentlichen Sinne, sondern ein Dämpfungsproblem: Eine
+%Schrittweitensteuerung $\omega<1$ würde diese Fälle mit hoher Wahrscheinlichkeit
+%einfangen, die verbleibenden $41$ dagegen nicht, weil dort keine Lösung existiert.
 
 %----------------------------------------------------------------------
-\subsection{Zwischenfazit und Einordnung}
-\label{subsec:rx_fazit}
-%----------------------------------------------------------------------
+%\subsection{Zwischenfazit und Einordnung}
+%\label{subsec:rx_fazit}
+%%----------------------------------------------------------------------
+%
+%Die Untersuchung lokalisiert den Einfluss des $R/X$-Verhältnisses eindeutig. Die
+%innere Fixpunktiteration ist gegen $\rho$ invariant: Ihre Kontraktionsrate folgt
+%bis auf $3{,}4\,\%$ der Invariante $\kappa=\eta\,v_{\min}^{2}/z_{\mathrm{rel}}$
+%mit $\kappa\propto n^{0{,}97}$ und hängt damit von Netzlänge, Impedanzbetrag und
+%Arbeitspunkt ab, nicht vom Leitungscharakter; ein $R/X$-Sweep bei fester Reaktanz
+%erzeugt eine scheinbare Winkelabhängigkeit, die sich vollständig als Betrags- und
+%Arbeitspunkteffekt erklärt. Der PV--PV-Block ist wegen
+%$\vect{X}_{pp}=X\,(\vect{M}^{-1})_{pv,pv}$ strukturell $\rho$-invariant; seine
+%Kondition wächst ausschließlich mit der Zahl der PV-Knoten.\\
+%
+%Die einzige echte $\rho$-Empfindlichkeit liegt in der Linearisierung der
+%Q-Korrektur und ist wegen $\lvert z_{kk}\rvert/X_{kk}=\sqrt{1+\rho^{2}}$ in beiden
+%Sweep-Modi vorhanden. Ursächlich ist nicht eine schlechtere Kondition der
+%Sensitivitätsmatrix -- diese ist über den Sweep exakt unverändert und korreliert
+%mit dem Aufwand sogar negativ ($-0{,}24$) --, sondern der mit $\rho$ schrumpfende
+%Betrag von $\vect{X}_{pp}$, der die Q-Schritte vergrößert und dadurch die eigene
+%Linearisierung entwertet. Bis $\rho\approx1$ -- dem Bereich typischer Mittel- und
+%Hochspannungsnetze -- ist der Aufwand mit drei äußeren Iterationen konstant und
+%vom PV-Anteil unabhängig, bis $\rho\approx6{,}8$ steigt er moderat auf sieben. Die
+%Grenze $\rho^\ast$ ist nicht monoton in der Netzgröße, weil zwei Mechanismen
+%wirken: bei kleinen Netzen ein Überschwing-Grenzzyklus dicht an der Lösung, bei
+%$n=350$ echte Divergenz mit Rückkopplung auf die innere Schleife. Der Vergleich
+%mit Newton-Raphson ordnet beide ein: Von $234$ Läufen sind lediglich zwei eine
+%echte Verfahrensgrenze. Die $R/X$-Grenze ist damit keine Grenze der
+%Tensor-Formulierung, sondern die Grenze der Spannungsregelung über Blindleistung,
+%die sie mit jedem Verfahren teilt, das $\partial|V|^{2}/\partial Q\approx2X$
+%verwendet.\\
+%
+%Praktisch bindend ist ohnehin früher der Blindleistungsbedarf: Er wächst über den
+%Sweep um mehr als eine Größenordnung und erreicht bei $n=40$ und $\rho=10$ bereits
+%$6$ bis $17\,\text{p.u.}$, sodass die betroffenen Knoten lange vor der numerischen
+%Grenze auf PQ-Betrieb umschalten müssten. Hinzu kommt, dass der kritische
+%Quadrant des Parameterraums in realen Systemen kaum besetzt ist: Nach
+%Tabelle~\ref{tab:rx-real} tritt $\rho\gtrsim7$ ausschließlich bei
+%Niederspannungskabeln kleinen Querschnitts auf, die in kurzen, kleinen Netzen
+%verlegt sind, während große Netze in höheren Spannungsebenen mit $\rho\lesssim1$
+%liegen -- Netzgröße und $R/X$ sind in der Praxis antikorreliert. Für ein
+%$40$-Knoten-Netz mit durchgängig NAYY~$4\times50$~SE ($\rho=7{,}7$) benötigt das
+%Verfahren sieben äußere Iterationen und ist uneingeschränkt einsetzbar, für das
+%$350$-Knoten-Netz bei realistischem $\rho\le1$ genügen drei bis vier.\\
+%
+%Abschließend sind die Grenzen der Untersuchung zu benennen. Sie beruht auf einer
+%einzigen, radialen Topologiefamilie mit einheitlichem Leitungstyp, weshalb
+%Gl.~\eqref{eq:zbb-angle} exakt gilt und in gemischten realen Netzen nur eine
+%Näherung ist. Lastfaktor ($\lambda=2{,}0$) und Dämpfung ($\omega=1$) sind
+%festgehalten, es werden drei Netzgrößen betrachtet, und für den Modus
+%\texttt{const\_x} liegen bei $n=350$ keine auswertbaren PV-Läufe vor. Die
+%naheliegende Gegenmaßnahme gegen die identifizierte Grenze -- eine
+%Schrittweitensteuerung, die das beobachtete Überschießen dämpft -- wird in
+%Abschnitt~\ref{sec:ausblick} aufgegriffen.
 
-Die Untersuchung lokalisiert den Einfluss des $R/X$-Verhältnisses eindeutig. Die
-innere Fixpunktiteration ist gegen $\rho$ invariant: Ihre Kontraktionsrate folgt
-bis auf $3{,}4\,\%$ der Invariante $\kappa=\eta\,v_{\min}^{2}/z_{\mathrm{rel}}$
-mit $\kappa\propto n^{0{,}97}$ und hängt damit von Netzlänge, Impedanzbetrag und
-Arbeitspunkt ab, nicht vom Leitungscharakter; ein $R/X$-Sweep bei fester Reaktanz
-erzeugt eine scheinbare Winkelabhängigkeit, die sich vollständig als Betrags- und
-Arbeitspunkteffekt erklärt. Der PV--PV-Block ist wegen
-$\vect{X}_{pp}=X\,(\vect{M}^{-1})_{pv,pv}$ strukturell $\rho$-invariant; seine
-Kondition wächst ausschließlich mit der Zahl der PV-Knoten.\\
-
-Die einzige echte $\rho$-Empfindlichkeit liegt in der Linearisierung der
-Q-Korrektur und ist wegen $\lvert z_{kk}\rvert/X_{kk}=\sqrt{1+\rho^{2}}$ in beiden
-Sweep-Modi vorhanden. Ursächlich ist nicht eine schlechtere Kondition der
-Sensitivitätsmatrix -- diese ist über den Sweep exakt unverändert und korreliert
-mit dem Aufwand sogar negativ ($-0{,}24$) --, sondern der mit $\rho$ schrumpfende
-Betrag von $\vect{X}_{pp}$, der die Q-Schritte vergrößert und dadurch die eigene
-Linearisierung entwertet. Bis $\rho\approx1$ -- dem Bereich typischer Mittel- und
-Hochspannungsnetze -- ist der Aufwand mit drei äußeren Iterationen konstant und
-vom PV-Anteil unabhängig, bis $\rho\approx6{,}8$ steigt er moderat auf sieben. Die
-Grenze $\rho^\ast$ ist nicht monoton in der Netzgröße, weil zwei Mechanismen
-wirken: bei kleinen Netzen ein Überschwing-Grenzzyklus dicht an der Lösung, bei
-$n=350$ echte Divergenz mit Rückkopplung auf die innere Schleife. Der Vergleich
-mit Newton-Raphson ordnet beide ein: Von $234$ Läufen sind lediglich zwei eine
-echte Verfahrensgrenze. Die $R/X$-Grenze ist damit keine Grenze der
-Tensor-Formulierung, sondern die Grenze der Spannungsregelung über Blindleistung,
-die sie mit jedem Verfahren teilt, das $\partial|V|^{2}/\partial Q\approx2X$
-verwendet.\\
-
-Praktisch bindend ist ohnehin früher der Blindleistungsbedarf: Er wächst über den
-Sweep um mehr als eine Größenordnung und erreicht bei $n=40$ und $\rho=10$ bereits
-$6$ bis $17\,\text{p.u.}$, sodass die betroffenen Knoten lange vor der numerischen
-Grenze auf PQ-Betrieb umschalten müssten. Hinzu kommt, dass der kritische
-Quadrant des Parameterraums in realen Systemen kaum besetzt ist: Nach
-Tabelle~\ref{tab:rx-real} tritt $\rho\gtrsim7$ ausschließlich bei
-Niederspannungskabeln kleinen Querschnitts auf, die in kurzen, kleinen Netzen
-verlegt sind, während große Netze in höheren Spannungsebenen mit $\rho\lesssim1$
-liegen -- Netzgröße und $R/X$ sind in der Praxis antikorreliert. Für ein
-$40$-Knoten-Netz mit durchgängig NAYY~$4\times50$~SE ($\rho=7{,}7$) benötigt das
-Verfahren sieben äußere Iterationen und ist uneingeschränkt einsetzbar, für das
-$350$-Knoten-Netz bei realistischem $\rho\le1$ genügen drei bis vier.\\
-
-Abschließend sind die Grenzen der Untersuchung zu benennen. Sie beruht auf einer
-einzigen, radialen Topologiefamilie mit einheitlichem Leitungstyp, weshalb
-Gl.~\eqref{eq:zbb-angle} exakt gilt und in gemischten realen Netzen nur eine
-Näherung ist. Lastfaktor ($\lambda=2{,}0$) und Dämpfung ($\omega=1$) sind
-festgehalten, es werden drei Netzgrößen betrachtet, und für den Modus
-\texttt{const\_x} liegen bei $n=350$ keine auswertbaren PV-Läufe vor. Die
-naheliegende Gegenmaßnahme gegen die identifizierte Grenze -- eine
-Schrittweitensteuerung, die das beobachtete Überschießen dämpft -- wird in
-Abschnitt~\ref{sec:ausblick} aufgegriffen.
-
-
+Von den insgesamt 234 Netzkonfigurationen, die mittels NR und erweiterten TPF getestet wurden, konvergieren beide Verfahren bei 191 Fällen.
+41 Berechnungen finden beide Methoden keine Lösung. In diesen Netzkonfigurationen liegt die minimale Knotenspannung bei $\sim0,8\,$p.u. im Median was auf nicht lösbare Netze spricht.
+Lediglich zwei Netzkonfigurationen konnten nur vom erweiterten TPF mit gelöst werden.
+In diesen beiden Konfigurationen überschreitet die äußere Schleife die spezifizierten 60 Iterationen. 
+Jedoch schrumpft das Residuum bereits auf $3\cdot10^{-6}\,\text{p.u.}$, was dafür spricht, dass diese Fälle noch konvergiert wären.
+Das erweiterte Verfahren ist folglich nahezu genauso robust wie das NR-Verfahren, auch wenn der erweiterte TPF in den Grenzfällen deutlich mehr Iterationen benötigt.
+Die innere Schleife ist gegenüber des R/X-Verhältnisses überwiegend invariant bis auf einhergehende Arbeitspunktverschiebungen.
+Die Reaktanzmatrix ist unter den Analysebedingungen auch $\rho$-invariant.
+Daher liegt die einzige tatsächliche Impedanzverhältnisabhängigkeit in der äußeren Schleife, welche durch Vernachlässigung nichtlinearer Terme hervorgerufen wird. 
+Bis $\rho\approx1$ ist keine Verschlechterung der Konvergenz erkennbar.
+Bis $\rho\approx6$ steigert sich für das TPF der Rechenaufwand. 
+Für Linearitätsfehler ab 0,5 kann Versagen der Methode eintreten.
 
 
 
@@ -3590,72 +3615,96 @@ Abschnitt~\ref{sec:ausblick} aufgegriffen.
 \section{Einfluss des Lastfaktors}
 \label{sec:lastfaktor}
 
-Die vorangehenden Abschnitte haben die Konvergenz von Methode~A bei nahezu
-nominellem Betriebspunkt untersucht und dabei Netzgröße, PV-Anteil und
-$R/X$-Verhältnis variiert. Offen bleibt, wie sich das Verfahren verhält, wenn der
-Arbeitspunkt selbst in Richtung der Lösbarkeitsgrenze verschoben wird. Dazu wird
-ein Lastfaktor $\lambda$ eingeführt, der alle Lasten (und optional die
-PV-Einspeisung) gleichförmig skaliert. Ziel des Abschnitts ist es, die
-Kontraktionsrate der inneren Fixpunktiteration, den Aufwand der äußeren
-Blindleistungskorrektur und die Robustheitsgrenze des Gesamtverfahrens als
-Funktion von $\lambda$ zu quantifizieren und gegen eine Newton--Raphson-Referenz
-(NR) abzugrenzen.
+Bislang wurde bei den Analysen darauf geachtet, den Betriebspunkt des Netzes möglichst konstant zu halten, um die untersuchten Parameter (Netzgröße, PV-Anteil, R/X-Verhältnis) weites gehend zu isolieren.
+Aus Abbildung~\ref{fig:rx-outer} (c) und (d) und Abbildung~\ref{fig:rx-inner} geht hervor, dass eine Arbeitspunktverschiebung einen starken Einfluss auf die Lösbarkeit von Lastflussproblemen hat, da sowohl das NR als auch der erweiterte TPF früher abbrechen oder mehr Iterationen benötigen.
+In diesem Abschnitt soll genau dieser Einfluss untersucht werden, wodurch die Belastungsgrenze des Verfahrens aufgezeigt werden soll.
+Hierzu wird ein Lastfaktor $\lambda$ eingeführt, wodurch der Betriebspunkt durch Skalierung der elektrischen Lasten verschoben wird.\\
+
+
+Für den Ausgangsfall $\lambda=1$ wird werden die Netzlasten kalibriert, sodass der maximale Spannungsabfall nicht mehr als $3\,\%$ ist, also $v_\mathrm{min}=0,97\,$p.u..
+Der Lastfaktor ist damit normiert auf den Betriebspunkt, sodass verschiedene Netzgrößen über einen ähnlichen Spannungsabfall vergleichbar miteinander sind.
+Damit wird sichergestellt, dass alle Spannungen innerhalb eines $\pm4\,\%$ Bandes der Nennspannung gemäß DIN EN 50160~\cite{50160} liegen.
+Für den Versuch werden drei Netzgrößen mit jeweils drei PV-Anteilen verwendet.
+Der Lastfaktor $\lambda$ wird von  0,2 bis 11,0  über 40 Schritte angehoben.
+Absolute Leistungswerte werden dementsprechend angepasst.
+Die Analyse umfasst somit relative Arbeitspunktverschiebungen.
+Aufgenommen werden die Anzahl der inneren Iterationen $k_\mathrm{in}$, der äußeren Iterationen $k_\mathrm{out}$ und die Kontraktionszahl $\eta$.
+Außerdem wird die maximale Blindleistung $\max_k|Q_k|$ und die minimale Knotenspannung $v_\mathrm{min}$.
+
+
+%Die vorangehenden Abschnitte haben die Konvergenz von Methode~A bei nahezu
+%nominellem Betriebspunkt untersucht und dabei Netzgröße, PV-Anteil und
+%$R/X$-Verhältnis variiert. Offen bleibt, wie sich das Verfahren verhält, wenn der
+%Arbeitspunkt selbst in Richtung der Lösbarkeitsgrenze verschoben wird. Dazu wird
+%ein Lastfaktor $\lambda$ eingeführt, der alle Lasten (und optional die
+%PV-Einspeisung) gleichförmig skaliert. Ziel des Abschnitts ist es, die
+%Kontraktionsrate der inneren Fixpunktiteration, den Aufwand der äußeren
+%Blindleistungskorrektur und die Robustheitsgrenze des Gesamtverfahrens als
+%Funktion von $\lambda$ zu quantifizieren und gegen eine Newton--Raphson-Referenz
+%(NR) abzugrenzen.
 
 %----------------------------------------------------------------------
-\subsection{Versuchsaufbau und Normierung}
-\label{subsec:lam-setup}
-
-Untersucht werden drei Netzgrößen mit je drei PV-Anteilen und
-$40$ Stützstellen in $\lambda\in[0{,}2;\,11{,}0]$. Damit $\lambda$ über die
-Netzgrößen hinweg vergleichbar ist, wird die absolute Netzlast je Netz so
-kalibriert, dass die minimale Knotenspannung bei $\lambda=1$ genau
-$v_{\min}=0{,}97$~p.u.\ beträgt. $\lambda$ ist damit \emph{betriebspunktnormiert};
-absolute Leistungswerte sind sekundär. 
-%Die vollständige Parametrierung zeigt
-%\Cref{tab:lam-setup}.
-
-%\begin{table}[htbp]
-%	\centering
-%	\small
-%	\caption{Parametrierung des $\lambda$-Sweeps.}
-%	\label{tab:lam-setup}
-%	\begin{tabularx}{\textwidth}{lX}
-%		\toprule
-%		Größe & Wert \\
-%		\midrule
-%		Netzgrößen $n$ & $40$, $120$, $350$ Knoten (radial, \texttt{branch\_span}~$=3$, \texttt{seed}~$=0$) \\
-%		PV-Anteil & $0{,}10$ / $0{,}25$ / $0{,}50$ (entspricht bis zu $175$ PV-Knoten) \\
-%		Lastfaktor & $\lambda\in[0{,}2;\,11{,}0]$, $40$ Stützstellen \\
-%		Normierung & \texttt{load\_scale} je Netz so, dass $v_{\min}(\lambda=1)=0{,}97$~p.u. \\
-%		Leitung & $R/X=1{,}0$ im Modus \texttt{const\_z}, $|z_0|=0{,}6597$~$\Omega$/km, $\ell=20$~m \\
-%		Netzdaten & $U_n=0{,}4$~kV, $S_{\mathrm{base}}=1$~MVA, $\cos\varphi=0{,}95$ \\
-%		PV-Wirkleistung & $30$~\% der Netzlast, Sollwertabstand $\delta=0{,}005$~p.u. \\
-%		Sollwertmodus & \texttt{calibrated} ($|v_{pv}^{\mathrm{base}}|+\delta$) und \texttt{fixed} ($1{,}00$~p.u.) \\
-%		Skalierungsmodus & \texttt{load}, \texttt{load\_pv}, \texttt{pv\_only} \\
-%		Abbruch & $\varepsilon_{\mathrm{in}}=\varepsilon_{pv}=10^{-6}$, $k_{\mathrm{in}}^{\max}=300$, $k_{\mathrm{out}}^{\max}=60$ \\
-%		Dämpfung & $\omega=1{,}0$ (Variation $0{,}8$ / $0{,}6$ / $0{,}4$) \\
-%		Referenz & pandapower-NR, flat start, ohne Blindleistungsgrenzen \\
-%		Umfang & $666$ Läufe, davon $630$ mit lösbarer Basislösung; Sweep-Laufzeit $290{,}5$~s \\
-%		\bottomrule
-%	\end{tabularx}
-%\end{table}
-
-Als Diagnosegrößen werden je Lauf die empirische Kontraktionsrate
-$\eta_{\mathrm{emp}}$ der inneren Iteration, die Zahl innerer und äußerer
-Iterationen $k_{\mathrm{in}}$ und $k_{\mathrm{out}}$, der Linearisierungsfehler
-$\varepsilon_{\mathrm{lin}}$ der Sensitivitätsmatrix, der maximale
-Blindleistungsbetrag $\max_k|Q_k|$ und die minimale Knotenspannung $v_{\min}$
-protokolliert. Zwei Einschränkungen sind für die Interpretation relevant. Erstens
-konnte der Produktionssolver in diesem Sweep nicht angebunden werden, die
-Diagnostik stammt aus einem instrumentierten Nachbau desselben Algorithmus;
-eine Gegenprobe steht aus. Zweitens werden Blindleistungsgrenzen der
-Wechselrichter nicht modelliert. Die berichteten $Q$-Werte sind damit rein
-numerische Größen und keine Aussage über die Realisierbarkeit an einer konkreten
-Anlage.
+%\subsection{Versuchsaufbau und Normierung}
+%\label{subsec:lam-setup}
+%
+%Untersucht werden drei Netzgrößen mit je drei PV-Anteilen und
+%$40$ Stützstellen in $\lambda\in[0{,}2;\,11{,}0]$. Damit $\lambda$ über die
+%Netzgrößen hinweg vergleichbar ist, wird die absolute Netzlast je Netz so
+%kalibriert, dass die minimale Knotenspannung bei $\lambda=1$ genau
+%$v_{\min}=0{,}97$~p.u.\ beträgt. $\lambda$ ist damit \emph{betriebspunktnormiert};
+%absolute Leistungswerte sind sekundär. 
+%%Die vollständige Parametrierung zeigt
+%%\Cref{tab:lam-setup}.
+%
+%%\begin{table}[htbp]
+%%	\centering
+%%	\small
+%%	\caption{Parametrierung des $\lambda$-Sweeps.}
+%%	\label{tab:lam-setup}
+%%	\begin{tabularx}{\textwidth}{lX}
+%%		\toprule
+%%		Größe & Wert \\
+%%		\midrule
+%%		Netzgrößen $n$ & $40$, $120$, $350$ Knoten (radial, \texttt{branch\_span}~$=3$, \texttt{seed}~$=0$) \\
+%%		PV-Anteil & $0{,}10$ / $0{,}25$ / $0{,}50$ (entspricht bis zu $175$ PV-Knoten) \\
+%%		Lastfaktor & $\lambda\in[0{,}2;\,11{,}0]$, $40$ Stützstellen \\
+%%		Normierung & \texttt{load\_scale} je Netz so, dass $v_{\min}(\lambda=1)=0{,}97$~p.u. \\
+%%		Leitung & $R/X=1{,}0$ im Modus \texttt{const\_z}, $|z_0|=0{,}6597$~$\Omega$/km, $\ell=20$~m \\
+%%		Netzdaten & $U_n=0{,}4$~kV, $S_{\mathrm{base}}=1$~MVA, $\cos\varphi=0{,}95$ \\
+%%		PV-Wirkleistung & $30$~\% der Netzlast, Sollwertabstand $\delta=0{,}005$~p.u. \\
+%%		Sollwertmodus & \texttt{calibrated} ($|v_{pv}^{\mathrm{base}}|+\delta$) und \texttt{fixed} ($1{,}00$~p.u.) \\
+%%		Skalierungsmodus & \texttt{load}, \texttt{load\_pv}, \texttt{pv\_only} \\
+%%		Abbruch & $\varepsilon_{\mathrm{in}}=\varepsilon_{pv}=10^{-6}$, $k_{\mathrm{in}}^{\max}=300$, $k_{\mathrm{out}}^{\max}=60$ \\
+%%		Dämpfung & $\omega=1{,}0$ (Variation $0{,}8$ / $0{,}6$ / $0{,}4$) \\
+%%		Referenz & pandapower-NR, flat start, ohne Blindleistungsgrenzen \\
+%%		Umfang & $666$ Läufe, davon $630$ mit lösbarer Basislösung; Sweep-Laufzeit $290{,}5$~s \\
+%%		\bottomrule
+%%	\end{tabularx}
+%%\end{table}
+%
+%Als Diagnosegrößen werden je Lauf die empirische Kontraktionsrate
+%$\eta_{\mathrm{emp}}$ der inneren Iteration, die Zahl innerer und äußerer
+%Iterationen $k_{\mathrm{in}}$ und $k_{\mathrm{out}}$, der Linearisierungsfehler
+%$\varepsilon_{\mathrm{lin}}$ der Sensitivitätsmatrix, der maximale
+%Blindleistungsbetrag $\max_k|Q_k|$ und die minimale Knotenspannung $v_{\min}$
+%protokolliert. Zwei Einschränkungen sind für die Interpretation relevant. Erstens
+%konnte der Produktionssolver in diesem Sweep nicht angebunden werden, die
+%Diagnostik stammt aus einem instrumentierten Nachbau desselben Algorithmus;
+%eine Gegenprobe steht aus. Zweitens werden Blindleistungsgrenzen der
+%Wechselrichter nicht modelliert. Die berichteten $Q$-Werte sind damit rein
+%numerische Größen und keine Aussage über die Realisierbarkeit an einer konkreten
+%Anlage.
 
 %----------------------------------------------------------------------
 \subsection{Innere Fixpunktiteration}
 \label{subsec:lam-inner}
+
+
+Zunächst wird wieder die innere Schleife des erweiterten TPF betrachtet.
+Es werden hierfür PV-Anteile von $0\,\%$ verwendet.
+In Abbildung~\ref{fig:e1_inner_convergence} (links) ist die Kontraktionzahl $\eta$ für verschiedene Lastfaktoren $\lambda$ aufgezeichnet.
+Der Verlauf ist monoton wachsend. 
+
 
 \Cref{fig:lam-inner}\,(a) zeigt $\eta_{\mathrm{emp}}$ über $\lambda$ in doppelt
 logarithmischer Darstellung. Über den Bereich $\lambda=0{,}2\ldots9{,}34$ wächst
@@ -3667,100 +3716,288 @@ Die Zahl innerer Iterationen (\Cref{fig:lam-inner}\,(b)) steigt dabei nur modera
 von $3$ auf $27$ und erst im letzten Stützpunkt sprunghaft auf $43$ ($n=40$)
 bzw.\ $37$ ($n=350$).
 
+%\begin{figure}[htbp]
+%	\centering
+%	
+%	% ============================================================
+%	% (a) Contraction rate
+%	% ============================================================
+%	\begin{subfigure}[t]{0.48\textwidth}
+%		\centering
+%		\begin{tikzpicture}[x=2.6cm,y=1.12cm,>=Latex]
+%			
+%			% --------------------------------------------------------
+%			% Plot area / grid
+%			% --------------------------------------------------------
+%			\begin{scope}
+%				% Major horizontal grid
+%				\foreach \y in {-2,-1,0}{
+%					\draw[gray!25] (-0.75,\y) -- (1.08,\y);
+%				}
+%				
+%				% Minor horizontal grid
+%				\foreach \y in {-1.9,-1.8,-1.7,-1.6,-1.5,-1.4,-1.3,
+%					-1.2,-1.1,
+%					-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1}{
+%					\draw[gray!12] (-0.75,\y) -- (1.08,\y);
+%				}
+%				
+%				% Major vertical grid
+%				\foreach \x in {-0.699,-0.301,0,0.301,0.699,1}{
+%					\draw[gray!25] (\x,-2.55) -- (\x,0.30);
+%				}
+%				
+%				% Minor vertical grid
+%				\foreach \x in {-0.60,-0.52,-0.44,-0.38,-0.25,-0.20,-0.15,
+%					-0.10,-0.05,
+%					0.05,0.10,0.15,0.20,0.25,
+%					0.35,0.40,0.45,0.50,0.55,0.60,0.65,
+%					0.72,0.76,0.80,0.84,0.88,0.92,0.96}{
+%					\draw[gray!12] (\x,-2.55) -- (\x,0.30);
+%				}
+%				
+%				% ----------------------------------------------------
+%				% Reference boundary
+%				% ----------------------------------------------------
+%				\draw[gray!45,dashed] (0.977,-2.55) -- (0.977,0.30);
+%				\node[
+%				gray!60,
+%				font=\scriptsize,
+%				anchor=south east,
+%				rotate=90
+%				] at (0.977,-2.45) {$\lambda^\ast$};
+%				
+%				% ----------------------------------------------------
+%				% Data
+%				% ----------------------------------------------------
+%				\draw[NavyBlue,thick] plot coordinates {
+%					(-0.699,-2.273) (-0.319,-1.899) (-0.125,-1.684) (0.013,-1.546)
+%					(0.117,-1.436) (0.199,-1.341) (0.270,-1.264) (0.330,-1.199)
+%					(0.384,-1.139) (0.430,-1.082) (0.473,-1.031) (0.512,-0.986)
+%					(0.547,-0.942) (0.580,-0.899) (0.611,-0.859) (0.639,-0.822)
+%					(0.666,-0.786) (0.691,-0.749) (0.714,-0.715) (0.737,-0.682)
+%					(0.759,-0.648) (0.780,-0.616) (0.799,-0.582) (0.818,-0.551)
+%					(0.836,-0.517) (0.853,-0.484) (0.869,-0.451) (0.885,-0.416)
+%					(0.900,-0.380) (0.915,-0.342) (0.930,-0.301) (0.944,-0.255)
+%					(0.957,-0.201) (0.970,-0.128)
+%				};
+%				
+%				\draw[BrickRed] plot[
+%				only marks,
+%				mark=*,
+%				mark size=1.0pt
+%				] coordinates {
+%					(-0.699,-2.265) (-0.319,-1.892) (-0.125,-1.677) (0.013,-1.539)
+%					(0.117,-1.429) (0.199,-1.334) (0.270,-1.257) (0.330,-1.192)
+%					(0.384,-1.132) (0.430,-1.075) (0.473,-1.024) (0.512,-0.979)
+%					(0.547,-0.935) (0.580,-0.892) (0.611,-0.852) (0.639,-0.815)
+%					(0.666,-0.778) (0.691,-0.743) (0.714,-0.709) (0.737,-0.674)
+%					(0.759,-0.641) (0.780,-0.609) (0.799,-0.576) (0.818,-0.543)
+%					(0.836,-0.510) (0.853,-0.477) (0.869,-0.444) (0.885,-0.409)
+%					(0.900,-0.372) (0.915,-0.334) (0.930,-0.292) (0.944,-0.245)
+%					(0.957,-0.189) (0.970,-0.110)
+%				};
+%				
+%				% ----------------------------------------------------
+%				% Legend in free space
+%				% ----------------------------------------------------
+%				\node[
+%				anchor=north west,
+%				font=\scriptsize,
+%				fill=white,
+%				fill opacity=0.85,
+%				text opacity=1,
+%				inner sep=3pt
+%				] at (-0.68,-0.12) {%
+%					\begin{tikzpicture}[baseline]
+%						\draw[BrickRed] (0,0) plot[
+%						only marks,
+%						mark=*,
+%						mark size=1.0pt
+%						] coordinates {(0,0)};
+%						\node[anchor=west,font=\scriptsize] at (0.12,0) {$n=40$};
+%						
+%						\draw[NavyBlue,thick] (0,-0.18) -- (0.18,-0.18);
+%						\node[anchor=west,font=\scriptsize] at (0.25,-0.18) {$n=350$};
+%					\end{tikzpicture}
+%				};
+%			\end{scope}
+%			
+%			% --------------------------------------------------------
+%			% Axes / ticks / labels
+%			% --------------------------------------------------------
+%			\draw[black!70] (-0.75,-2.55) rectangle (1.08,0.30);
+%			
+%			\foreach \x/\l in {
+%				-0.699/0{,}2,
+%				-0.301/0{,}5,
+%				0/1,
+%				0.301/2,
+%				0.699/5,
+%				1/10
+%			}{
+%				\draw[black!70] (\x,-2.55) -- (\x,-2.49);
+%				\node[below,font=\scriptsize] at (\x,-2.55) {$\l$};
+%			}
+%			
+%			\foreach \y/\l in {
+%				-2/10^{-2},
+%				-1/10^{-1},
+%				0/10^{0}
+%			}{
+%				\draw[black!70] (-0.75,\y) -- (-0.69,\y);
+%				\node[left,font=\scriptsize] at (-0.75,\y) {$\l$};
+%			}
+%			
+%			\node[
+%			font=\footnotesize,
+%			rotate=90,
+%			anchor=south
+%			] at (-1.22,-1.2) {$\eta_{\mathrm{emp}}$};
+%			
+%			\node[
+%			font=\footnotesize,
+%			anchor=north
+%			] at (0.16,-2.88) {$\lambda$};
+%			
+%		\end{tikzpicture}
+%		\caption{Kontraktionsrate $\eta_{\mathrm{emp}}$.}
+%		\label{fig:lam-eta}
+%	\end{subfigure}
+%	\hfill
+%	% ============================================================
+%	% (b) Inner iterations
+%	% ============================================================
+%	\begin{subfigure}[t]{0.48\textwidth}
+%		\centering
+%		\begin{tikzpicture}[x=0.50cm,y=0.065cm,>=Latex]
+%			
+%			% --------------------------------------------------------
+%			% Grid
+%			% --------------------------------------------------------
+%			% Major horizontal grid
+%			\foreach \y in {0,10,20,30,40}{
+%				\draw[gray!25] (0,\y) -- (10,\y);
+%			}
+%			
+%			% Minor horizontal grid
+%			\foreach \y in {5,15,25,35,45}{
+%				\draw[gray!12] (0,\y) -- (10,\y);
+%			}
+%			
+%			% Major vertical grid
+%			\foreach \x in {0,2,4,6,8,10}{
+%				\draw[gray!25] (\x,0) -- (\x,46);
+%			}
+%			
+%			% Minor vertical grid
+%			\foreach \x in {1,3,5,7,9}{
+%				\draw[gray!12] (\x,0) -- (\x,46);
+%			}
+%			
+%			% --------------------------------------------------------
+%			% Critical lambda
+%			% --------------------------------------------------------
+%			\draw[gray!45,dashed] (9.49,0) -- (9.49,46);
+%			\node[
+%			gray!60,
+%			font=\scriptsize,
+%			anchor=south east,
+%			rotate=90
+%			] at (9.49,1) {$\lambda^\ast$};
+%			
+%			% --------------------------------------------------------
+%			% Data
+%			% --------------------------------------------------------
+%			\draw[BrickRed,thick] plot[
+%			mark=*,
+%			mark size=0.9pt
+%			] coordinates {
+%				(0.20,3) (0.48,4) (0.75,4) (1.03,4) (1.31,5) (1.58,5) (1.86,5)
+%				(2.14,6) (2.42,6) (2.69,6) (2.97,6) (3.25,7) (3.52,7) (3.80,7)
+%				(4.08,7) (4.35,8) (4.63,8) (4.91,8) (5.18,9) (5.46,9) (5.74,9)
+%				(6.02,10) (6.29,10) (6.57,11) (6.85,12) (7.12,12) (7.40,13)
+%				(7.68,14) (7.95,15) (8.23,17) (8.51,19) (8.78,22) (9.06,27) (9.34,43)
+%			};
+%			
+%			\draw[NavyBlue,thick,dashed] plot coordinates {
+%				(0.20,3) (0.48,4) (0.75,4) (1.03,4) (1.31,5) (1.58,5) (1.86,5)
+%				(2.14,5) (2.42,6) (2.69,6) (2.97,6) (3.25,7) (3.52,7) (3.80,7)
+%				(4.08,7) (4.35,8) (4.63,8) (4.91,8) (5.18,9) (5.46,9) (5.74,9)
+%				(6.02,10) (6.29,10) (6.57,11) (6.85,11) (7.12,12) (7.40,13)
+%				(7.68,14) (7.95,15) (8.23,16) (8.51,18) (8.78,21) (9.06,25) (9.34,37)
+%			};
+%			
+%			% --------------------------------------------------------
+%			% Legend in upper-left free space
+%			% --------------------------------------------------------
+%			\node[
+%			anchor=north west,
+%			font=\scriptsize,
+%			fill=white,
+%			fill opacity=0.85,
+%			text opacity=1,
+%			inner sep=3pt
+%			] at (0.35,44.5) {%
+%				\begin{tikzpicture}[baseline]
+%					\draw[BrickRed,thick] (0,0) -- (0.75,0);
+%					\node[anchor=west,font=\scriptsize] at (0.85,0) {$n=40$};
+%					
+%					\draw[NavyBlue,thick,dashed] (0,-5) -- (0.75,-5);
+%					\node[anchor=west,font=\scriptsize] at (0.85,-5) {$n=350$};
+%				\end{tikzpicture}
+%			};
+%			
+%			% --------------------------------------------------------
+%			% Box
+%			% --------------------------------------------------------
+%			\draw[black!70] (0,0) rectangle (10,46);
+%			
+%			% --------------------------------------------------------
+%			% Ticks
+%			% --------------------------------------------------------
+%			\foreach \x in {0,2,4,6,8,10}{
+%				\draw[black!70] (\x,0) -- (\x,1.2);
+%				\node[below,font=\scriptsize] at (\x,0) {$\x$};
+%			}
+%			
+%			\foreach \y in {0,10,20,30,40}{
+%				\draw[black!70] (0,\y) -- (0.16,\y);
+%				\node[left,font=\scriptsize] at (0,\y) {$\y$};
+%			}
+%			
+%			\node[
+%			font=\footnotesize,
+%			rotate=90,
+%			anchor=south
+%			] at (-1.65,23) {$k_{\mathrm{in}}$};
+%			
+%			\node[
+%			font=\footnotesize,
+%			anchor=north
+%			] at (5,-3.0) {$\lambda$};
+%			
+%		\end{tikzpicture}
+%		\caption{Innere Iterationen bis $10^{-6}$.}
+%		\label{fig:lam-kin}
+%	\end{subfigure}
+%	
+%	\caption{Innere Fixpunktiteration über dem Lastfaktor. Die Kurven für
+%		$n=40$ und $n=350$ liegen in (a) praktisch aufeinander. Die
+%		gestrichelte Referenz kennzeichnet den kritischen Lastfaktor
+%		$\lambda^\ast$.}
+%	\label{fig:lam-inner}
+%\end{figure}
+
+
 \begin{figure}[htbp]
 	\centering
-	\begin{subfigure}[t]{0.48\textwidth}
-		\centering
-		\begin{tikzpicture}[x=2.6cm,y=1.12cm,>=Latex]
-%			% Hilfslinien
-%			\draw[gray!25] (-0.75,-2) -- (1.05,-2);
-%			\draw[gray!25] (-0.75,-1) -- (1.05,-1);
-%			\draw[gray!45,dashed] (-0.75,0) -- (1.05,0);
-%			\node[gray!60,font=\scriptsize,anchor=south west] at (-0.74,0.02) {$\eta=1$};
-			% Grenze
-%			\draw[gray!55,dashed] (0.977,-2.55) -- (0.977,0.05);
-%			\node[gray!60,font=\scriptsize,anchor=south east,rotate=90] at (0.977,-2.5) {$\lambda^\ast$};
-			% Achsen
-			\draw[-] (-0.75,-2.55) -- (1.08,-2.55) node[anchor=west,font=\footnotesize] {$\lambda$};
-			\draw[-] (-0.75,-2.55) -- (-0.75,0.30);
-			\draw[-] (1.08,0.30) -- (1.08,-2.55) node[anchor=west,font=\footnotesize] {$\lambda$};
-			\draw[-] (1.08,0.30) -- (-0.75,0.30);
-			\node[font=\footnotesize,rotate=90,anchor=south] at (-1.22,-1.2) {$\eta_{\mathrm{emp}}$};
-			% Ticks
-			\foreach \x/\l in {-0.699/0{,}2,-0.301/0{,}5,0/1,0.301/2,0.699/5,1/10}{%
-				\draw (\x,-2.55) -- (\x,-2.49);
-				\node[below,font=\scriptsize] at (\x,-2.55) {$\l$};}
-			\foreach \y/\l in {-2/10^{-2},-1/10^{-1},0/10^{0}}{%
-				\draw (-0.75,\y) -- (-0.72,\y);
-				\node[left,font=\scriptsize] at (-0.75,\y) {$\l$};}
-			% Steigungsdreieck
-			\draw[gray!70] (0.15,-1.95) -- (0.75,-1.194);
-			\draw[gray!70,dashed] (0.15,-1.95) -- (0.75,-1.95) -- (0.75,-1.194);
-			\node[gray!70,font=\scriptsize] at (0.56,-1.80) {$1{,}26$};
-			% n=350 als Linie
-			\draw[NavyBlue,thick] plot coordinates {
-				(-0.699,-2.273) (-0.319,-1.899) (-0.125,-1.684) (0.013,-1.546)
-				(0.117,-1.436) (0.199,-1.341) (0.270,-1.264) (0.330,-1.199)
-				(0.384,-1.139) (0.430,-1.082) (0.473,-1.031) (0.512,-0.986)
-				(0.547,-0.942) (0.580,-0.899) (0.611,-0.859) (0.639,-0.822)
-				(0.666,-0.786) (0.691,-0.749) (0.714,-0.715) (0.737,-0.682)
-				(0.759,-0.648) (0.780,-0.616) (0.799,-0.582) (0.818,-0.551)
-				(0.836,-0.517) (0.853,-0.484) (0.869,-0.451) (0.885,-0.416)
-				(0.900,-0.380) (0.915,-0.342) (0.930,-0.301) (0.944,-0.255)
-				(0.957,-0.201) (0.970,-0.128)};
-			% n=40 als Marker
-			\draw[BrickRed] plot[only marks,mark=*,mark size=1.0pt] coordinates {
-				(-0.699,-2.265) (-0.319,-1.892) (-0.125,-1.677) (0.013,-1.539)
-				(0.117,-1.429) (0.199,-1.334) (0.270,-1.257) (0.330,-1.192)
-				(0.384,-1.132) (0.430,-1.075) (0.473,-1.024) (0.512,-0.979)
-				(0.547,-0.935) (0.580,-0.892) (0.611,-0.852) (0.639,-0.815)
-				(0.666,-0.778) (0.691,-0.743) (0.714,-0.709) (0.737,-0.674)
-				(0.759,-0.641) (0.780,-0.609) (0.799,-0.576) (0.818,-0.543)
-				(0.836,-0.510) (0.853,-0.477) (0.869,-0.444) (0.885,-0.409)
-				(0.900,-0.372) (0.915,-0.334) (0.930,-0.292) (0.944,-0.245)
-				(0.957,-0.189) (0.970,-0.110)};
-			\node[font=\scriptsize,anchor=north west] at (-0.70,-1.55) {\textcolor{BrickRed}{$\bullet$}~$n=40$};
-			\node[font=\scriptsize,anchor=north west] at (-0.70,-1.83) {\textcolor{NavyBlue}{\rule{6pt}{0.7pt}}~$n=350$};
-		\end{tikzpicture}
-		\caption{Kontraktionsrate $\eta_{\mathrm{emp}}$.}
-		\label{fig:lam-eta}
-	\end{subfigure}\hfill
-	\begin{subfigure}[t]{0.48\textwidth}
-		\centering
-		\begin{tikzpicture}[x=0.50cm,y=0.065cm,>=Latex]
-			\draw[gray!25] (0,10) -- (10,10);
-			\draw[gray!25] (0,20) -- (10,20);
-			\draw[gray!25] (0,30) -- (10,30);
-			\draw[gray!25] (0,40) -- (10,40);
-			\draw[gray!55,dashed] (9.49,0) -- (9.49,46);
-			\node[gray!60,font=\scriptsize,anchor=south east,rotate=90] at (9.49,1) {$\lambda^\ast$};
-			\draw[->] (0,0) -- (10.4,0) node[anchor=west,font=\footnotesize] {$\lambda$};
-			\draw[->] (0,0) -- (0,48);
-			\node[font=\footnotesize,rotate=90,anchor=south] at (-1.9,23) {$k_{\mathrm{in}}$};
-			\foreach \x in {0,2,4,6,8,10}{\draw (\x,0) -- (\x,1.2); \node[below,font=\scriptsize] at (\x,0) {$\x$};}
-			\foreach \y in {0,10,20,30,40}{\draw (0,\y) -- (0.16,\y); \node[left,font=\scriptsize] at (0,\y) {$\y$};}
-			\draw[BrickRed,thick] plot[mark=*,mark size=0.9pt] coordinates {
-				(0.20,3) (0.48,4) (0.75,4) (1.03,4) (1.31,5) (1.58,5) (1.86,5)
-				(2.14,6) (2.42,6) (2.69,6) (2.97,6) (3.25,7) (3.52,7) (3.80,7)
-				(4.08,7) (4.35,8) (4.63,8) (4.91,8) (5.18,9) (5.46,9) (5.74,9)
-				(6.02,10) (6.29,10) (6.57,11) (6.85,12) (7.12,12) (7.40,13)
-				(7.68,14) (7.95,15) (8.23,17) (8.51,19) (8.78,22) (9.06,27) (9.34,43)};
-			\draw[NavyBlue,thick,dashed] plot coordinates {
-				(0.20,3) (0.48,4) (0.75,4) (1.03,4) (1.31,5) (1.58,5) (1.86,5)
-				(2.14,5) (2.42,6) (2.69,6) (2.97,6) (3.25,7) (3.52,7) (3.80,7)
-				(4.08,7) (4.35,8) (4.63,8) (4.91,8) (5.18,9) (5.46,9) (5.74,9)
-				(6.02,10) (6.29,10) (6.57,11) (6.85,11) (7.12,12) (7.40,13)
-				(7.68,14) (7.95,15) (8.23,16) (8.51,18) (8.78,21) (9.06,25) (9.34,37)};
-			\draw[BrickRed,thick] (0.5,44) -- (1.7,44) node[right,black,font=\scriptsize] {$n=40$};
-			\draw[NavyBlue,thick,dashed] (0.5,39) -- (1.7,39) node[right,black,font=\scriptsize] {$n=350$};
-		\end{tikzpicture}
-		\caption{Innere Iterationen bis $10^{-6}$.}
-		\label{fig:lam-kin}
-	\end{subfigure}
-	\caption{Innere Fixpunktiteration über dem Lastfaktor. Die Kurven für
-		$n=40$ und $n=350$ liegen in (a) praktisch aufeinander; die gestrichelte
-		Referenz kennzeichnet die Steigung $1{,}26$ im Log-Log-Maßstab.}
-	\label{fig:lam-inner}
+	\input{figures/e1_inner_convergence.pgf}
+	\caption{Kontraktionszahl (links) und innere Fixpunktiteration (rechts) über dem Lastfaktor. Die Kurven für
+		$n=40$, $n=120$ und $n=350$ liegen in praktisch aufeinander. Die
+		gestrichelte Referenz kennzeichnet den kritischen Lastfaktor
+		$\lambda^\ast$.}
+	\label{fig:e1_inner_convergence}
 \end{figure}
 
 Der moderate Anstieg von $k_{\mathrm{in}}$ trotz stark wachsender Rate erklärt
