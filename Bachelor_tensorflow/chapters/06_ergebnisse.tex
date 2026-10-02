@@ -2,7 +2,7 @@
 \chapter{Ergebnisse und Diskussion}
 \label{ch:ergebnisse}
 %======================================================================
-\section{Optimierung der Methode A}
+\section{Optimierung der Methode}
 \label{sec:Optimierung der Methode}
 
 
@@ -309,7 +309,7 @@ Der grüne Verlauf kennzeichnet die Spannungsabweichung der äußeren PV-Schleif
 
 Zunächst ist in beiden Graphen das charakteristische Sägezahnmuster zu erkennen.
 Ein solcher Zahn ist dabei die innere TPF-Schleife, bei der die Spannungsänderung bis  zur Konvergenzgrenze $\varepsilon=10^{-8}$ Iterativ berechnet wird. 
-bei dem Cold-Start (~\ref{fig:inner_start_comparison} oberer Plot) berechnet die äußere Q-Korrektur die neue Blindleistung, setzt aber den Spannungsstartwert des TPF wieder auf den Einheitsvektor, weshalb der nächste Sägezahn wieder auf dem selben Niveau wie zuvor ansetzt.
+bei dem Cold-Start (\ref{fig:inner_start_comparison} oberer Plot) berechnet die äußere Q-Korrektur die neue Blindleistung, setzt aber den Spannungsstartwert des TPF wieder auf den Einheitsvektor, weshalb der nächste Sägezahn wieder auf dem selben Niveau wie zuvor ansetzt.
 Das hat auch zur Folge, dass sich eine konstanter Flankenabstand von 6 inneren Iterationen einstellt.
 Diese Prozedere wiederholt sich, bis die äußere Schleife, wie in \cref{fig:outer_convergence_error_coupled}, die PV-Spannungsbeträge angeglichen hat.
 In diesem Beispiel konvergiert das gesamte Verfahren nach 106 Iterationen.\\
@@ -703,7 +703,7 @@ Größenbereich.
 
 
 
-\section{PV-Anteil}
+\section{Einfluss des PV-Anteils}
 \label{sec:pv-share-invarianz}
 
 
@@ -3277,6 +3277,7 @@ anwendbar, sodass das Verhältnis zwischen dem linearen (beachteten) und quadrat
 		=
 		\underbrace{(1+\rho^2)}_{\text{Hebel}}
 		\underbrace{\frac{\Delta(|V_k|^2)}{4|V_k|^2}}_{\text{Betriebspunkt}}
+		\label{eq:lin-error-scaling}
 \end{equation}
 ergibt.
 Diese Gleichung zeigt, dass eine starke quadratische Abhängigkeit von dem R/X-Verhältnis vorliegt.
@@ -3623,7 +3624,7 @@ Hierzu wird ein Lastfaktor $\lambda$ eingeführt, wodurch der Betriebspunkt durc
 
 Für den Ausgangsfall $\lambda=1$ wird werden die Netzlasten kalibriert, sodass der maximale Spannungsabfall nicht mehr als $3\,\%$ ist, also $v_\mathrm{min}=0,97\,$p.u..
 Der Lastfaktor ist damit normiert auf den Betriebspunkt, sodass verschiedene Netzgrößen über einen ähnlichen Spannungsabfall vergleichbar miteinander sind.
-Damit wird sichergestellt, dass alle Spannungen innerhalb eines $\pm4\,\%$ Bandes der Nennspannung gemäß DIN EN 50160~\cite{50160} liegen.
+Damit wird sichergestellt, dass alle Spannungen innerhalb eines $\pm5\,\%$ Bandes der Nennspannung gemäß DIN EN 50160~\cite{50160} liegen.
 Für den Versuch werden drei Netzgrößen mit jeweils drei PV-Anteilen verwendet.
 Der Lastfaktor $\lambda$ wird von  0,2 bis 11,0  über 40 Schritte angehoben.
 Absolute Leistungswerte werden dementsprechend angepasst.
@@ -3700,296 +3701,6 @@ Außerdem wird die maximale Blindleistung $\max_k|Q_k|$ und die minimale Knotens
 \label{subsec:lam-inner}
 
 
-Zunächst wird wieder die innere Schleife des erweiterten TPF betrachtet.
-Es werden hierfür PV-Anteile von $0\,\%$ verwendet.
-In Abbildung~\ref{fig:e1_inner_convergence} (links) ist die Kontraktionzahl $\eta$ für verschiedene Lastfaktoren $\lambda$ aufgezeichnet.
-Der Verlauf ist monoton wachsend. 
-
-
-\Cref{fig:lam-inner}\,(a) zeigt $\eta_{\mathrm{emp}}$ über $\lambda$ in doppelt
-logarithmischer Darstellung. Über den Bereich $\lambda=0{,}2\ldots9{,}34$ wächst
-die Rate um den Faktor $139$ bis $146$, bei einer $\lambda$-Spanne von Faktor
-$47$. Die lokale Steigung beträgt $\mathrm{d}\ln\eta/\mathrm{d}\ln\lambda=1{,}26$
-($R^2=0{,}976$), das Wachstum ist also klar überlinear und zusätzlich leicht
-konvex: die Regressionsgerade unterschätzt beide Enden des Sweeps.
-Die Zahl innerer Iterationen (\Cref{fig:lam-inner}\,(b)) steigt dabei nur moderat
-von $3$ auf $27$ und erst im letzten Stützpunkt sprunghaft auf $43$ ($n=40$)
-bzw.\ $37$ ($n=350$).
-
-%\begin{figure}[htbp]
-%	\centering
-%	
-%	% ============================================================
-%	% (a) Contraction rate
-%	% ============================================================
-%	\begin{subfigure}[t]{0.48\textwidth}
-%		\centering
-%		\begin{tikzpicture}[x=2.6cm,y=1.12cm,>=Latex]
-%			
-%			% --------------------------------------------------------
-%			% Plot area / grid
-%			% --------------------------------------------------------
-%			\begin{scope}
-%				% Major horizontal grid
-%				\foreach \y in {-2,-1,0}{
-%					\draw[gray!25] (-0.75,\y) -- (1.08,\y);
-%				}
-%				
-%				% Minor horizontal grid
-%				\foreach \y in {-1.9,-1.8,-1.7,-1.6,-1.5,-1.4,-1.3,
-%					-1.2,-1.1,
-%					-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1}{
-%					\draw[gray!12] (-0.75,\y) -- (1.08,\y);
-%				}
-%				
-%				% Major vertical grid
-%				\foreach \x in {-0.699,-0.301,0,0.301,0.699,1}{
-%					\draw[gray!25] (\x,-2.55) -- (\x,0.30);
-%				}
-%				
-%				% Minor vertical grid
-%				\foreach \x in {-0.60,-0.52,-0.44,-0.38,-0.25,-0.20,-0.15,
-%					-0.10,-0.05,
-%					0.05,0.10,0.15,0.20,0.25,
-%					0.35,0.40,0.45,0.50,0.55,0.60,0.65,
-%					0.72,0.76,0.80,0.84,0.88,0.92,0.96}{
-%					\draw[gray!12] (\x,-2.55) -- (\x,0.30);
-%				}
-%				
-%				% ----------------------------------------------------
-%				% Reference boundary
-%				% ----------------------------------------------------
-%				\draw[gray!45,dashed] (0.977,-2.55) -- (0.977,0.30);
-%				\node[
-%				gray!60,
-%				font=\scriptsize,
-%				anchor=south east,
-%				rotate=90
-%				] at (0.977,-2.45) {$\lambda^\ast$};
-%				
-%				% ----------------------------------------------------
-%				% Data
-%				% ----------------------------------------------------
-%				\draw[NavyBlue,thick] plot coordinates {
-%					(-0.699,-2.273) (-0.319,-1.899) (-0.125,-1.684) (0.013,-1.546)
-%					(0.117,-1.436) (0.199,-1.341) (0.270,-1.264) (0.330,-1.199)
-%					(0.384,-1.139) (0.430,-1.082) (0.473,-1.031) (0.512,-0.986)
-%					(0.547,-0.942) (0.580,-0.899) (0.611,-0.859) (0.639,-0.822)
-%					(0.666,-0.786) (0.691,-0.749) (0.714,-0.715) (0.737,-0.682)
-%					(0.759,-0.648) (0.780,-0.616) (0.799,-0.582) (0.818,-0.551)
-%					(0.836,-0.517) (0.853,-0.484) (0.869,-0.451) (0.885,-0.416)
-%					(0.900,-0.380) (0.915,-0.342) (0.930,-0.301) (0.944,-0.255)
-%					(0.957,-0.201) (0.970,-0.128)
-%				};
-%				
-%				\draw[BrickRed] plot[
-%				only marks,
-%				mark=*,
-%				mark size=1.0pt
-%				] coordinates {
-%					(-0.699,-2.265) (-0.319,-1.892) (-0.125,-1.677) (0.013,-1.539)
-%					(0.117,-1.429) (0.199,-1.334) (0.270,-1.257) (0.330,-1.192)
-%					(0.384,-1.132) (0.430,-1.075) (0.473,-1.024) (0.512,-0.979)
-%					(0.547,-0.935) (0.580,-0.892) (0.611,-0.852) (0.639,-0.815)
-%					(0.666,-0.778) (0.691,-0.743) (0.714,-0.709) (0.737,-0.674)
-%					(0.759,-0.641) (0.780,-0.609) (0.799,-0.576) (0.818,-0.543)
-%					(0.836,-0.510) (0.853,-0.477) (0.869,-0.444) (0.885,-0.409)
-%					(0.900,-0.372) (0.915,-0.334) (0.930,-0.292) (0.944,-0.245)
-%					(0.957,-0.189) (0.970,-0.110)
-%				};
-%				
-%				% ----------------------------------------------------
-%				% Legend in free space
-%				% ----------------------------------------------------
-%				\node[
-%				anchor=north west,
-%				font=\scriptsize,
-%				fill=white,
-%				fill opacity=0.85,
-%				text opacity=1,
-%				inner sep=3pt
-%				] at (-0.68,-0.12) {%
-%					\begin{tikzpicture}[baseline]
-%						\draw[BrickRed] (0,0) plot[
-%						only marks,
-%						mark=*,
-%						mark size=1.0pt
-%						] coordinates {(0,0)};
-%						\node[anchor=west,font=\scriptsize] at (0.12,0) {$n=40$};
-%						
-%						\draw[NavyBlue,thick] (0,-0.18) -- (0.18,-0.18);
-%						\node[anchor=west,font=\scriptsize] at (0.25,-0.18) {$n=350$};
-%					\end{tikzpicture}
-%				};
-%			\end{scope}
-%			
-%			% --------------------------------------------------------
-%			% Axes / ticks / labels
-%			% --------------------------------------------------------
-%			\draw[black!70] (-0.75,-2.55) rectangle (1.08,0.30);
-%			
-%			\foreach \x/\l in {
-%				-0.699/0{,}2,
-%				-0.301/0{,}5,
-%				0/1,
-%				0.301/2,
-%				0.699/5,
-%				1/10
-%			}{
-%				\draw[black!70] (\x,-2.55) -- (\x,-2.49);
-%				\node[below,font=\scriptsize] at (\x,-2.55) {$\l$};
-%			}
-%			
-%			\foreach \y/\l in {
-%				-2/10^{-2},
-%				-1/10^{-1},
-%				0/10^{0}
-%			}{
-%				\draw[black!70] (-0.75,\y) -- (-0.69,\y);
-%				\node[left,font=\scriptsize] at (-0.75,\y) {$\l$};
-%			}
-%			
-%			\node[
-%			font=\footnotesize,
-%			rotate=90,
-%			anchor=south
-%			] at (-1.22,-1.2) {$\eta_{\mathrm{emp}}$};
-%			
-%			\node[
-%			font=\footnotesize,
-%			anchor=north
-%			] at (0.16,-2.88) {$\lambda$};
-%			
-%		\end{tikzpicture}
-%		\caption{Kontraktionsrate $\eta_{\mathrm{emp}}$.}
-%		\label{fig:lam-eta}
-%	\end{subfigure}
-%	\hfill
-%	% ============================================================
-%	% (b) Inner iterations
-%	% ============================================================
-%	\begin{subfigure}[t]{0.48\textwidth}
-%		\centering
-%		\begin{tikzpicture}[x=0.50cm,y=0.065cm,>=Latex]
-%			
-%			% --------------------------------------------------------
-%			% Grid
-%			% --------------------------------------------------------
-%			% Major horizontal grid
-%			\foreach \y in {0,10,20,30,40}{
-%				\draw[gray!25] (0,\y) -- (10,\y);
-%			}
-%			
-%			% Minor horizontal grid
-%			\foreach \y in {5,15,25,35,45}{
-%				\draw[gray!12] (0,\y) -- (10,\y);
-%			}
-%			
-%			% Major vertical grid
-%			\foreach \x in {0,2,4,6,8,10}{
-%				\draw[gray!25] (\x,0) -- (\x,46);
-%			}
-%			
-%			% Minor vertical grid
-%			\foreach \x in {1,3,5,7,9}{
-%				\draw[gray!12] (\x,0) -- (\x,46);
-%			}
-%			
-%			% --------------------------------------------------------
-%			% Critical lambda
-%			% --------------------------------------------------------
-%			\draw[gray!45,dashed] (9.49,0) -- (9.49,46);
-%			\node[
-%			gray!60,
-%			font=\scriptsize,
-%			anchor=south east,
-%			rotate=90
-%			] at (9.49,1) {$\lambda^\ast$};
-%			
-%			% --------------------------------------------------------
-%			% Data
-%			% --------------------------------------------------------
-%			\draw[BrickRed,thick] plot[
-%			mark=*,
-%			mark size=0.9pt
-%			] coordinates {
-%				(0.20,3) (0.48,4) (0.75,4) (1.03,4) (1.31,5) (1.58,5) (1.86,5)
-%				(2.14,6) (2.42,6) (2.69,6) (2.97,6) (3.25,7) (3.52,7) (3.80,7)
-%				(4.08,7) (4.35,8) (4.63,8) (4.91,8) (5.18,9) (5.46,9) (5.74,9)
-%				(6.02,10) (6.29,10) (6.57,11) (6.85,12) (7.12,12) (7.40,13)
-%				(7.68,14) (7.95,15) (8.23,17) (8.51,19) (8.78,22) (9.06,27) (9.34,43)
-%			};
-%			
-%			\draw[NavyBlue,thick,dashed] plot coordinates {
-%				(0.20,3) (0.48,4) (0.75,4) (1.03,4) (1.31,5) (1.58,5) (1.86,5)
-%				(2.14,5) (2.42,6) (2.69,6) (2.97,6) (3.25,7) (3.52,7) (3.80,7)
-%				(4.08,7) (4.35,8) (4.63,8) (4.91,8) (5.18,9) (5.46,9) (5.74,9)
-%				(6.02,10) (6.29,10) (6.57,11) (6.85,11) (7.12,12) (7.40,13)
-%				(7.68,14) (7.95,15) (8.23,16) (8.51,18) (8.78,21) (9.06,25) (9.34,37)
-%			};
-%			
-%			% --------------------------------------------------------
-%			% Legend in upper-left free space
-%			% --------------------------------------------------------
-%			\node[
-%			anchor=north west,
-%			font=\scriptsize,
-%			fill=white,
-%			fill opacity=0.85,
-%			text opacity=1,
-%			inner sep=3pt
-%			] at (0.35,44.5) {%
-%				\begin{tikzpicture}[baseline]
-%					\draw[BrickRed,thick] (0,0) -- (0.75,0);
-%					\node[anchor=west,font=\scriptsize] at (0.85,0) {$n=40$};
-%					
-%					\draw[NavyBlue,thick,dashed] (0,-5) -- (0.75,-5);
-%					\node[anchor=west,font=\scriptsize] at (0.85,-5) {$n=350$};
-%				\end{tikzpicture}
-%			};
-%			
-%			% --------------------------------------------------------
-%			% Box
-%			% --------------------------------------------------------
-%			\draw[black!70] (0,0) rectangle (10,46);
-%			
-%			% --------------------------------------------------------
-%			% Ticks
-%			% --------------------------------------------------------
-%			\foreach \x in {0,2,4,6,8,10}{
-%				\draw[black!70] (\x,0) -- (\x,1.2);
-%				\node[below,font=\scriptsize] at (\x,0) {$\x$};
-%			}
-%			
-%			\foreach \y in {0,10,20,30,40}{
-%				\draw[black!70] (0,\y) -- (0.16,\y);
-%				\node[left,font=\scriptsize] at (0,\y) {$\y$};
-%			}
-%			
-%			\node[
-%			font=\footnotesize,
-%			rotate=90,
-%			anchor=south
-%			] at (-1.65,23) {$k_{\mathrm{in}}$};
-%			
-%			\node[
-%			font=\footnotesize,
-%			anchor=north
-%			] at (5,-3.0) {$\lambda$};
-%			
-%		\end{tikzpicture}
-%		\caption{Innere Iterationen bis $10^{-6}$.}
-%		\label{fig:lam-kin}
-%	\end{subfigure}
-%	
-%	\caption{Innere Fixpunktiteration über dem Lastfaktor. Die Kurven für
-%		$n=40$ und $n=350$ liegen in (a) praktisch aufeinander. Die
-%		gestrichelte Referenz kennzeichnet den kritischen Lastfaktor
-%		$\lambda^\ast$.}
-%	\label{fig:lam-inner}
-%\end{figure}
-
-
 \begin{figure}[htbp]
 	\centering
 	\input{figures/e1_inner_convergence.pgf}
@@ -4000,121 +3711,172 @@ bzw.\ $37$ ($n=350$).
 	\label{fig:e1_inner_convergence}
 \end{figure}
 
-Der moderate Anstieg von $k_{\mathrm{in}}$ trotz stark wachsender Rate erklärt
-sich daraus, dass der Fehlerabfall über den gesamten Sweep streng geometrisch
-bleibt: der Median des Bestimmtheitsmaßes der logarithmischen Anpassung beträgt
-$R^2=0{,}9999$, und die aus $\eta_{\mathrm{emp}}$ vorhergesagte Iterationszahl
-weicht im Mittel nur um $1{,}5$ Iterationen von der gemessenen ab. Die Iteration
-verliert also nicht ihren Charakter, sondern lediglich an Rate.
 
-Bemerkenswert ist die Netzgrößenunabhängigkeit. \Cref{tab:lam-inner} fasst die
-Skalierung zusammen und enthält zusätzlich die parameterfreie Kennzahl
-\begin{equation}
-	\kappa \;\coloneqq\; \frac{\eta_{\mathrm{emp}}\,v_{\min}^2}{\lambda\,z_{\mathrm{rel}}},
-	\label{eq:lam-kappa}
-\end{equation}
-die für alle drei Netzgrößen mit $\kappa\approx0{,}0248\ldots0{,}0251$
-zusammenfällt. Die Restschwankung von $\kappa$ beträgt maximal $14{,}1$~\%,
-während $\eta_{\mathrm{emp}}$ selbst um den Faktor $146$ variiert. Der Exponent in
-$n$ ist mit $\kappa\propto n^{-0{,}006}$ vernachlässigbar, das heißt bei
-betriebspunktnormierter Last gibt es \emph{keine} explizite
-Netzgrößenabhängigkeit. Damit gilt näherungsweise
-\begin{equation}
-	\eta \;\approx\; \kappa_1\,\frac{\lambda\,z_{\mathrm{rel}}}{v_{\min}^2},
-	\qquad \kappa_1\approx0{,}025 .
-	\label{eq:lam-etamodell}
-\end{equation}
+Zunächst wird wieder die innere Schleife des erweiterten TPF betrachtet.
+Es werden hierfür PV-Anteile von $0\,\%$ verwendet.
+In Abbildung~\ref{fig:e1_inner_convergence} (links) ist die Kontraktionzahl $\eta$ für verschiedene Lastfaktoren $\lambda$ doppeltlogarithmisch aufgezeichnet.
+Der Verlauf ist monoton wachsend. 
+Auffällig ist, dass sich die drei Netzgrößen nahezu den selben Verlauf teilen und die Datenpunkte für jeden Lastfaktor nahezu, mit einer maximalen Abweichung von $4.44\,\%$, übereinander liegen.
+Während $\lambda$ bis 9,34 steigt, wächst die Kontraktionszahl um den Faktor $\sim140$.
+Genauere Kennzahlen über das Wachstum sind in Tabelle~\ref{tab:lam-inner} dargestellt.
+Daraus geht auch hervor, dass der Anstieg überlinear ist.
 
 \begin{table}[htbp]
 	\centering
 	\small
 	\caption{Skalierung der inneren Iteration über $\lambda\in[0{,}2;\,9{,}34]$
-		(je $34$ auswertbare Stützstellen).}
+		(je $34$ auswertbare Datenpunkte).}
 	\label{tab:lam-inner}
-	\begin{tabular}{lrrrrrrr}
+	\begin{tabular}{lrrrr}
 		\toprule
 		$n$ & $\eta_{\min}$ & $\eta_{\max}$ & Faktor &
-		$\frac{\mathrm{d}\ln\eta}{\mathrm{d}\ln\lambda}$ & $R^2$ &
-		$\bar\kappa$ & Streuung $\kappa$ \\
+		$\frac{\mathrm{d}\ln\eta}{\mathrm{d}\ln\lambda}$ \\
 		\midrule
-		$40$  & 0,00543 & 0,7773 & 143,1 & 1,260 & 0,976 & 0,02509 & 14,1~\% \\
-		$120$ & 0,00541 & 0,7876 & 145,6 & 1,263 & 0,976 & 0,02510 & 13,4~\% \\
-		$350$ & 0,00534 & 0,7446 & 139,4 & 1,258 & 0,977 & 0,02476 & 12,7~\% \\
+		$40$  & 0,00543 & 0,7773 & 143,1 & 1,260 \\
+		$120$ & 0,00541 & 0,7876 & 145,6 & 1,263 \\
+		$350$ & 0,00534 & 0,7446 & 139,4 & 1,258 \\
 		\bottomrule
 	\end{tabular}
 \end{table}
 
-Als Extrapolationsmodell taugt \eqref{eq:lam-etamodell} allerdings nur
-größenordnungsmäßig: die Vorhersage von $\eta(\lambda=9{,}34)$ aus
-$\eta(\lambda=0{,}2)$ überschätzt den Messwert um $22$ bis $25$~\%, weil die
-Krümmung unmittelbar vor der Lösbarkeitsgrenze nicht erfasst wird. Für die
-Interpretation ist der Befund dennoch zentral: die im Abschnitt zum
-$R/X$-Verhältnis beobachtete Verschlechterung der inneren Iteration lässt sich
-mit derselben Kennzahl beschreiben, sie war dort ebenfalls eine Folge sinkender
-Knotenspannungen und nicht des Impedanzwinkels.
 
-%----------------------------------------------------------------------
-\subsection{Lösbarkeitsgrenze und Kriterienvergleich}
-\label{subsec:lam-limit}
+Wie bereits in \cref{sec:rx} gezeigt wurde, führt ein Anstieg der Kontraktion ebenfalls zu einem höheren Rechenaufwand durch mehr benötigte Iterationen. 
+Dieses Verhalten ist auch hier in Abbildung~\ref{fig:e1_inner_convergence} (rechts) erkennbar. 
+Ebenso monoton steigt die Iterationsanzahl jedes Netzes an. 
+Die Punkte der verschiedenen Netze liegen auch hier nahezu übereinander.
+Der Parameter Netzgröße ist somit kein Faktor, welcher die Konvergenzeigenschaft beeinträchtigt.
+Im Vergleich zu den Verläufen der Kontraktionszahlen steigt die Anzahl der Iterationsschritte erst moderat bis $\lambda=8$, wonach die Anzahl sprunghaft auf deutlich ansteigt, bis der TPF für $\lambda>9,34=\lambda^*$ nicht mehr konvergiert.
+In den selben Fällen erreicht auch das NR keine Lösungen mehr.
+Da gleichzeitig für Lastfaktorwerte über dem kritischen Wert die Kontraktionszahlen über eins liegt, ist davon auszugehen, dass keine physikalische Lösung für diese Konfigurationen existiert.
 
-\Cref{tab:lam-lambdastar} stellt die kritischen Lastfaktoren $\lambda^\ast$
-nach unterschiedlichen Kriterien gegenüber. Der Verlust der Kontraktion
-($\eta=1$) und die reine PQ-Lösbarkeit der Fixpunktiteration fallen mit einem
-Verhältnis von $0{,}998$ zusammen, und die NR-Referenz im PQ-Betrieb liefert
-dieselben Werte. Der Abbruch der inneren Iteration ist also keine Eigenschaft des
-Verfahrens, sondern markiert die Spannungsstabilitätsgrenze des Problems.
-An dieser Grenze liegt $v_{\min}\approx0{,}51$~p.u.; mit
-\eqref{eq:lam-etamodell} und $z_{\mathrm{rel}}=1$ folgt
-$\lambda^\ast\approx v_{\min}^2/\kappa_1\approx10$ gegenüber gemessenen $9{,}5$,
-eine Abweichung von rund $5$~\%.
 
-\begin{table}[htbp]
-	\centering
-	\small
-	\caption{Kritischer Lastfaktor $\lambda^\ast$ je Kriterium; Bereichsangaben
-		umfassen die PV-Anteile $0{,}10$ bis $0{,}50$.}
-	\label{tab:lam-lambdastar}
-	\begin{tabular}{lrrr}
-		\toprule
-		Kriterium & $n=40$ & $n=120$ & $n=350$ \\
-		\midrule
-		PQ-Lösbarkeit der Fixpunktiteration & 9,49 & 9,48 & 9,54 \\
-		Kontraktionsverlust $\eta=1$ & 9,48 & 9,46 & 9,54 \\
-		NR-Referenz, PQ-Betrieb & 9,49 & 9,48 & 9,54 \\
-		Methode~A (äußere Schleife) & 9,21--9,28 & 9,19--9,21 & 9,27--9,30 \\
-		NR-Referenz mit PV-Sollwerten & 9,64--9,76 & 5,22--6,30 & 3,95--4,51 \\
-		Frühwarnschwelle $\varepsilon_{\mathrm{lin}}\ge0{,}6$ & \multicolumn{3}{c}{nicht ausgelöst} \\
-		\bottomrule
-		\multicolumn{4}{l}{\footnotesize Die Schwelle $\varepsilon_{\mathrm{lin}}\ge0{,}6$ wird nie erreicht; das Maximum über}\\
-		\multicolumn{4}{l}{\footnotesize alle Läufe beträgt $\varepsilon_{\mathrm{lin}}=0{,}023$.}
-	\end{tabular}
-\end{table}
 
-Die äußere Blindleistungsschleife von Methode~A bricht mit
-$\lambda^\ast=9{,}19\ldots9{,}30$ nur $2$ bis $3$~\% früher ab als die innere
-Iteration. Die Q-Korrektur kostet damit kaum Reserve; die Grenze wird im
-Wesentlichen von der Physik des Betriebspunkts geerbt und nicht von der
-Linearisierung erzeugt. Die NR-Referenz mit harten PV-Sollwerten versagt
-demgegenüber weit früher und ausgeprägt netzgrößenabhängig
-($3{,}95$ bei $n=350$). Da diese Referenz mit flat start und ohne
-Blindleistungsgrenzen rechnet, ist dieser Wert als Startwerteffekt zu lesen und
-nicht als generelle Verfahrensgrenze des Newton-Verfahrens.
+
+%\Cref{fig:lam-inner}\,(a) zeigt $\eta_{\mathrm{emp}}$ über $\lambda$ in doppelt
+%logarithmischer Darstellung. Über den Bereich $\lambda=0{,}2\ldots9{,}34$ wächst
+%die Rate um den Faktor $139$ bis $146$, bei einer $\lambda$-Spanne von Faktor
+%$47$. Die lokale Steigung beträgt $\mathrm{d}\ln\eta/\mathrm{d}\ln\lambda=1{,}26$
+%($R^2=0{,}976$), das Wachstum ist also klar überlinear und zusätzlich leicht
+%konvex: die Regressionsgerade unterschätzt beide Enden des Sweeps.
+%Die Zahl innerer Iterationen (\Cref{fig:lam-inner}\,(b)) steigt dabei nur moderat
+%von $3$ auf $27$ und erst im letzten Stützpunkt sprunghaft auf $43$ ($n=40$)
+%bzw.\ $37$ ($n=350$).
+
+
+
+
+%
+%Der moderate Anstieg von $k_{\mathrm{in}}$ trotz stark wachsender Rate erklärt
+%sich daraus, dass der Fehlerabfall über den gesamten Sweep streng geometrisch
+%bleibt: der Median des Bestimmtheitsmaßes der logarithmischen Anpassung beträgt
+%$R^2=0{,}9999$, und die aus $\eta_{\mathrm{emp}}$ vorhergesagte Iterationszahl
+%weicht im Mittel nur um $1{,}5$ Iterationen von der gemessenen ab. Die Iteration
+%verliert also nicht ihren Charakter, sondern lediglich an Rate.
+
+%
+%\begin{equation}
+%	\eta \;\approx\; \kappa_1\,\frac{\lambda}{v_{\min}^2},
+%	\qquad \kappa_1\approx0{,}025 .
+%	\label{eq:lam-etamodell}
+%\end{equation}
+
+
+
+%Als Extrapolationsmodell taugt \eqref{eq:lam-etamodell} allerdings nur
+%größenordnungsmäßig: die Vorhersage von $\eta(\lambda=9{,}34)$ aus
+%$\eta(\lambda=0{,}2)$ überschätzt den Messwert um $22$ bis $25$~\%, weil die
+%Krümmung unmittelbar vor der Lösbarkeitsgrenze nicht erfasst wird. Für die
+%Interpretation ist der Befund dennoch zentral: die im Abschnitt zum
+%$R/X$-Verhältnis beobachtete Verschlechterung der inneren Iteration lässt sich
+%mit derselben Kennzahl beschreiben, sie war dort ebenfalls eine Folge sinkender
+%Knotenspannungen und nicht des Impedanzwinkels.
+
+%%----------------------------------------------------------------------
+%\subsection{Lösbarkeitsgrenze und Kriterienvergleich}
+%\label{subsec:lam-limit}
+%
+%Von Interesse ist zudem die Lösbarkeitsgrenze der Verfahren und somit der kritische Lastfaktor $\lambda^*$.
+%\Cref{tab:lam-lambdastar} liefert diesen Wert aus den Ergebnissen für verschiedene Konstellationen.
+%Da bisher gezeigt werden konnte, dass die Netzgröße irrelevant ist und in \cref{sec:pv-share-invarianz} die PV-Anzahl selber auch keinen Einfluss auf die Lösbarkeit hat, sind diese hier zusammengefasst dargestellt.
+%Dabei wird die kritische Kontraktionszahl $\eta=1$ und der Konvergenzverlust des reinen TPF und des NR ohne PV-Knoten  nahezu identisch bei $\lambda^*=9,46-9,54$ je nach Netzgröße erreicht.
+%Hierbei handelt es sich, durch die gleichbleibenden Abbruch zwischen NR und TPF, eher um ein eine physikalische Lösbarkeitsgrenze als einer Verfahrensgrenze.
+%Dafür spricht ebenfalls eine außerordentlich tiefe Minimalspannung $v_\mathrm{min}=0,51$\,p.u. an der Lösbarkeitsgrenze.\\
+%
+%
+%
+%
+%%\Cref{tab:lam-lambdastar} stellt die kritischen Lastfaktoren $\lambda^\ast$
+%%nach unterschiedlichen Kriterien gegenüber. Der Verlust der Kontraktion
+%%($\eta=1$) und die reine PQ-Lösbarkeit der Fixpunktiteration fallen mit einem
+%%Verhältnis von $0{,}998$ zusammen, und die NR-Referenz im PQ-Betrieb liefert
+%%dieselben Werte. Der Abbruch der inneren Iteration ist also keine Eigenschaft des
+%%Verfahrens, sondern markiert die Spannungsstabilitätsgrenze des Problems.
+%%An dieser Grenze liegt $v_{\min}\approx0{,}51$~p.u.; mit
+%%\eqref{eq:lam-etamodell} und $z_{\mathrm{rel}}=1$ folgt
+%%$\lambda^\ast\approx v_{\min}^2/\kappa_1\approx10$ gegenüber gemessenen $9{,}5$,
+%%eine Abweichung von rund $5$~\%.
+%
+%\begin{table}[htbp]
+%	\centering
+%	\small
+%	\caption{Kritischer Lastfaktor $\lambda^\ast$ je Konstellation. Bereichsangaben
+%		umfassen die PV-Anteile $0{,}10$ bis $0{,}50$.}
+%	\label{tab:lam-lambdastar}
+%	\begin{tabular}{l|c|c|c}
+%		\toprule
+%		Kriterium & $n=40$ & $n=120$ & $n=350$ \\
+%		\midrule
+%
+%		Kontraktionsverlust $\eta=1$, TPF & 9,48 & 9,46 & 9,54 \\
+%		NR-Referenz, PQ-Betrieb & 9,49 & 9,48 & 9,54 \\
+%		\midrule
+%		erweiterter TPF & 9,21--9,28 & 9,19--9,21 & 9,27--9,30 \\
+%		NR-Referenz mit PV-Knoten & 9,64--9,76 & 5,22--6,30 & 3,95--4,51 \\
+%		\bottomrule
+%	\end{tabular}
+%\end{table}
+%
+%
+%Die letzten zwei Zeilen fassen die Konvergenzegrenzen für Netze mit PV-Knoten zusammen.
+%Der erweiterte TPF erreicht bereits bei $\sim3\,\%$ kleineren $\lambda^*\approx9,28$, durch die äußere Blindleistungskorrektur, das Abbruchkriterium.
+%Folglich ist die Einbuße gegenüber dem reinen PQ-Fall nur marginal. 
+%Die Größenordnung des kritischen Lastfaktors richtet sich nach dem reinen TPF der inneren Schleife.
+%Für die Hierfür verwendete kalibrierte Auslegung der PV-Knoten versagt jedoch das NR früher für kleinere Lastfaktoren. 
+%Besonders bei dem größeren 350-Knoten-Netz versagt die Referenz bei Lastfaktoren unter dem Faktor fünf, also bei knapp der Hälfte des erweiterten TPF.
+%In den Fällen, wo nur der erweiterte TPF konvergiert, werden knotenweise Leistungsbilanzen nach Konvergenz durchgeführt.
+%Deren Leistungsabweichung zwischen Einspeisung und Verbrauch hält sich konsistent in der Größenordnung $10^{-11}$, was für ein physikalische Lösung des Verfahrens spricht, neben der Garantie der FPI auf eine Hochspannungslösung zu konvergieren \cite{Giraldo2022}.
+%Durch die Unabhängigkeit des Startwerts des inneren FPI, erbt der erweiterte TPF diese Eigenschaft.
+%Da für $eta<1$ die innere Schleife immer in Richtung der Hochspannungslösung korrigiert, wird der Ausgangspunkt der äußeren Blindleistungskorrektur ebenso mit jedem Durchlauf in die richtige Richtung gezogen.
+%Dass hier ein Startpunktpunktproblem vorliegt, belegt auch folgende Beobachtung: 
+%Wird in den Fällen weiterhin der NR mit der TPF Lösung als Warm-Start ausgeführt, konvergiert dieser auch.
+%Wird im NR eine entkoppelte Berechnung als Startwert verwendet, findet das Verfahren auch eine Lösung.
+%Damit liefert der TPF unter einem Flat-Start auch bei hohen Lastfaktoren physikalische Lösungen, während der NR in diesen Situationen einen günstigeren Startwert benötigt.
+
+%Die äußere Blindleistungsschleife von Methode~A bricht mit
+%$\lambda^\ast=9{,}19\ldots9{,}30$ nur $2$ bis $3$~\% früher ab als die innere
+%Iteration. Die Q-Korrektur kostet damit kaum Reserve; die Grenze wird im
+%Wesentlichen von der Physik des Betriebspunkts geerbt und nicht von der
+%Linearisierung erzeugt. Die NR-Referenz mit harten PV-Sollwerten versagt
+%demgegenüber weit früher und ausgeprägt netzgrößenabhängig
+%($3{,}95$ bei $n=350$). Da diese Referenz mit flat start und ohne
+%Blindleistungsgrenzen rechnet, ist dieser Wert als Startwerteffekt zu lesen und
+%nicht als generelle Verfahrensgrenze des Newton-Verfahrens.
 
 %----------------------------------------------------------------------
 \subsection{Äußere Blindleistungskorrektur}
 \label{subsec:lam-outer}
 
-\Cref{fig:lam-kout} zeigt die Zahl äußerer Iterationen. Bis $\lambda\approx1{,}6$
-genügen drei Q-Korrekturschritte, bei $\lambda\approx5{,}2$ sind es fünf, und erst
-oberhalb von $\lambda\approx8$ setzt ein steiler Anstieg auf $21$ bis $31$
-Schritte bei $\lambda=9{,}06$ ein. Der Median über alle konvergenten Läufe liegt
-bei $k_{\mathrm{out}}=5$.
+
+In der  Basisanalyse des inneren TPF für den PQ-Fall wurde bereits gezeigt, dass dieser keine Einschränkung in der Robustheit gegenüber dem NR aufweist.
+Aufbauend darauf wird nun der Einfluss der äußeren Q-Korrektur betrachtet.
+Hierzu werden jeweils drei PV-Anteil in die Netze eingefügt, welche sich dem natürlichen Spannungsprofil anpassen.\\
+
 
 \begin{figure}[htbp]
 	\centering
 	\begin{subfigure}[t]{0.48\textwidth}
 		\centering
-		\begin{tikzpicture}[x=0.55cm,y=0.090cm,>=Latex]
+		\begin{tikzpicture}[x=0.54cm,y=0.135cm,>=Latex]
 			\foreach \y in {10,20,30}{\draw[gray!25] (0,\y) -- (9.6,\y);}
 			\draw[gray!55,dashed] (9.21,0) -- (9.21,33);
 			\draw[->] (0,0) -- (10.0,0) node[anchor=west,font=\footnotesize] {$\lambda$};
@@ -4149,7 +3911,7 @@ bei $k_{\mathrm{out}}=5$.
 	\end{subfigure}\hfill
 	\begin{subfigure}[t]{0.48\textwidth}
 		\centering
-		\begin{tikzpicture}[x=0.55cm,y=0.090cm,>=Latex]
+		\begin{tikzpicture}[x=0.54cm,y=0.135cm,>=Latex]
 			\foreach \y in {10,20,30}{\draw[gray!25] (0,\y) -- (9.6,\y);}
 			\draw[->] (0,0) -- (10.0,0) node[anchor=west,font=\footnotesize] {$\lambda$};
 			\draw[->] (0,0) -- (0,35);
@@ -4183,119 +3945,278 @@ bei $k_{\mathrm{out}}=5$.
 	\end{subfigure}
 	\caption{Äußere Iterationen der Blindleistungskorrektur bei kalibrierten
 		Sollwerten. Die gestrichelte Vertikale in (a) markiert
-		$\lambda^\ast_{\mathrm{TPF}}\approx9{,}2$; jenseits davon konvergiert kein Lauf.}
+		$\lambda^\ast_{\mathrm{TPF}}\approx9{,}2$, jenseits davon konvergiert kein Lauf.}
 	\label{fig:lam-kout}
 \end{figure}
 
-Der Vergleich der Netzgrößen in \Cref{fig:lam-kout-n} bestätigt die frühere
-Beobachtung und verallgemeinert sie deutlich: die Kurven für $40$, $120$ und
-$350$ Knoten liegen über den gesamten $\lambda$-Bereich innerhalb einer
-Iteration übereinander, die Rangkorrelation zwischen Netzgröße und
-$k_{\mathrm{out}}$ beträgt lediglich $\rho_s=+0{,}03$. Auch der PV-Anteil wirkt
-schwach ($\rho_s=+0{,}12$); erst nahe der Grenze liegt $k_{\mathrm{out}}$ bei
-$50$~\% PV um $15$ bis $36$~\% über dem Wert bei $10$~\% PV. Der Aufwand der
-äußeren Schleife wird damit fast ausschließlich vom Betriebspunkt bestimmt, nicht
-von der Problemgröße.
+
+
+In \Cref{fig:lam-kout} werden die Ergebnisse der Analyse aufgezeigt. 
+Beide Grafen stellen die Anzahl der äußeren Iterationen $k_\mathrm{out}$ abhängig von dem Lastfaktor dar.
+Links (a) werden drei 40-Knoten-Netze mit verschiedenen PV-Anteilen bis 50\,\%  gezeichnet.
+Die Anzahl der Korrekturen nimmt auch hier monoton, ähnlich wie in \cref{subsec:lam-inner}, zu.
+Alle dieser Kurven verlaufen nahe zueinander.
+Dabei benötigt eine Konstellation mit mehr PV-Knoten konsistent mehr Iterationen.
+Für kleine $\lambda<2$ benötigen die drei Fälle gliech viele Schritte.
+Bis $\lambda\approx8$ liegen die Kurven 1--2 Schritte auseinander. 
+Die Diskrepanz erhöht sich ständig, bis sie bei dem gemeinsamen Konvergenzabbruch 10 Schritte beträgt.
+Da die PV-Knoten hier jeweils eine Wirkleistung besitzen, findet trotz Kalibrierung eine kleine Betriebspunktverschiebung statt, welche mit höherem Lastfaktor größer wird, was dieses Verhalten widerspiegelt.
+Trotzdem liegen die Abweichungen zwischen den Kurven in einem schmalen Band, sodass der PV-Anteil nur einen geringfügigen Anstieg hervorruft.
+Da dieser jedoch klein ist und gemäß \cref{sec:pv-share-invarianz} kein Einfluss durch Verwendung von mehr PV-Knoten zu erwarten ist, spricht das Ergebnis hier ebenso für eine Invarianz bezüglich des PV-Anteils. 
+\\
+
+
+
+
+Rechts (b) sind drei Netzgrößen mit dem selben PV-Anteil dargestellt.
+Dort ist die Unabhängigkeit gegenüber der Netzgröße wieder klar erkennbar, da die Kurven bis auf einzelne Ausnahmen exakt aufeinander liegen.
+Damit ist der Parameter der Netzgröße für die äußere Blindleistungskorrektur ebenfalls kein Einflussträger auf das Konvergenzverhalten.
+Zusammen mit der Invarianz in der inneren Schleife ist somit der gesamte erweiterte TPF robust gegenüber der Netzgröße.
+Die Anzahl an äußeren Schritten steigt auch hier monoton an.
+Der Anstieg verläuft hier auch erst moderat uns wächst ähnlich wie in (a) stark bis zum kritischen $\lambda^*$ an.
+\\
+
+
+Alle verbleibenden Kombinationen zwischen Netzgröße und PV-Anteil, welche in \Cref{fig:lam-kout} nicht gezeigt werden, folgen dem selben Verhalten.
+Von den variierten Parametern zeigt nur die Arbeitspunktverschiebung durch den Lastfaktor eine deutliche Abhängigkeit zum Konvergenzverhalten des erweiterten TPF.
+Im Gegensatz zur R/X-Analyse in \cref{sec:rx} bleibt der Linearitätsfehler durch die Q-Korrektur verschont.
+Über alle konvergierten Läufe beträgt dieser maximal 2,3\,\%, was ihn weiterhin als Ursache der verschlechterten Konvergenz ausschließt.
+Als verbleibende Fehlerquelle bleibt somit das Spannungsresiduum selber, da die Reaktanz unverändert bleibt.
+Der vergrößerte Spannungsabfall, hervorgerufen durch den Lastfaktor, degradiert somit nur die innere Schleife, dessen Zwischenlösung ausschlaggebend für die Q-Korrektur ist. 
+Die Linearisierung bleibt in der Hinsicht korrekt und der Anstieg in äußeren Iterationen ist eine direkte Konsequenz der verschlechterten inneren Fixpunktiteration.
+\\ 
+
+%Neben der Kalibrierung der PV-Größen nach \cref{sec:pv_auswirkung} wird für die Netze ebenfalls ein fester Spannungssollwert von $V^{\mathrm{spec}}=1,0\,$p.u. verwendet und getestet, um den Blindleistungsbedarf zu erhöhen.
+%In dem Kalibrierten Fall ist dieser nämlich konstruktiv durch den Spannungsoffset zur PQ-Lösung nahezu konstant für alle $\lambda$.
+%Das zeigt auch Abbildung \ref{fig:lam-q}. 
+%Dort ist der maximale Blindleistungsbedarf eines Netzes einmal für den kalibrierten Fall (blau) und für den konstanten Sollwert (rot) gegen den Lastfaktor aufgetragen.
+%Der feste Spannungswert hebt darüber hinaus das Spannungsprofil künstlich hoch, wodurch die minimale Knotenspannung auch steigt.
+%Dadurch konvergiert auch folglich die innere Schleife schneller, wodurch die Q-Korrektur ebenso konsistent weniger Schritte benötigt.
+%Das ist auch in (b) erkennbar. 
+%Dort steigt im fixen Fall die Anzahl der Korrekturen nur langsam an, und wird von dem kalibrierten Fall ab $\lambda\approx8$ überholt.
+%Es genügen dadurch weniger Schritte, um zu einer Lösung zu kommen.
+%Der kritische Lastfaktor ist jedoch nur geringfügig um $\sim5\,\%$  höher.
+%Die Versagensgrenze bleibt auch für anderweitige Konfigurationen zwischen dem fixierten und dem kalibrierten Fall bis auf kleine Streuung konstant.
+%\\
+%
+%
+%
+%%\Cref{fig:lam-kout} zeigt die Zahl äußerer Iterationen. Bis $\lambda\approx1{,}6$
+%%genügen drei Q-Korrekturschritte, bei $\lambda\approx5{,}2$ sind es fünf, und erst
+%%oberhalb von $\lambda\approx8$ setzt ein steiler Anstieg auf $21$ bis $31$
+%%Schritte bei $\lambda=9{,}06$ ein. Der Median über alle konvergenten Läufe liegt
+%%bei $k_{\mathrm{out}}=5$.
+%%
+%%
+%%Der Vergleich der Netzgrößen in \Cref{fig:lam-kout-n} bestätigt die frühere
+%%Beobachtung und verallgemeinert sie deutlich: die Kurven für $40$, $120$ und
+%%$350$ Knoten liegen über den gesamten $\lambda$-Bereich innerhalb einer
+%%Iteration übereinander, die Rangkorrelation zwischen Netzgröße und
+%%$k_{\mathrm{out}}$ beträgt lediglich $\rho_s=+0{,}03$. Auch der PV-Anteil wirkt
+%%schwach ($\rho_s=+0{,}12$); erst nahe der Grenze liegt $k_{\mathrm{out}}$ bei
+%%$50$~\% PV um $15$ bis $36$~\% über dem Wert bei $10$~\% PV. Der Aufwand der
+%%äußeren Schleife wird damit fast ausschließlich vom Betriebspunkt bestimmt, nicht
+%%von der Problemgröße.
+%%
+%%\begin{table}[htbp]
+%%	\centering
+%%	\small
+%%	\caption{Spearman-Rangkorrelationen über alle konvergenten PV-Läufe.}
+%%	\label{tab:lam-spearman}
+%%	\begin{tabular}{lrr}
+%%		\toprule
+%%		Größe & $k_{\mathrm{in}}$ & $k_{\mathrm{out}}$ \\
+%%		\midrule
+%%		$v_{\min}$ & $-0{,}993$ & $-0{,}976$ \\
+%%		$\eta_{\mathrm{emp}}$ & $+0{,}993$ & $+0{,}975$ \\
+%%		$\lambda$ & $+0{,}992$ & $+0{,}974$ \\
+%%		Machbarkeitsmaß $\mathrm{feas}_{\min}$ & $-0{,}515$ & $-0{,}496$ \\
+%%		$\varepsilon_{\mathrm{lin}}$ (Maximum) & $+0{,}453$ & $+0{,}462$ \\
+%%		$\varepsilon_{\mathrm{lin}}$ (Median) & $-0{,}350$ & $-0{,}402$ \\
+%%		$\max_k|Q_k|$ & $-0{,}374$ & $-0{,}352$ \\
+%%		PV-Anteil & $+0{,}088$ & $+0{,}117$ \\
+%%		Zahl PV-Knoten $n_{pv}$ & $+0{,}062$ & $+0{,}083$ \\
+%%		Netzgröße $n$ & $+0{,}020$ & $+0{,}027$ \\
+%%		\bottomrule
+%%	\end{tabular}
+%%\end{table}
+%%
+%%Damit ist die im $R/X$-Abschnitt aufgestellte Erwartung, der
+%%Linearisierungsfehler $\varepsilon_{\mathrm{lin}}$ sei der beste Prädiktor des
+%%äußeren Aufwands, für den Lastpfad zu verwerfen. $\varepsilon_{\mathrm{lin}}$
+%%bleibt über den gesamten Sweep unter $0{,}023$, zeigt keinen belastbaren
+%%$\lambda$-Trend ($R^2=0{,}01\ldots0{,}22$) und korreliert mit
+%%$\rho_s=-0{,}40$ sogar mit falschem Vorzeichen (\Cref{tab:lam-spearman}). Da
+%%alle $315$ Läufe in dieselbe Klasse $\varepsilon_{\mathrm{lin}}\le0{,}6$ fallen,
+%%besitzt die dort abgeleitete Schwelle hier keine Trennschärfe. Prädiktiv sind
+%%statt dessen die Betriebspunktgrößen $v_{\min}$ ($\rho_s=-0{,}976$),
+%%$\eta_{\mathrm{emp}}$ ($+0{,}975$) und $\lambda$ ($+0{,}974$). Bei
+%%Laststeigerung degradiert nicht die Linearisierung der Sensitivität, sondern die
+%%Kontraktion der inneren Iteration.
+%%
+%\begin{figure}[htbp]
+%	\centering
+%	\begin{subfigure}[t]{0.4\textwidth}
+%		\centering
+%		\begin{tikzpicture}[x=0.85cm,y=15cm,>=Latex]
+%			\foreach \y in {0.05,0.10,0.15,0.20}{\draw[gray!25] (0,\y) -- (5.7,\y);}
+%			\draw[->] (0,0) -- (6.0,0) node[anchor=west,font=\footnotesize] {$\lambda$};
+%			\draw[->] (0,0) -- (0,0.225);
+%			\node[font=\footnotesize,rotate=90,anchor=south] at (-0.95,0.11) {$\max_k|Q_k|$ in p.u.};
+%			\foreach \x in {0,1,2,3,4,5}{\draw (\x,0) -- (\x,0.005); \node[below,font=\scriptsize] at (\x,0) {$\x$};}
+%			\foreach \y/\l in {0/0,0.05/0{,}05,0.10/0{,}10,0.15/0{,}15,0.20/0{,}20}{%
+%				\draw (0,\y) -- (0.09,\y); \node[left,font=\scriptsize] at (0,\y) {$\l$};}
+%			\draw[BrickRed,thick] plot[mark=*,mark size=0.9pt] coordinates {
+%				(0.20,0.0030) (0.48,0.0081) (0.75,0.0161) (1.03,0.0243) (1.31,0.0328)
+%				(1.58,0.0416) (1.86,0.0507) (2.14,0.0602) (2.42,0.0699) (2.69,0.0800)
+%				(2.97,0.0904) (3.25,0.1011) (3.52,0.1123) (3.80,0.1238) (4.08,0.1357)
+%				(4.35,0.1480) (4.63,0.1608) (4.91,0.1741) (5.18,0.1878) (5.46,0.2020)};
+%			\draw[NavyBlue,thick,dashed] plot[mark=x,mark size=1.4pt] coordinates {
+%				(0.20,0.0863) (0.48,0.0861) (0.75,0.0859) (1.03,0.0857) (1.31,0.0855)
+%				(1.58,0.0853) (1.86,0.0851) (2.14,0.0849) (2.42,0.0847) (2.69,0.0845)
+%				(2.97,0.0843) (3.25,0.0841) (3.52,0.0838) (3.80,0.0836) (4.08,0.0834)
+%				(4.35,0.0832) (4.63,0.0830) (4.91,0.0828) (5.18,0.0826) (5.46,0.0824)};
+%			\draw[BrickRed,thick] (0.3,0.212) -- (0.7,0.212);
+%			\node[right,black,font=\tiny] at (0.75,0.212) {fest, $1{,}00$~p.u.};
+%			\draw[NavyBlue,thick,dashed] (0.3,0.196) -- (0.7,0.196);
+%			\node[right,black,font=\tiny] at (0.75,0.196) {kalibriert};
+%		\end{tikzpicture}
+%		\caption{Maximaler Blindleistungsbetrag}
+%		\label{fig:lam-q-a}
+%	\end{subfigure}\hfill
+%	\begin{subfigure}[t]{0.48\textwidth}
+%		\centering
+%		\begin{tikzpicture}[x=0.5cm,y=0.14cm,>=Latex]
+%			\foreach \y in {5,10,15,20}{\draw[gray!25] (0,\y) -- (10.2,\y);}
+%			\draw[->] (0,0) -- (10.6,0) node[anchor=west,font=\footnotesize] {$\lambda$};
+%			\draw[->] (0,0) -- (0,24);
+%			\node[font=\footnotesize,rotate=90,anchor=south] at (-1.7,12) {$k_{\mathrm{out}}$};
+%			\foreach \x in {0,2,4,6,8,10}{\draw (\x,0) -- (\x,0.5); \node[below,font=\scriptsize] at (\x,0) {$\x$};}
+%			\foreach \y in {0,5,10,15,20}{\draw (0,\y) -- (0.15,\y); \node[left,font=\scriptsize] at (0,\y) {$\y$};}
+%			\draw[NavyBlue,thick,dashed] plot[mark=*,mark size=0.9pt] coordinates {
+%				(0.20,3) (0.48,3) (0.75,3) (1.03,3) (1.31,3) (1.58,3) (1.86,3)
+%				(2.14,3) (2.42,3) (2.69,3) (2.97,3) (3.25,3) (3.52,3) (3.80,4)
+%				(4.08,4) (4.35,4) (4.63,4) (4.91,4) (5.18,5) (5.46,5) (5.74,5)
+%				(6.02,5) (6.29,5) (6.57,6) (6.85,6) (7.12,6) (7.40,7) (7.68,7)
+%				(7.95,8) (8.23,9) (8.51,11) (8.78,14) (9.06,22)};
+%			\draw[BrickRed,thick] plot[mark=x,mark size=1.2pt] coordinates {
+%				(0.20,3) (0.48,2) (0.75,3) (1.03,4) (1.31,4) (1.58,4) (1.86,5)
+%				(2.14,5) (2.42,5) (2.69,5) (2.97,5) (3.25,5) (3.52,6) (3.80,6)
+%				(4.08,6) (4.35,6) (4.63,6) (4.91,6) (5.18,7) (5.46,7) (5.74,7)
+%				(6.02,7) (6.29,7) (6.57,7) (6.85,7) (7.12,7) (7.40,7) (7.68,7)
+%				(7.95,8) (8.23,8) (8.51,8) (8.78,7) (9.06,7) (9.34,8) (9.62,8)};
+%			\draw[BrickRed,thick] (0.4,21.5) -- (1.4,21.5);
+%			\node[right,black,font=\tiny] at (1.5,21.5) {fest};
+%			\draw[NavyBlue,thick,dashed] (0.4,19.5) -- (1.4,19.5);
+%			\node[right,black,font=\tiny] at (1.5,19.5) {kalibriert};
+%		\end{tikzpicture}
+%		\caption{Anzahl äußerer Iterationen}
+%		\label{fig:lam-q-b}
+%	\end{subfigure}
+%	\caption{Vergleich der beiden Sollwertmodi (fester Sollwert $1{,}00$~p.u.
+%		vs.\ kalibrierter Sollwert) für $n=40$ und $10$~\% PV-Anteil.}
+%	\label{fig:lam-q}
+%\end{figure}
+%%
+%%Der Blindleistungsbedarf (\Cref{fig:lam-q}) ist nur im Modus mit festem Sollwert
+%%aussagekräftig. Dort wächst $\max_k|Q_k|$ von $3{,}0\cdot10^{-3}$ auf
+%%$2{,}0\cdot10^{-1}$~p.u.\ und damit etwa mit $\lambda^{1{,}27}$, also leicht
+%%überlinear. Im kalibrierten Modus bleibt der Wert bei $8{,}6\cdot10^{-2}$~p.u.\
+%%praktisch konstant. Das ist ein Artefakt der Kalibrierung: da der Sollwert stets
+%%um $\delta=0{,}005$~p.u.\ über der Basisspannung liegt, ist die zu erzeugende
+%%Differenz $\Delta(v^2)$ näherungsweise konstant, und mit
+%%$Q_k\approx\Delta(v^2)/(2X_{kk})$ folgt ein von $\lambda$ unabhängiger Bedarf.
+%%Quantitative Aussagen zum Blindleistungsbedarf werden daher ausschließlich aus
+%%dem Modus mit festem Sollwert abgeleitet. Dieser Modus konvergiert zudem in
+%%$100$~\% der Fälle gegenüber $94{,}3$~\% bei kalibrierten Sollwerten, benötigt
+%%aber im Median eine äußere Iteration mehr ($6$ statt $5$).
+%%
+%%Wirksam gegen den Anstieg von $k_{\mathrm{out}}$ ist eine Fortsetzung des
+%%Blindleistungsstartwerts über $\lambda$ statt eines Starts bei
+%%$\bm{Q}=\bm{0}$: der Median von $k_{\mathrm{out}}$ sinkt um den Faktor $1{,}25$,
+%%der Linearisierungsfehler auf $24$~\% des Ausgangswerts. Bei $\lambda=9{,}06$
+%%reduziert sich $k_{\mathrm{in}}$ von $248$ auf $143$ und $k_{\mathrm{out}}$ von
+%%$22$ auf $15$. Für Zeitreihenrechnungen mit langsam veränderlicher Last ist die
+%%Fortsetzung damit die naheliegende Standardeinstellung.
+
+
+%----------------------------------------------------------------------
+\subsection{Lösbarkeitsgrenze und Kriterienvergleich}
+\label{subsec:lam-limit}
+
+Von Interesse ist zudem die Lösbarkeitsgrenze der Verfahren und somit der kritische Lastfaktor $\lambda^*$.
+\Cref{tab:lam-lambdastar} liefert diesen Wert aus den Ergebnissen für verschiedene Konstellationen.
+Da bisher gezeigt werden konnte, dass die Netzgröße irrelevant ist und in \cref{sec:pv-share-invarianz} die PV-Anzahl selber auch keinen Einfluss auf die Lösbarkeit hat, sind diese hier zusammengefasst dargestellt.
+Dabei wird die kritische Kontraktionszahl $\eta=1$ und der Konvergenzverlust des reinen TPF und des NR ohne PV-Knoten  nahezu identisch bei $\lambda^*=9,46-9,54$ je nach Netzgröße erreicht.
+Hierbei handelt es sich, durch die gleichbleibenden Abbruch zwischen NR und TPF, eher um ein eine physikalische Lösbarkeitsgrenze als einer Verfahrensgrenze.
+Dafür spricht ebenfalls eine außerordentlich tiefe Minimalspannung $v_\mathrm{min}=0,51$\,p.u. an der Lösbarkeitsgrenze.\\
+
+
+
+
+%\Cref{tab:lam-lambdastar} stellt die kritischen Lastfaktoren $\lambda^\ast$
+%nach unterschiedlichen Kriterien gegenüber. Der Verlust der Kontraktion
+%($\eta=1$) und die reine PQ-Lösbarkeit der Fixpunktiteration fallen mit einem
+%Verhältnis von $0{,}998$ zusammen, und die NR-Referenz im PQ-Betrieb liefert
+%dieselben Werte. Der Abbruch der inneren Iteration ist also keine Eigenschaft des
+%Verfahrens, sondern markiert die Spannungsstabilitätsgrenze des Problems.
+%An dieser Grenze liegt $v_{\min}\approx0{,}51$~p.u.; mit
+%\eqref{eq:lam-etamodell} und $z_{\mathrm{rel}}=1$ folgt
+%$\lambda^\ast\approx v_{\min}^2/\kappa_1\approx10$ gegenüber gemessenen $9{,}5$,
+%eine Abweichung von rund $5$~\%.
 
 \begin{table}[htbp]
 	\centering
 	\small
-	\caption{Spearman-Rangkorrelationen über alle konvergenten PV-Läufe.}
-	\label{tab:lam-spearman}
-	\begin{tabular}{lrr}
+	\caption{Kritischer Lastfaktor $\lambda^\ast$ je Konstellation. Bereichsangaben
+		umfassen die PV-Anteile $0{,}10$ bis $0{,}50$.}
+	\label{tab:lam-lambdastar}
+	\begin{tabular}{l|c|c|c}
 		\toprule
-		Größe & $k_{\mathrm{in}}$ & $k_{\mathrm{out}}$ \\
+		Kriterium & $n=40$ & $n=120$ & $n=350$ \\
 		\midrule
-		$v_{\min}$ & $-0{,}993$ & $-0{,}976$ \\
-		$\eta_{\mathrm{emp}}$ & $+0{,}993$ & $+0{,}975$ \\
-		$\lambda$ & $+0{,}992$ & $+0{,}974$ \\
-		Machbarkeitsmaß $\mathrm{feas}_{\min}$ & $-0{,}515$ & $-0{,}496$ \\
-		$\varepsilon_{\mathrm{lin}}$ (Maximum) & $+0{,}453$ & $+0{,}462$ \\
-		$\varepsilon_{\mathrm{lin}}$ (Median) & $-0{,}350$ & $-0{,}402$ \\
-		$\max_k|Q_k|$ & $-0{,}374$ & $-0{,}352$ \\
-		PV-Anteil & $+0{,}088$ & $+0{,}117$ \\
-		Zahl PV-Knoten $n_{pv}$ & $+0{,}062$ & $+0{,}083$ \\
-		Netzgröße $n$ & $+0{,}020$ & $+0{,}027$ \\
+		
+		Kontraktionsverlust $\eta=1$, TPF & 9,48 & 9,46 & 9,54 \\
+		NR-Referenz, PQ-Betrieb & 9,49 & 9,48 & 9,54 \\
+		\midrule
+		erweiterter TPF & 9,21--9,28 & 9,19--9,21 & 9,27--9,30 \\
+		NR-Referenz mit PV-Knoten & 9,64--9,76 & 5,22--6,30 & 3,95--4,51 \\
 		\bottomrule
 	\end{tabular}
 \end{table}
 
-Damit ist die im $R/X$-Abschnitt aufgestellte Erwartung, der
-Linearisierungsfehler $\varepsilon_{\mathrm{lin}}$ sei der beste Prädiktor des
-äußeren Aufwands, für den Lastpfad zu verwerfen. $\varepsilon_{\mathrm{lin}}$
-bleibt über den gesamten Sweep unter $0{,}023$, zeigt keinen belastbaren
-$\lambda$-Trend ($R^2=0{,}01\ldots0{,}22$) und korreliert mit
-$\rho_s=-0{,}40$ sogar mit falschem Vorzeichen (\Cref{tab:lam-spearman}). Da
-alle $315$ Läufe in dieselbe Klasse $\varepsilon_{\mathrm{lin}}\le0{,}6$ fallen,
-besitzt die dort abgeleitete Schwelle hier keine Trennschärfe. Prädiktiv sind
-statt dessen die Betriebspunktgrößen $v_{\min}$ ($\rho_s=-0{,}976$),
-$\eta_{\mathrm{emp}}$ ($+0{,}975$) und $\lambda$ ($+0{,}974$). Bei
-Laststeigerung degradiert nicht die Linearisierung der Sensitivität, sondern die
-Kontraktion der inneren Iteration.
 
-\begin{figure}[htbp]
-	\centering
-	\begin{tikzpicture}[x=1.35cm,y=14cm,>=Latex]
-		\foreach \y in {0.05,0.10,0.15,0.20}{\draw[gray!25] (0,\y) -- (5.7,\y);}
-		\draw[->] (0,0) -- (6.0,0) node[anchor=west,font=\footnotesize] {$\lambda$};
-		\draw[->] (0,0) -- (0,0.225);
-		\node[font=\footnotesize,rotate=90,anchor=south] at (-0.62,0.11) {$\max_k|Q_k|$ in p.u.};
-		\foreach \x in {0,1,2,3,4,5}{\draw (\x,0) -- (\x,0.005); \node[below,font=\scriptsize] at (\x,0) {$\x$};}
-		\foreach \y/\l in {0/0,0.05/0{,}05,0.10/0{,}10,0.15/0{,}15,0.20/0{,}20}{%
-			\draw (0,\y) -- (0.06,\y); \node[left,font=\scriptsize] at (0,\y) {$\l$};}
-		\draw[BrickRed,thick] plot[mark=*,mark size=0.9pt] coordinates {
-			(0.20,0.0030) (0.48,0.0081) (0.75,0.0161) (1.03,0.0243) (1.31,0.0328)
-			(1.58,0.0416) (1.86,0.0507) (2.14,0.0602) (2.42,0.0699) (2.69,0.0800)
-			(2.97,0.0904) (3.25,0.1011) (3.52,0.1123) (3.80,0.1238) (4.08,0.1357)
-			(4.35,0.1480) (4.63,0.1608) (4.91,0.1741) (5.18,0.1878) (5.46,0.2020)};
-		\draw[NavyBlue,thick,dashed] plot[mark=x,mark size=1.4pt] coordinates {
-			(0.20,0.0863) (0.48,0.0861) (0.75,0.0859) (1.03,0.0857) (1.31,0.0855)
-			(1.58,0.0853) (1.86,0.0851) (2.14,0.0849) (2.42,0.0847) (2.69,0.0845)
-			(2.97,0.0843) (3.25,0.0841) (3.52,0.0838) (3.80,0.0836) (4.08,0.0834)
-			(4.35,0.0832) (4.63,0.0830) (4.91,0.0828) (5.18,0.0826) (5.46,0.0824)};
-		\draw[BrickRed,thick] (0.25,0.212) -- (0.75,0.212) node[right,black,font=\scriptsize] {fester Sollwert $1{,}00$~p.u.};
-		\draw[NavyBlue,thick,dashed] (0.25,0.196) -- (0.75,0.196) node[right,black,font=\scriptsize] {kalibrierter Sollwert};
-	\end{tikzpicture}
-	\caption{Maximaler Blindleistungsbetrag über $\lambda$ für $n=40$ und
-		$10$~\% PV-Anteil. Bei kalibriertem Sollwert ist $\max_k|Q_k|$
-		konstruktionsbedingt nahezu $\lambda$-invariant, bei festem Sollwert
-		wächst er etwa mit $\lambda^{1{,}3}$.}
-	\label{fig:lam-q}
-\end{figure}
+Die letzten zwei Zeilen fassen die Konvergenzegrenzen für Netze mit PV-Knoten zusammen.
+Der erweiterte TPF erreicht bereits bei $\sim3\,\%$ kleineren $\lambda^*\approx9,28$, durch die äußere Blindleistungskorrektur, das Abbruchkriterium.
+Folglich ist die Einbuße gegenüber dem reinen PQ-Fall nur marginal. 
+Die Größenordnung des kritischen Lastfaktors richtet sich nach dem reinen TPF der inneren Schleife.
+Für die hierfür verwendete kalibrierte Auslegung der PV-Knoten versagt jedoch das NR früher für kleinere Lastfaktoren. 
+Besonders bei dem größeren 350-Knoten-Netz versagt die Referenz bei Lastfaktoren unter dem Faktor fünf, also bei knapp der Hälfte des erweiterten TPF.
+In den Fällen, wo nur der erweiterte TPF konvergiert, werden knotenweise Leistungsbilanzen nach Konvergenz durchgeführt.
+Deren Leistungsabweichung zwischen Einspeisung und Verbrauch hält sich konsistent in der Größenordnung $10^{-11}$, was für ein physikalische Lösung des Verfahrens spricht, neben der Garantie der FPI auf eine Hochspannungslösung zu konvergieren \cite{Giraldo2022}.
+Durch die Unabhängigkeit des Startwerts des inneren FPI, erbt der erweiterte TPF diese Eigenschaft.
+Da für $eta<1$ die innere Schleife immer in Richtung der Hochspannungslösung korrigiert, wird der Ausgangspunkt der äußeren Blindleistungskorrektur ebenso mit jedem Durchlauf in die richtige Richtung gezogen.
+Dass hier ein Startpunktpunktproblem vorliegt, belegt auch folgende Beobachtung: 
+Wird in den Fällen weiterhin der NR mit der TPF Lösung als Warm-Start ausgeführt, konvergiert dieser auch.
+Damit liefert der TPF unter einem Flat-Start auch bei hohen Lastfaktoren physikalische Lösungen, während der NR in diesen Situationen einen günstigeren Startwert benötigt.\\
 
-Der Blindleistungsbedarf (\Cref{fig:lam-q}) ist nur im Modus mit festem Sollwert
-aussagekräftig. Dort wächst $\max_k|Q_k|$ von $3{,}0\cdot10^{-3}$ auf
-$2{,}0\cdot10^{-1}$~p.u.\ und damit etwa mit $\lambda^{1{,}27}$, also leicht
-überlinear. Im kalibrierten Modus bleibt der Wert bei $8{,}6\cdot10^{-2}$~p.u.\
-praktisch konstant. Das ist ein Artefakt der Kalibrierung: da der Sollwert stets
-um $\delta=0{,}005$~p.u.\ über der Basisspannung liegt, ist die zu erzeugende
-Differenz $\Delta(v^2)$ näherungsweise konstant, und mit
-$Q_k\approx\Delta(v^2)/(2X_{kk})$ folgt ein von $\lambda$ unabhängiger Bedarf.
-Quantitative Aussagen zum Blindleistungsbedarf werden daher ausschließlich aus
-dem Modus mit festem Sollwert abgeleitet. Dieser Modus konvergiert zudem in
-$100$~\% der Fälle gegenüber $94{,}3$~\% bei kalibrierten Sollwerten, benötigt
-aber im Median eine äußere Iteration mehr ($6$ statt $5$).
+Näher aufgeschlüsselt konvergiert der erweiterte TPF in 612 der 630 durchgeführten Läufe, was einer Erfolgsrate von $97{,}1$~\% entspricht.
+In \Cref{tab:lam-fail} wird das Versagensbild näher beschrieben.
+Für die meisten Fälle konvergieren sowohl TPF als auch NR.
+Sechs Konfigurationen werden nur vom NR gelöst.
+In allen dieser Fälle liegen die kritischen $\lambda^*$-Werte des TPF und NR  nahe beieinander ($\lambda_\mathrm{TPF}^*\approx9,34$ und $\lambda_\mathrm{NR}^*\approx 9.61$).
+Die äußere Schleife versagt dementsprechend nahe der Lösbarkeitsgrenze in einigen Fällen.
+\\
 
-Wirksam gegen den Anstieg von $k_{\mathrm{out}}$ ist eine Fortsetzung des
-Blindleistungsstartwerts über $\lambda$ statt eines Starts bei
-$\bm{Q}=\bm{0}$: der Median von $k_{\mathrm{out}}$ sinkt um den Faktor $1{,}25$,
-der Linearisierungsfehler auf $24$~\% des Ausgangswerts. Bei $\lambda=9{,}06$
-reduziert sich $k_{\mathrm{in}}$ von $248$ auf $143$ und $k_{\mathrm{out}}$ von
-$22$ auf $15$. Für Zeitreihenrechnungen mit langsam veränderlicher Last ist die
-Fortsetzung damit die naheliegende Standardeinstellung.
+Dem Gegenüber stehen 92 Fälle in denen der erweiterte TPF ausgehend vom Flat-Start eine Lösung finden, während der NR im Flat-Start keine findet und wie bereits beschrieben, einen Warmstart benötigt, um ebenfalls zu konvergieren.
+Außerdem konvergiert der NR mit der Lösung des TPF als Startwert.
+Mit diesem Initialwert benötigt der NR lediglich 0--1 Iterationen, was ebenfalls für eine korrekte Lösung des TPF spricht.
+Wird \texttt{pandapower} im \emph{decoupled}-Modus ausgeführt um einen Warm-Start mit der entkoppelten Lösung zu initiieren, konvergiert in der NR bloß in 1 von 92 dieser Fälle. 
+Dadurch bietet der erweiterte TPF für große Netze mit ungünstiger Lastsituation einen signifikanten Vorteil bezüglich der Robustheit. 
+Auch wenn der erweiterte TPF für große Netze gemäß \cref{sec:einzelner_lastfluss} zeitlich im Nachteil ist, kann das Verfahren dennoch Lösungen liefern, die sonst mittels des NR auch mit DC-Start nicht gefunden werden.
 
-%----------------------------------------------------------------------
-\subsection{Robustheit und Versagensbild}
-\label{subsec:lam-robust}
 
-Von $630$ Läufen mit lösbarer Basislösung konvergiert Methode~A in $612$ Fällen
-($97{,}1$~\%). \Cref{tab:lam-fail} schlüsselt das Versagensbild auf.
-Bemerkenswert ist die Asymmetrie zur NR-Referenz: in $92$ Läufen findet
-Methode~A eine Lösung, während NR mit PV-Sollwerten scheitert, umgekehrt nur in
-sechs. Diese sechs Fälle betreffen ausschließlich $n=40$ bei
-$\lambda\in\{9{,}34;\,9{,}62\}$, also das letzte Prozent vor der Nase, mit
-$v_{\min}=0{,}47\ldots0{,}63$~p.u. In zwölf weiteren Fällen findet keines der
-beiden Verfahren eine Lösung, was mit $\lambda>\lambda^\ast$ konsistent ist.
+
 
 \begin{table}[htbp]
 	\centering
@@ -4307,47 +4228,78 @@ beiden Verfahren eine Lösung, was mit $\lambda>\lambda^\ast$ konsistent ist.
 		Klasse & Fälle & Charakterisierung \\
 		\midrule
 		beide konvergent & 520 & Regelfall über den gesamten $\lambda$-Bereich \\
-		nur Methode~A & 92 & NR mit PV-Sollwerten ohne Lösung (flat start) \\
+		nur erw. TPF & 92 & NR mit PV-Sollwerten ohne Lösung (flat start) \\
 		nur NR & 6 & Divergenz der äußeren Schleife, alle $n=40$, $\lambda\ge9{,}34$ \\
 		keines & 12 & jenseits der Lösbarkeitsgrenze, $n\in\{120,350\}$, $\lambda\ge9{,}34$ \\
-		Basis unlösbar & 36 & $\lambda>\lambda^\ast_{\mathrm{FPI}}$, nicht ausgewertet \\
 		\bottomrule
 	\end{tabularx}
 \end{table}
 
-Die $92$ nur-Methode-A-Fälle sind als eigener Robustheitsbefund zu werten: die
-Fixpunktformulierung mit spannungsbasiertem Warm Start erreicht Betriebspunkte,
-an denen das Newton-Verfahren aus dem flachen Startwert nicht konvergiert. Die
-Aussage ist jedoch als Startwertrobustheit zu lesen und nicht als generelle
-Überlegenheit gegenüber Newton-Verfahren, da die Referenz ohne Warmstart und ohne
-Blindleistungsgrenzen betrieben wird und die Grenze dort stark netzgrößenabhängig
-ausfällt.
+
+%Von $630$ Läufen mit lösbarer Basislösung konvergiert Methode~A in $612$ Fällen
+%($97{,}1$~\%). \Cref{tab:lam-fail} schlüsselt das Versagensbild auf.
+%Bemerkenswert ist die Asymmetrie zur NR-Referenz: in $92$ Läufen findet
+%Methode~A eine Lösung, während NR mit PV-Sollwerten scheitert, umgekehrt nur in
+%sechs. Diese sechs Fälle betreffen ausschließlich $n=40$ bei
+%$\lambda\in\{9{,}34;\,9{,}62\}$, also das letzte Prozent vor der Nase, mit
+%$v_{\min}=0{,}47\ldots0{,}63$~p.u. In zwölf weiteren Fällen findet keines der
+%beiden Verfahren eine Lösung, was mit $\lambda>\lambda^\ast$ konsistent ist.
 
 
 
-Schließlich zeigt der Vergleich der Skalierungsmodi, dass die Richtung der
-Leistungsflüsse numerisch unkritisch ist. Wird ausschließlich die PV-Einspeisung
-skaliert (\texttt{pv\_only}), konvergieren alle Läufe bis $\lambda=11$ mit einem
-Median von drei äußeren Iterationen, bei maximalen Spannungen von höchstens
-$1{,}057$~p.u. Werden Last und PV gemeinsam skaliert (\texttt{load\_pv}), stützt
-die Einspeisung den Betriebspunkt: $v_{\min}$ liegt bei $0{,}65$~p.u.\ statt bei
-$0{,}45$~p.u.\ im reinen Lastfall, und die Konvergenzquote steigt von $94{,}4$ auf
-$100$~\%. Rückspeisung verschiebt die Grenze also nach oben, statt sie zu
-verschärfen.
+\begin{figure}[htbp]
+	\centering
+	\input{figures/advantage_region_by_size.pgf}
+	\caption{Vorteilsbereich des erweiterten TPF (grün) zwischen den kritischen
+	Lastfaktoren $\lambda^\ast$ von NR (Kaltstart) und TPF, aufgetragen über
+	der Netzgröße $n_\mathrm{bus}$. Die Balken zeigen die Streuung über
+	PV-Anteile bis $50\,\%$, die Punkte deren Mittelwert.}
+	\label{fig:advantage_region_by_size}
+\end{figure}
+
+
+Konkret wird der Vorteilsbereich in Abbildung \ref{fig:advantage_region_by_size} markiert.
+Dort ist der kritische Lastfaktor über der Netzgröße aufgeführt.
+Hier ist deutlich erkennbar, dass bei kleinen Netzen ($n_\mathrm{bus}<50$) das NR robuster ist und bei höheren Lastfällen Konvergiert als der TPF. 
+Bei größeren Netzen fällt $\lambda^*$ des NR unter den des erweiterten TPF. 
+Der Grüne Bereich kennzeichnet den erweiterten Lastbereich, der durch den erweiterten TPF gewonnen wird.
+Dieser wird für größere Netze ebenfalls monoton breiter.
+
+
+
+
+
+
+
+%Die $92$ nur-Methode-A-Fälle sind als eigener Robustheitsbefund zu werten: die
+%Fixpunktformulierung mit spannungsbasiertem Warm Start erreicht Betriebspunkte,
+%an denen das Newton-Verfahren aus dem flachen Startwert nicht konvergiert. Die
+%Aussage ist jedoch als Startwertrobustheit zu lesen und nicht als generelle
+%Überlegenheit gegenüber Newton-Verfahren, da die Referenz ohne Warmstart und ohne
+%Blindleistungsgrenzen betrieben wird und die Grenze dort stark netzgrößenabhängig
+%ausfällt.
+%
+%
+%
+%Schließlich zeigt der Vergleich der Skalierungsmodi, dass die Richtung der
+%Leistungsflüsse numerisch unkritisch ist. Wird ausschließlich die PV-Einspeisung
+%skaliert (\texttt{pv\_only}), konvergieren alle Läufe bis $\lambda=11$ mit einem
+%Median von drei äußeren Iterationen, bei maximalen Spannungen von höchstens
+%$1{,}057$~p.u. Werden Last und PV gemeinsam skaliert (\texttt{load\_pv}), stützt
+%die Einspeisung den Betriebspunkt: $v_{\min}$ liegt bei $0{,}65$~p.u.\ statt bei
+%$0{,}45$~p.u.\ im reinen Lastfall, und die Konvergenzquote steigt von $94{,}4$ auf
+%$100$~\%. Rückspeisung verschiebt die Grenze also nach oben, statt sie zu
+%verschärfen.
 
 %----------------------------------------------------------------------
 \subsection{Rechenzeit und Wirksamkeit der Optimierungen}
 \label{subsec:lam-time}
 
-\Cref{tab:lam-time} zeigt, dass die Rechenzeit von Methode~A mit dem
-Betriebspunkt skaliert: innerhalb einer Netzgröße liegen zwischen Median und
-Maximum Faktoren von $12$ bis $14$, ausschließlich verursacht durch die höhere
-Gesamtzahl innerer und äußerer Iterationen bei großem $\lambda$. Die NR-Referenz
-ist dagegen nahezu $\lambda$-invariant, da die Iterationszahl des
-Newton-Verfahrens auch bei hoher Last kaum wächst. Ein Break-even in $\lambda$
-tritt in keiner Konfiguration auf. Wegen \texttt{repeats}~$=1$ und des in den
-NR-Zeiten enthaltenen Aufrufoverheads sind die absoluten Werte allerdings nur
-begrenzt belastbar; berichtet werden daher primär die relativen Trends.
+Abschließend wird in \Cref{tab:lam-time} die Rechenzeit und die Einsparung durch die Optimierungen beleuchtet.
+Zwischen dem Median und der maximalen Rechenzeit liegen für den TPF Faktoren im Bereich $\sim13$ vor. 
+Bei ungünstigen Lastsituationen braucht der erweiterte TPF folglich eine Größenordnung länger für eine Lösung.
+Die Maximalzeiten der beiden größeren Netze liegen gemäß Abbildung \ref{fig:timing_vs_size_from_csv} über den gängigen Lösungszeiten des NR.
+Dies ist die Konsequenz des Anstiegs der Gesamtiterationen.\\
 
 \begin{table}[htbp]
 	\centering
@@ -4355,29 +4307,50 @@ begrenzt belastbar; berichtet werden daher primär die relativen Trends.
 	\caption{Rechenzeit in ms und Einsparungsfaktoren der Iterationszahl
 		(Median, in Klammern Maximum).}
 	\label{tab:lam-time}
-	\begin{tabular}{lrrrrrrr}
+	\begin{tabular}{lrrrrr}
 		\toprule
-		& \multicolumn{4}{c}{Rechenzeit} & \multicolumn{3}{c}{Einsparung innere Iterationen} \\
-		\cmidrule(lr){2-5}\cmidrule(lr){6-8}
-		$n$ & $t_{\mathrm{TPF}}$ & $t_{\mathrm{TPF}}^{\max}$ & $t_{\mathrm{NR}}$ &
-		Speed-up & Warm Start & adapt. Tol. & kombiniert \\
+		& \multicolumn{2}{c}{Rechenzeit} & \multicolumn{3}{c}{Einsparung innere Iterationen} \\
+		\cmidrule(lr){2-3}\cmidrule(lr){4-6}
+		$n$ & $t_{\mathrm{TPF}}$ & $t_{\mathrm{TPF}}^{\max}$ & 
+		Warm Start & adapt. Tol. & kombiniert \\
 		\midrule
-		$40$  & 0,47 & 5,74  & 11,63  & 24,6 & 1,65 (2,37) & 1,70 (3,80) & 2,81 (7,92) \\
-		$120$ & 2,55 & 36,40 & 15,93  & 6,2  & 1,62 (2,51) & 1,70 (4,92) & 2,81 (9,69) \\
-		$350$ & 3,31 & 40,45 & 101,74 & 30,7 & 1,62 (2,40) & 1,73 (4,10) & 2,81 (7,50) \\
+		$40$  & 0,47 & 5,74    & 1,65 (2,37) & 1,70 (3,80) & 2,81 (7,92) \\
+		$120$ & 2,55 & 36,40    & 1,62 (2,51) & 1,70 (4,92) & 2,81 (9,69) \\
+		$350$ & 3,31 & 40,45   & 1,62 (2,40) & 1,73 (4,10) & 2,81 (7,50) \\
 		\bottomrule
 	\end{tabular}
 \end{table}
 
-Entscheidend ist, dass die in den vorangehenden Abschnitten eingeführten
-Optimierungen mit steigender Last nicht an Wirkung verlieren, sondern gewinnen.
-\Cref{fig:lam-opt} zeigt die inneren Iterationen für drei Varianten. Bei
-$\lambda=9{,}06$ sinkt die Gesamtzahl von $587$ über $248$ (Warm Start) auf $89$
-Iterationen (Warm Start mit adaptiver innerer Toleranz), was einer Einsparung um
-den Faktor $6{,}6$ entspricht. Über alle Netzgrößen liegt die kombinierte
-Einsparung im Median bei $2{,}81$ und wächst mit $\lambda^{0{,}31}$
-($R^2=0{,}55$). Die Optimierungen kompensieren damit einen erheblichen Teil des
-lastinduzierten Aufwandsanstiegs.
+Die Optimierungen aus \cref{sec:Optimierung der Methode} halten hier dem Lastanstieg stand. 
+In allen Fällen können Einsparungen im Bezug auf die Rechenschritte erzielt werden.
+Dies Bezeugt auch Abbildung \ref{fig:lam-opt}.
+Dort sind die Anzahl an Iterationen beispielhaft für eine Netzkonfiguration über verschiedene Lastfaktoren dargestellt.
+Jeder Verlauf entspricht einer weiteren Stufe der Optimierung.
+mit zunehmender Stufe liegt die jeweilige Kurve konsequent tiefer.
+Dadurch muss keine Abgrenzung der Optimierungsmaßnahmen getroffen werden.\\
+
+
+
+%\Cref{tab:lam-time} zeigt, dass die Rechenzeit von Methode~A mit dem
+%Betriebspunkt skaliert: innerhalb einer Netzgröße liegen zwischen Median und
+%Maximum Faktoren von $12$ bis $14$, ausschließlich verursacht durch die höhere
+%Gesamtzahl innerer und äußerer Iterationen bei großem $\lambda$. Die NR-Referenz
+%ist dagegen nahezu $\lambda$-invariant, da die Iterationszahl des
+%Newton-Verfahrens auch bei hoher Last kaum wächst. Ein Break-even in $\lambda$
+%tritt in keiner Konfiguration auf. Wegen \texttt{repeats}~$=1$ und des in den
+%NR-Zeiten enthaltenen Aufrufoverheads sind die absoluten Werte allerdings nur
+%begrenzt belastbar; berichtet werden daher primär die relativen Trends.
+
+
+%Entscheidend ist, dass die in den vorangehenden Abschnitten eingeführten
+%Optimierungen mit steigender Last nicht an Wirkung verlieren, sondern gewinnen.
+%\Cref{fig:lam-opt} zeigt die inneren Iterationen für drei Varianten. Bei
+%$\lambda=9{,}06$ sinkt die Gesamtzahl von $587$ über $248$ (Warm Start) auf $89$
+%Iterationen (Warm Start mit adaptiver innerer Toleranz), was einer Einsparung um
+%den Faktor $6{,}6$ entspricht. Über alle Netzgrößen liegt die kombinierte
+%Einsparung im Median bei $2{,}81$ und wächst mit $\lambda^{0{,}31}$
+%($R^2=0{,}55$). Die Optimierungen kompensieren damit einen erheblichen Teil des
+%lastinduzierten Aufwandsanstiegs.
 
 \begin{figure}[htbp]
 	\centering
@@ -4409,42 +4382,42 @@ lastinduzierten Aufwandsanstiegs.
 		\draw[ForestGreen,thick,densely dotted] (0.4,2.42) -- (1.2,2.42) node[right,black,font=\scriptsize] {Warm Start + adaptive Toleranz};
 	\end{tikzpicture}
 	\caption{Gesamtzahl innerer Iterationen über $\lambda$ für $n=40$ und
-		$10$~\% PV-Anteil, logarithmische Ordinate. Der Abstand der Kurven wächst
+		$10$~\% PV-Anteil. Der Abstand der Kurven wächst
 		mit dem Lastfaktor.}
 	\label{fig:lam-opt}
 \end{figure}
 
-%----------------------------------------------------------------------
-\subsection{Zwischenfazit}
-\label{subsec:lam-fazit}
-
-Der Lastfaktor ist der dominierende Konvergenzparameter dieser Arbeit, deutlich
-stärker als Netzgröße, PV-Anteil und, im Modus konstanten Impedanzbetrags, als
-das $R/X$-Verhältnis. Die innere Kontraktionsrate wächst überlinear mit
-$\lambda$, lässt sich über \eqref{eq:lam-etamodell} netzgrößenunabhängig
-beschreiben und erreicht $\eta=1$ genau dort, wo das Lastflussproblem seine
-Lösbarkeitsgrenze hat. Die äußere Blindleistungsschleife erbt diese Grenze und
-verliert nur $2$ bis $3$~\% Reserve. Für die praktische Anwendung folgt daraus
-eine einfache Regel: solange $v_{\min}\gtrsim0{,}7$~p.u.\ gilt, bleibt
-$k_{\mathrm{out}}\le10$ und der Aufwand unkritisch; problematisch wird das
-Verfahren nur im letzten Prozent vor der Nase, in dem auch physikalisch keine
-belastbare Lösung mehr existiert. Als Frühwarnindikator ist $v_{\min}$
-beziehungsweise $\eta_{\mathrm{emp}}$ zu verwenden, nicht der
-Linearisierungsfehler.
-
-
-
-Die Aussagen unterliegen vier Einschränkungen. Die Untersuchung nutzt synthetische
-Radialnetze bei einem einzigen $R/X$-Verhältnis; die Sollwerte sind je $\lambda$
-kalibriert, wodurch der Blindleistungsbedarf im kalibrierten Modus
-konstruktionsbedingt konstant bleibt; die NR-Referenz arbeitet mit flachem
-Startwert und ohne Blindleistungsgrenzen, weshalb ihr früher Abbruch bei
-PV-Sollwerten nicht als Verfahrensgrenze interpretiert werden darf; und
-Wechselrichtergrenzen sind nicht modelliert, sodass die $Q$-Werte rein numerisch
-zu lesen sind. Der maximale Spannungsunterschied gegenüber der NR-Referenz von
-$7{,}5\cdot10^{-2}$~p.u.\ tritt ausschließlich in Grenzfällen mit
-$\lambda\gtrsim9$ auf, in denen die Referenz plausibel in den unteren Lösungszweig
-läuft; eine $\lambda$-aufgelöste Auswertung dieses Vergleichs steht aus.
+%%----------------------------------------------------------------------
+%\subsection{Zwischenfazit}
+%\label{subsec:lam-fazit}
+%
+%Der Lastfaktor ist der dominierende Konvergenzparameter dieser Arbeit, deutlich
+%stärker als Netzgröße, PV-Anteil und, im Modus konstanten Impedanzbetrags, als
+%das $R/X$-Verhältnis. Die innere Kontraktionsrate wächst überlinear mit
+%$\lambda$, lässt sich über \eqref{eq:lam-etamodell} netzgrößenunabhängig
+%beschreiben und erreicht $\eta=1$ genau dort, wo das Lastflussproblem seine
+%Lösbarkeitsgrenze hat. Die äußere Blindleistungsschleife erbt diese Grenze und
+%verliert nur $2$ bis $3$~\% Reserve. Für die praktische Anwendung folgt daraus
+%eine einfache Regel: solange $v_{\min}\gtrsim0{,}7$~p.u.\ gilt, bleibt
+%$k_{\mathrm{out}}\le10$ und der Aufwand unkritisch; problematisch wird das
+%Verfahren nur im letzten Prozent vor der Nase, in dem auch physikalisch keine
+%belastbare Lösung mehr existiert. Als Frühwarnindikator ist $v_{\min}$
+%beziehungsweise $\eta_{\mathrm{emp}}$ zu verwenden, nicht der
+%Linearisierungsfehler.
+%
+%
+%
+%Die Aussagen unterliegen vier Einschränkungen. Die Untersuchung nutzt synthetische
+%Radialnetze bei einem einzigen $R/X$-Verhältnis; die Sollwerte sind je $\lambda$
+%kalibriert, wodurch der Blindleistungsbedarf im kalibrierten Modus
+%konstruktionsbedingt konstant bleibt; die NR-Referenz arbeitet mit flachem
+%Startwert und ohne Blindleistungsgrenzen, weshalb ihr früher Abbruch bei
+%PV-Sollwerten nicht als Verfahrensgrenze interpretiert werden darf; und
+%Wechselrichtergrenzen sind nicht modelliert, sodass die $Q$-Werte rein numerisch
+%zu lesen sind. Der maximale Spannungsunterschied gegenüber der NR-Referenz von
+%$7{,}5\cdot10^{-2}$~p.u.\ tritt ausschließlich in Grenzfällen mit
+%$\lambda\gtrsim9$ auf, in denen die Referenz plausibel in den unteren Lösungszweig
+%läuft; eine $\lambda$-aufgelöste Auswertung dieses Vergleichs steht aus.
 
 
 
@@ -4471,61 +4444,236 @@ läuft; eine $\lambda$-aufgelöste Auswertung dieses Vergleichs steht aus.
 \label{sec:batch_lastfluss}
 %======================================================================
 
-Abschnitt~\ref{sec:einzelner_lastfluss} hat gezeigt, dass das
-Fixpunktverfahren beim \emph{einzelnen} Lastfluss oberhalb von etwa
-$500$~Knoten gegen das Newton-Raphson-Verfahren verliert, weil der Aufwand pro
-innerer Iteration von einem Produkt mit der dichten Impedanzmatrix dominiert
-wird und damit quadratisch mit der Knotenzahl wächst, während die sparse
-LU-Faktorisierung radialer Netze nahezu linear skaliert. Entscheidend für die
-vorliegende Formulierung ist jedoch, dass sich dieses Produkt strukturell nicht
-ändert, wenn viele Lastszenarien gleichzeitig gerechnet werden: Die $\tau$
-Szenarien treten ausschließlich als zusätzliche Spalten des Argumenttensors
-auf, sodass aus dem Matrix-Vektor-Produkt ein Matrix-Matrix-Produkt mit
-identischer, einmal berechneter Matrix wird und der Aufwand pro Szenario auf
-den Grenzaufwand einer zusätzlichen Spalte sinkt.\\
 
-Untersucht werden im Folgenden die Amortisation der einmaligen Vorberechnung
-und der daraus folgende Break-even gegenüber der Referenzimplementierung
-(Abschnitt~\ref{subsec:batch_amortisation}) sowie der Nachweis, dass die
-Batch-Verarbeitung die Lösung nicht verändert
-(Abschnitt~\ref{subsec:batch_genauigkeit}).
+Bisher wurde im Zuge der Ausarbeitung lediglich ein einzelner Lastfluss pro erweitertem TPF betrachtet.
+Dies hat auch eine starke Relevanz, da dadurch wegen der Isolation der Variablen und der gleichzeitigen Kontrolle über die restlichen Netzparameter, klare Abhängigkeiten aufgezeigt werden konnten.
+Darüber hinaus konnte deswegen ein Lastbereich festgestellt werden, wo die erweiterte Methode einen klaren Vorteil in Punkt Robustheit gegenüber dem NR aufweist.
+Gleichzeitig konnte besonders in Abschnitt~\ref{sec:einzelner_lastfluss} beobachtet werden, dass der rechentechnische zeitliche Vorteil für den einzelnen Lastfluss für Netze mit mehr als 500 Knoten auch für günstige Lastfälle verloren geht.
+\cref{subsec:lam-time} bestätigt weiterhin, dass auch schon 120-Knoten-Netze an der Belastungsgrenze ähnlich lange im erweiterten TPF rechnen.\\
+
+An dieser Stelle greift der eigentliche zentrale Vorteil des Verfahrens: die Tensorisierung.
+Wie in \cref{sec:tpf_algorithmus} eingeführt wurde, kann das Verfahren mittels einer Erweiterung der Dimension um beliebig viele Lastflussprofile parallelisiert werden.
+Es können damit mehrere Lastflüsse gleichzeitig pro Schritt berechnet werden.
+Während im NR jeder Lastfluss seine eigene Jacobi-Matrix besitzt, kann im TPF die selbe Systemmatrix verwendet werden.
+Dadurch konnte bereits eine signifikante Einsparung gegenüber klassischen Lastflussmethoden, darunter der NR, nachgewiesen werden \cite{Salazar2024}.\\
+
+Dieser Vorteil der Parallelisierung soll in diesem Abschnitt für das erweiterte TPF-Verfahren mittels der äußeren Q-Korrektur untersucht werden.\\
+
+
+
+
+
+
+
+
+%Abschnitt~\ref{sec:einzelner_lastfluss} hat gezeigt, dass das
+%Fixpunktverfahren beim \emph{einzelnen} Lastfluss oberhalb von etwa
+%$500$~Knoten gegen das Newton-Raphson-Verfahren verliert, weil der Aufwand pro
+%innerer Iteration von einem Produkt mit der dichten Impedanzmatrix dominiert
+%wird und damit quadratisch mit der Knotenzahl wächst, während die sparse
+%LU-Faktorisierung radialer Netze nahezu linear skaliert. Entscheidend für die
+%vorliegende Formulierung ist jedoch, dass sich dieses Produkt strukturell nicht
+%ändert, wenn viele Lastszenarien gleichzeitig gerechnet werden: Die $\tau$
+%Szenarien treten ausschließlich als zusätzliche Spalten des Argumenttensors
+%auf, sodass aus dem Matrix-Vektor-Produkt ein Matrix-Matrix-Produkt mit
+%identischer, einmal berechneter Matrix wird und der Aufwand pro Szenario auf
+%den Grenzaufwand einer zusätzlichen Spalte sinkt.\\
+%
+%Untersucht werden im Folgenden die Amortisation der einmaligen Vorberechnung
+%und der daraus folgende Break-even gegenüber der Referenzimplementierung
+%(Abschnitt~\ref{subsec:batch_amortisation}) sowie der Nachweis, dass die
+%Batch-Verarbeitung die Lösung nicht verändert
+%(Abschnitt~\ref{subsec:batch_genauigkeit}).
+
+
+Für die Versuchsreihe wird die optimierte Standardkonfiguration gemäß Abschnitt~\ref{sec:Optimierung der Methode} mit gekoppelter Sensitivität verwendet.
+Als zentrale Variable wird die Netzgröße bis zu einer Größe von 1500 Knoten erhöht.
+Es werden weiterhin zwei PV-Anteile pro Netzgröße betrachtet.
+Diese folgen wieder dem natürlichen Spannungsprofil und weisen ebenfalls Wirkleistungen auf, um den Arbeitspunkt gleichzeitig zu verschieben.
+Die zweite zentrale Variable stellt die Batch-Größe dar.
+Diese umfasst eine variierte Anzahl von Lastprofilen, welche gleichzeitig Berechnet werden sollen.
+Die Menge der getesteten parallelen Läufe umfasst $\tau\in\{1,10,50,100,500,10^3,5\cdot10^3,10^4,5\cdot10^4,10^5, 5\cdot10^5, 10^6\}$.
+Um dabei den Einfluss des R/X-Verhältnisses sowie des Lastfaktors zu berücksichtigen, werden jeweils drei Werte  zur Abdeckung des normalen, belasteten und stark belasteten Fälle (\cref{sec:lastfaktor} und \ref{sec:rx}) getestet. 
+
+Da die Laufzeiten streuen können werden pro Konfiguration fünf Wiederholungen durchgeführt und der Median gebildet.
+Die Ergebnisse umfassen 1\,350 Versuche und insgesamt über 1\,6 Millionen Lastflüsse.\\
+
+Die Referenz ist eine sequenzielle Ausführung des NR, analog zur Basisschrift von Salazar et al. \cite{Salazar2024}.
+ 
+
+%%----------------------------------------------------------------------
+%\subsection{Versuchsaufbau und Datenbasis}
+%\label{subsec:batch_setup}
+%%----------------------------------------------------------------------
+%
+%Verwendet wird die Standardkonfiguration aus
+%Abschnitt~\ref{sec:Optimierung der Methode A}, also die gekoppelte
+%Q-Korrektur, der Warm Start innerhalb der äußeren Schleife und die adaptive
+%innere Toleranz. Variiert werden die Netzgröße
+%$n_\mathrm{bus}\in\{40,200,500,1000\}$, der PV-Anteil $\{0;\,30;\,50\}\,\%$
+%und die Batch-Breite
+%$\tau\in\{1,10,50,100,500,10^3,5\cdot10^3,10^4,5\cdot10^4,10^5\}$; für
+%$n_\mathrm{bus}=1000$ liegen nur PQ-Läufe bis $\tau=5\cdot10^4$ vor. Jede
+%Konfiguration wird fünfmal gemessen und der Median berichtet, angegeben ist
+%stets die Gesamtzeit einschließlich Vorberechnung. Die Spannungen werden in
+%jedem Batch flach initialisiert, ein Übertrag zwischen Zeitschritten findet
+%also nicht statt. Insgesamt umfasst der Datensatz $99$~Läufe mit
+%$1\,566\,610$ einzelnen Lastflüssen.\\
+%
+%Als Referenz dient eine sequentielle Schleife über \texttt{pandapower}s
+%Newton-Raphson-Löser, also ein NR-Lauf je Szenario mit Flat Start. Ein Aufruf
+%von \texttt{runpp} enthält einen konstanten Overhead von $5$ bis
+%$8\,\mathrm{ms}$, der aus einem erneuten Lauf auf dem bereits gelösten Netz
+%geschätzt wird. Alle Beschleunigungsfaktoren werden daher doppelt angegeben,
+%roh und overheadkorrigiert; der korrigierte Wert ist eine untere Schranke, weil
+%die Overheadmessung eine zusätzliche NR-Iteration enthält. Für $\tau\ge10^4$
+%wurde die Referenz nur auf $5000$ Szenarien gemessen und linear extrapoliert,
+%die zugehörigen Faktoren sind daher Projektionen.
 
 %----------------------------------------------------------------------
-\subsection{Versuchsaufbau und Datenbasis}
-\label{subsec:batch_setup}
-%----------------------------------------------------------------------
-
-Verwendet wird die Standardkonfiguration aus
-Abschnitt~\ref{sec:Optimierung der Methode A}, also die gekoppelte
-Q-Korrektur, der Warm Start innerhalb der äußeren Schleife und die adaptive
-innere Toleranz. Variiert werden die Netzgröße
-$n_\mathrm{bus}\in\{40,200,500,1000\}$, der PV-Anteil $\{0;\,30;\,50\}\,\%$
-und die Batch-Breite
-$\tau\in\{1,10,50,100,500,10^3,5\cdot10^3,10^4,5\cdot10^4,10^5\}$; für
-$n_\mathrm{bus}=1000$ liegen nur PQ-Läufe bis $\tau=5\cdot10^4$ vor. Jede
-Konfiguration wird fünfmal gemessen und der Median berichtet, angegeben ist
-stets die Gesamtzeit einschließlich Vorberechnung. Die Spannungen werden in
-jedem Batch flach initialisiert, ein Übertrag zwischen Zeitschritten findet
-also nicht statt. Insgesamt umfasst der Datensatz $99$~Läufe mit
-$1\,566\,610$ einzelnen Lastflüssen.\\
-
-Als Referenz dient eine sequentielle Schleife über \texttt{pandapower}s
-Newton-Raphson-Löser, also ein NR-Lauf je Szenario mit Flat Start. Ein Aufruf
-von \texttt{runpp} enthält einen konstanten Overhead von $5$ bis
-$8\,\mathrm{ms}$, der aus einem erneuten Lauf auf dem bereits gelösten Netz
-geschätzt wird. Alle Beschleunigungsfaktoren werden daher doppelt angegeben,
-roh und overheadkorrigiert; der korrigierte Wert ist eine untere Schranke, weil
-die Overheadmessung eine zusätzliche NR-Iteration enthält. Für $\tau\ge10^4$
-wurde die Referenz nur auf $5000$ Szenarien gemessen und linear extrapoliert,
-die zugehörigen Faktoren sind daher Projektionen.
-
-%----------------------------------------------------------------------
-\subsection{Amortisation der Vorberechnung und Break-even}
+\subsection{Amortisation bei nominalem Betriebspunkt}
 \label{subsec:batch_amortisation}
 \label{subsec:batch_breakeven}
 \label{subsec:batch_total_time}
 \label{subsec:batch_pv}
 %----------------------------------------------------------------------
+\begin{figure}[htbp]
+	\centering
+	\input{figures/tau_thorough_analysis.pgf}
+	\caption{Skalierung der Rechenzeit über $\tau$ unter zusätzlicher Variation
+		von $R/X$-Verhältnis und Lastfaktor. (a)~Gesamtzeit und (b)~Zeit pro
+		Szenario für verschiedene Netzgrößen bei nominalem Betriebspunkt
+		($\lambda=1{,}0$, $\rho=1{,}0$), über PV-Anteile aggregiert (Fehlerbalken:
+		Standardabweichung). (c)~1000-Knoten-Netze bei $\mathrm{pv}=50\,\%$ für
+		drei Lastfaktoren $\lambda$. (d)~1000-Knoten-Netze bei $\mathrm{pv}=50\,\%$
+		für drei $R/X$-Verhältnisse $\rho$. Rote gestrichelte Linien: NR-Referenz.}
+	\label{fig:tau_thorough_analysis}
+\end{figure}
+
+Die zentrale Frage zielt auf einen erweiterten Vorteilsbereich für größere Netze ab, da in \cref{sec:einzelner_lastfluss} bereits gezeigt werden konnte, dass der TPF für Netze über 500 Knoten langsamer konvergiert als der NR.
+Hierzu werden zunächst in Abbildung~\ref{fig:tau_thorough_analysis}~(a) die Rechenzeiten über die Lastflussanzahl $\tau$ für 10 Netzgrößen aufgetragen. 
+Es wird für alle Netze der Normalfall von $\lambda=1.0$ und $\rho=1.0$ verwendet.
+Die einzelnen TPF Verläufe umfassen dabei die drei PV-Anteile 0\,\%, 30\,\% und 50\,\%. 
+Der rote Verlauf bildet die NR-Referenz und umfasst pro Datenpunkt alle Netzgrößen und PV-Anteile.\\
+
+Wie zu erwarten steigt der NR-Verlauf proportional mit $\tau$ durch den sequenziellen Aufruf des \texttt{pandapower}-Lösers.
+Für den TPF-Löser ist ebenfalls ein monotoner Anstieg erkennbar, jedoch mit einem Unterschied.
+Bei weniger als 1000 Szenarien ist eine geringere Steigung zu erkennen, welche größer wird, bis sie in einen linearen Verlauf übergeht.
+Für $\tau=1$ entsprechen die Startpunkte den Ergebnissen aus \cref{sec:einzelner_lastfluss}. 
+Netze mit mehr als 500 Knoten benötigen mehr Zeit als die Referenz.
+Wird $\tau$ vergrößert, retardiert der zeitliche Anstieg für alle betrachteten Netzgrößen.
+Unter kleinen Netzen steigt die Rechenzeit früher als für große Netze.
+Der Schnittpunkt jenes Verlaufes mit dem NR-Verlauf markiert den Punkt der Amortisation, da ab dieser Szenarienanzahl der erweiterte TPF schneller zu einer Lösung findet.
+Für mehr als 1000 Szenarien steigen die Zeiten linear und laufen im doppellogarithmischen parallel zu der Referenz.
+Einige Datenpunkte für $\tau>500_000$ fehlen aufgrund der Überschreitung von Arbeitsspeicherkapazitäten bei großen Netzen.
+Die Balken sind für alle Punkte schmal, welches die Invarianz gegenüber des PV-Anteils wieder bestätigt.\\
+
+Abbildung~\ref{fig:tau_thorough_analysis}~(d) zeigt die selben Fälle, es wird nur die Zeit pro Szenario $t_\mathrm{szen}$ gegen die Anzahl Szenarien aufgetragen.
+Diese Darstellung bietet den Vorteil eines anschaulicheren Modells um das Plateau von (a) für kleine $\tau$ zu erklären.
+Die gesamte Zeit zur Lösung eines Szenarios setzt sich dabei aus $t_\mathrm{pre}$ der einmaligen Erstellung der Systemmatrix $\mathbf{F}$ \eqref{eq:tpf_F} und der Zeit $t_\infty$ des Iterationsalgorithmus selber.
+Wird $\tau$ vergrößert, verringert sich für die Szenarienzeit $t_\mathrm{szen}$, da die Vorberechnung einmalig erfolgt und für alle Szenarien.
+Der verbleibende Zeitanteil ist dabei der Löse-Zeit pro Szenario.
+Die Beziehung lässt sich somit durch
+
+\begin{equation}
+	t_\mathrm{szen}(\tau) \;=\; \frac{t_\mathrm{pre}}{\tau} \;+\; t_\infty ,
+	\label{eq:batch_amort}
+\end{equation}
+
+beschreiben.
+Damit wird durch die Parallelisierung die Vorberechnung im Vergleich zum sequenziellen NR eingespart, da dort jedes Szenario eine eigene Konstruktion der Jakobimatrix benötigt.
+Für große $\tau$ verliert $t_\mathrm{pre}$ an Gewicht und die Gesamtlaufzeit wächst lediglich mit $t_\infty$ pro Szenario.
+In (d) ist dieses Verhalten klar erkennbar.
+$t_\mathrm{szen}$ fällt monoton, bis es ein Plateau bildet. 
+Kleine Netze erreichen dieses bereits nach wenigen hundert Szenarien, große Netze benötigen dafür über 1000.
+Die Plateauzeit ist dabei genau $t_\infty$. 
+Wird die Differenz mit dem Wert von $\tau=1$ genommen, lässt sich ebenfalls $t_\mathrm{pre}$ bestimmen.
+Durch Vergrößerung der Matrixdimensionen bei größeren Netzen, steigen $t_\infty$ und $t_\mathrm{pre}$ ebenfalls.
+Die Anzahl an Knoten bestimmt somit die Steigung des gesättigten linearen Verlaufs.
+\\
+
+Dieses Modell erklärt das Verhalten von Abbildung~\ref{fig:tau_thorough_analysis}~(a). 
+Vorberechnungen werden für steigende Szenarienanzahl gemäß $\frac{t_\mathrm{pre}}{\tau}$ eingespart, während die Iterationzeit gemäß $\tau \cdot t_\infty$ steigt.
+Dadurch amortisiert sich das Verfahren, bis der Vorberechnungsanteil nicht mehr schrumpfen kann. 
+Ab diesem Punkt steigt der Verlauf lediglich linear.\\
+
+Ist $t_\infty$ kleiner als die Rechenzeit $t_\mathrm{NR}$ des NR eines Szenarios, kann für endliche $\tau$ eine Amortisierung erreicht werden, da beides Maße für die Steigungen des Verlaufes sind.
+Ist $t_\infty > t_\mathrm{NR}$ ist die Steigung des TPF-Verlaufes immer größer als die des NR, und kann sich somit für beliebig hohe $\tau$ nicht amortisieren.
+\\
+
+In Abbildung~\ref{fig:tau_thorough_analysis}~(a, b) ist weiterhin erkennbar, dass sich die Kurvenlage für steigende Netzgröße verschiebt.
+Dies deckt sich mit den Erkenntnissen von Salazar et al.~\cite{Salazar2024}. 
+Dort wird die asymptotische Zeit $t_\infty$ mittels des Fits
+
+\begin{equation}
+	t_\infty(n_\mathrm{bus}) \;=\; c \cdot n_\mathrm{bus}^p
+	\label{eq:fit}
+\end{equation}
+
+modelliert.
+Für den NR und erweiterten TPF können durch lineare Regression die Parameter $c_\mathrm{TPF, NR}$ und $p_\mathrm{TPF, NR}$ berechnet werden. 
+Durch Gleichsetzen der Zeiten der beiden Verfahren kann dessen Schnittpunkt durch
+
+\begin{equation}
+	n_\mathrm{crit} \;=\; \left(\frac{c_\mathrm{NR}}{c_\mathrm{TPF}}\right)^{\frac{1}{p_\mathrm{TPF}-p_\mathrm{NR}}}
+	\label{eq:fit}
+\end{equation}
+
+
+bestimmt werden. 
+Die kritische Busgröße $n_\mathrm{crit}$ an dieser Stelle kennzeichnet den Punkt, ab dem der erweiterte TPF eine höhere Steigung hat, als der NR.
+Er kennzeichnet das Ende des Vorteilsbereichs für die Parallelisierung.
+In \Cref{tab:time_scaling_fits} sind für die betrachteten Kombinationen aus Lastfaktor und R/X-Verhältnis die kritischen Netzgrößen und die Fit-Parameter angegeben. 
+
+
+\begin{table}[htbp]
+	\caption{Zeit pro Szenario: Fit-Parameter und kritische Buszahl}
+	\centering
+	\begin{tabular}{r|r|r|r|r|r|r}
+		\toprule
+		$\lambda$ & $\rho$ & $c_{\mathrm{TPF}}$ & $p_{\mathrm{TPF}}$ & $c_{\mathrm{NR}}$ & $p_{\mathrm{NR}}$ & $n_{\mathrm{crit}}$ \\
+		\midrule
+		1.0 & 1.00 & 9.842e-05 & 1.314 & 1.373e+01 & 0.101 & 17\,506\\
+		5.0 & 1.00 & 3.109e-04 & 1.210 & 1.202e+01 & 0.142 & 19\,673\\
+		9.0 & 1.00 & 2.875e-03 & 1.129 & 1.113e+00 & 0.756 & 8\,504\,240\\
+		\midrule
+		1.0 & 3.16 & 2.174e-04 & 1.185 & 2.781e+01 & -0.017 & 17\,646\\
+		1.0 & 7.73 & 4.340e-04 & 1.184 & 2.383e+01 & 0.023 & 12\,138\\
+		\bottomrule
+	\end{tabular}
+	
+	\label{tab:time_scaling_fits}
+\end{table}
+
+Für vier der fünf Last- und Leitungskonfigurationen befindet sich das Bus-Limit in der Größenordnung $10^5$, welches für die meisten Netze in Deutschland genügt \cite{}.
+Auffällig  
+
+
+
+
+
+
+
+\begin{figure}[htbp]
+	\centering
+	\input{figures/time_per_scenario_scaling.pgf}
+	\caption{Skalierung der Rechenzeit über $\tau$ unter zusätzlicher Variation
+		von $R/X$-Verhältnis und Lastfaktor. (a)~Gesamtzeit und (b)~Zeit pro
+		Szenario für verschiedene Netzgrößen bei nominalem Betriebspunkt
+		($\lambda=1{,}0$, $\rho=1{,}0$), über PV-Anteile aggregiert (Fehlerbalken:
+		Standardabweichung). (c)~1000-Knoten-Netze bei $\mathrm{pv}=50\,\%$ für
+		drei Lastfaktoren $\lambda$. (d)~1000-Knoten-Netze bei $\mathrm{pv}=50\,\%$
+		für drei $R/X$-Verhältnisse $\rho$. Rote gestrichelte Linien: NR-Referenz.}
+	\label{fig:time_per_scenario_scalingsalazar}
+\end{figure}
+
+
+
+
+
+
+
+
 
 Die dichte Matrix $\vect{Z}_B=\vect{Y}_{dd}^{-1}$, der Konstantenvektor
 $\vect{L}$ und die Faktorisierung der PV-PV-Sensitivität hängen nur von der
@@ -4568,6 +4716,10 @@ $\tau\approx550$.
 		kodiert die Netzgröße, der PV-Anteil ist über alle Kurven identisch.}
 	\label{fig:batch_scaling_tau}
 \end{figure}
+
+
+
+
 
 Bei $\tau=1$ bestätigt Abbildung~\ref{fig:batch_scaling_tau}\,(b)
 qualitativ den Befund aus Abschnitt~\ref{sec:einzelner_lastfluss}: Für

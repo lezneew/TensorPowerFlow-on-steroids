@@ -16,7 +16,9 @@ if USE_PGF:
     })
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from pathlib import Path
+from scipy.optimize import curve_fit
 
 SAVE_DIR = Path(r"C:\Users\sgrigorevski-admin\TensorPowerFlow\TensorPowerFlow-on-steroids\Bachelor_tensorflow\figures")
 SAVE_DIR = Path(r"..\..\..\Bachelor_tensorflow\figures")
@@ -2155,6 +2157,532 @@ def plot_e1_inner_convergence(save_name="e1_inner_convergence.pgf"):
     plt.close(fig)
 
 
+def plot_e2_outer_convergence(save_name="e2_outer_convergence.pgf"):
+    """
+    Plot k_out vs lambda for n=40, pv_share=0.50 comparing calibrated vs fixed setpoints.
+    Reads data from e2_outer.csv.
+    """
+    import pandas as pd
+
+    csv_path = Path(__file__).parent / "results_lastfaktor" / "e2_outer.csv"
+    if not csv_path.exists():
+        print(f"  CSV file not found: {csv_path}")
+        return
+
+    df = pd.read_csv(csv_path)
+    df = df[df["n"] == 40]
+    df = df[df["pv_share"] == 0.10]
+
+    df_cal = df[df["setpoint_mode"] == "calibrated"]
+    df_fix = df[df["setpoint_mode"] == "fixed"]
+
+    df_cal = df_cal[df_cal["tpf_conv"] == True]
+    df_fix = df_fix[df_fix["tpf_conv"] == True]
+
+    df_cal = df_cal.sort_values("lam")
+    df_fix = df_fix.sort_values("lam")
+
+    print(f"  Calibrated: {len(df_cal)} points, lambda range [{df_cal['lam'].min():.2f}, {df_cal['lam'].max():.2f}]")
+    print(f"  Fixed: {len(df_fix)} points, lambda range [{df_fix['lam'].min():.2f}, {df_fix['lam'].max():.2f}]")
+
+    print(f"\n  === Calibrated Data ===")
+    print(f"  {'Lambda':<10} {'k_out':<10}")
+    for lam, k_out in zip(df_cal["lam"], df_cal["k_out"]):
+        print(f"  {lam:<10.4f} {k_out:<10.1f}")
+
+    print(f"\n  === Fixed Data ===")
+    print(f"  {'Lambda':<10} {'k_out':<10}")
+    for lam, k_out in zip(df_fix["lam"], df_fix["k_out"]):
+        print(f"  {lam:<10.4f} {k_out:<10.1f}")
+
+    fig, ax = plt.subplots(figsize=(5.91, 3.5))
+
+    ax.plot(df_cal["lam"], df_cal["k_out"], "o-", color="darkblue",
+            linewidth=.5, markersize=2, label="Calibrated", alpha=0.8)
+    ax.plot(df_fix["lam"], df_fix["k_out"], "s--", color="darkred",
+            linewidth=.5, markersize=2, label="Fixed", alpha=0.8)
+
+    ax.set_xlabel(r"$\lambda$", fontsize=12)
+    ax.set_ylabel(r"$k_{\mathrm{out}}$", fontsize=12)
+    ax.legend(fontsize=10)
+    ax.grid(True, which="both", alpha=0.3)
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 40)
+
+    plt.tight_layout()
+
+    save_path = SAVE_DIR / save_name
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    print(f"\n  Plot saved: {save_path}")
+
+    if not USE_PGF:
+        plt.show()
+    plt.close(fig)
+
+
+def plot_advantage_region_by_size(csv_path: Path | None = None, save_name: str = "advantage_region_by_size.pgf"):
+    """
+    Plot lambda* vs network size from advantage_region_data.csv.
+    Aggregates all pv_share values per network size with mean and std error bands.
+    """
+    if csv_path is None:
+        csv_path = Path(__file__).parent / "advantage_region_results" / "advantage_region_data.csv"
+
+    if not csv_path.exists():
+        print(f"  CSV file not found: {csv_path}")
+        return
+
+    df = pd.read_csv(csv_path)
+
+    df["lambda_star_tpf"] = pd.to_numeric(df["lambda_star_tpf"], errors="coerce")
+    df["lambda_star_nr"] = pd.to_numeric(df["lambda_star_nr"], errors="coerce")
+
+    grouped = df.groupby("n").agg({
+        "lambda_star_tpf": ["mean", "std"],
+        "lambda_star_nr": ["mean", "std"]
+    }).reset_index()
+
+    grouped.columns = ["n", "tpf_mean", "tpf_std", "nr_mean", "nr_std"]
+    grouped = grouped.sort_values("n")
+
+    grouped["tpf_std"] = grouped["tpf_std"].fillna(0)
+    grouped["nr_std"] = grouped["nr_std"].fillna(0)
+
+    n_vals = grouped["n"].values
+    tpf_mean = grouped["tpf_mean"].values
+    tpf_std = grouped["tpf_std"].values
+    nr_mean = grouped["nr_mean"].values
+    nr_std = grouped["nr_std"].values
+
+    valid_tpf = ~np.isnan(tpf_mean)
+    valid_nr = ~np.isnan(nr_mean)
+
+    fig, ax = plt.subplots(figsize=(5.91, 3.5))
+
+    common_n = sorted(set(n_vals[valid_tpf]) & set(n_vals[valid_nr]))
+    common_mask_tpf = np.isin(n_vals, common_n) & valid_tpf
+    common_mask_nr = np.isin(n_vals, common_n) & valid_nr
+
+    if np.any(valid_tpf) and np.any(valid_nr):
+        common_tpf = np.array([np.interp(n, n_vals[valid_tpf], tpf_mean[valid_tpf]) for n in common_n])
+        common_nr = np.array([np.interp(n, n_vals[valid_nr], nr_mean[valid_nr]) for n in common_n])
+        advantage_mask = common_tpf > common_nr
+        if np.any(advantage_mask):
+            ax.fill_between(np.array(common_n)[advantage_mask],
+                            common_nr[advantage_mask],
+                            common_tpf[advantage_mask],
+                            color="green", alpha=0.3, label="Vorteilsbereich")
+
+    if np.any(valid_tpf):
+        ax.errorbar(n_vals[valid_tpf], tpf_mean[valid_tpf], yerr=tpf_std[valid_tpf],
+                    fmt="o-", color="darkblue", linewidth=1, markersize=2,
+                    capsize=1.5, capthick=1, label="TPF")
+
+    if np.any(valid_nr):
+        ax.errorbar(n_vals[valid_nr], nr_mean[valid_nr], yerr=nr_std[valid_nr],
+                    fmt="s--", color="darkred", linewidth=1, markersize=2,
+                    capsize=1.5, capthick=1, label="NR")
+
+    ax.set_xlabel(r"$n_\mathrm{bus}$", fontsize=12)
+    ax.set_ylabel(r"$\lambda^\ast$", fontsize=12)
+    ax.set_ylim(0, 10)
+    ax.set_xlim(0, 1050)
+
+    ax.legend(fontsize=10)
+    ax.grid(True, which="both", alpha=0.3)
+
+    plt.tight_layout()
+
+    save_path = SAVE_DIR / save_name
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    print(f"\n  Plot saved: {save_path}")
+
+    if not USE_PGF:
+        plt.show()
+    plt.close(fig)
+
+
+def plot_tau_thorough_analysis(csv_path: Path | None = None, save_name: str = "tau_thorough_analysis.pgf"):
+    """
+    Plot tau scaling analysis from thorough results.
+
+    Creates 4 subplots:
+    1. Total time vs tau for different n_bus (lam=1.0, rho=1.0, all pv_shares aggregated with error bars)
+    2. 1000 bus networks at const lambda and pv_share with varying rho
+    3. 1000 bus networks at const rho with varying lambda
+    4. Time per scenario vs tau (same filtering as subplot 1)
+
+    NR reference data is added in red to each subplot with error bars.
+    """
+    if csv_path is None:
+        csv_path = Path(__file__).parent / "results_tau_thorough" / "tau_sweep_main.csv"
+
+    df = pd.read_csv(csv_path)
+
+    df = df[df["skip_reason"].isna() | (df["skip_reason"] == "")]
+    df = df[df["converged"] == True]
+
+    n_bus_values = sorted(df["n_bus"].unique())
+    pv_shares = sorted(df["pv_share"].unique())
+
+    fig, axes = plt.subplots(2, 2, figsize=(5.9, 5.9))
+
+    colors = plt.cm.viridis(np.linspace(0, 0.9, len(n_bus_values)))
+    markers = ["o", "s", "^", "D", "v", "<", ">", "p", "h", "*"]
+
+    ax1 = axes[0, 0]
+    for idx, n_bus in enumerate(n_bus_values):
+        mask = (df["n_bus"] == n_bus) & (df["lam_ref"] == 1.0) & (df["rho"] == 1.0)
+        subset = df[mask]
+
+        if len(subset) == 0:
+            continue
+
+        grouped = subset.groupby("tau").agg(
+            t_mean=("t_total_ms_median", "mean"),
+            t_std=("t_total_ms_median", "std"),
+        ).reset_index()
+
+        if len(grouped) > 0:
+            color = colors[idx]
+            marker = markers[idx % len(markers)]
+            ax1.errorbar(grouped["tau"], grouped["t_mean"], yerr=grouped["t_std"],
+                        fmt=f"{marker}-", color=color, linewidth=.5, markersize=2,
+                        capsize=2, capthick=.5)
+
+    nr_mask_1 = (df["lam_ref"] == 1.0) & (df["rho"] == 1.0)
+    nr_subset_1 = df[nr_mask_1]
+    if len(nr_subset_1) > 0:
+        nr_grouped = nr_subset_1.groupby("tau").agg(
+            t_mean=("t_nr_total_ms_median", "mean"),
+            t_std=("t_nr_total_ms_median", "std"),
+        ).reset_index()
+        if len(nr_grouped) > 0:
+            ax1.errorbar(nr_grouped["tau"], nr_grouped["t_mean"], yerr=nr_grouped["t_std"],
+                        fmt="s--", color="red", linewidth=.5, markersize=2,
+                        capsize=2, capthick=.5, alpha=0.8)
+
+    ax1.set_xscale("log")
+    ax1.set_yscale("log")
+    ax1.set_xlabel(r"$\tau$", fontsize=12)
+    ax1.set_ylabel(r"Gesamtzeit [ms]", fontsize=12)
+    ax1.set_title(r"(a) " +
+                  r"$\lambda=1.0, \rho=1.0$", fontsize=12)
+    # ax1.legend(fontsize=9, loc="best")
+    ax1.grid(True, which="both", alpha=0.3)
+
+    ax2 = axes[1, 1]
+    mask_1000 = (df["n_bus"] == 1000) & (df["pv_share"] == 0.5) & (df["lam_ref"] == 1.0)
+    subset_1000 = df[mask_1000]
+
+    rho_colors = {"1.0": "blue", "3.16": "orange", "7.73": "green"}
+    rho_labels = {"1.0": r"$\rho=1.0$", "3.16": r"$\rho=3.16$", "7.73": r"$\rho=7.73$"}
+    rho_marker_idx = {"1.0": 0, "3.16": 1, "7.73": 2}
+
+    for rho_idx, rho_val in enumerate([1.0, 3.16, 7.73]):
+        mask = subset_1000["rho"] == rho_val
+        sub = subset_1000[mask].sort_values("tau")
+
+        if len(sub) > 0:
+            rho_str = str(rho_val)
+            ax2.plot(sub["tau"], sub["t_total_ms_median"],
+                    f"{markers[rho_idx]}-",
+                    color=rho_colors[rho_str], linewidth=.5, markersize=2,
+                    label=rho_labels[rho_str])
+
+    nr_mask_2 = (df["n_bus"] == 1000) & (df["pv_share"] == 0.5) & (df["lam_ref"] == 1.0)
+    nr_subset_2 = df[nr_mask_2]
+    if len(nr_subset_2) > 0:
+        nr_grouped_2 = nr_subset_2.groupby("tau").agg(
+            t_mean=("t_nr_total_ms_median", "mean"),
+            t_std=("t_nr_total_ms_median", "std"),
+        ).reset_index()
+        if len(nr_grouped_2) > 0:
+            ax2.errorbar(nr_grouped_2["tau"], nr_grouped_2["t_mean"], yerr=nr_grouped_2["t_std"],
+                        fmt="s--", color="red", linewidth=.5, markersize=2,
+                        capsize=2, capthick=.5, alpha=0.8, label="NR")
+
+    ax2.set_xscale("log")
+    ax2.set_yscale("log")
+    ax2.set_xlabel(r"$\tau$", fontsize=12)
+    ax2.set_ylabel(r"Gesamtzeit [ms]", fontsize=12)
+    ax2.set_title(r"(b) 1000 Knoten, $\lambda=1.0$, pv=0.5", fontsize=12)
+    ax2.legend(fontsize=10)
+    ax2.grid(True, which="both", alpha=0.3)
+
+    ax3 = axes[1, 0]
+    mask_1000_rho = (df["n_bus"] == 1000) & (df["pv_share"] == 0.5) & (df["rho"] == 1.0)
+    subset_1000_lam = df[mask_1000_rho]
+
+    lam_colors = {"1.0": "blue", "5.0": "orange", "9.0": "green"}
+    lam_labels = {"1.0": r"$\lambda=1.0$", "5.0": r"$\lambda=5.0$", "9.0": r"$\lambda=9.0$"}
+
+    for lam_idx, lam_val in enumerate([1.0, 5.0, 9.0]):
+        mask = subset_1000_lam["lam_ref"] == lam_val
+        sub = subset_1000_lam[mask].sort_values("tau")
+
+        if len(sub) > 0:
+            lam_str = str(lam_val)
+            ax3.plot(sub["tau"], sub["t_total_ms_median"],
+                    f"{markers[lam_idx]}-",
+                    color=lam_colors[lam_str], linewidth=.5, markersize=2,
+                    label=lam_labels[lam_str])
+
+    nr_mask_3 = (df["n_bus"] == 1000) & (df["pv_share"] == 0.5) & (df["rho"] == 1.0)
+    nr_subset_3 = df[nr_mask_3]
+    if len(nr_subset_3) > 0:
+        nr_grouped_3 = nr_subset_3.groupby("tau").agg(
+            t_mean=("t_nr_total_ms_median", "mean"),
+            t_std=("t_nr_total_ms_median", "std"),
+        ).reset_index()
+        if len(nr_grouped_3) > 0:
+            ax3.errorbar(nr_grouped_3["tau"], nr_grouped_3["t_mean"], yerr=nr_grouped_3["t_std"],
+                        fmt="s--", color="red", linewidth=.5, markersize=2,
+                        capsize=2, capthick=.5, alpha=0.8, label="NR")
+
+    ax3.set_xscale("log")
+    ax3.set_yscale("log")
+    ax3.set_xlabel(r"$\tau$", fontsize=12)
+    ax3.set_ylabel(r"Gesamtzeit [ms]", fontsize=12)
+    ax3.set_title(r"(c) 1000 Knoten, $\rho=1.0$, pv=0.5", fontsize=12)
+    ax3.legend(fontsize=10)
+    ax3.grid(True, which="both", alpha=0.3)
+
+    ax4 = axes[0, 1]
+    for idx, n_bus in enumerate(n_bus_values):
+        mask = (df["n_bus"] == n_bus) & (df["lam_ref"] == 1.0) & (df["rho"] == 1.0)
+        subset = df[mask]
+
+        if len(subset) == 0:
+            continue
+
+        grouped = subset.groupby("tau").agg(
+            t_mean=("t_per_scen_ms_median", "mean"),
+            t_std=("t_per_scen_ms_median", "std"),
+        ).reset_index()
+
+        if len(grouped) > 0:
+            color = colors[idx]
+            marker = markers[idx % len(markers)]
+            ax4.errorbar(grouped["tau"], grouped["t_mean"], yerr=grouped["t_std"],
+                        fmt=f"{marker}-", color=color, linewidth=.5, markersize=2,
+                        capsize=2, capthick=1)
+
+    nr_mask_4 = (df["lam_ref"] == 1.0) & (df["rho"] == 1.0)
+    nr_subset_4 = df[nr_mask_4]
+    if len(nr_subset_4) > 0:
+        nr_subset_4 = nr_subset_4.copy()
+        nr_subset_4["nr_t_per_scen"] = nr_subset_4["t_nr_total_ms_median"] / nr_subset_4["tau"].replace(0, np.nan)
+        nr_grouped_4 = nr_subset_4.groupby("tau").agg(
+            t_mean=("nr_t_per_scen", "mean"),
+            t_std=("nr_t_per_scen", "std"),
+        ).reset_index()
+        if len(nr_grouped_4) > 0:
+            ax4.errorbar(nr_grouped_4["tau"], nr_grouped_4["t_mean"], yerr=nr_grouped_4["t_std"],
+                        fmt="s--", color="red", linewidth=.5, markersize=2,
+                        capsize=2, capthick=.5, alpha=0.8)
+
+    ax4.set_xscale("log")
+    ax4.set_yscale("log")
+    ax4.set_xlabel(r"$\tau$", fontsize=12)
+    ax4.set_ylabel(r"$t_\mathrm{szen}$ [ms]", fontsize=12)
+    ax4.set_title(r"(b)"+
+                  r"$\lambda=1.0, \rho=1.0$", fontsize=12)
+    # ax4.legend(fontsize=9, loc="best")
+    ax4.grid(True, which="both", alpha=0.3)
+
+    legend_handles = []
+    legend_labels = []
+    for idx, n_bus in enumerate(n_bus_values):
+        color = colors[idx]
+        marker = markers[idx % len(markers)]
+        legend_handles.append(Line2D([0], [0], marker=marker, color='w', markerfacecolor=color,
+                                     markersize=8, label=f"$n$={n_bus}"))
+        legend_labels.append(f"$n$={n_bus}")
+    legend_handles.append(Line2D([0], [0], marker='s', color='w', markerfacecolor='red',
+                                 markersize=8, label='NR'))
+    legend_labels.append('NR')
+
+    fig.legend(handles=legend_handles, labels=legend_labels, loc='upper center', bbox_to_anchor=(0.5, 1.1),
+               ncol=6, fontsize=9, frameon=True)
+
+    plt.tight_layout()
+
+    save_path = SAVE_DIR / save_name
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    print(f"\n  Plot saved: {save_path}")
+
+    if not USE_PGF:
+        plt.show()
+    plt.close(fig)
+
+
+def plot_time_per_scenario_scaling(csv_path: Path | None = None, save_name: str = "time_per_scenario_scaling.pgf"):
+    """
+    Plot asymptotic time per scenario (t_∞) for TPF and time per scenario (t_szen) for NR
+    vs network size (n_bus) with power-law fits.
+
+    TPF t_∞: take t_per_scen_ms_median at largest tau per n_bus
+    NR t_szen: t_nr_total_ms_median / tau
+
+    Fits power-law t(n) = c * n^p for each (lambda, rho) combination.
+    """
+    if csv_path is None:
+        csv_path = Path(__file__).parent / "results_tau_thorough" / "tau_sweep_main.csv"
+
+    if not csv_path.exists():
+        print(f"  CSV file not found: {csv_path}")
+        return
+
+    df = pd.read_csv(csv_path)
+    df = df[df["skip_reason"].isna() | (df["skip_reason"] == "")]
+    df = df[df["converged"] == True]
+
+    df = df[df["pv_share"] == 0.5]
+    df = df[df["n_bus"] <= 500]
+
+    lambda_rho_pairs = [
+        (1.0, 1.0),
+        (5.0, 1.0),
+        (9.0, 1.0),
+        (1.0, 3.16),
+        (1.0, 7.73),
+    ]
+
+    colors = ["blue", "orange", "green", "red", "purple"]
+    markers = ["o", "s", "^", "D", "v"]
+
+    fig, ax = plt.subplots(figsize=(5.91, 3.5))
+
+    def power_law(n, c, p):
+        return c * np.power(n, p)
+
+    all_handles = []
+    all_labels = []
+    fit_results = []
+
+    for idx, (lam_val, rho_val) in enumerate(lambda_rho_pairs):
+        mask = (df["lam_ref"] == lam_val) & (df["rho"] == rho_val)
+        subset = df[mask].copy()
+
+        if len(subset) == 0:
+            continue
+
+        tpf_by_n = {}
+        for n_bus in subset["n_bus"].unique():
+            n_mask = subset["n_bus"] == n_bus
+            n_subset = subset[n_mask]
+            max_tau_idx = n_subset["tau"].idxmax()
+            tpf_by_n[n_bus] = n_subset.loc[max_tau_idx, "t_per_scen_ms_median"]
+
+        tpf_n_bus = np.array(sorted(tpf_by_n.keys()))
+        tpf_times = np.array([tpf_by_n[n] for n in tpf_n_bus])
+
+        subset["nr_t_per_scen"] = subset["t_nr_total_ms_median"] / subset["tau"]
+        nr_by_n = {}
+        for n_bus in subset["n_bus"].unique():
+            n_mask = subset["n_bus"] == n_bus
+            n_subset = subset[n_mask]
+            max_tau_idx = n_subset["tau"].idxmax()
+            nr_by_n[n_bus] = n_subset.loc[max_tau_idx, "nr_t_per_scen"]
+
+        nr_n_bus = np.array(sorted(nr_by_n.keys()))
+        nr_times = np.array([nr_by_n[n] for n in nr_n_bus])
+
+        color = colors[idx]
+        marker = markers[idx]
+
+        c_tpf, p_tpf = None, None
+        c_nr, p_nr = None, None
+
+        if len(tpf_n_bus) >= 2 and np.all(tpf_times > 0):
+            try:
+                popt, _ = curve_fit(power_law, tpf_n_bus, tpf_times, p0=[1e-3, 1.5], maxfev=5000)
+                c_tpf, p_tpf = popt
+                n_fit = np.linspace(tpf_n_bus.min(), 100000, 100)
+                t_fit = power_law(n_fit, c_tpf, p_tpf)
+                ax.plot(n_fit, t_fit, "-", color=color, linewidth=1.0, alpha=0.7)
+
+                label = f"TPF $\\lambda$={lam_val}, $\\rho$={rho_val}"
+                all_handles.append(Line2D([0], [0], marker=marker, color='w', markerfacecolor=color,
+                                          markersize=6, label=label))
+                all_labels.append(label)
+            except Exception:
+                pass
+            ax.scatter(tpf_n_bus, tpf_times, marker=marker, color=color, s=30, alpha=0.8, edgecolors="white", linewidths=0.5)
+
+        if len(nr_n_bus) >= 2 and np.all(nr_times > 0):
+            try:
+                popt, _ = curve_fit(power_law, nr_n_bus, nr_times, p0=[1e-3, 1.5], maxfev=5000)
+                c_nr, p_nr = popt
+                n_fit = np.linspace(nr_n_bus.min(), 100000, 100)
+                t_fit = power_law(n_fit, c_nr, p_nr)
+                ax.plot(n_fit, t_fit, "--", color=color, linewidth=1.0, alpha=0.7)
+            except Exception:
+                pass
+            ax.scatter(nr_n_bus, nr_times, marker="s", color=color, s=30, alpha=0.6, edgecolors="white", linewidths=0.5, facecolors="none")
+
+        if c_tpf is not None and p_tpf is not None and c_nr is not None and p_nr is not None:
+            if p_tpf != p_nr and c_nr / c_tpf > 0:
+                n_crit = (c_nr / c_tpf) ** (1.0 / (p_tpf - p_nr))
+            else:
+                n_crit = None
+            fit_results.append({
+                "lambda": lam_val,
+                "rho": rho_val,
+                "c_tpf": c_tpf,
+                "p_tpf": p_tpf,
+                "c_nr": c_nr,
+                "p_nr": p_nr,
+                "n_crit": n_crit
+            })
+
+    all_handles.append(Line2D([0], [0], marker='o', color='w', markerfacecolor='gray',
+                              markersize=6, label='TPF (data)'))
+    all_labels.append('TPF (data)')
+    all_handles.append(Line2D([0], [0], marker='s', color='w', markerfacecolor='none',
+                              markeredgecolor='gray', markersize=6, label='NR (data)'))
+    all_labels.append('NR (data)')
+
+    if fit_results:
+        print(r"\begin{table}[htbp]")
+        print(r"\centering")
+        print(r"\begin{tabular}{r|r|r|r|r|r|r}")
+        print(r"\hline")
+        print(r"$\lambda$ & $\rho$ & $c_{\mathrm{TPF}}$ & $p_{\mathrm{TPF}}$ & $c_{\mathrm{NR}}$ & $p_{\mathrm{NR}}$ & $n_{\mathrm{crit}}$ \\")
+        print(r"\hline")
+        for r in fit_results:
+            n_crit_str = f"{r['n_crit']:.0f}" if r['n_crit'] is not None else "—"
+            print(f"{r['lambda']:.1f} & {r['rho']:.2f} & {r['c_tpf']:.3e} & {r['p_tpf']:.3f} & {r['c_nr']:.3e} & {r['p_nr']:.3f} & {n_crit_str}\\\\")
+        print(r"\hline")
+        print(r"\end{tabular}")
+        print(r"\caption{Zeit pro Szenario Skalierung: Fit-Parameter und kritische Buszahl}")
+        print(r"\label{tab:time_scaling_fits}")
+        print(r"\end{table}")
+
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel(r"$n_{\mathrm{bus}}$", fontsize=12)
+    ax.set_ylabel(r"Zeit pro Szenario [ms]", fontsize=12)
+    ax.set_xlim(10, 150000)
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(handles=all_handles, labels=all_labels, fontsize=8, loc="upper left", ncol=2)
+
+    plt.tight_layout()
+
+    save_path = SAVE_DIR / save_name
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    print(f"\n  Plot saved: {save_path}")
+
+    if not USE_PGF:
+        plt.show()
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     # print_salazar_scaling_table()
     # plot_max_pv_convergence()
@@ -2170,8 +2698,12 @@ if __name__ == "__main__":
     # plot_baseline_tpf_vs_nr()
     # plot_timing_vs_size()
     # plot_subplot_c_from_csv()
-    plot_e1_inner_convergence()
+    # plot_e1_inner_convergence()
+    # plot_e2_outer_convergence()
+    # plot_advantage_region_by_size()
     # plot_subplot_c_from_csvlog_log()
     # plot_timing_vs_pv_ratio()
     # plot_radial_networks_for_convergence()
     # plot_outer_convergence_error_decoupled()
+    # plot_tau_thorough_analysis()
+    plot_time_per_scenario_scaling()

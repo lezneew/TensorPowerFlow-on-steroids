@@ -21,11 +21,11 @@
 \contentsline {todo}{warten auf ergebnisse---}{40}{section*.41}%
 \contentsline {todo}{-inner loop komplett konvergieren lassen vs adaptiv anzahl an inneren iteration bis zu nächsten äußeren schleife begrenzen -sägezahn charakter kann reduziert werden ein}{41}{section*.43}%
 \contentsline {todo}{literatur}{45}{section*.47}%
-\contentsline {todo}{literatur}{47}{section*.49}%
+\contentsline {todo}{literatur}{46}{section*.49}%
 \contentsline {todo}{-basierend auf den zuvor getroffenen optimierungen -frag: bei welchen größen ist das fixpunktverfahren schneller als pandapower? -variation von netzgröße und pv anteil -boxplot rechenzeit vs. netzgröße eine box hat mehrere netze gelicher größe aber mit verschiedenen pv anteilen. begründet durch die zuvor ermittelte pv unabhängigkeit. -im plot: linearer anstieg der tfp rechenzeit, nr const auf ca 20 ms -boxen im tpf breiter als bei nr -}{48}{section*.50}%
 \contentsline {todo}{lit.}{50}{section*.52}%
 \contentsline {todo}{lit}{50}{section*.53}%
 \contentsline {todo}{-aufbauend auf dem vorherigen kapitel bei netzen die bei NR nicht konvergieren -}{51}{section*.56}%
-\contentsline {todo}{literatur}{55}{section*.59}%
-\contentsline {todo}{literatur}{55}{section*.60}%
-\contentsline {todo}{lit.}{56}{section*.62}%
+\contentsline {todo}{literatur}{56}{section*.59}%
+\contentsline {todo}{literatur}{56}{section*.60}%
+\contentsline {todo}{lit.}{57}{section*.62}%

@@ -1,0 +1,90 @@
+{
+  "mode": "thorough",
+  "n_bus": [
+    20,
+    40,
+    75,
+    120,
+    200,
+    350,
+    500,
+    750,
+    1000,
+    1500
+  ],
+  "pv_share": [
+    0.0,
+    0.3,
+    0.5
+  ],
+  "tau": [
+    1,
+    10,
+    100,
+    1000,
+    10000,
+    50000,
+    100000,
+    500000,
+    1000000
+  ],
+  "stress_configs": [
+    {
+      "axis": "base",
+      "level": 0,
+      "lam": 1.0,
+      "rho": 1.0
+    },
+    {
+      "axis": "lambda",
+      "level": 1,
+      "lam": 5.0,
+      "rho": 1.0
+    },
+    {
+      "axis": "lambda",
+      "level": 2,
+      "lam": 9.0,
+      "rho": 1.0
+    },
+    {
+      "axis": "rho",
+      "level": 1,
+      "lam": 1.0,
+      "rho": 3.16
+    },
+    {
+      "axis": "rho",
+      "level": 2,
+      "lam": 1.0,
+      "rho": 7.73
+    }
+  ],
+  "repeats": 5,
+  "time_cap_s": 1800.0,
+  "nr_tau_ref": 500,
+  "mem_cap_gb": 30.0,
+  "mem_factor": 6.0,
+  "jitter_lambda": 0.15,
+  "dv_setpoint": 0.005,
+  "v_min_target_lam1": 0.97,
+  "cos_phi": 0.95,
+  "z0_ohm_km": 0.6597,
+  "pv_p_total_ratio": 0.3,
+  "solver_config": {
+    "coupled": true,
+    "warm_start": true,
+    "adaptive_inner": true,
+    "batch_init": "flat",
+    "enforce_q_lims": false
+  },
+  "nr_overhead": {
+    "nr_overhead_ms_min": 6.430899957194924,
+    "nr_overhead_ms_median": 7.238999998662621
+  },
+  "runtime_s": 128.1575614999747,
+  "python": "3.13.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "numpy": "2.4.6",
+  "pandapower": "3.5.4"
+}
